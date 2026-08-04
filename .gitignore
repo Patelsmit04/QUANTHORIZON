@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+data/*.json
+data/*.db
+data/*.lock
+.claude/
+.vscode/
+.idea/
+venv/
+.venv/
+*.log

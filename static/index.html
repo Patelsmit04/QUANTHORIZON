@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTST Ranker — High-Conviction Institutional Engine & Gap Predictor</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+    <!-- Top Navigation & Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand-section">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-chart-line-up"></i>
+                </div>
+                <div>
+                    <h1 class="brand-title">BTST <span>RANKER</span></h1>
+                    <p class="brand-subtitle">High-Conviction Priority Engine & Gap Predictor</p>
+                </div>
+            </div>
+
+            <!-- Section Nav: Scanner vs News -->
+            <nav class="main-nav-tabs" id="mainNavTabs">
+                <button class="main-nav-tab active" data-section="scanner">
+                    <i class="fa-solid fa-radar"></i> SCANNER
+                </button>
+                <button class="main-nav-tab" data-section="news">
+                    <i class="fa-solid fa-newspaper"></i> NEWS
+                    <span class="nav-badge" id="newsNavBadge">--</span>
+                </button>
+            </nav>
+
+            <!-- Market Status Pill -->
+            <div class="market-status-box">
+                <div class="status-indicator live-pulse" id="statusDot"></div>
+                <div class="status-text">
+                    <span class="status-label">MARKET STATUS</span>
+                    <span id="marketStatusText" class="status-value">OPEN</span>
+                </div>
+                <div class="timer-box">
+                    <span class="timer-label" id="scanModeLabel">MODE:</span>
+                    <span id="marketTimer" class="timer-value">OFF-MARKET SNAPSHOT (3:30 PM Scan Locked)</span>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="header-actions">
+                <!-- Priority Only Quick Toggle -->
+                <div class="priority-toggle-box">
+                    <i class="fa-solid fa-fire text-gold"></i>
+                    <span>PRIORITY ONLY</span>
+                    <label class="switch">
+                        <input type="checkbox" id="priorityOnlyToggle" aria-label="Show priority picks only">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="auto-refresh-toggle">
+                    <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
+                    <span>AUTO</span>
+                    <label class="switch">
+                        <input type="checkbox" id="autoRefreshToggle" checked aria-label="Toggle auto refresh">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <button id="winRateBtn" class="btn btn-pill btn-secondary" title="View BTST Win Rate Analytics">
+                    <i class="fa-solid fa-trophy text-gold"></i>
+                    <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
+                </button>
+
+                <button id="guideBtn" class="btn btn-pill btn-secondary" title="Learn How Priority Ranking Works">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>GUIDE</span>
+                </button>
+
+                <button id="scanBtn" class="btn btn-pill btn-primary">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>SCAN NOW</span>
+                </button>
+
+                <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
+                    <i class="fa-solid fa-file-csv"></i>
+                    <span>CSV</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+
+    <!-- ============================== SCANNER SECTION ============================== -->
+    <div id="scannerSection">
+
+        <!-- Metrics Overview Section -->
+        <section class="metrics-grid">
+            
+            <!-- Card 1: Total Scanned -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">TOTAL SCANNED</span>
+                    <div class="card-icon-bubble"><i class="fa-solid fa-database"></i></div>
+                </div>
+                <div class="metric-body">
+                    <span id="totalScanned" class="metric-value">--</span>
+                    <span class="metric-subtext">NSE F&O Tickers</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Priority 1 High Conviction -->
+            <div class="metric-card card-p1">
+                <div class="metric-header">
+                    <span class="metric-title">🔥 PRIORITY 1 (TIER 1)</span>
+                    <div class="card-icon-bubble text-gold"><i class="fa-solid fa-crown"></i></div>
+                </div>
+                <div class="metric-body">
+                    <span id="priority1Count" class="metric-value text-gold">0</span>
+                    <span class="metric-subtext">High Conviction Picks</span>
+                </div>
+            </div>
+
+            <!-- Card 3: BTST Win Rate Score -->
+            <div class="metric-card card-winrate">
+                <div class="metric-header">
+                    <span class="metric-title">🏆 BTST WIN RATE</span>
+                    <div class="card-icon-bubble text-gold"><i class="fa-solid fa-trophy"></i></div>
+                </div>
+                <div class="metric-body">
+                    <span id="cardWinRatePct" class="metric-value text-gold">0.0%</span>
+                    <span class="metric-subtext"><span id="cardTrackedTradesCount">0</span> Overnight Trades Analyzed</span>
+                </div>
+            </div>
+
+            <!-- Card 4: BTST Calls -->
+            <div class="metric-card card-bullish">
+                <div class="metric-header">
+                    <span class="metric-title">BTST CALLS (CE)</span>
+                    <div class="card-icon-bubble text-bullish"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                </div>
+                <div class="metric-body">
+                    <span id="btstCount" class="metric-value text-bullish">0</span>
+                    <span class="metric-subtext">Overnight Call Signals</span>
+                </div>
+            </div>
+
+            <!-- Card 5: STBT Puts -->
+            <div class="metric-card card-bearish">
+                <div class="metric-header">
+                    <span class="metric-title">STBT PUTS (PE)</span>
+                    <div class="card-icon-bubble text-bearish"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                </div>
+                <div class="metric-body">
+                    <span id="stbtCount" class="metric-value text-bearish">0</span>
+                    <span class="metric-subtext">Overnight Put Signals</span>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Clean Priority Ranking Legend Card -->
+        <section class="ranking-legend-card">
+            <div class="legend-header">
+                <div class="legend-title-wrap">
+                    <i class="fa-solid fa-layer-group text-gold"></i>
+                    <span class="legend-title">PRIORITY RANKING LEGEND</span>
+                </div>
+                <span class="legend-subtitle">How Stocks Are Filtered & Ranked By Conviction</span>
+            </div>
+            <div class="legend-pills-row">
+                <div class="legend-pill-card legend-p1-pill">
+                    <span class="badge badge-p1-high"><i class="fa-solid fa-fire"></i> PRIORITY 1</span>
+                    <div class="legend-text">
+                        <strong>High Conviction (85%–100% Score)</strong>: Price within 0.3% of High/Low + Vol Surge ≥ 3.0x + VWAP/RSI Confluence.
+                    </div>
+                </div>
+                <div class="legend-pill-card legend-p2-pill">
+                    <span class="badge badge-p2-medium"><i class="fa-solid fa-bolt"></i> PRIORITY 2</span>
+                    <div class="legend-text">
+                        <strong>Moderate Conviction (65%–84% Score)</strong>: Standard breakout within 0.5%–1.0% of High/Low + Vol Surge ≥ 1.8x.
+                    </div>
+                </div>
+                <div class="legend-pill-card legend-p3-pill">
+                    <span class="badge badge-p3-low"><i class="fa-solid fa-eye"></i> WATCHLIST</span>
+                    <div class="legend-text">
+                        <strong>Accumulation / Watchlist (&lt;65% Score)</strong>: Early volume surge without full price breakout.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Controls & Filter Toolbar -->
+        <section class="toolbar-container">
+            <!-- Filter Tabs -->
+            <div class="filter-tabs" id="filterTabs">
+                <button class="tab-btn active" data-filter="ALL">
+                    <i class="fa-solid fa-border-all"></i> ALL STOCKS
+                </button>
+                <button class="tab-btn btn-tab-bullish" data-filter="BTST">
+                    <i class="fa-solid fa-circle-arrow-up"></i> BTST (CALL)
+                </button>
+                <button class="tab-btn btn-tab-bearish" data-filter="STBT">
+                    <i class="fa-solid fa-circle-arrow-down"></i> STBT (PUT)
+                </button>
+                <button class="tab-btn btn-tab-vol" data-filter="HIGH_VOL">
+                    <i class="fa-solid fa-fire-flame-curved"></i> VOL SURGE ≥ 2.0x
+                </button>
+                <button class="tab-btn btn-tab-watch" data-filter="WATCHLIST">
+                    <i class="fa-solid fa-eye"></i> WATCHLIST
+                </button>
+            </div>
+
+            <!-- Toolbar Actions (Search & Sort) -->
+            <div class="toolbar-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Search Ticker (e.g. RELIANCE)...">
+                </div>
+
+                <div class="sort-box">
+                    <i class="fa-solid fa-sort"></i>
+                    <select id="sortSelect" aria-label="Sort stocks">
+                        <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
+                        <option value="SCORE_DESC">Sort: Highest Confidence %</option>
+                        <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
+                        <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
+                        <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Stocks Data Table -->
+        <section class="table-container">
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>RANK</th>
+                            <th>TICKER</th>
+                            <th>SIGNAL</th>
+                            <th>OPTION TYPE</th>
+                            <th>PRIORITY LEVEL</th>
+                            <th>CONFIDENCE SCORE</th>
+                            <th>EST. OVERNIGHT GAP</th>
+                            <th>LTP</th>
+                            <th>VOL SURGE</th>
+                            <th>RSI</th>
+                            <th>5-PILLAR WEIGHT</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stocksTableBody">
+                        <!-- Dynamic Rows Injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Scan Progress Bar -->
+            <div id="scanProgressBar" class="progress-bar-container hidden">
+                <div class="progress-bar"></div>
+            </div>
+
+            <!-- Empty State Display -->
+            <div id="emptyState" class="empty-state hidden">
+                <i class="fa-solid fa-radar fa-3x"></i>
+                <h3>No Priority Signals Found</h3>
+                <p>Try unchecking "Tier 1 Only" or clicking "SCAN NOW" to fetch fresh market data.</p>
+            </div>
+        </section>
+
+    </div>
+    <!-- ============================== END SCANNER SECTION ============================== -->
+
+    <!-- ============================== NEWS SECTION ============================== -->
+    <div id="newsSection" class="hidden">
+
+        <section class="news-toolbar">
+            <div class="news-status-bar" id="newsStatusBar">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Loading news coverage...</span>
+            </div>
+
+            <div class="toolbar-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="newsSearchInput" placeholder="Search stock or company name...">
+                </div>
+            </div>
+        </section>
+
+        <section class="news-toolbar">
+            <div class="news-verdict-filters" id="newsVerdictFilters">
+                <button class="tab-btn active" data-verdict="ALL"><i class="fa-solid fa-border-all"></i> ALL</button>
+                <button class="tab-btn" data-verdict="NEGATIVE"><i class="fa-solid fa-triangle-exclamation"></i> NEGATIVE</button>
+                <button class="tab-btn" data-verdict="CAUTION"><i class="fa-solid fa-flag"></i> CAUTION</button>
+                <button class="tab-btn" data-verdict="POSITIVE"><i class="fa-solid fa-circle-check"></i> POSITIVE</button>
+                <button class="tab-btn" data-verdict="NEUTRAL"><i class="fa-solid fa-minus"></i> NEUTRAL</button>
+            </div>
+        </section>
+
+        <section id="newsGrid" class="news-grid">
+            <!-- Dynamic News Cards Injected by JS -->
+        </section>
+
+        <div id="newsEmptyState" class="empty-state hidden">
+            <i class="fa-solid fa-newspaper fa-3x"></i>
+            <h3>No News Cached Yet</h3>
+            <p>The background job refreshes news for every F&amp;O stock up to 3x/day to stay within the API budget. Check back after the next scheduled pass.</p>
+        </div>
+
+    </div>
+    <!-- ============================== END NEWS SECTION ============================== -->
+
+    </main>
+
+    <!-- Win Rate & Score Tracker Modal -->
+    <div id="winRateModal" class="modal-overlay hidden">
+        <div class="modal-card modal-large">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h2><i class="fa-solid fa-trophy text-gold"></i> Win Rate & Gap Prediction Accuracy Analytics</h2>
+                </div>
+                <button id="closeWinRateBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Action Controls -->
+                <div class="winrate-action-bar">
+                    <button id="lockPicksBtn" class="btn btn-pill btn-primary">
+                        <i class="fa-solid fa-lock"></i> LOCK TODAY'S 3:30 PM BTST PICKS
+                    </button>
+                    <button id="evaluatePicksBtn" class="btn btn-pill btn-secondary">
+                        <i class="fa-solid fa-chart-line"></i> RUN 9:15 AM GAP ANALYSIS
+                    </button>
+                </div>
+
+                <!-- Stats Overview Grid -->
+                <div class="winrate-stats-grid">
+                    <div class="winrate-stat-card">
+                        <span class="lbl">OVERALL WIN RATE</span>
+                        <span id="modalWinRateVal" class="val text-gold">0.0%</span>
+                    </div>
+                    <div class="winrate-stat-card">
+                        <span class="lbl">PREDICTION ACCURACY</span>
+                        <span id="modalAccuracyVal" class="val text-bullish">92.5%</span>
+                    </div>
+                    <div class="winrate-stat-card">
+                        <span class="lbl">TOTAL TRACKED</span>
+                        <span id="modalTotalTradesVal" class="val">0</span>
+                    </div>
+                    <div class="winrate-stat-card">
+                        <span class="lbl">AVG OVERNIGHT GAP</span>
+                        <span id="modalAvgGapVal" class="val text-cyan">0.0%</span>
+                    </div>
+                </div>
+
+                <!-- Historical Trade Log Table -->
+                <h4 class="section-heading mt-4"><i class="fa-solid fa-history"></i> PREDICTED GAP VS ACTUAL GAP ACCURACY LOG</h4>
+                <div class="recent-candles-wrapper">
+                    <table class="data-table mini-table">
+                        <thead>
+                            <tr>
+                                <th>LOCK DATE</th>
+                                <th>SYMBOL</th>
+                                <th>OPTION TYPE</th>
+                                <th>3:30 PM CLOSE</th>
+                                <th>PREDICTED GAP %</th>
+                                <th>9:15 AM OPEN</th>
+                                <th>ACTUAL GAP %</th>
+                                <th>ACCURACY SCORE</th>
+                                <th>OUTCOME</th>
+                            </tr>
+                        </thead>
+                        <tbody id="winRateHistoryBody">
+                            <!-- Dynamic Rows Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ranking Guide Modal -->
+    <div id="guideModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h2><i class="fa-solid fa-graduation-cap text-gold"></i> Priority Ranking & Gap Prediction Guide</h2>
+                </div>
+                <button id="closeGuideBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Our quantitative engine predicts overnight gap movements and ranks Indian NSE F&O stocks using 5 institutional pillars:</p>
+
+                <div class="guide-step-box">
+                    <h4>🟢 CALL (CE) vs 🔴 PUT (PE) Option Signals</h4>
+                    <p><strong>CALL (CE)</strong> represents overnight long breakout setups (BTST Buy). <strong>PUT (PE)</strong> represents overnight short distribution setups (STBT Sell).</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>📈 Autonomous Background Scanning Schedule & Locking</h4>
+                    <p><strong>9:15 AM – 2:30 PM</strong>: 5-minute background scanning.<br>
+                    <strong>2:30 PM – 3:30 PM (Power Hour)</strong>: 1-minute high-frequency scanning.<br>
+                    <strong>3:30 PM Final Scan Cut-Off</strong>: Scanning finishes — no further scanning — and active BTST/STBT picks are automatically locked with a full written depth-analysis.<br>
+                    <strong>3:30 PM – 9:15 AM Next Day (Off-Market)</strong>: Live scanning freezes and serves the frozen 3:30 PM BTST pick snapshot.</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>🎯 9:15-9:17 AM Auto-Analyse & Accuracy Auto-Upgrade Engine</h4>
+                    <p>Every morning in a tight 9:15-9:17 AM window, the system fetches the real opening prices, compares <strong>Predicted Gap % vs Actual Gap %</strong> for yesterday's locked picks, records variance error, and updates win rate / accuracy metrics — once a day, not repeatedly.</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>🧪 Fundamental &amp; News Quality Gates</h4>
+                    <p>Fundamentals (P/E, ROE, debt/equity, earnings growth) and stock-specific news are checked as quality gates on top of the technical setup — they can only <strong>cap</strong> conviction (e.g. P1 → P2) when the business or headlines look risky, never manufacture it. Both are shown in each pick's depth-analysis.</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>⚙️ Auto-Improving Pillar Weights</h4>
+                    <p>Once there are 30+ graded predictions, the system recomputes each of the 5 technical pillars' real hit rate and nudges its scoring weight toward that — capped at ±15%/day so one lucky or unlucky streak can't swing live scoring. Check <code>/api/validation</code> for the full history.</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>📰 News Coverage, Budget-Aware</h4>
+                    <p>The News tab covers every F&amp;O stock (the full option-chain universe). A background job refreshes it up to 3x/day within CurrentsAPI's daily limit — your page views never call the API directly, so any number of people can browse News at zero extra cost.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Detail Drawer / Modal -->
+    <div id="stockModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h2 id="modalSymbol">RELIANCE</h2>
+                    <span id="modalSignalBadge" class="badge">BTST (BUY)</span>
+                </div>
+                <button id="closeModalBtn" class="modal-close-btn">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Score Breakdown -->
+                <div class="modal-score-box">
+                    <div class="score-radial">
+                        <span id="modalScoreVal">95</span>
+                        <span class="score-label">CONFIDENCE</span>
+                    </div>
+                    <div class="modal-metrics-grid">
+                        <div class="metric-item">
+                            <span class="lbl">RANK & TIER</span>
+                            <span id="modalRankTier" class="val text-amber">#1 (TIER 1)</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="lbl">OPTION TYPE</span>
+                            <span id="modalOptionType" class="val text-bullish">CALL (CE)</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="lbl">EST. OVERNIGHT GAP</span>
+                            <span id="modalEstGap" class="val text-cyan">+2.8%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="lbl">LTP</span>
+                            <span id="modalLtp" class="val">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breakdown Checklist -->
+                <h4 class="section-heading"><i class="fa-solid fa-list-check"></i> QUANTITATIVE TIER 1 CONVICTION CHECKLIST</h4>
+                <div id="modalChecklist" class="checklist-grid">
+                    <!-- Dynamic Checklist Injected by JS -->
+                </div>
+
+                <!-- Recent Intraday Candles Table -->
+                <h4 class="section-heading mt-4"><i class="fa-solid fa-bars-staggered"></i> RECENT 5-MINUTE CANDLES</h4>
+                <div class="recent-candles-wrapper">
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>TIME</th>
+                                <th>OPEN</th>
+                                <th>HIGH</th>
+                                <th>LOW</th>
+                                <th>CLOSE</th>
+                                <th>VOLUME</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalCandlesBody">
+                            <!-- Dynamic Candles Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App JavaScript -->
+    <script src="/static/app.js?v=5.0.0"></script>
+</body>
+</html>
