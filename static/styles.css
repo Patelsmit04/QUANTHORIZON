@@ -822,6 +822,79 @@ input:checked + .slider:before { transform: translateX(16px); }
 .cue-chip.cue-down { background: var(--bearish-bg); color: var(--bearish); }
 
 /* ==========================================
+   INDEX BTST INTELLIGENCE (post-close structured verdict)
+   ========================================== */
+
+.index-verdict-heading-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.index-verdict-heading { font-family: var(--font-heading); font-size: 19px; font-weight: 800; color: var(--ink-primary); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.index-verdict-heading-sub { font-family: var(--font-body); font-size: 12px; font-weight: 600; color: var(--ink-muted); }
+
+.index-verdict-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; }
+
+.index-verdict-card {
+    background: var(--glass-bg-strong);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.index-verdict-card.unverified { border-color: var(--status-critical-bg); }
+
+.index-verdict-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.index-verdict-card-name { font-family: var(--font-heading); font-weight: 800; font-size: 18px; }
+.index-verdict-card-price { font-family: var(--font-heading); font-size: 20px; font-weight: 800; margin-top: 4px; }
+.index-verdict-card-price .unverified-tag { font-size: 10px; font-weight: 700; color: var(--status-critical); margin-left: 6px; vertical-align: middle; }
+
+.verdict-badge { font-family: var(--font-heading); font-weight: 800; font-size: 12px; padding: 6px 14px; border-radius: var(--radius-pill); white-space: nowrap; }
+.verdict-badge.buy-call { background: var(--status-good-bg); color: var(--status-good); }
+.verdict-badge.buy-put { background: var(--status-critical-bg); color: var(--status-critical); }
+.verdict-badge.avoid { background: rgba(11, 11, 11, 0.06); color: var(--ink-muted); }
+
+.verdict-primary-reason { font-size: 13px; color: var(--ink-secondary); line-height: 1.5; }
+
+.verdict-metrics-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.verdict-metric-box {
+    background: var(--glass-bg-soft); border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+}
+.verdict-metric-box .lbl { display: block; font-size: 9px; font-weight: 800; color: var(--ink-muted); letter-spacing: 0.4px; margin-bottom: 3px; }
+.verdict-metric-box .val { font-family: var(--font-heading); font-weight: 800; font-size: 14px; }
+
+.verdict-greeks-box {
+    font-size: 12px; color: var(--ink-secondary); line-height: 1.5;
+    background: var(--glass-bg-soft); border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+}
+
+.verdict-catalysts-list { display: flex; flex-direction: column; gap: 5px; }
+.verdict-catalyst-item { font-size: 12px; color: var(--ink-secondary); padding-left: 10px; border-left: 2px solid var(--gold); }
+
+.verdict-invalidation { font-size: 12px; color: var(--status-serious); font-weight: 700; }
+
+.verdict-trade-box { background: var(--gold-bg); border: 1px solid rgba(201, 148, 51, 0.28); border-radius: var(--radius-sm); padding: 12px 14px; }
+.verdict-trade-box .trade-type { font-family: var(--font-heading); font-weight: 800; font-size: 14px; color: var(--gold); }
+.verdict-trade-box .trade-justification { font-size: 12px; color: var(--ink-secondary); margin-top: 4px; line-height: 1.4; }
+
+.verdict-expand-toggle {
+    background: none; border: none; color: var(--cat-blue); font-size: 12px; font-weight: 700;
+    cursor: pointer; padding: 0; text-align: left; display: flex; align-items: center; gap: 6px;
+}
+.verdict-expand-toggle i { transition: transform 0.15s ease; }
+.verdict-expand-toggle.open i { transform: rotate(90deg); }
+
+.verdict-pillar-detail { display: none; flex-direction: column; gap: 10px; }
+.verdict-pillar-detail.open { display: flex; }
+.verdict-detail-block { background: var(--glass-bg-soft); border: 1px solid var(--glass-border); border-radius: var(--radius-sm); padding: 10px 12px; }
+.verdict-detail-block .detail-title { font-size: 10px; font-weight: 800; color: var(--ink-muted); letter-spacing: 0.4px; margin-bottom: 6px; }
+.verdict-detail-block .detail-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--ink-secondary); padding: 2px 0; }
+.verdict-detail-block .detail-row span:last-child { font-weight: 700; color: var(--ink-primary); }
+
+/* ==========================================
    STRATEGIES SECTION
    ========================================== */
 

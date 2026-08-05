@@ -67,6 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Indices & Strategies Section DOM
     const indicesSection = document.getElementById("indicesSection");
     const indexGrid = document.getElementById("indexGrid");
+    const indexVerdictGrid = document.getElementById("indexVerdictGrid");
+    const indexVerdictEmptyState = document.getElementById("indexVerdictEmptyState");
+    const indexVerdictMeta = document.getElementById("indexVerdictMeta");
     const strategiesSection = document.getElementById("strategiesSection");
     const strategiesNavBadge = document.getElementById("strategiesNavBadge");
     const strategyGrid = document.getElementById("strategyGrid");
@@ -80,7 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const ALL_PILLAR_NAMES = [
         "Pillar 1: Futures OI", "Pillar 2: Vol Persistence", "Pillar 3: Relative Strength",
         "Pillar 4: Volume Spike", "Pillar 5: Marubozu Close",
-        "Index: Marubozu Close", "Index: Relative Strength", "Index: Global Cues", "Index: Macro News"
+        "Index: Marubozu Close", "Index: Relative Strength", "Index: Global Cues", "Index: Macro News",
+        "Index: Derivatives Positioning", "Index: Greeks Outlook"
     ];
 
     // -------------------------------------------------------------
@@ -147,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (section === "news" && !newsLoaded) fetchNewsSection();
-            if (section === "indices") fetchIndices();
+            if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
             if (section === "strategies") fetchStrategies();
         });
     }
@@ -845,6 +849,169 @@ document.addEventListener("DOMContentLoaded", () => {
     // -------------------------------------------------------------
     // 10. INDICES SECTION (Nifty 50 / Bank Nifty / Sensex)
     // -------------------------------------------------------------
+    async function fetchIndexVerdicts() {
+        if (!indexVerdictGrid) return;
+        try {
+            indexVerdictGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
+            if (indexVerdictEmptyState) indexVerdictEmptyState.classList.add("hidden");
+
+            const response = await fetch("/api/indices/verdict");
+            if (!response.ok) throw new Error("Index verdict API error");
+            const data = await response.json();
+
+            if (!data.available) {
+                indexVerdictGrid.innerHTML = "";
+                if (indexVerdictMeta) indexVerdictMeta.textContent = "";
+                if (indexVerdictEmptyState) indexVerdictEmptyState.classList.remove("hidden");
+                return;
+            }
+
+            if (indexVerdictMeta && data.generated_at) {
+                const generated = new Date(data.generated_at);
+                indexVerdictMeta.textContent = `Generated ${generated.toLocaleString("en-IN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "short" })} IST`;
+            }
+
+            renderIndexVerdictGrid(data.verdicts || {});
+        } catch (error) {
+            console.error("Failed to fetch index verdicts:", error);
+            indexVerdictGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-muted);">Could not load Index BTST Intelligence right now.</div>`;
+        }
+    }
+
+    function renderIndexVerdictGrid(verdicts) {
+        if (!indexVerdictGrid) return;
+        indexVerdictGrid.innerHTML = "";
+        const order = ["NIFTY50", "BANKNIFTY", "SENSEX"];
+        order.filter(name => verdicts[name]).forEach(name => {
+            indexVerdictGrid.appendChild(buildIndexVerdictCard(verdicts[name]));
+        });
+    }
+
+    function verdictBadgeClass(verdict) {
+        if (verdict === "Buy Call") return "buy-call";
+        if (verdict === "Buy Put") return "buy-put";
+        return "avoid";
+    }
+
+    function buildIndexVerdictCard(v) {
+        const card = document.createElement("div");
+        card.className = `index-verdict-card ${v.price_verified ? "" : "unverified"}`;
+
+        const badgeClass = verdictBadgeClass(v.verdict);
+        const priceText = v.price !== null && v.price !== undefined ? v.price.toLocaleString("en-IN") : "--";
+        const unverifiedTag = v.price_verified ? "" : `<span class="unverified-tag">UNVERIFIED</span>`;
+
+        const eo = v.expected_open || {};
+        const expectedOpenText = eo.direction
+            ? `${escapeHtml(eo.direction)} (±${eo.points} pts, ${eo.range_low}–${eo.range_high})`
+            : "--";
+
+        const catalysts = v.key_overnight_catalysts || [];
+        const catalystsHtml = catalysts.map(c => `<div class="verdict-catalyst-item">${escapeHtml(c)}</div>`).join("");
+
+        const trade = v.highest_probability_btst_trade || {};
+
+        const detailId = `verdict-detail-${v.index_name}`;
+        const detailHtml = buildPillarDetailHtml(v.pillar_breakdown);
+
+        card.innerHTML = `
+            <div class="index-verdict-card-header">
+                <div>
+                    <div class="index-verdict-card-name">${escapeHtml(v.display_name || v.index_name || "")}</div>
+                    <div class="index-verdict-card-price">${priceText}${unverifiedTag}</div>
+                </div>
+                <div class="verdict-badge ${badgeClass}">${escapeHtml(v.verdict || "Avoid")}</div>
+            </div>
+
+            <div class="verdict-primary-reason">${escapeHtml(v.primary_reason || "")}</div>
+
+            <div class="verdict-metrics-row">
+                <div class="verdict-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${v.confidence_level_pct !== undefined ? v.confidence_level_pct + "%" : "--"}</span></div>
+                <div class="verdict-metric-box"><span class="lbl">EXPECTED OPEN</span><span class="val">${expectedOpenText}</span></div>
+            </div>
+
+            <div class="verdict-greeks-box"><strong>Greek Outlook:</strong> ${escapeHtml(v.greek_outlook || "")}</div>
+
+            ${catalysts.length ? `<div><div class="form-hint" style="margin-bottom:6px;">Key Overnight Catalysts</div><div class="verdict-catalysts-list">${catalystsHtml}</div></div>` : ""}
+
+            <div class="verdict-invalidation"><i class="fa-solid fa-triangle-exclamation"></i> Invalidation: ${escapeHtml(v.invalidation_level || "")}</div>
+
+            <div class="verdict-trade-box">
+                <div class="trade-type">Highest Probability BTST Trade: ${escapeHtml(trade.type || "Avoid")}</div>
+                <div class="trade-justification">${escapeHtml(trade.justification || "")}</div>
+            </div>
+
+            ${v.pillar_breakdown ? `
+            <button type="button" class="verdict-expand-toggle" data-detail-target="${detailId}">
+                <i class="fa-solid fa-chevron-right"></i> Full Pillar Breakdown (Macro / Derivatives / Greeks)
+            </button>
+            <div class="verdict-pillar-detail" id="${detailId}">${detailHtml}</div>
+            ` : ""}
+        `;
+
+        const toggleBtn = card.querySelector(".verdict-expand-toggle");
+        if (toggleBtn) {
+            toggleBtn.addEventListener("click", () => {
+                const detail = card.querySelector(`#${CSS.escape(detailId)}`);
+                if (!detail) return;
+                const isOpen = detail.classList.toggle("open");
+                toggleBtn.classList.toggle("open", isOpen);
+            });
+        }
+
+        return card;
+    }
+
+    function buildPillarDetailHtml(breakdown) {
+        if (!breakdown) return "";
+
+        const cues = (breakdown.global_cues && breakdown.global_cues.detail) || {};
+        const cueLabels = { DOW: "Dow", NASDAQ: "Nasdaq", NIKKEI: "Nikkei", HANGSENG: "Hang Seng", CRUDE: "Crude", USDINR: "USD/INR" };
+        const cueRows = Object.entries(cues).map(([k, val]) =>
+            `<div class="detail-row"><span>${cueLabels[k] || k}</span><span>${val >= 0 ? "+" : ""}${val}%</span></div>`
+        ).join("") || `<div class="detail-row"><span>No cue data</span><span>--</span></div>`;
+
+        const deriv = breakdown.derivatives || {};
+        const derivRows = deriv.verified ? `
+            <div class="detail-row"><span>PCR</span><span>${deriv.pcr ?? "--"}</span></div>
+            <div class="detail-row"><span>Max Pain</span><span>${deriv.max_pain ?? "--"}</span></div>
+            <div class="detail-row"><span>OI Buildup</span><span>${(deriv.oi_buildup && deriv.oi_buildup.verdict) || "--"}</span></div>
+            <div class="detail-row"><span>Resistance</span><span>${(deriv.support_resistance && deriv.support_resistance.resistance_strikes || []).join(", ") || "--"}</span></div>
+            <div class="detail-row"><span>Support</span><span>${(deriv.support_resistance && deriv.support_resistance.support_strikes || []).join(", ") || "--"}</span></div>
+        ` : `<div class="detail-row"><span>Derivatives data</span><span>Unverified</span></div>`;
+
+        const greeks = breakdown.greeks_outlook || {};
+        const call = greeks.call_greeks, put = greeks.put_greeks;
+        const greeksRows = greeks.verified ? `
+            ${call ? `<div class="detail-row"><span>ATM Call Delta / Theta</span><span>${call.delta} / ${call.theta_per_day}</span></div>` : ""}
+            ${put ? `<div class="detail-row"><span>ATM Put Delta / Theta</span><span>${put.delta} / ${put.theta_per_day}</span></div>` : ""}
+            <div class="detail-row"><span>Better Positioned</span><span>${greeks.better_positioned_side || "--"}</span></div>
+        ` : `<div class="detail-row"><span>Greeks data</span><span>Unverified</span></div>`;
+
+        const pillarRows = Object.entries(breakdown.pillar_weights || {}).map(([name, weight]) =>
+            `<div class="detail-row"><span>${escapeHtml(name)}</span><span>${weight}</span></div>`
+        ).join("");
+
+        return `
+            <div class="verdict-detail-block">
+                <div class="detail-title">CONFIRMED PILLARS</div>
+                ${pillarRows || `<div class="detail-row"><span>None confirmed</span><span>--</span></div>`}
+            </div>
+            <div class="verdict-detail-block">
+                <div class="detail-title">GLOBAL CUES (${(breakdown.global_cues && breakdown.global_cues.verdict) || "UNAVAILABLE"})</div>
+                ${cueRows}
+            </div>
+            <div class="verdict-detail-block">
+                <div class="detail-title">DERIVATIVES POSITIONING</div>
+                ${derivRows}
+            </div>
+            <div class="verdict-detail-block">
+                <div class="detail-title">GREEKS OUTLOOK</div>
+                ${greeksRows}
+            </div>
+        `;
+    }
+
     async function fetchIndices() {
         try {
             if (indexGrid) indexGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;

@@ -33,7 +33,21 @@ fundamental and news quality gates, and grading its own predictions every tradin
   5-pillar matrix — indices report zero volume via yfinance, so volume-based pillars and VWAP
   don't apply. Built around Marubozu close position, relative strength vs Nifty (Bank
   Nifty/Sensex only), **global cues** (US markets overnight, Asian markets same-day, crude
-  oil, USD/INR), and macro news sentiment.
+  oil, USD/INR), macro news sentiment, and (Nifty 50/Bank Nifty only — see below) live
+  **derivatives positioning** and **options Greeks outlook** — 6 pillars total.
+- **Index BTST Intelligence**: a dedicated post-close run (default 3:45 PM IST, separate from
+  the 3:30 PM stock lock) that fetches the live NSE option chain for Nifty 50 and Bank Nifty
+  (Sensex options trade on the BSE — no verified NSE source, so this stays honestly
+  unavailable for Sensex rather than faked), computes PCR, max pain, OI-buildup direction,
+  OI-cluster support/resistance, and real Black-Scholes Greeks (Delta/Gamma/Theta/Vega) off
+  live spot/strike/IV, and turns all of it into a structured per-index verdict: Verdict (Buy
+  Call / Buy Put / Avoid), Expected Open, Confidence, Primary Reason, Greek Outlook, Key
+  Overnight Catalysts, Invalidation Level, and Highest Probability BTST Trade. If the index's
+  live price can't be verified, the verdict is forced to `Avoid` with
+  `Primary Reason: "Unable to verify live closing price."` — never a fabricated read. Every
+  night's verdict is logged (`index_verdict_journal` in the signal journal) and graded the
+  next morning against the real 9:15 AM open, including whether the price landed inside the
+  options-market-implied expected range.
 - **Strategies**: the 5-pillar matrix + index model are configurable, not fixed. Create named
   strategies that target stocks and/or any index, toggle individual pillars on/off, override
   the confirmation-weight threshold, and turn the fundamentals/news gates on or off per
@@ -86,13 +100,17 @@ scan, lock, and grade picks on schedule.
 
 On first run, `data/` is created automatically to hold:
 - `trade_history.json`, `signal_journal.db` — locked picks and graded outcomes (journal now
-  tracks a `strategy_id` per signal, so each strategy's performance is queryable separately)
+  tracks a `strategy_id` per signal, so each strategy's performance is queryable separately;
+  the same DB also holds `index_verdict_journal`/`index_verdict_evaluations` for Index BTST
+  Intelligence)
 - `fundamentals_cache.json`, `stock_news_cache.json` — daily/budget-capped provider caches
 - `active_pillar_weights.json`, `pillar_weights_history.json` — the auto-improve state + audit trail
 - `strategies.json` — every strategy's configuration (the built-in Default 5-Pillar strategy
   is seeded automatically on first run)
 - `paper_trades.json` — simulated order log (see Paper Trading below)
 - `last_market_scan.json` — the persisted snapshot served off-market
+- `index_btst_verdicts.json` — the latest post-close Index BTST Intelligence verdict (Nifty
+  50 / Bank Nifty / Sensex), regenerated once daily
 
 This directory is gitignored — it's runtime state, not source.
 
@@ -133,22 +151,26 @@ strategy's signals — logging a fake order to `data/paper_trades.json` — but 
 ## Project structure
 
 ```
-app.py                     FastAPI app, scheduler threads, API routes
-scoring_engine.py          The stock 5-pillar matrix
-index_scoring.py           The index model (Nifty 50 / Bank Nifty / Sensex)
-strategy_manager.py        Strategy CRUD + pillar multiplier composition
-execution_provider.py      Paper/simulated order execution (no real broker)
-fo_universe.py             Canonical NSE F&O stock whitelist
-nse_data_provider.py       OI proxy + delivery % history (jugaad-data)
-fundamental_provider.py    Fundamental quality gate (yfinance)
-news_provider.py           News quality gate + universe-wide cache (CurrentsAPI)
-depth_analysis.py          Per-stock written narrative generator
-walk_forward_validator.py  Out-of-sample validation + auto-improving pillar weights
-signal_journal.py          SQLite journal of signals + graded outcomes, per strategy
-vix_provider.py            India VIX regime classifier
-json_utils.py              Atomic JSON read/write (concurrency-safe)
-scanner.py                 Standalone CLI scan script (no server)
-static/                    Dashboard (HTML/CSS/JS)
+app.py                        FastAPI app, scheduler threads, API routes
+scoring_engine.py             The stock 5-pillar matrix
+index_scoring.py              The index model (Nifty 50 / Bank Nifty / Sensex), 6 pillars
+options_chain_provider.py     Live NSE index option chain (Nifty 50 / Bank Nifty only)
+index_derivatives_analyzer.py PCR, max pain, OI buildup, OI-cluster support/resistance, expected move
+options_greeks_analyzer.py    Real Black-Scholes Greeks (Delta/Gamma/Theta/Vega) from live IV
+index_depth_analysis.py       Structured Index BTST verdict generator (post-close narrative)
+strategy_manager.py           Strategy CRUD + pillar multiplier composition
+execution_provider.py         Paper/simulated order execution (no real broker)
+fo_universe.py                Canonical NSE F&O stock whitelist
+nse_data_provider.py          OI proxy + delivery % history (jugaad-data)
+fundamental_provider.py       Fundamental quality gate (yfinance)
+news_provider.py              News quality gate + universe-wide cache (CurrentsAPI)
+depth_analysis.py             Per-stock written narrative generator
+walk_forward_validator.py     Out-of-sample validation + auto-improving pillar weights
+signal_journal.py             SQLite journal of signals + graded outcomes, per strategy + index
+vix_provider.py               India VIX regime classifier
+json_utils.py                 Atomic JSON read/write (concurrency-safe)
+scanner.py                    Standalone CLI scan script (no server)
+static/                       Dashboard (HTML/CSS/JS)
 ```
 
 ## Key API endpoints
@@ -158,6 +180,9 @@ static/                    Dashboard (HTML/CSS/JS)
 | `GET /api/scan` | Current/cached scan results for the full universe |
 | `GET /api/stock/{symbol}` | Live detail + recent candles for one stock |
 | `GET /api/indices` | Current Nifty 50 / Bank Nifty / Sensex signals |
+| `GET /api/indices/verdict` | Latest post-close Index BTST Intelligence verdict (structured Buy Call/Buy Put/Avoid per index) |
+| `POST /api/indices/verdict/run` | Manually trigger the Index BTST Intelligence run (normally runs once, ~3:45 PM IST) |
+| `GET /api/indices/verdict/performance` | Directional accuracy + expected-range hit rate for past index verdicts |
 | `GET /api/news` | Cached news for every F&O stock (never calls the news API live) |
 | `GET /api/news/{symbol}` | Cached news for one stock |
 | `GET /api/strategies` | List all strategies |
@@ -181,3 +206,7 @@ static/                    Dashboard (HTML/CSS/JS)
   daily limit (see `news_provider.py` for the exact budget math).
 - Running multiple strategies doesn't multiply network calls — stock and index data are each
   fetched once per scan tick and reused across every active strategy that targets them.
+- The live NSE option chain (and therefore derivatives positioning, Greeks, and the Index
+  BTST Intelligence run) is only fetched once/day, during the dedicated post-close window —
+  never on every scan tick. Override the run time with `INDEX_INTELLIGENCE_RUN_HOUR` /
+  `INDEX_INTELLIGENCE_RUN_MINUTE` env vars (24h IST, default 15:45).

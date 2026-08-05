@@ -19,7 +19,8 @@ from nse_data_provider import fetch_all_nse_data, get_per_stock_oi_data, get_per
 from fo_universe import get_canonical_fo_tickers, NSE_FO_STOCKS
 from vix_provider import fetch_india_vix
 from signal_journal import (
-    log_signal_entry, evaluate_pending_signals, get_metrics_summary, get_confidence_calibration
+    log_signal_entry, evaluate_pending_signals, get_metrics_summary, get_confidence_calibration,
+    log_index_verdict, evaluate_pending_index_verdicts, get_index_verdict_metrics_summary
 )
 from walk_forward_validator import (
     run_walk_forward_validation, compute_dynamic_pillar_weights,
@@ -33,6 +34,8 @@ from news_provider import (
     get_all_cached_news, get_universe_news_meta
 )
 from index_scoring import evaluate_index_signal, fetch_global_cues, classify_global_cues, INDEX_TICKERS
+from options_chain_provider import fetch_index_option_chain, get_nearest_expiry_chain, OPTION_CHAIN_INDICES
+from index_depth_analysis import build_index_btst_verdicts
 import strategy_manager as sm
 from strategy_manager import DEFAULT_STRATEGY_ID, get_strategy, list_strategies, compute_effective_pillar_multipliers
 from execution_provider import execute_signal, get_paper_trades, get_paper_performance
@@ -93,6 +96,13 @@ FO_STOCKS = get_canonical_fo_tickers()
 DATA_DIR = "data"
 TRADE_HISTORY_FILE = os.path.join(DATA_DIR, "trade_history.json")
 LAST_MARKET_SCAN_FILE = os.path.join(DATA_DIR, "last_market_scan.json")
+INDEX_INTELLIGENCE_FILE = os.path.join(DATA_DIR, "index_btst_verdicts.json")
+
+# Post-close Index BTST Intelligence run time — deliberately separate from the 3:30 PM stock
+# lock, since overnight-relevant reads (option chain positioning) settle right after close, not
+# during intraday scanning. Configurable via env vars per the original spec's "config flag".
+INDEX_INTELLIGENCE_RUN_HOUR = int(os.environ.get("INDEX_INTELLIGENCE_RUN_HOUR", "15"))
+INDEX_INTELLIGENCE_RUN_MINUTE = int(os.environ.get("INDEX_INTELLIGENCE_RUN_MINUTE", "45"))
 
 # In-Memory Cache Store for Instant Responses
 cache_store: Dict[str, Any] = {
@@ -556,6 +566,84 @@ def score_index_universe(raw: Dict[str, Any], strategy: Dict[str, Any]) -> List[
     return results
 
 
+def was_index_intelligence_completed_today() -> bool:
+    """Disk-backed freshness check (not an in-memory flag) — same reasoning as
+    fundamentals' was_refresh_completed_today(): an in-memory flag resets on every process
+    restart (e.g. --reload picking up a code change), which would silently re-trigger a
+    same-day re-run instead of running once."""
+    data = read_json(INDEX_INTELLIGENCE_FILE, default={})
+    return data.get("_meta", {}).get("completed_date") == get_ist_now().strftime("%Y-%m-%d")
+
+
+def run_index_btst_intelligence() -> Dict[str, Any]:
+    """
+    The dedicated post-close Index BTST Intelligence run — separate from the 3:30 PM stock
+    lock and from every regular scan tick, because it's the only place the live NSE option
+    chain gets fetched (options_chain_provider.py) — doing that on every 1-5 min scan tick
+    would multiply NSE calls for no benefit, since overnight-relevant derivatives positioning
+    doesn't need re-checking every few minutes.
+
+    Fetches fresh index OHLC + global cues + macro news + option chain (NIFTY50/BANKNIFTY
+    only — no verified Sensex source, see options_chain_provider.py), scores all three
+    indices under the Default strategy's 6-pillar model, turns each into the structured
+    Verdict/Expected-Open/Greeks/Catalysts/Invalidation block (index_depth_analysis.py),
+    persists each to the index verdict journal for later backtesting, and caches the combined
+    result to disk so /api/indices/verdict can serve it without recomputing.
+    """
+    index_dfs: Dict[str, Optional[pd.DataFrame]] = {}
+    for name, ticker in INDEX_TICKERS.items():
+        try:
+            df = yf.download(ticker, period="1d", interval="5m", progress=False)
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            index_dfs[name] = df.dropna()
+        except Exception as e:
+            logger.warning(f"[Index Intelligence] Data fetch failed for {name} ({ticker}): {e}")
+            index_dfs[name] = None
+
+    global_cues_classified = classify_global_cues(fetch_global_cues())
+    news_classification = classify_news_signal(fetch_market_news())
+    default_strategy = get_strategy(DEFAULT_STRATEGY_ID)
+    effective_multipliers = compute_effective_pillar_multipliers(default_strategy, get_active_pillar_weights())
+
+    index_results: Dict[str, Dict[str, Any]] = {}
+    for index_name in INDEX_TICKERS:
+        option_chain = None
+        if index_name in OPTION_CHAIN_INDICES:
+            raw_chain = fetch_index_option_chain(index_name)
+            option_chain = get_nearest_expiry_chain(raw_chain) if raw_chain else None
+
+        try:
+            index_results[index_name] = evaluate_index_signal(
+                index_name=index_name,
+                df_index=index_dfs.get(index_name),
+                df_nifty=index_dfs.get("NIFTY50") if index_name != "NIFTY50" else None,
+                global_cues_read=global_cues_classified,
+                news_classification=news_classification,
+                option_chain=option_chain,
+                pillar_weight_multipliers=effective_multipliers,
+                required_weight_override=default_strategy.get("required_weight_override"),
+            )
+        except Exception as e:
+            logger.warning(f"[Index Intelligence] Scoring failed for {index_name}: {e}")
+            index_results[index_name] = {"index_name": index_name, "signal": "NEUTRAL", "reason": str(e)}
+
+    verdicts_output = build_index_btst_verdicts(index_results)
+
+    for index_name, verdict in verdicts_output["verdicts"].items():
+        try:
+            log_index_verdict(verdict, index_results[index_name])
+        except Exception as e:
+            logger.warning(f"[Index Intelligence] Journal log failed for {index_name}: {e}")
+
+    verdicts_output["_meta"] = {"completed_date": get_ist_now().strftime("%Y-%m-%d")}
+    atomic_write_json(INDEX_INTELLIGENCE_FILE, verdicts_output)
+
+    summary = {k: v["verdict"] for k, v in verdicts_output["verdicts"].items()}
+    logger.info(f"[Index Intelligence] Post-close verdict run complete: {summary}")
+    return verdicts_output
+
+
 def run_full_scan_pipeline() -> Dict[str, Any]:
     """
     Execute the full scan pipeline and update the persistent disk cache. The Default 5-Pillar
@@ -764,6 +852,16 @@ def background_scheduler_worker():
                     logger.info("Running once-daily fundamentals cache refresh...")
                     refresh_fundamentals_cache(FO_STOCKS)
 
+                # Once-daily post-close Index BTST Intelligence run (default 3:45 PM IST,
+                # configurable via INDEX_INTELLIGENCE_RUN_HOUR/MINUTE env vars) — deliberately
+                # separate from the 3:30 PM stock lock above; see run_index_btst_intelligence()
+                # for why this is the only place the live option chain gets fetched.
+                index_intel_ready_mins = INDEX_INTELLIGENCE_RUN_HOUR * 60 + INDEX_INTELLIGENCE_RUN_MINUTE
+                if (ist_now.weekday() not in [5, 6] and (ist_now.hour * 60 + ist_now.minute) >= index_intel_ready_mins
+                        and not was_index_intelligence_completed_today()):
+                    logger.info(f"Running post-close Index BTST Intelligence ({INDEX_INTELLIGENCE_RUN_HOUR:02d}:{INDEX_INTELLIGENCE_RUN_MINUTE:02d} IST window reached)...")
+                    run_index_btst_intelligence()
+
                 time.sleep(sched_info["sleep_seconds"])
 
         except Exception as e:
@@ -811,6 +909,7 @@ def evaluation_scheduler_worker():
 
                     eval_res = TradeHistoryManager.evaluate_pending_trades()
                     evaluate_pending_signals()  # Evaluate SQLite Signal Journal
+                    index_verdict_eval_res = evaluate_pending_index_verdicts()  # Evaluate prior-night index BTST verdicts
                     last_evaluated_date = today_date
 
                     win_summary = TradeHistoryManager.load_data()
@@ -821,7 +920,8 @@ def evaluation_scheduler_worker():
                         cache_store["scan_summary"]["avg_gap_pct"] = win_summary.get("avg_gap_pct", 0.0)
 
                     logger.info(
-                        f"Evaluation complete: {eval_res.get('evaluated_count', 0)} trade(s) graded. "
+                        f"Evaluation complete: {eval_res.get('evaluated_count', 0)} trade(s) graded, "
+                        f"{index_verdict_eval_res.get('evaluated_count', 0)} index verdict(s) graded. "
                         f"Win rate now {win_summary.get('win_rate_pct', 0.0)}%, "
                         f"accuracy {win_summary.get('prediction_accuracy_pct', 0.0)}%."
                     )
@@ -1070,6 +1170,47 @@ def get_index_signals():
         scan_res = run_full_scan_pipeline()
         index_data = scan_res.get("indices", [])
     return sanitize_json_data({"indices": index_data, "tickers": INDEX_TICKERS})
+
+
+@app.get("/api/indices/verdict")
+def get_index_btst_verdict():
+    """
+    The structured post-close Index BTST Intelligence verdict (Nifty 50 / Bank Nifty /
+    Sensex) — Verdict/Expected Open/Confidence/Primary Reason/Greek Outlook/Key Overnight
+    Catalysts/Invalidation Level/Highest Probability Trade per index, built once after close
+    by run_index_btst_intelligence() (see background_scheduler_worker). Reads the persisted
+    cache — never recomputes on request, since option-chain data is only ever fetched during
+    the dedicated post-close run, not on demand.
+    """
+    data = read_json(INDEX_INTELLIGENCE_FILE, default=None)
+    if not data:
+        return sanitize_json_data({
+            "available": False,
+            "message": "Index BTST Intelligence hasn't run yet today — it runs once, shortly after market close.",
+        })
+    return sanitize_json_data({"available": True, **data})
+
+
+@app.get("/api/indices/verdict/performance")
+def get_index_btst_verdict_performance(index_name: Optional[str] = Query(None)):
+    """Directional accuracy + expected-range hit rate for past Index BTST verdicts, optionally
+    scoped to one index (NIFTY50 / BANKNIFTY / SENSEX). See signal_journal's
+    index_verdict_journal / index_verdict_evaluations tables."""
+    return sanitize_json_data(get_index_verdict_metrics_summary(index_name))
+
+
+@app.post("/api/indices/verdict/run")
+def run_index_btst_intelligence_now():
+    """Manually trigger the post-close Index BTST Intelligence run — same manual-override
+    pattern as /api/lock_picks and /api/evaluate_picks, for testing or an on-demand refresh
+    without waiting for the scheduled 3:45 PM IST window."""
+    result = run_index_btst_intelligence()
+    summary = {k: v["verdict"] for k, v in result["verdicts"].items()}
+    return sanitize_json_data({
+        "status": "SUCCESS",
+        "message": f"Index BTST Intelligence run complete: {summary}",
+        "result": result,
+    })
 
 
 # -------------------------------------------------------------

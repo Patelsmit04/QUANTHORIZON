@@ -18,6 +18,14 @@ a dedicated, honestly-scoped model built around what's actually computable for a
    read, not just a domestic technical one.
 4. Macro news sentiment — reuses news_provider's market-news channel (same transparent
    keyword-flag discipline as the stock news gate: every flag traces to a headline).
+5. Derivatives Positioning — reuses index_derivatives_analyzer's already-classified OI
+   buildup verdict (NIFTY50/BANKNIFTY only; SENSEX options trade on the BSE, no verified NSE
+   source — this pillar is DATA_UNAVAILABLE for Sensex, not faked, same as Pillar 2 for Nifty
+   itself).
+6. Greeks Outlook — reuses options_greeks_analyzer's ATM Call/Put Greeks: confirms only when
+   the option type that matches today's directional bias also has the smaller theta-decay-to
+   -premium ratio (i.e. the natural overnight trade for that bias isn't the one bleeding
+   faster to time decay). Same NIFTY50/BANKNIFTY-only scope as Pillar 5.
 
 Same discipline as the rest of this codebase: FAIL LOUD (missing data excluded, never
 fabricated), gates only cap conviction they don't invent it, and every pillar's weight can be
@@ -30,6 +38,9 @@ from typing import Dict, Any, Optional
 import pandas as pd
 import numpy as np
 import yfinance as yf
+
+from index_derivatives_analyzer import analyze_index_derivatives
+from options_greeks_analyzer import estimate_overnight_greeks_outlook
 
 logger = logging.getLogger("IndexScoring")
 
@@ -50,8 +61,9 @@ GLOBAL_CUE_TICKERS: Dict[str, str] = {
 
 # Indices have fewer independently-computable pillars than stocks (no volume-based ones survive
 # zero-volume index data), so the bar is proportionally lower — not a laxer standard, a smaller
-# denominator. Nifty itself tops out at 3.0 possible (no RS-vs-self pillar); Bank Nifty/Sensex
-# top out at 4.0.
+# denominator. Max possible confirmed weight varies by index and data availability: Sensex tops
+# out at 4.0 (no verified NSE options source, so pillars 5-6 stay at 0); Nifty tops out at 5.0
+# (no RS-vs-self pillar, but derivatives/Greeks ARE available for it); Bank Nifty tops out at 6.0.
 REQUIRED_INDEX_WEIGHT = 2.0
 
 
@@ -129,11 +141,12 @@ def evaluate_index_signal(
     df_nifty: Optional[pd.DataFrame] = None,
     global_cues_read: Optional[Dict[str, Any]] = None,
     news_classification: Optional[Dict[str, Any]] = None,
+    option_chain: Optional[Dict[str, Any]] = None,
     pillar_weight_multipliers: Optional[Dict[str, float]] = None,
     required_weight_override: Optional[float] = None,
 ) -> Dict[str, Any]:
     """
-    Evaluate one index (NIFTY50 / BANKNIFTY / SENSEX) against the 4-pillar index model.
+    Evaluate one index (NIFTY50 / BANKNIFTY / SENSEX) against the 6-pillar index model.
 
     df_index: intraday OHLC for the index itself (Volume ignored — always 0).
     df_nifty: intraday OHLC for Nifty 50, for the relative-strength pillar. Pass None for
@@ -142,6 +155,11 @@ def evaluate_index_signal(
     reads (see fetch_global_cues/classify_global_cues and news_provider's market-news
     channel) — this function doesn't fetch them itself so callers can share one fetch across
     all three indices per scan instead of tripling the network calls.
+    option_chain: the RAW chain from options_chain_provider.fetch_index_option_chain()
+    (ideally passed through get_nearest_expiry_chain first), or None for Sensex / any fetch
+    failure. Passed raw (not pre-classified) because OI-buildup classification needs
+    bullish_bias/bearish_bias, which this function only knows once it has read df_index —
+    the derivatives/Greeks analysis runs internally, below, right after bias is computed.
     required_weight_override: replaces REQUIRED_INDEX_WEIGHT — lets strategy_manager define a
     strategy-specific confirmation bar for indices, same mechanism as the stock matrix.
     """
@@ -234,6 +252,43 @@ def evaluate_index_signal(
             confirmed_pillars.append("Macro News: Negative")
     pillar_weights["Index: Macro News"] = p_news_weight
 
+    # Derivatives + Greeks both need the underlying spot the chain itself was fetched
+    # against — use the chain's own underlying_value (paired to the same NSE snapshot),
+    # not df_index's ltp, so strike selection stays internally consistent.
+    chain_spot = float(option_chain["underlying_value"]) if option_chain else None
+
+    # Pillar: Derivatives Positioning (NIFTY50/BANKNIFTY only — no verified Sensex source)
+    p_derivatives_weight = 0.0
+    derivatives_result = analyze_index_derivatives(option_chain, chain_spot, bullish_bias, bearish_bias) if option_chain else {
+        "verified": False, "reason": "Unable to verify live options chain data.",
+        "pcr": None, "max_pain": None, "oi_buildup": {"verdict": "UNAVAILABLE"},
+        "support_resistance": None, "expected_move": None,
+    }
+    oi_verdict = derivatives_result.get("oi_buildup", {}).get("verdict", "UNAVAILABLE")
+    if derivatives_result.get("verified"):
+        if bullish_bias and oi_verdict in ("CALL_LONG_BUILDUP", "PUT_SHORT_COVERING"):
+            p_derivatives_weight = 1.0 * _mult("Index: Derivatives Positioning")
+            confirmed_pillars.append(f"Derivatives: {oi_verdict.replace('_', ' ').title()}")
+        elif bearish_bias and oi_verdict in ("PUT_LONG_BUILDUP", "CALL_LONG_UNWINDING"):
+            p_derivatives_weight = 1.0 * _mult("Index: Derivatives Positioning")
+            confirmed_pillars.append(f"Derivatives: {oi_verdict.replace('_', ' ').title()}")
+    pillar_weights["Index: Derivatives Positioning"] = p_derivatives_weight
+
+    # Pillar: Greeks Outlook (NIFTY50/BANKNIFTY only — depends on the same option chain)
+    p_greeks_weight = 0.0
+    greeks_result = estimate_overnight_greeks_outlook(option_chain, chain_spot) if option_chain else {
+        "verified": False, "reason": "Unable to verify live options chain data.",
+    }
+    better_side = greeks_result.get("better_positioned_side")
+    if greeks_result.get("verified"):
+        if bullish_bias and better_side == "CALL (CE)":
+            p_greeks_weight = 1.0 * _mult("Index: Greeks Outlook")
+            confirmed_pillars.append("Greeks: Calls carry lighter overnight theta burn")
+        elif bearish_bias and better_side == "PUT (PE)":
+            p_greeks_weight = 1.0 * _mult("Index: Greeks Outlook")
+            confirmed_pillars.append("Greeks: Puts carry lighter overnight theta burn")
+    pillar_weights["Index: Greeks Outlook"] = p_greeks_weight
+
     total_confirmed_weight = round(sum(pillar_weights.values()), 2)
     required_weight = required_weight_override if required_weight_override is not None else REQUIRED_INDEX_WEIGHT
 
@@ -282,6 +337,8 @@ def evaluate_index_signal(
         "relative_strength": {"rs_diff": rs_diff, "data_status": "AVAILABLE" if rs_diff is not None else "N/A_FOR_NIFTY50" if index_name == "NIFTY50" else "DATA_UNAVAILABLE"},
         "global_cues": {"verdict": global_verdict, "detail": global_cues_read.get("cues", {}) if global_cues_read else {}},
         "macro_news": {"verdict": news_verdict},
+        "derivatives": derivatives_result,
+        "greeks_outlook": greeks_result,
         "signal": signal,
         "option_type": option_type,
         "conviction_level": conviction_level,

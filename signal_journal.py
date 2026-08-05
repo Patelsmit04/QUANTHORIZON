@@ -10,6 +10,7 @@ confidence calibration, and sample size guardrails (N < 30).
 import os
 import sqlite3
 import time
+import json
 import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
@@ -17,6 +18,7 @@ import pandas as pd
 import yfinance as yf
 
 from strategy_manager import DEFAULT_STRATEGY_ID
+from index_scoring import INDEX_TICKERS
 
 logger = logging.getLogger("SignalJournal")
 
@@ -105,6 +107,53 @@ def init_journal_db():
             net_pnl_pct REAL NOT NULL,
             is_trade_win INTEGER NOT NULL,
             FOREIGN KEY(signal_id) REFERENCES signal_journal(id)
+        );
+        """)
+
+        # Table 3: Index BTST Verdict Journal — one row per index per post-close run. Kept
+        # SEPARATE from signal_journal (not shoehorned into its stock-shaped columns) because
+        # the index verdict payload (derivatives + Greeks + macro snapshot) has a genuinely
+        # different, nested shape — stored as JSON blobs here rather than flattened into dozens
+        # of stock-specific pillar columns that wouldn't apply.
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS index_verdict_journal (
+            id TEXT PRIMARY KEY,
+            verdict_date TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            index_name TEXT NOT NULL,
+            raw_ticker TEXT NOT NULL,
+            price REAL,
+            price_verified INTEGER NOT NULL,
+            verdict TEXT NOT NULL,
+            confidence_level_pct INTEGER NOT NULL,
+            expected_open_direction TEXT,
+            expected_open_points REAL,
+            expected_range_low REAL,
+            expected_range_high REAL,
+            primary_reason TEXT NOT NULL,
+            invalidation_level TEXT NOT NULL,
+            highest_probability_trade_type TEXT NOT NULL,
+            full_verdict_json TEXT NOT NULL,
+            raw_pillar_inputs_json TEXT NOT NULL
+        );
+        """)
+
+        # Table 4: Index Verdict Evaluations — next-day outcome vs the verdict AND vs the
+        # straddle-implied expected range specifically (a metric stock signals don't have,
+        # since expected_open there comes from an RSI heuristic, not a live options market).
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS index_verdict_evaluations (
+            verdict_id TEXT PRIMARY KEY,
+            eval_date TEXT NOT NULL,
+            eval_timestamp TEXT NOT NULL,
+            next_open_915 REAL NOT NULL,
+            next_close_930 REAL,
+            actual_gap_pct REAL NOT NULL,
+            is_direction_correct INTEGER NOT NULL,
+            variance_error_pct REAL NOT NULL,
+            actual_move_points REAL NOT NULL,
+            move_within_expected_range INTEGER,
+            FOREIGN KEY(verdict_id) REFERENCES index_verdict_journal(id)
         );
         """)
         conn.commit()
@@ -215,6 +264,213 @@ def log_signal_entry(
     except Exception as e:
         logger.error(f"Error logging signal {signal_id}: {e}")
         return False
+
+
+def log_index_verdict(verdict: Dict[str, Any], raw_index_result: Dict[str, Any]) -> bool:
+    """
+    Log one index's structured BTST verdict (index_depth_analysis.generate_index_verdict()'s
+    output), plus the full raw pillar-input snapshot it was built from (evaluate_index_signal()'s
+    output — macro/derivatives/Greeks all included) for later audit and walk-forward backtesting.
+
+    id is date+index_name only (no strategy_id) — this is the post-close index intelligence run,
+    not a per-strategy signal; it runs once per index per day regardless of how many strategies
+    are configured.
+    """
+    verdict_date = datetime.now().strftime("%Y-%m-%d")
+    index_name = verdict.get("index_name")
+    if not index_name:
+        logger.warning("log_index_verdict: no index_name on verdict — skipping.")
+        return False
+    verdict_id = f"{verdict_date}_{index_name}"
+
+    expected_open = verdict.get("expected_open") or {}
+    trade = verdict.get("highest_probability_btst_trade") or {}
+
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT OR REPLACE INTO index_verdict_journal (
+                id, verdict_date, timestamp, index_name, raw_ticker, price, price_verified,
+                verdict, confidence_level_pct, expected_open_direction, expected_open_points,
+                expected_range_low, expected_range_high, primary_reason, invalidation_level,
+                highest_probability_trade_type, full_verdict_json, raw_pillar_inputs_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                verdict_id,
+                verdict_date,
+                time.strftime("%Y-%m-%d %H:%M:%S IST"),
+                index_name,
+                INDEX_TICKERS.get(index_name, index_name),
+                verdict.get("price"),
+                1 if verdict.get("price_verified") else 0,
+                verdict.get("verdict", "Avoid"),
+                int(verdict.get("confidence_level_pct", 0)),
+                expected_open.get("direction"),
+                expected_open.get("points"),
+                expected_open.get("range_low"),
+                expected_open.get("range_high"),
+                verdict.get("primary_reason", ""),
+                verdict.get("invalidation_level", ""),
+                trade.get("type", "Avoid"),
+                json.dumps(verdict, default=str),
+                json.dumps(raw_index_result, default=str),
+            ))
+            conn.commit()
+            return True
+    except Exception as e:
+        logger.error(f"Error logging index verdict {verdict_id}: {e}")
+        return False
+
+
+def evaluate_pending_index_verdicts() -> Dict[str, Any]:
+    """
+    Same next-morning gap-evaluation idea as evaluate_pending_signals(), scoped to the index
+    verdict journal: fetches the real 9:15 AM open (and 9:30 AM close) for each unevaluated
+    index verdict, checks directional accuracy, AND checks whether the actual move landed
+    inside the straddle-implied expected range (move_within_expected_range) — validating the
+    options-market-derived expected move specifically, not just the up/down call.
+    """
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT j.* FROM index_verdict_journal j
+            LEFT JOIN index_verdict_evaluations e ON j.id = e.verdict_id
+            WHERE e.verdict_id IS NULL AND j.verdict != 'Avoid'
+        """)
+        unevaluated = [dict(row) for row in cursor.fetchall()]
+
+    if not unevaluated:
+        return {"evaluated_count": 0, "message": "No pending index verdicts to evaluate."}
+
+    evaluated_count = 0
+    today_date_str = datetime.now().strftime("%Y-%m-%d")
+
+    for v in unevaluated:
+        if v["verdict_date"] == today_date_str:
+            continue
+
+        ticker = v["raw_ticker"]
+        try:
+            df = yf.download(ticker, period="5d", interval="5m", progress=False)
+            if df is None or df.empty:
+                continue
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+
+            df = df.dropna().copy()
+            if df.empty:
+                continue
+
+            df.reset_index(inplace=True)
+            time_col = 'Datetime' if 'Datetime' in df.columns else ('Date' if 'Date' in df.columns else df.columns[0])
+            df['DateStr'] = df[time_col].astype(str).str.slice(0, 10)
+
+            post_lock_df = df[df['DateStr'] > v["verdict_date"]]
+            if post_lock_df.empty:
+                continue
+
+            open_915 = float(post_lock_df.iloc[0]['Open'])
+            price_325 = float(v["price"]) if v["price"] is not None else 0.0
+            if price_325 <= 0 or open_915 <= 0:
+                continue
+
+            exit_candle_idx = min(3, len(post_lock_df) - 1)
+            close_930 = float(post_lock_df.iloc[exit_candle_idx]['Close'])
+
+            actual_gap = round(((open_915 - price_325) / price_325) * 100, 2)
+            actual_move_points = round(open_915 - price_325, 1)
+
+            is_dir_correct = 0
+            if v["verdict"] == "Buy Call" and actual_gap > 0:
+                is_dir_correct = 1
+            elif v["verdict"] == "Buy Put" and actual_gap < 0:
+                is_dir_correct = 1
+
+            expected_points = v["expected_open_points"]
+            variance_err = round(abs(abs(actual_move_points) - expected_points), 2) if expected_points is not None else 0.0
+
+            move_within_range = None
+            if v["expected_range_low"] is not None and v["expected_range_high"] is not None:
+                move_within_range = 1 if v["expected_range_low"] <= open_915 <= v["expected_range_high"] else 0
+
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                INSERT OR REPLACE INTO index_verdict_evaluations (
+                    verdict_id, eval_date, eval_timestamp, next_open_915, next_close_930,
+                    actual_gap_pct, is_direction_correct, variance_error_pct,
+                    actual_move_points, move_within_expected_range
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    v["id"],
+                    today_date_str,
+                    time.strftime("%Y-%m-%d %H:%M:%S IST"),
+                    round(open_915, 2),
+                    round(close_930, 2),
+                    actual_gap,
+                    is_dir_correct,
+                    variance_err,
+                    actual_move_points,
+                    move_within_range,
+                ))
+                conn.commit()
+                evaluated_count += 1
+                logger.info(f"Index verdict evaluated {v['index_name']}: Dir Correct={is_dir_correct}, Gap={actual_gap}%, Within Expected Range={move_within_range}")
+
+        except Exception as e:
+            logger.warning(f"Error evaluating index verdict for {ticker}: {e}")
+
+    return {"evaluated_count": evaluated_count}
+
+
+def get_index_verdict_metrics_summary(index_name: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Win rate / directional accuracy for index BTST verdicts, optionally scoped to one index.
+    Includes expected_range_hit_rate_pct — how often the actual next-day open landed inside
+    the straddle-implied expected range, which is a genuinely different question from "was the
+    direction right" and only meaningful because that range came from a live options market.
+    """
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        if index_name:
+            cursor.execute("""
+                SELECT j.*, e.* FROM index_verdict_journal j
+                INNER JOIN index_verdict_evaluations e ON j.id = e.verdict_id
+                WHERE j.index_name = ?
+            """, (index_name,))
+        else:
+            cursor.execute("""
+                SELECT j.*, e.* FROM index_verdict_journal j
+                INNER JOIN index_verdict_evaluations e ON j.id = e.verdict_id
+            """)
+        rows = [dict(r) for r in cursor.fetchall()]
+
+    total_evaluated = len(rows)
+    sample_guardrail_msg = "INSUFFICIENT SAMPLE (N < 30)" if total_evaluated < 30 else "SUFFICIENT SAMPLE (N >= 30)"
+
+    if total_evaluated == 0:
+        return {
+            "total_evaluated_verdicts": 0,
+            "sample_guardrail": sample_guardrail_msg,
+            "directional_accuracy_pct": 0.0,
+            "expected_range_hit_rate_pct": 0.0,
+        }
+
+    correct = sum(1 for r in rows if r["is_direction_correct"] == 1)
+    directional_accuracy = round((correct / total_evaluated) * 100, 1)
+
+    range_checked = [r for r in rows if r["move_within_expected_range"] is not None]
+    range_hits = sum(1 for r in range_checked if r["move_within_expected_range"] == 1)
+    range_hit_rate = round((range_hits / len(range_checked)) * 100, 1) if range_checked else 0.0
+
+    return {
+        "total_evaluated_verdicts": total_evaluated,
+        "sample_guardrail": sample_guardrail_msg,
+        "directional_accuracy_pct": directional_accuracy,
+        "expected_range_hit_rate_pct": range_hit_rate,
+        "expected_range_sample_size": len(range_checked),
+    }
 
 
 def evaluate_pending_signals() -> Dict[str, Any]:

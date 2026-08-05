@@ -48,6 +48,8 @@ INDEX_PILLAR_NAMES = [
     "Index: Relative Strength",
     "Index: Global Cues",
     "Index: Macro News",
+    "Index: Derivatives Positioning",
+    "Index: Greeks Outlook",
 ]
 
 ALL_PILLAR_NAMES = STOCK_PILLAR_NAMES + INDEX_PILLAR_NAMES
