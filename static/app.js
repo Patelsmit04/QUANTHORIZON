@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Event Listeners
     
     // Mobile Menu Toggle
-    if (mobileMenuToggle) {
+    if (mobileMenuToggle && mobileMenuDrawer) {
         mobileMenuToggle.addEventListener("click", () => {
             mobileMenuDrawer.classList.toggle("active");
             mobileMenuToggle.classList.toggle("active");
@@ -125,6 +125,15 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add("active");
 
             const section = btn.dataset.section;
+            
+            // Sync with desktop mainNavTabs if present
+            if (mainNavTabs) {
+                mainNavTabs.querySelectorAll(".main-nav-tab").forEach(b => {
+                    if (b.dataset.section === section) b.classList.add("active");
+                    else b.classList.remove("active");
+                });
+            }
+
             const sections = { scanner: scannerSection, news: newsSection, indices: indicesSection, strategies: strategiesSection };
             Object.entries(sections).forEach(([key, el]) => {
                 if (!el) return;
@@ -141,11 +150,53 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Mobile Buttons
-    if (scanBtnMobile) scanBtnMobile.addEventListener("click", () => fetchScanResults(true));
-    if (guideBtnMobile) guideBtnMobile.addEventListener("click", () => guideModal.classList.remove("hidden"));
-    if (winRateBtnMobile) winRateBtnMobile.addEventListener("click", openWinRateModal);
-    if (exportCsvBtnMobile) exportCsvBtnMobile.addEventListener("click", exportWatchlistCsv);
+    // Mobile Action Buttons
+    if (scanBtnMobile) scanBtnMobile.addEventListener("click", () => {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        fetchScanResults(true);
+    });
+    if (guideBtnMobile) guideBtnMobile.addEventListener("click", () => {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        guideModal.classList.remove("hidden");
+    });
+    if (winRateBtnMobile) winRateBtnMobile.addEventListener("click", () => {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        openWinRateModal();
+    });
+    if (exportCsvBtnMobile) exportCsvBtnMobile.addEventListener("click", () => {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        exportWatchlistCsv();
+    });
+
+    // Sync Priority & AutoRefresh toggles between Desktop and Mobile
+    if (priorityOnlyToggleMobile) {
+        priorityOnlyToggleMobile.addEventListener("change", (e) => {
+            if (priorityOnlyToggle) priorityOnlyToggle.checked = e.target.checked;
+            filterAndRenderTable();
+        });
+    }
+    if (autoRefreshToggleMobile) {
+        autoRefreshToggleMobile.addEventListener("change", (e) => {
+            if (autoRefreshToggle) autoRefreshToggle.checked = e.target.checked;
+            setupAutoRefresh();
+        });
+    }
+    if (priorityOnlyToggle) {
+        priorityOnlyToggle.addEventListener("change", (e) => {
+            if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.checked = e.target.checked;
+            filterAndRenderTable();
+        });
+    }
+    if (autoRefreshToggle) {
+        autoRefreshToggle.addEventListener("change", (e) => {
+            if (autoRefreshToggleMobile) autoRefreshToggleMobile.checked = e.target.checked;
+            setupAutoRefresh();
+        });
+    }
 
     if (scanBtn) scanBtn.addEventListener("click", () => fetchScanResults(true));
     if (guideBtn) guideBtn.addEventListener("click", () => guideModal.classList.remove("hidden"));

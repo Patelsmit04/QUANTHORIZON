@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTST Ranker — High-Conviction Institutional Engine & Gap Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QuantHorizon — High-Conviction Institutional Engine & Gap Predictor</title>
+    <link rel="icon" type="image/png" href="/static/logo.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,11 +23,11 @@
     <header class="app-header">
         <div class="header-container">
             <div class="brand-section">
-                <div class="logo-icon">
-                    <i class="fa-solid fa-chart-line-up"></i>
+                <div class="app-logo-frame">
+                    <img src="/static/logo.png" alt="QuantHorizon Logo">
                 </div>
                 <div>
-                    <h1 class="brand-title">BTST <span>RANKER</span></h1>
+                    <h1 class="brand-title">Quant<span>Horizon</span></h1>
                     <p class="brand-subtitle">High-Conviction Priority Engine & Gap Predictor</p>
                 </div>
             </div>
@@ -113,6 +114,15 @@
         <!-- Mobile Menu Drawer -->
         <div class="mobile-menu-drawer" id="mobileMenuDrawer">
             <div class="mobile-menu-content">
+                <div class="mobile-menu-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                    <div class="app-logo-frame md">
+                        <img src="/static/logo.png" alt="QuantHorizon Logo">
+                    </div>
+                    <div>
+                        <div style="font-family: var(--font-heading); font-weight: 800; font-size: 16px; color: var(--ink-primary);">Quant<span style="color: var(--gold);">Horizon</span></div>
+                        <div style="font-size: 10px; color: var(--ink-secondary);">Institutional BTST Engine & Gap Predictor</div>
+                    </div>
+                </div>
                 <nav class="mobile-nav-tabs" id="mobileNavTabs">
                     <button class="mobile-nav-tab active" data-section="scanner">
                         <i class="fa-solid fa-radar"></i> SCANNER
@@ -129,17 +139,33 @@
                 </nav>
                 <div class="mobile-menu-divider"></div>
                 <div class="mobile-menu-controls">
+                    <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px;">
+                        <div class="priority-toggle-box" style="flex: 1; justify-content: space-between;">
+                            <span><i class="fa-solid fa-fire text-gold"></i> PRIORITY</span>
+                            <label class="switch">
+                                <input type="checkbox" id="priorityOnlyToggleMobile" aria-label="Show priority picks only">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="auto-refresh-toggle" style="flex: 1; justify-content: space-between;">
+                            <span><i class="fa-solid fa-rotate-right"></i> AUTO</span>
+                            <label class="switch">
+                                <input type="checkbox" id="autoRefreshToggleMobile" checked aria-label="Toggle auto refresh">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
                     <button id="scanBtnMobile" class="btn btn-pill btn-primary btn-full-width">
                         <i class="fa-solid fa-bolt"></i> SCAN NOW
                     </button>
-                    <button id="guideBtnMobile" class="btn btn-pill btn-secondary btn-full-width">
-                        <i class="fa-solid fa-circle-question"></i> GUIDE
-                    </button>
                     <button id="winRateBtnMobile" class="btn btn-pill btn-secondary btn-full-width">
-                        <i class="fa-solid fa-trophy"></i> WIN RATE
+                        <i class="fa-solid fa-trophy text-gold"></i> WIN RATE ANALYTICS
+                    </button>
+                    <button id="guideBtnMobile" class="btn btn-pill btn-secondary btn-full-width">
+                        <i class="fa-solid fa-circle-question"></i> USER GUIDE
                     </button>
                     <button id="exportCsvBtnMobile" class="btn btn-pill btn-secondary btn-full-width">
-                        <i class="fa-solid fa-file-csv"></i> CSV
+                        <i class="fa-solid fa-file-csv"></i> EXPORT CSV
                     </button>
                 </div>
             </div>
@@ -489,8 +515,11 @@
     <div id="winRateModal" class="modal-overlay hidden">
         <div class="modal-card modal-large">
             <div class="modal-header">
-                <div class="modal-title-group">
-                    <h2><i class="fa-solid fa-trophy text-gold"></i> Win Rate & Gap Prediction Accuracy Analytics</h2>
+                <div class="modal-title-group" style="display: flex; align-items: center; gap: 10px;">
+                    <div class="app-logo-frame sm">
+                        <img src="/static/logo.png" alt="QuantHorizon">
+                    </div>
+                    <h2>Win Rate & Gap Prediction Accuracy Analytics</h2>
                 </div>
                 <button id="closeWinRateBtn" class="modal-close-btn">&times;</button>
             </div>
@@ -555,8 +584,11 @@
     <div id="guideModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
-                <div class="modal-title-group">
-                    <h2><i class="fa-solid fa-graduation-cap text-gold"></i> Priority Ranking & Gap Prediction Guide</h2>
+                <div class="modal-title-group" style="display: flex; align-items: center; gap: 10px;">
+                    <div class="app-logo-frame sm">
+                        <img src="/static/logo.png" alt="QuantHorizon">
+                    </div>
+                    <h2>Priority Ranking & Gap Prediction Guide</h2>
                 </div>
                 <button id="closeGuideBtn" class="modal-close-btn">&times;</button>
             </div>

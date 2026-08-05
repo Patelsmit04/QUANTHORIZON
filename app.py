@@ -45,9 +45,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger("BTSTScanner")
 
 app = FastAPI(
-    title="BTST Scanner Engine — 5-Pillar Matrix & Autonomous Scheduler",
-    description="Refactored 5-Pillar Intraday Matrix, OI Magnitude Threshold, Expiry Discount, Liquidity Tiering & 3:30 PM Off-Market Freeze",
-    version="4.5.0"
+    title="QuantHorizon Engine — 5-Pillar Matrix & Autonomous Scheduler",
+    description="QuantHorizon Institutional Intraday & BTST Matrix Engine",
+    version="5.0.0"
 )
 
 

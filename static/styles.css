@@ -161,6 +161,53 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     box-shadow: 0 4px 16px rgba(169, 122, 28, 0.35);
 }
 
+/* App Logo Frame — Square with Circular Corners */
+.app-logo-frame {
+    width: 46px;
+    height: 46px;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(201, 148, 51, 0.2), rgba(27, 175, 122, 0.2));
+    border: 1px solid var(--glass-border-strong);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(169, 122, 28, 0.25);
+    flex-shrink: 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.app-logo-frame:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 18px rgba(169, 122, 28, 0.35);
+}
+
+.app-logo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.app-logo-frame.sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}
+
+.app-logo-frame.md {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+}
+
+.app-logo-frame.lg {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+}
+
 .brand-title {
     font-family: var(--font-heading);
     font-size: 22px;
@@ -1392,13 +1439,260 @@ input:checked + .slider:before { transform: translateX(16px); }
 }
 
 /* ==========================================
-   RESPONSIVE
+   RESPONSIVE & MOBILE DESIGN SYSTEM
    ========================================== */
 
-@media (max-width: 860px) {
-    .header-container { flex-direction: column; align-items: stretch; }
-    .header-actions { justify-content: flex-start; }
-    .toolbar-container { flex-direction: column; align-items: stretch; }
-    .modal-score-box { flex-direction: column; align-items: flex-start; }
-    .index-grid, .strategy-grid { grid-template-columns: 1fr; }
+@media (max-width: 1024px) {
+    .app-header {
+        padding: 12px 18px;
+    }
+    
+    .header-container {
+        gap: 12px;
+    }
+
+    .main-nav-tab {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .header-actions .btn {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    .priority-toggle-box, .auto-refresh-toggle {
+        padding: 4px 10px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 992px) {
+    .app-header {
+        padding: 10px 16px;
+    }
+
+    .header-container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .main-nav-tabs, 
+    .header-actions {
+        display: none !important;
+    }
+
+    .mobile-menu-toggle {
+        display: flex !important;
+    }
+
+    .metrics-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    .metric-card {
+        padding: 14px 16px;
+    }
+
+    .index-grid, .strategy-grid, .index-verdict-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 40px;
+    }
+
+    .main-content {
+        padding: 14px 12px;
+    }
+
+    .brand-section {
+        gap: 10px;
+    }
+
+    .brand-title {
+        font-size: 18px;
+    }
+
+    .brand-subtitle {
+        display: none;
+    }
+
+    .market-status-box {
+        padding: 4px 10px;
+    }
+
+    .timer-box {
+        display: none;
+    }
+
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .metric-card:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .ranking-legend-card {
+        padding: 14px 16px;
+    }
+
+    .legend-pills-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .toolbar-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .filter-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+        margin-bottom: 4px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .tab-btn {
+        flex: 0 0 auto;
+        padding: 8px 14px;
+        font-size: 11px;
+    }
+
+    .toolbar-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .search-box, .sort-box {
+        width: 100%;
+    }
+
+    .search-box input, .sort-box select {
+        width: 100%;
+    }
+
+    /* Table Mobile Responsive Touch Scroll */
+    .table-container {
+        border-radius: var(--radius-md);
+        margin-top: 10px;
+    }
+
+    .table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table th, .data-table td {
+        padding: 10px 10px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    /* Sticky Rank/Ticker Columns on touch scroll */
+    .data-table th:nth-child(1), .data-table td:nth-child(1),
+    .data-table th:nth-child(2), .data-table td:nth-child(2) {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: var(--glass-bg-strong);
+        box-shadow: 2px 0 6px rgba(0,0,0,0.06);
+    }
+
+    .data-table th:nth-child(2), .data-table td:nth-child(2) {
+        left: 55px;
+    }
+
+    .index-grid, .strategy-grid, .news-grid, .index-verdict-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-overlay {
+        padding: 10px;
+    }
+
+    .modal-card {
+        max-height: 94vh;
+        border-radius: var(--radius-md);
+    }
+
+    .modal-score-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .winrate-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .news-verdict-filters {
+        overflow-x: auto;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+    }
+
+    .news-verdict-filters .tab-btn {
+        flex: 0 0 auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-header {
+        padding: 8px 12px;
+    }
+
+    .brand-title {
+        font-size: 16px;
+    }
+
+    .app-logo-frame {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+    }
+
+    .market-status-box {
+        display: none;
+    }
+
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .metric-title {
+        font-size: 9px;
+    }
+
+    .metric-value {
+        font-size: 20px;
+    }
+
+    .modal-header {
+        padding: 12px 14px;
+    }
+
+    .modal-body {
+        padding: 12px 14px;
+    }
 }
