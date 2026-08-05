@@ -13,3 +13,4 @@ data/*.lock
 venv/
 .venv/
 *.log
+.vercel

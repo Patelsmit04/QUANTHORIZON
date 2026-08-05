@@ -8,6 +8,15 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentFilter = "ALL";
     let autoRefreshInterval = null;
 
+    // Mobile Menu DOM
+    const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+    const mobileMenuDrawer = document.getElementById("mobileMenuDrawer");
+    const mobileNavTabs = document.getElementById("mobileNavTabs");
+    const scanBtnMobile = document.getElementById("scanBtnMobile");
+    const guideBtnMobile = document.getElementById("guideBtnMobile");
+    const winRateBtnMobile = document.getElementById("winRateBtnMobile");
+    const exportCsvBtnMobile = document.getElementById("exportCsvBtnMobile");
+
     // DOM Elements
     const scanBtn = document.getElementById("scanBtn");
     const guideBtn = document.getElementById("guideBtn");
@@ -97,6 +106,47 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshStrategiesNavBadge();
 
     // Event Listeners
+    
+    // Mobile Menu Toggle
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener("click", () => {
+            mobileMenuDrawer.classList.toggle("active");
+            mobileMenuToggle.classList.toggle("active");
+        });
+    }
+
+    // Mobile Navigation
+    if (mobileNavTabs) {
+        mobileNavTabs.addEventListener("click", (e) => {
+            const btn = e.target.closest(".mobile-nav-tab");
+            if (!btn) return;
+
+            mobileNavTabs.querySelectorAll(".mobile-nav-tab").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            const section = btn.dataset.section;
+            const sections = { scanner: scannerSection, news: newsSection, indices: indicesSection, strategies: strategiesSection };
+            Object.entries(sections).forEach(([key, el]) => {
+                if (!el) return;
+                if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
+            });
+
+            // Close mobile menu after selection
+            if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+            if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+
+            if (section === "news" && !newsLoaded) fetchNewsSection();
+            if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
+            if (section === "strategies") fetchStrategies();
+        });
+    }
+
+    // Mobile Buttons
+    if (scanBtnMobile) scanBtnMobile.addEventListener("click", () => fetchScanResults(true));
+    if (guideBtnMobile) guideBtnMobile.addEventListener("click", () => guideModal.classList.remove("hidden"));
+    if (winRateBtnMobile) winRateBtnMobile.addEventListener("click", openWinRateModal);
+    if (exportCsvBtnMobile) exportCsvBtnMobile.addEventListener("click", exportWatchlistCsv);
+
     if (scanBtn) scanBtn.addEventListener("click", () => fetchScanResults(true));
     if (guideBtn) guideBtn.addEventListener("click", () => guideModal.classList.remove("hidden"));
     if (closeGuideBtn) closeGuideBtn.addEventListener("click", () => guideModal.classList.add("hidden"));
