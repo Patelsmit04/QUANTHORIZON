@@ -8,6 +8,13 @@
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/static/$1",
+      "headers": {
+        "cache-control": "no-cache, no-store, must-revalidate, max-age=0"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "app.py"
     }
