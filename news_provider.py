@@ -23,6 +23,7 @@ the company name together to cut down false matches; it's a heuristic, not a gua
 import os
 import time
 import logging
+from pathlib import Path
 from datetime import datetime, date, timezone, timedelta
 from typing import Dict, List, Any, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -32,7 +33,19 @@ from dotenv import load_dotenv
 
 from json_utils import atomic_write_json, read_json
 
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent
+ENV_PATH = BASE_DIR / ".env"
+EXAMPLE_ENV_PATH = BASE_DIR / ".env.example"
+
+
+def _load_env() -> None:
+    if ENV_PATH.exists():
+        load_dotenv(dotenv_path=ENV_PATH, override=False)
+    elif EXAMPLE_ENV_PATH.exists():
+        load_dotenv(dotenv_path=EXAMPLE_ENV_PATH, override=False)
+
+
+_load_env()
 
 logger = logging.getLogger("NewsProvider")
 

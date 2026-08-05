@@ -662,6 +662,182 @@ input:checked + .slider:before { transform: translateX(16px); }
 .news-empty-headlines { font-size: 12px; color: var(--ink-muted); font-style: italic; }
 
 /* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 1200px) {
+    .app-header {
+        padding: 14px 18px;
+    }
+
+    .header-container {
+        justify-content: center;
+    }
+
+    .market-status-box {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 900px) {
+    .brand-section {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .main-nav-tabs {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .main-nav-tab {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .market-status-box {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 16px;
+    }
+
+    .timer-box {
+        border-left: none;
+        padding-left: 0;
+        border-top: 1px solid var(--glass-border-strong);
+        padding-top: 8px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .toolbar-container {
+        align-items: stretch;
+    }
+
+    .filter-tabs {
+        width: 100%;
+    }
+
+    .filter-tabs .tab-btn {
+        flex: 1 1 calc(50% - 8px);
+        justify-content: center;
+    }
+
+    .toolbar-actions {
+        width: 100%;
+    }
+
+    .search-box, .sort-box {
+        flex: 1 1 100%;
+    }
+
+    .search-box input, .sort-box select {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 700px) {
+    body {
+        padding-bottom: 40px;
+    }
+
+    .main-content {
+        padding: 0 14px;
+        margin-top: 16px;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .metric-card {
+        padding: 16px;
+    }
+
+    .metric-value {
+        font-size: 24px;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .priority-toggle-box,
+    .auto-refresh-toggle,
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .legend-pills-row {
+        grid-template-columns: 1fr;
+    }
+
+    .data-table tbody td {
+        white-space: normal;
+        min-width: 120px;
+    }
+
+    .news-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .app-header {
+        padding: 12px 12px 14px;
+    }
+
+    .brand-title {
+        font-size: 18px;
+    }
+
+    .brand-subtitle {
+        display: none;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .main-nav-tabs {
+        flex-wrap: wrap;
+    }
+
+    .main-nav-tab {
+        flex: 1 1 100%;
+    }
+
+    .priority-toggle-box,
+    .auto-refresh-toggle {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+    }
+
+    .modal-card {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+        max-height: 100vh;
+    }
+
+    .modal-header,
+    .modal-body {
+        padding: 16px;
+    }
+}
+
+/* ==========================================
    MODALS
    ========================================== */
 
