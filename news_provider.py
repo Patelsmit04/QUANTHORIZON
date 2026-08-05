@@ -40,7 +40,7 @@ EXAMPLE_ENV_PATH = BASE_DIR / ".env.example"
 
 def _load_env() -> None:
     if ENV_PATH.exists():
-        load_dotenv(dotenv_path=ENV_PATH, override=False)
+        load_dotenv(dotenv_path=ENV_PATH, override=True)
     elif EXAMPLE_ENV_PATH.exists():
         load_dotenv(dotenv_path=EXAMPLE_ENV_PATH, override=False)
 
@@ -50,7 +50,18 @@ _load_env()
 logger = logging.getLogger("NewsProvider")
 
 CURRENTS_API_BASE = "https://api.currentsapi.services/v1"
-API_KEY = os.environ.get("CURRENTS_API_KEY")
+
+
+def get_api_key() -> Optional[str]:
+    _load_env()
+    key = os.environ.get("CURRENTS_API_KEY")
+    if not key:
+        return None
+    key_clean = key.strip()
+    if not key_clean or key_clean in ("your_api_key_here", "<your key>", "your_api_key", "YOUR_API_KEY"):
+        return None
+    return key_clean
+
 
 DATA_DIR = "data"
 STOCK_NEWS_CACHE_FILE = os.path.join(DATA_DIR, "stock_news_cache.json")
@@ -85,20 +96,22 @@ GREEN_FLAG_KEYWORDS = [
 
 
 def _api_available() -> bool:
-    if not API_KEY:
-        logger.warning("CURRENTS_API_KEY not set — news features disabled.")
+    key = get_api_key()
+    if not key:
+        logger.info("CURRENTS_API_KEY not configured — news API calls disabled.")
         return False
     return True
 
 
 def _search(keywords: str, max_results: int = 8) -> Optional[List[Dict[str, Any]]]:
     """Raw CurrentsAPI search call. Returns None on any failure — FAIL LOUD, never fabricated."""
-    if not _api_available():
+    key = get_api_key()
+    if not key:
         return None
     try:
         resp = requests.get(
             f"{CURRENTS_API_BASE}/search",
-            params={"keywords": keywords, "language": "en", "apiKey": API_KEY},
+            params={"keywords": keywords, "language": "en", "apiKey": key},
             headers=REQUEST_HEADERS,
             timeout=15,
         )
@@ -113,6 +126,7 @@ def _search(keywords: str, max_results: int = 8) -> Optional[List[Dict[str, Any]
         return data.get("news", [])[:max_results]
     except Exception as e:
         logger.warning(f"CurrentsAPI search failed for '{keywords}': {e}")
+        return None
         return None
 
 

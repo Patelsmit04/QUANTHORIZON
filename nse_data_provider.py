@@ -48,13 +48,29 @@ def _ensure_data_dir():
     os.makedirs(DATA_DIR, exist_ok=True)
 
 
+_STORE_CACHE: Dict[str, Any] = {}
+_STORE_MTIME: Dict[str, float] = {}
+
+
 def _load_json_store(filepath: str) -> Dict[str, Any]:
-    return read_json(filepath, default={})
+    try:
+        mtime = os.path.getmtime(filepath) if os.path.exists(filepath) else 0.0
+        if filepath in _STORE_CACHE and _STORE_MTIME.get(filepath) == mtime:
+            return _STORE_CACHE[filepath]
+        data = read_json(filepath, default={})
+        _STORE_CACHE[filepath] = data
+        _STORE_MTIME[filepath] = mtime
+        return data
+    except Exception:
+        return read_json(filepath, default={})
 
 
 def _save_json_store(filepath: str, data: Dict[str, Any]):
     _ensure_data_dir()
     atomic_write_json(filepath, data)
+    _STORE_CACHE[filepath] = data
+    if os.path.exists(filepath):
+        _STORE_MTIME[filepath] = os.path.getmtime(filepath)
 
 
 # =========================================================================
@@ -239,7 +255,7 @@ def get_per_stock_oi_data(symbol: str, fetch_online: bool = False) -> Optional[D
 # 3. BATCH FETCHER — For Multiple Stocks
 # =========================================================================
 
-def fetch_all_nse_data(symbols: List[str], delay: float = 0.3) -> Dict[str, Dict[str, Any]]:
+def fetch_all_nse_data(symbols: List[str], delay: float = 0.0, fetch_online: bool = False) -> Dict[str, Dict[str, Any]]:
     """
     Batch-fetch per-stock OI and delivery data for a list of symbols.
     Returns {symbol: {"oi_data": {...} or None, "delivery_data": {...} or None}}
@@ -247,8 +263,9 @@ def fetch_all_nse_data(symbols: List[str], delay: float = 0.3) -> Dict[str, Dict
     result = {}
     for sym in symbols:
         clean_sym = sym.replace(".NS", "").upper()
-        oi = get_per_stock_oi_data(clean_sym)
-        delivery = get_per_stock_delivery_data(clean_sym)
+        oi = get_per_stock_oi_data(clean_sym, fetch_online=fetch_online)
+        delivery = get_per_stock_delivery_data(clean_sym, fetch_online=fetch_online)
         result[clean_sym] = {"oi_data": oi, "delivery_data": delivery}
-        time.sleep(delay)
+        if delay > 0 and fetch_online:
+            time.sleep(delay)
     return result

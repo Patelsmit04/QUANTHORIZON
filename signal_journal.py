@@ -29,7 +29,7 @@ DB_FILE = os.path.join(DATA_DIR, "signal_journal.db")
 def get_db_connection():
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR, exist_ok=True)
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(DB_FILE, timeout=30.0)
     conn.row_factory = sqlite3.Row
     return conn
 

@@ -12,6 +12,14 @@ from pydantic import BaseModel
 import yfinance as yf
 import pandas as pd
 import numpy as np
+from dotenv import load_dotenv
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+env_file = os.path.join(BASE_DIR, ".env")
+if os.path.exists(env_file):
+    load_dotenv(env_file, override=True)
+elif os.path.exists(os.path.join(BASE_DIR, ".env.example")):
+    load_dotenv(os.path.join(BASE_DIR, ".env.example"), override=False)
 
 from json_utils import atomic_write_json, read_json
 from scoring_engine import evaluate_5_pillar_matrix, get_liquidity_tier
