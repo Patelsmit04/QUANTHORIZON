@@ -776,6 +776,143 @@ input:checked + .slider:before { transform: translateX(16px); }
 .guide-step-box p { font-size: 12px; color: var(--ink-secondary); line-height: 1.6; }
 
 /* ==========================================
+   INDICES SECTION (Nifty / Bank Nifty / Sensex)
+   ========================================== */
+
+.index-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+}
+
+.index-card {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.index-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.index-card-name { font-family: var(--font-heading); font-weight: 800; font-size: 18px; }
+.index-card-ltp { font-family: var(--font-heading); font-size: 22px; font-weight: 800; margin-top: 4px; }
+
+.index-metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.index-metric-box {
+    background: var(--glass-bg-soft); border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm); padding: 10px 12px; text-align: center;
+}
+.index-metric-box .lbl { display: block; font-size: 9px; font-weight: 800; color: var(--ink-muted); letter-spacing: 0.4px; margin-bottom: 3px; }
+.index-metric-box .val { font-family: var(--font-heading); font-weight: 800; font-size: 15px; }
+
+.index-pillars-list { display: flex; flex-direction: column; gap: 6px; }
+.index-pillar-item { font-size: 12px; color: var(--ink-secondary); padding-left: 10px; border-left: 2px solid var(--bullish); }
+
+.global-cues-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.cue-chip {
+    font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: var(--radius-pill);
+    background: rgba(11,11,11,0.05); color: var(--ink-secondary);
+}
+.cue-chip.cue-up { background: var(--bullish-bg); color: var(--bullish); }
+.cue-chip.cue-down { background: var(--bearish-bg); color: var(--bearish); }
+
+/* ==========================================
+   STRATEGIES SECTION
+   ========================================== */
+
+.strategy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 16px;
+}
+
+.strategy-card {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 20px 22px;
+    box-shadow: var(--glass-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.strategy-card.inactive { opacity: 0.55; }
+
+.strategy-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.strategy-card-name { font-family: var(--font-heading); font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.strategy-card-desc { font-size: 12px; color: var(--ink-secondary); line-height: 1.5; }
+
+.strategy-scope-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.scope-chip {
+    font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: var(--radius-pill);
+    background: rgba(42, 120, 214, 0.12); color: var(--cat-blue);
+}
+
+.strategy-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.strategy-stat-box {
+    background: var(--glass-bg-soft); border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm); padding: 8px 10px; text-align: center;
+}
+.strategy-stat-box .lbl { display: block; font-size: 8px; font-weight: 800; color: var(--ink-muted); letter-spacing: 0.3px; margin-bottom: 2px; }
+.strategy-stat-box .val { font-family: var(--font-heading); font-weight: 800; font-size: 14px; }
+
+.strategy-flags-row { display: flex; flex-wrap: wrap; gap: 6px; font-size: 10px; }
+.strategy-flag { padding: 3px 9px; border-radius: var(--radius-pill); font-weight: 700; background: rgba(11,11,11,0.05); color: var(--ink-muted); }
+.strategy-flag.on { background: var(--status-good-bg); color: var(--status-good); }
+
+.strategy-card-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--gridline); }
+.strategy-card-actions .btn { flex: 1; padding: 8px 10px; font-size: 10px; }
+
+.builtin-tag {
+    font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: var(--radius-pill);
+    background: var(--gold-bg); color: var(--gold);
+}
+
+/* Strategy form */
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-label { font-size: 11px; font-weight: 800; color: var(--ink-secondary); letter-spacing: 0.3px; }
+.form-hint { font-size: 11px; color: var(--ink-muted); }
+
+.form-input, .form-textarea {
+    font-family: var(--font-body); font-size: 13px; color: var(--ink-primary);
+    background: var(--glass-bg-soft); border: 1px solid var(--glass-border-strong);
+    border-radius: var(--radius-sm); padding: 10px 12px; outline: none;
+    transition: border-color 0.2s ease;
+}
+.form-input:focus, .form-textarea:focus { border-color: var(--gold); }
+.form-textarea { resize: vertical; min-height: 60px; font-family: var(--font-body); }
+
+.checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+.checkbox-item {
+    display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-secondary);
+    background: var(--glass-bg-soft); border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm); padding: 8px 10px; cursor: pointer;
+}
+.checkbox-item input { accent-color: var(--gold); width: 15px; height: 15px; }
+
+.toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--glass-bg-soft); border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 10px;
+}
+.toggle-row .lbl { font-size: 12px; font-weight: 600; color: var(--ink-secondary); }
+
+.paper-trade-notice {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--status-warning-bg); color: var(--status-warning);
+    border-radius: var(--radius-sm); padding: 10px 14px; font-size: 11px; font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* ==========================================
    RESPONSIVE
    ========================================== */
 
@@ -784,4 +921,5 @@ input:checked + .slider:before { transform: translateX(16px); }
     .header-actions { justify-content: flex-start; }
     .toolbar-container { flex-direction: column; align-items: stretch; }
     .modal-score-box { flex-direction: column; align-items: flex-start; }
+    .index-grid, .strategy-grid { grid-template-columns: 1fr; }
 }

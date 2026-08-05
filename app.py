@@ -4,10 +4,11 @@ import threading
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timezone, timedelta
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import yfinance as yf
 import pandas as pd
 import numpy as np
@@ -31,6 +32,10 @@ from news_provider import (
     should_refresh_universe_news, refresh_universe_news_cache, get_cached_stock_news,
     get_all_cached_news, get_universe_news_meta
 )
+from index_scoring import evaluate_index_signal, fetch_global_cues, classify_global_cues, INDEX_TICKERS
+import strategy_manager as sm
+from strategy_manager import DEFAULT_STRATEGY_ID, get_strategy, list_strategies, compute_effective_pillar_multipliers
+from execution_provider import execute_signal, get_paper_trades, get_paper_performance
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -41,6 +46,29 @@ app = FastAPI(
     description="Refactored 5-Pillar Intraday Matrix, OI Magnitude Threshold, Expiry Discount, Liquidity Tiering & 3:30 PM Off-Market Freeze",
     version="4.5.0"
 )
+
+
+class StrategyCreateRequest(BaseModel):
+    name: str
+    description: str = ""
+    target_scope: List[str] = ["STOCKS"]
+    active_pillars: Optional[Dict[str, bool]] = None
+    required_weight_override: Optional[float] = None
+    fundamentals_gate_enabled: bool = True
+    news_gate_enabled: bool = True
+    auto_paper_trade: bool = False
+
+
+class StrategyUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    target_scope: Optional[List[str]] = None
+    active_pillars: Optional[Dict[str, bool]] = None
+    required_weight_override: Optional[float] = None
+    fundamentals_gate_enabled: Optional[bool] = None
+    news_gate_enabled: Optional[bool] = None
+    auto_paper_trade: Optional[bool] = None
+    is_active: Optional[bool] = None
 
 # CORS Middleware
 app.add_middleware(
@@ -378,10 +406,17 @@ def load_last_market_scan() -> Optional[Dict[str, Any]]:
     return read_json(LAST_MARKET_SCAN_FILE, default=None)
 
 
-def fetch_all_stocks_data(oi_mult: float = 1.5) -> List[Dict[str, Any]]:
+def fetch_raw_stock_universe() -> Dict[str, Any]:
+    """
+    The expensive part (one batch yfinance download + per-stock OI/delivery/fundamentals
+    reads) — done ONCE per scan tick and reused by every strategy that scores the stock
+    universe, so running N strategies doesn't multiply network calls by N. That's what
+    caused real rate-limiting earlier; this split is what prevents a repeat now that
+    multiple strategies can all target STOCKS.
+    """
     logger.info(f"Downloading 5-Pillar intraday data for {len(FO_STOCKS)} F&O stocks + Nifty 50...")
     tickers_to_download = FO_STOCKS + ["^NSEI"]
-    
+
     download_df = yf.download(
         tickers=tickers_to_download,
         period="1d",
@@ -395,10 +430,24 @@ def fetch_all_stocks_data(oi_mult: float = 1.5) -> List[Dict[str, Any]]:
     if isinstance(download_df.columns, pd.MultiIndex) and "^NSEI" in download_df.columns.levels[0]:
         nifty_df = download_df["^NSEI"]
 
-    results = []
-    fundamentals_cache = load_all_fundamentals()  # loaded once, not per-stock, to avoid 200+ redundant disk reads
-    active_pillar_weights = get_active_pillar_weights()  # same — one disk read, not 200+
+    return {
+        "download_df": download_df,
+        "nifty_df": nifty_df,
+        "fundamentals_cache": load_all_fundamentals(),
+        "dynamic_pillar_weights": get_active_pillar_weights(),
+    }
 
+
+def score_stock_universe(raw: Dict[str, Any], strategy: Dict[str, Any], oi_mult: float = 1.5) -> List[Dict[str, Any]]:
+    """Score the already-fetched stock universe against one strategy's config."""
+    download_df = raw["download_df"]
+    nifty_df = raw["nifty_df"]
+    fundamentals_cache = raw["fundamentals_cache"]
+    effective_multipliers = compute_effective_pillar_multipliers(strategy, raw["dynamic_pillar_weights"])
+    required_override = strategy.get("required_weight_override")
+    use_fundamentals_gate = strategy.get("fundamentals_gate_enabled", True)
+
+    results = []
     for ticker in FO_STOCKS:
         try:
             if isinstance(download_df.columns, pd.MultiIndex):
@@ -412,7 +461,7 @@ def fetch_all_stocks_data(oi_mult: float = 1.5) -> List[Dict[str, Any]]:
             clean_sym = ticker.replace(".NS", "")
             oi = get_per_stock_oi_data(clean_sym)
             delivery = get_per_stock_delivery_data(clean_sym)
-            fundamentals = get_fundamental_data(ticker, cache=fundamentals_cache)
+            fundamentals = get_fundamental_data(ticker, cache=fundamentals_cache) if use_fundamentals_gate else None
 
             processed = evaluate_5_pillar_matrix(
                 symbol=ticker,
@@ -423,9 +472,12 @@ def fetch_all_stocks_data(oi_mult: float = 1.5) -> List[Dict[str, Any]]:
                 oi_magnitude_mult=oi_mult,
                 eval_date=get_ist_now(),
                 fundamental_data=fundamentals,
-                pillar_weight_multipliers=active_pillar_weights
+                pillar_weight_multipliers=effective_multipliers,
+                required_weight_override=required_override
             )
             if processed and "confidence_score" in processed:
+                processed["strategy_id"] = strategy["id"]
+                processed["strategy_name"] = strategy["name"]
                 results.append(processed)
         except Exception as e:
             continue
@@ -438,12 +490,109 @@ def fetch_all_stocks_data(oi_mult: float = 1.5) -> List[Dict[str, Any]]:
     return results
 
 
+def fetch_all_stocks_data(oi_mult: float = 1.5) -> List[Dict[str, Any]]:
+    """Backward-compatible entry point — scores the stock universe against the Default
+    5-Pillar strategy, exactly matching pre-strategy-system behavior. Everything already
+    built (locking, evaluation, depth analysis, news enrichment) keeps working unchanged."""
+    raw = fetch_raw_stock_universe()
+    default_strategy = get_strategy(DEFAULT_STRATEGY_ID)
+    return score_stock_universe(raw, default_strategy, oi_mult=oi_mult)
+
+
+def fetch_raw_index_universe() -> Dict[str, Any]:
+    """Fetch index OHLCV + global cues + macro news ONCE per scan tick, shared across every
+    strategy that targets an index — same no-duplicate-fetch discipline as the stock side."""
+    index_dfs: Dict[str, Optional[pd.DataFrame]] = {}
+    for name, ticker in INDEX_TICKERS.items():
+        try:
+            df = yf.download(ticker, period="1d", interval="5m", progress=False)
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            index_dfs[name] = df.dropna()
+        except Exception as e:
+            logger.warning(f"Index data fetch failed for {name} ({ticker}): {e}")
+            index_dfs[name] = None
+
+    global_cues_classified = classify_global_cues(fetch_global_cues())
+    news_classification = classify_news_signal(fetch_market_news())
+
+    return {
+        "index_dfs": index_dfs,
+        "global_cues": global_cues_classified,
+        "news_classification": news_classification,
+        "dynamic_pillar_weights": get_active_pillar_weights(),
+    }
+
+
+def score_index_universe(raw: Dict[str, Any], strategy: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Score the already-fetched index universe against one strategy's config."""
+    scope = strategy.get("target_scope", [])
+    effective_multipliers = compute_effective_pillar_multipliers(strategy, raw["dynamic_pillar_weights"])
+    required_override = strategy.get("required_weight_override")
+    use_news_gate = strategy.get("news_gate_enabled", True)
+
+    results = []
+    for index_name in INDEX_TICKERS:
+        if index_name not in scope:
+            continue
+        df_index = raw["index_dfs"].get(index_name)
+        df_nifty = raw["index_dfs"].get("NIFTY50") if index_name != "NIFTY50" else None
+        news_read = raw["news_classification"] if use_news_gate else None
+        try:
+            processed = evaluate_index_signal(
+                index_name=index_name,
+                df_index=df_index,
+                df_nifty=df_nifty,
+                global_cues_read=raw["global_cues"],
+                news_classification=news_read,
+                pillar_weight_multipliers=effective_multipliers,
+                required_weight_override=required_override,
+            )
+            processed["strategy_id"] = strategy["id"]
+            processed["strategy_name"] = strategy["name"]
+            results.append(processed)
+        except Exception as e:
+            logger.warning(f"Index scoring failed for {index_name} under strategy {strategy['id']}: {e}")
+    return results
+
+
 def run_full_scan_pipeline() -> Dict[str, Any]:
-    """Execute full 5-Pillar scan pipeline and update persistent disk cache."""
-    stocks = fetch_all_stocks_data()
+    """
+    Execute the full scan pipeline and update the persistent disk cache. The Default 5-Pillar
+    strategy drives the main dashboard exactly as before strategies existed. Any OTHER active
+    strategy targeting stocks and/or indices is scored too, reusing the SAME raw data fetch —
+    strategy count doesn't multiply network calls — and cached separately for the Strategies
+    view (see cache_store["strategy_results"]).
+    """
+    raw_stocks = fetch_raw_stock_universe()
+    all_strategies = list_strategies(active_only=True)
+    default_strategy = get_strategy(DEFAULT_STRATEGY_ID)
+
+    stocks = score_stock_universe(raw_stocks, default_strategy)
     annotate_bestest_5(stocks)
     annotate_depth_analysis(stocks)
 
+    # Index universe — always scanned under the default strategy for the Indices view, plus
+    # any custom strategy that targets an index.
+    raw_indices = fetch_raw_index_universe()
+    index_signals = score_index_universe(raw_indices, default_strategy)
+
+    strategy_results: Dict[str, Any] = {}
+    for strat in all_strategies:
+        if strat["id"] == DEFAULT_STRATEGY_ID:
+            continue
+        scope = strat.get("target_scope", [])
+        strat_stocks = score_stock_universe(raw_stocks, strat) if "STOCKS" in scope else []
+        strat_indices = score_index_universe(raw_indices, strat) if any(i in scope for i in INDEX_TICKERS) else []
+        if strat_stocks or strat_indices:
+            strategy_results[strat["id"]] = {
+                "strategy_name": strat["name"],
+                "stocks": strat_stocks,
+                "indices": strat_indices,
+            }
+
+    cache_store["strategy_results"] = strategy_results
+    cache_store["index_data"] = index_signals
 
     p1_high_count = sum(1 for s in stocks if s["priority_level"] == "P1_HIGH")
     p2_med_count = sum(1 for s in stocks if s["priority_level"] == "P2_MEDIUM")
@@ -474,7 +623,9 @@ def run_full_scan_pipeline() -> Dict[str, Any]:
         "prediction_accuracy_pct": win_summary.get("prediction_accuracy_pct", 92.5),
         "total_tracked_trades": win_summary.get("total_trades", 0),
         "avg_gap_pct": win_summary.get("avg_gap_pct", 0.0),
-        "stocks": stocks
+        "stocks": stocks,
+        "indices": index_signals,
+        "active_strategy_count": len(all_strategies)
     }
 
     cache_store["data"] = stocks
@@ -484,6 +635,43 @@ def run_full_scan_pipeline() -> Dict[str, Any]:
 
     save_last_market_scan(scan_response)
     return scan_response
+
+
+def _log_and_maybe_paper_trade(signal: Dict[str, Any], strategy_id: str, vix_val: float, vix_regime: str, auto_paper_trade: bool):
+    if "BTST" not in signal.get("signal", "") and "STBT" not in signal.get("signal", ""):
+        return
+    log_signal_entry(signal, vix_val, vix_regime, strategy_id=strategy_id)
+    if auto_paper_trade:
+        execute_signal(signal, strategy_id=strategy_id)
+
+
+def log_index_and_custom_strategy_signals(
+    index_signals: List[Dict[str, Any]],
+    strategy_results: Dict[str, Any],
+    vix_val: float,
+    vix_regime: str,
+):
+    """
+    Journal every BTST/STBT signal that ISN'T already covered by the default stock-picks
+    loop: the default strategy's index signals, and every custom strategy's stock + index
+    signals. This is what lets each strategy (and each index) build up its own tracked
+    win rate / accuracy instead of only the default stock strategy having one.
+
+    Also triggers PAPER (simulated only — see execution_provider.py) trade logging for any
+    strategy with auto_paper_trade enabled. Off by default on every strategy, including the
+    built-in one — this never fires unless explicitly turned on.
+    """
+    default_strategy = get_strategy(DEFAULT_STRATEGY_ID) or {}
+    for idx_signal in index_signals or []:
+        _log_and_maybe_paper_trade(idx_signal, DEFAULT_STRATEGY_ID, vix_val, vix_regime, default_strategy.get("auto_paper_trade", False))
+
+    for strategy_id, result in (strategy_results or {}).items():
+        strategy = get_strategy(strategy_id) or {}
+        auto_paper = strategy.get("auto_paper_trade", False)
+        for stock in result.get("stocks", []):
+            _log_and_maybe_paper_trade(stock, strategy_id, vix_val, vix_regime, auto_paper)
+        for idx_signal in result.get("indices", []):
+            _log_and_maybe_paper_trade(idx_signal, strategy_id, vix_val, vix_regime, auto_paper)
 
 
 # -------------------------------------------------------------
@@ -529,8 +717,12 @@ def background_scheduler_worker():
                     lock_result = TradeHistoryManager.lock_btst_picks(btst_picks)
 
                     vix_val, vix_regime = fetch_india_vix()
+                    default_auto_paper = (get_strategy(DEFAULT_STRATEGY_ID) or {}).get("auto_paper_trade", False)
                     for stock in btst_picks:
                         log_signal_entry(stock, vix_val, vix_regime)
+                        if default_auto_paper:
+                            execute_signal(stock, strategy_id=DEFAULT_STRATEGY_ID)
+                    log_index_and_custom_strategy_signals(scan_res["indices"], cache_store.get("strategy_results", {}), vix_val, vix_regime)
 
                     last_locked_date = today_date
                     logger.info(f"3:30 PM Pick Lock Complete: Locked {lock_result['locked_count']} BTST/STBT picks into Signal Journal.")
@@ -548,8 +740,12 @@ def background_scheduler_worker():
                         lock_result = TradeHistoryManager.lock_btst_picks(btst_picks)
 
                         vix_val, vix_regime = fetch_india_vix()
+                        default_auto_paper = (get_strategy(DEFAULT_STRATEGY_ID) or {}).get("auto_paper_trade", False)
                         for stock in btst_picks:
                             log_signal_entry(stock, vix_val, vix_regime)
+                            if default_auto_paper:
+                                execute_signal(stock, strategy_id=DEFAULT_STRATEGY_ID)
+                        log_index_and_custom_strategy_signals(cache_store.get("index_data", []), cache_store.get("strategy_results", {}), vix_val, vix_regime)
 
                         last_locked_date = today_date
                         logger.info(f"Post-3:30 PM Lock Complete: Locked {lock_result['locked_count']} picks into Signal Journal.")
@@ -856,6 +1052,142 @@ def get_stock_news_detail(symbol: str):
     if cached is None:
         raise HTTPException(status_code=404, detail=f"No cached news for {symbol} yet — it will appear after the next scheduled refresh.")
     return sanitize_json_data(cached)
+
+
+# -------------------------------------------------------------
+# INDEX SIGNALS (Nifty 50 / Bank Nifty / Sensex) — Default strategy's read
+# -------------------------------------------------------------
+@app.get("/api/indices")
+def get_index_signals():
+    """
+    Current BTST/STBT-style signals for Nifty 50, Bank Nifty, and Sensex under the Default
+    strategy (see index_scoring.py — a dedicated model, not the stock 5-pillar matrix, since
+    indices report zero volume). For other strategies' index reads, see
+    /api/strategies/{id}/signals.
+    """
+    index_data = cache_store.get("index_data")
+    if index_data is None:
+        scan_res = run_full_scan_pipeline()
+        index_data = scan_res.get("indices", [])
+    return sanitize_json_data({"indices": index_data, "tickers": INDEX_TICKERS})
+
+
+# -------------------------------------------------------------
+# STRATEGY MANAGEMENT — full CRUD + per-strategy performance
+# -------------------------------------------------------------
+@app.get("/api/strategies")
+def api_list_strategies(active_only: bool = Query(False)):
+    return sanitize_json_data({"strategies": list_strategies(active_only=active_only)})
+
+
+@app.get("/api/strategies/{strategy_id}")
+def api_get_strategy(strategy_id: str):
+    strategy = get_strategy(strategy_id)
+    if strategy is None:
+        raise HTTPException(status_code=404, detail=f"Strategy {strategy_id} not found.")
+    return sanitize_json_data(strategy)
+
+
+@app.post("/api/strategies")
+def api_create_strategy(payload: StrategyCreateRequest):
+    try:
+        strategy = sm.create_strategy(**payload.model_dump())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return sanitize_json_data(strategy)
+
+
+@app.put("/api/strategies/{strategy_id}")
+def api_update_strategy(strategy_id: str, payload: StrategyUpdateRequest):
+    fields = {k: v for k, v in payload.model_dump().items() if v is not None}
+    try:
+        strategy = sm.update_strategy(strategy_id, **fields)
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return sanitize_json_data(strategy)
+
+
+@app.delete("/api/strategies/{strategy_id}")
+def api_delete_strategy(strategy_id: str):
+    try:
+        sm.delete_strategy(strategy_id)
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"status": "SUCCESS", "message": f"Strategy {strategy_id} deleted."}
+
+
+@app.get("/api/strategies/{strategy_id}/performance")
+def api_strategy_performance(strategy_id: str):
+    """Win rate, directional accuracy, expectancy etc. for THIS strategy only — same metrics
+    engine as the main dashboard, filtered to this strategy's own journaled signals."""
+    strategy = get_strategy(strategy_id)
+    if strategy is None:
+        raise HTTPException(status_code=404, detail=f"Strategy {strategy_id} not found.")
+    return sanitize_json_data({
+        "strategy": strategy,
+        "metrics": get_metrics_summary(strategy_id=strategy_id),
+        "paper_trading": get_paper_performance(strategy_id=strategy_id),
+    })
+
+
+@app.get("/api/strategies/{strategy_id}/signals")
+def api_strategy_signals(strategy_id: str):
+    """This strategy's current live signals (stocks + indices), from the most recent scan."""
+    strategy = get_strategy(strategy_id)
+    if strategy is None:
+        raise HTTPException(status_code=404, detail=f"Strategy {strategy_id} not found.")
+
+    if strategy_id == DEFAULT_STRATEGY_ID:
+        stocks = cache_store.get("data") or []
+        indices = cache_store.get("index_data") or []
+    else:
+        result = (cache_store.get("strategy_results") or {}).get(strategy_id, {})
+        stocks = result.get("stocks", [])
+        indices = result.get("indices", [])
+
+    return sanitize_json_data({"strategy_id": strategy_id, "stocks": stocks, "indices": indices})
+
+
+@app.post("/api/strategies/{strategy_id}/execute")
+def api_execute_strategy_signals(strategy_id: str):
+    """
+    Manually paper-execute this strategy's CURRENT BTST/STBT signals right now (in addition
+    to any automatic execution if auto_paper_trade is on). Always simulated — see
+    execution_provider.py's module docstring for why real order placement isn't wired in.
+    """
+    strategy = get_strategy(strategy_id)
+    if strategy is None:
+        raise HTTPException(status_code=404, detail=f"Strategy {strategy_id} not found.")
+
+    if strategy_id == DEFAULT_STRATEGY_ID:
+        stocks = cache_store.get("data") or []
+        indices = cache_store.get("index_data") or []
+    else:
+        result = (cache_store.get("strategy_results") or {}).get(strategy_id, {})
+        stocks = result.get("stocks", [])
+        indices = result.get("indices", [])
+
+    executed = []
+    for signal in list(stocks) + list(indices):
+        if "BTST" in signal.get("signal", "") or "STBT" in signal.get("signal", ""):
+            res = execute_signal(signal, strategy_id=strategy_id)
+            if res.get("executed"):
+                executed.append(res)
+
+    return sanitize_json_data({
+        "status": "SUCCESS",
+        "message": f"Paper-executed {len(executed)} signal(s) for strategy {strategy_id}.",
+        "executed": executed,
+    })
+
+
+@app.get("/api/paper_trades")
+def api_paper_trades(strategy_id: Optional[str] = Query(None), limit: int = Query(100)):
+    return sanitize_json_data({"trades": get_paper_trades(strategy_id=strategy_id, limit=limit)})
 
 
 @app.post("/api/lock_picks")

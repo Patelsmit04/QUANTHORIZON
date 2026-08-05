@@ -64,21 +64,42 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentNewsVerdictFilter = "ALL";
     let newsLoaded = false;
 
+    // Indices & Strategies Section DOM
+    const indicesSection = document.getElementById("indicesSection");
+    const indexGrid = document.getElementById("indexGrid");
+    const strategiesSection = document.getElementById("strategiesSection");
+    const strategiesNavBadge = document.getElementById("strategiesNavBadge");
+    const strategyGrid = document.getElementById("strategyGrid");
+    const addStrategyBtn = document.getElementById("addStrategyBtn");
+    const strategyFormModal = document.getElementById("strategyFormModal");
+    const closeStrategyFormBtn = document.getElementById("closeStrategyFormBtn");
+    const strategyForm = document.getElementById("strategyForm");
+    const strategyFormTitle = document.getElementById("strategyFormTitle");
+    const strategyPillarCheckboxes = document.getElementById("strategyPillarCheckboxes");
+
+    const ALL_PILLAR_NAMES = [
+        "Pillar 1: Futures OI", "Pillar 2: Vol Persistence", "Pillar 3: Relative Strength",
+        "Pillar 4: Volume Spike", "Pillar 5: Marubozu Close",
+        "Index: Marubozu Close", "Index: Relative Strength", "Index: Global Cues", "Index: Macro News"
+    ];
+
     // -------------------------------------------------------------
     // 1. INITIALIZATION & TIMERS
     // -------------------------------------------------------------
     fetchScanResults();
     fetchWinRatePerformance();
     setupAutoRefresh();
+    populatePillarCheckboxes();
+    refreshStrategiesNavBadge();
 
     // Event Listeners
     if (scanBtn) scanBtn.addEventListener("click", () => fetchScanResults(true));
     if (guideBtn) guideBtn.addEventListener("click", () => guideModal.classList.remove("hidden"));
     if (closeGuideBtn) closeGuideBtn.addEventListener("click", () => guideModal.classList.add("hidden"));
-    
+
     if (winRateBtn) winRateBtn.addEventListener("click", openWinRateModal);
     if (closeWinRateBtn) closeWinRateBtn.addEventListener("click", () => winRateModal.classList.add("hidden"));
-    
+
     if (lockPicksBtn) lockPicksBtn.addEventListener("click", lockPicksAction);
     if (evaluatePicksBtn) evaluatePicksBtn.addEventListener("click", evaluatePicksAction);
 
@@ -88,6 +109,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (searchInput) searchInput.addEventListener("input", filterAndRenderTable);
     if (sortSelect) sortSelect.addEventListener("change", filterAndRenderTable);
     if (closeModalBtn) closeModalBtn.addEventListener("click", hideModal);
+
+    if (addStrategyBtn) addStrategyBtn.addEventListener("click", () => openStrategyForm(null));
+    if (closeStrategyFormBtn) closeStrategyFormBtn.addEventListener("click", () => strategyFormModal.classList.add("hidden"));
+    if (strategyForm) strategyForm.addEventListener("submit", submitStrategyForm);
+    if (strategyFormModal) strategyFormModal.addEventListener("click", (e) => {
+        if (e.target === strategyFormModal) strategyFormModal.classList.add("hidden");
+    });
 
     if (filterTabs) {
         filterTabs.addEventListener("click", (e) => {
@@ -112,14 +140,15 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add("active");
 
             const section = btn.dataset.section;
-            if (section === "news") {
-                if (scannerSection) scannerSection.classList.add("hidden");
-                if (newsSection) newsSection.classList.remove("hidden");
-                if (!newsLoaded) fetchNewsSection();
-            } else {
-                if (scannerSection) scannerSection.classList.remove("hidden");
-                if (newsSection) newsSection.classList.add("hidden");
-            }
+            const sections = { scanner: scannerSection, news: newsSection, indices: indicesSection, strategies: strategiesSection };
+            Object.entries(sections).forEach(([key, el]) => {
+                if (!el) return;
+                if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
+            });
+
+            if (section === "news" && !newsLoaded) fetchNewsSection();
+            if (section === "indices") fetchIndices();
+            if (section === "strategies") fetchStrategies();
         });
     }
 
@@ -811,5 +840,288 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function escapeAttr(str) {
         return escapeHtml(str).replace(/"/g, "&quot;");
+    }
+
+    // -------------------------------------------------------------
+    // 10. INDICES SECTION (Nifty 50 / Bank Nifty / Sensex)
+    // -------------------------------------------------------------
+    async function fetchIndices() {
+        try {
+            if (indexGrid) indexGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
+            const response = await fetch("/api/indices");
+            if (!response.ok) throw new Error("Indices API error");
+            const data = await response.json();
+            renderIndexGrid(data.indices || []);
+        } catch (error) {
+            console.error("Failed to fetch indices:", error);
+            if (indexGrid) indexGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-muted);">Could not load index signals right now.</div>`;
+        }
+    }
+
+    function renderIndexGrid(indices) {
+        if (!indexGrid) return;
+        indexGrid.innerHTML = "";
+        indices.forEach(idx => indexGrid.appendChild(buildIndexCard(idx)));
+    }
+
+    function buildIndexCard(idx) {
+        const card = document.createElement("div");
+        card.className = "index-card";
+
+        const sigText = idx.signal || "NEUTRAL";
+        const sigClass = sigText.includes("BTST") ? "text-bullish" : (sigText.includes("STBT") ? "text-bearish" : "text-sub");
+        const pillars = idx.confirmed_pillars || [];
+        const pillarsHtml = pillars.length
+            ? pillars.map(p => `<div class="index-pillar-item">${escapeHtml(p)}</div>`).join("")
+            : `<div class="index-pillar-item" style="border-color:var(--glass-border-strong);color:var(--ink-muted);">No pillars confirmed right now.</div>`;
+
+        const cues = (idx.global_cues && idx.global_cues.detail) || {};
+        const cueLabels = { DOW: "Dow", NASDAQ: "Nasdaq", NIKKEI: "Nikkei", HANGSENG: "Hang Seng", CRUDE: "Crude", USDINR: "USD/INR" };
+        const cuesHtml = Object.entries(cues).map(([k, v]) => {
+            const cls = v > 0 ? "cue-up" : (v < 0 ? "cue-down" : "");
+            return `<span class="cue-chip ${cls}">${cueLabels[k] || k} ${v >= 0 ? "+" : ""}${v}%</span>`;
+        }).join("");
+
+        card.innerHTML = `
+            <div class="index-card-header">
+                <div>
+                    <div class="index-card-name">${escapeHtml(idx.index_name || "")}</div>
+                    <div class="index-card-ltp">${idx.ltp !== undefined ? idx.ltp.toLocaleString("en-IN") : "--"}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div class="signal-badge ${sigClass}">${sigText}</div>
+                    ${getPriorityBadgeHTML(idx.priority_level || "P3_LOW", sigText)}
+                </div>
+            </div>
+            <div class="index-metrics-row">
+                <div class="index-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${idx.confidence_score !== undefined ? idx.confidence_score + "%" : "--"}</span></div>
+                <div class="index-metric-box"><span class="lbl">WEIGHT</span><span class="val">${idx.confirmed_pillars_weight}/${idx.required_weight}</span></div>
+                <div class="index-metric-box"><span class="lbl">RSI</span><span class="val">${idx.rsi !== undefined ? idx.rsi : "--"}</span></div>
+            </div>
+            <div class="index-pillars-list">${pillarsHtml}</div>
+            <div>
+                <div class="form-hint" style="margin-bottom:6px;">Global cues (${(idx.global_cues && idx.global_cues.verdict) || "UNAVAILABLE"})</div>
+                <div class="global-cues-row">${cuesHtml || '<span class="cue-chip">Not fetched yet</span>'}</div>
+            </div>
+        `;
+        return card;
+    }
+
+    // -------------------------------------------------------------
+    // 11. STRATEGIES SECTION — full CRUD + per-strategy performance
+    // -------------------------------------------------------------
+    function populatePillarCheckboxes() {
+        if (!strategyPillarCheckboxes) return;
+        strategyPillarCheckboxes.innerHTML = ALL_PILLAR_NAMES.map(p => `
+            <label class="checkbox-item">
+                <input type="checkbox" value="${escapeAttr(p)}" checked> ${escapeHtml(p)}
+            </label>
+        `).join("");
+    }
+
+    async function refreshStrategiesNavBadge() {
+        try {
+            const response = await fetch("/api/strategies");
+            if (!response.ok) return;
+            const data = await response.json();
+            if (strategiesNavBadge) strategiesNavBadge.textContent = (data.strategies || []).length;
+        } catch (e) { /* nav badge is cosmetic — ignore fetch errors here */ }
+    }
+
+    async function fetchStrategies() {
+        try {
+            if (strategyGrid) strategyGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
+            const response = await fetch("/api/strategies");
+            if (!response.ok) throw new Error("Strategies API error");
+            const data = await response.json();
+            const strategies = data.strategies || [];
+            if (strategiesNavBadge) strategiesNavBadge.textContent = strategies.length;
+            await renderStrategyGrid(strategies);
+        } catch (error) {
+            console.error("Failed to fetch strategies:", error);
+            if (strategyGrid) strategyGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-muted);">Could not load strategies right now.</div>`;
+        }
+    }
+
+    async function renderStrategyGrid(strategies) {
+        if (!strategyGrid) return;
+        strategyGrid.innerHTML = "";
+        for (const strat of strategies) {
+            const card = await buildStrategyCard(strat);
+            strategyGrid.appendChild(card);
+        }
+    }
+
+    async function buildStrategyCard(strategy) {
+        const card = document.createElement("div");
+        card.className = `strategy-card ${strategy.is_active ? "" : "inactive"}`;
+
+        let perf = { metrics: {}, paper_trading: {} };
+        try {
+            const response = await fetch(`/api/strategies/${strategy.id}/performance`);
+            if (response.ok) perf = await response.json();
+        } catch (e) { /* stats are supplementary — card still renders without them */ }
+
+        const scopeHtml = (strategy.target_scope || []).map(s => `<span class="scope-chip">${escapeHtml(s)}</span>`).join("");
+        const metrics = perf.metrics || {};
+        const paperTrading = perf.paper_trading || {};
+
+        card.innerHTML = `
+            <div class="strategy-card-header">
+                <div>
+                    <div class="strategy-card-name">
+                        ${escapeHtml(strategy.name)}
+                        ${strategy.is_builtin ? '<span class="builtin-tag">BUILT-IN</span>' : ""}
+                    </div>
+                </div>
+                <label class="switch" title="Active / Inactive">
+                    <input type="checkbox" ${strategy.is_active ? "checked" : ""} data-strategy-toggle="${strategy.id}">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="strategy-card-desc">${escapeHtml(strategy.description || "No description.")}</div>
+            <div class="strategy-scope-row">${scopeHtml}</div>
+            <div class="strategy-stats-row">
+                <div class="strategy-stat-box"><span class="lbl">WIN RATE</span><span class="val">${metrics.win_rate_pct !== undefined ? metrics.win_rate_pct + "%" : "--"}</span></div>
+                <div class="strategy-stat-box"><span class="lbl">ACCURACY</span><span class="val">${metrics.directional_accuracy_pct !== undefined ? metrics.directional_accuracy_pct + "%" : "--"}</span></div>
+                <div class="strategy-stat-box"><span class="lbl">SIGNALS</span><span class="val">${metrics.total_evaluated_signals !== undefined ? metrics.total_evaluated_signals : "--"}</span></div>
+            </div>
+            <div class="strategy-flags-row">
+                <span class="strategy-flag ${strategy.fundamentals_gate_enabled ? "on" : ""}">Fundamentals ${strategy.fundamentals_gate_enabled ? "ON" : "OFF"}</span>
+                <span class="strategy-flag ${strategy.news_gate_enabled ? "on" : ""}">News ${strategy.news_gate_enabled ? "ON" : "OFF"}</span>
+                <span class="strategy-flag ${strategy.auto_paper_trade ? "on" : ""}">Auto Paper-Trade ${strategy.auto_paper_trade ? "ON" : "OFF"}</span>
+                <span class="strategy-flag">${paperTrading.total_paper_trades || 0} paper trade(s)</span>
+            </div>
+            <div class="strategy-card-actions">
+                <button class="btn btn-secondary" data-strategy-edit="${strategy.id}"><i class="fa-solid fa-pen"></i> EDIT</button>
+                <button class="btn btn-secondary" data-strategy-execute="${strategy.id}"><i class="fa-solid fa-bolt"></i> RUN NOW</button>
+                ${strategy.is_builtin ? "" : `<button class="btn btn-secondary" data-strategy-delete="${strategy.id}"><i class="fa-solid fa-trash"></i></button>`}
+            </div>
+        `;
+
+        const toggleInput = card.querySelector("[data-strategy-toggle]");
+        if (toggleInput) toggleInput.addEventListener("change", () => toggleStrategyActive(strategy.id, toggleInput.checked));
+
+        const editBtn = card.querySelector("[data-strategy-edit]");
+        if (editBtn) editBtn.addEventListener("click", () => openStrategyForm(strategy));
+
+        const executeBtn = card.querySelector("[data-strategy-execute]");
+        if (executeBtn) executeBtn.addEventListener("click", () => executeStrategyNow(strategy.id));
+
+        const deleteBtn = card.querySelector("[data-strategy-delete]");
+        if (deleteBtn) deleteBtn.addEventListener("click", () => deleteStrategyAction(strategy.id, strategy.name));
+
+        return card;
+    }
+
+    function openStrategyForm(strategy) {
+        if (!strategyForm || !strategyFormModal) return;
+        strategyForm.reset();
+        document.getElementById("strategyFormId").value = strategy ? strategy.id : "";
+        strategyFormTitle.innerHTML = strategy
+            ? `<i class="fa-solid fa-pen text-gold"></i> Edit Strategy`
+            : `<i class="fa-solid fa-plus text-gold"></i> Add Strategy`;
+
+        document.getElementById("strategyName").value = strategy ? strategy.name : "";
+        document.getElementById("strategyDescription").value = strategy ? (strategy.description || "") : "";
+        document.getElementById("strategyWeightOverride").value = (strategy && strategy.required_weight_override !== null && strategy.required_weight_override !== undefined) ? strategy.required_weight_override : "";
+        document.getElementById("strategyFundamentalsGate").checked = strategy ? !!strategy.fundamentals_gate_enabled : true;
+        document.getElementById("strategyNewsGate").checked = strategy ? !!strategy.news_gate_enabled : true;
+        document.getElementById("strategyAutoPaperTrade").checked = strategy ? !!strategy.auto_paper_trade : false;
+
+        const scope = strategy ? (strategy.target_scope || []) : ["STOCKS"];
+        document.querySelectorAll("#strategyScopeCheckboxes input").forEach(cb => {
+            cb.checked = scope.includes(cb.value);
+        });
+
+        const activePillars = strategy ? (strategy.active_pillars || {}) : {};
+        document.querySelectorAll("#strategyPillarCheckboxes input").forEach(cb => {
+            cb.checked = strategy ? (activePillars[cb.value] !== false) : true;
+        });
+
+        strategyFormModal.classList.remove("hidden");
+    }
+
+    async function submitStrategyForm(e) {
+        e.preventDefault();
+        const id = document.getElementById("strategyFormId").value;
+        const scope = Array.from(document.querySelectorAll("#strategyScopeCheckboxes input:checked")).map(cb => cb.value);
+        const activePillars = {};
+        document.querySelectorAll("#strategyPillarCheckboxes input").forEach(cb => {
+            activePillars[cb.value] = cb.checked;
+        });
+        const weightOverrideRaw = document.getElementById("strategyWeightOverride").value;
+
+        const payload = {
+            name: document.getElementById("strategyName").value,
+            description: document.getElementById("strategyDescription").value,
+            target_scope: scope.length ? scope : ["STOCKS"],
+            active_pillars: activePillars,
+            required_weight_override: weightOverrideRaw === "" ? null : parseFloat(weightOverrideRaw),
+            fundamentals_gate_enabled: document.getElementById("strategyFundamentalsGate").checked,
+            news_gate_enabled: document.getElementById("strategyNewsGate").checked,
+            auto_paper_trade: document.getElementById("strategyAutoPaperTrade").checked,
+        };
+
+        try {
+            const url = id ? `/api/strategies/${id}` : "/api/strategies";
+            const method = id ? "PUT" : "POST";
+            const response = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Save failed");
+            }
+            strategyFormModal.classList.add("hidden");
+            fetchStrategies();
+        } catch (error) {
+            alert(`Could not save strategy: ${error.message}`);
+        }
+    }
+
+    async function toggleStrategyActive(id, isActive) {
+        try {
+            const response = await fetch(`/api/strategies/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ is_active: isActive }),
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Update failed");
+            }
+            fetchStrategies();
+        } catch (error) {
+            alert(`Could not update strategy: ${error.message}`);
+            fetchStrategies();
+        }
+    }
+
+    async function deleteStrategyAction(id, name) {
+        if (!confirm(`Delete strategy "${name}"? This cannot be undone.`)) return;
+        try {
+            const response = await fetch(`/api/strategies/${id}`, { method: "DELETE" });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Delete failed");
+            }
+            fetchStrategies();
+        } catch (error) {
+            alert(`Could not delete strategy: ${error.message}`);
+        }
+    }
+
+    async function executeStrategyNow(id) {
+        try {
+            const response = await fetch(`/api/strategies/${id}/execute`, { method: "POST" });
+            const data = await response.json();
+            alert(data.message || "Executed.");
+            fetchStrategies();
+        } catch (error) {
+            alert("Could not execute strategy right now.");
+        }
     }
 });

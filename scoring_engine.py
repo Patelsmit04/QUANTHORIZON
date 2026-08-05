@@ -117,7 +117,8 @@ def evaluate_5_pillar_matrix(
     oi_magnitude_mult: float = 1.5,
     eval_date: Optional[datetime] = None,
     fundamental_data: Optional[Dict[str, Any]] = None,
-    pillar_weight_multipliers: Optional[Dict[str, float]] = None
+    pillar_weight_multipliers: Optional[Dict[str, float]] = None,
+    required_weight_override: Optional[float] = None
 ) -> Dict[str, Any]:
     """
     Evaluates stock against the Refactored 5-Pillar Matrix.
@@ -131,9 +132,13 @@ def evaluate_5_pillar_matrix(
     pillar_weight_multipliers (optional): output of
     walk_forward_validator.get_active_pillar_weights() — per-pillar multipliers empirically
     tuned from evaluated outcome history (capped +/-15%/day, gated on >=30 samples; see that
-    module). Defaults to None, meaning every pillar keeps its original 1.0 weight — identical to
-    the hand-tuned baseline behavior unless the caller explicitly opts into the auto-improved
-    weights.
+    module), OR strategy_manager.compute_effective_pillar_multipliers() when a strategy has
+    disabled specific pillars (multiplier 0.0). Defaults to None, meaning every pillar keeps
+    its original 1.0 weight.
+
+    required_weight_override (optional): replaces the tier-based required_pillars threshold
+    (3 for TIER_1, 4 for TIER_2) with a caller-supplied value — used by strategy_manager to
+    let a strategy define its own confirmation bar. None (default) keeps the tier-based rule.
     """
     weight_mult = pillar_weight_multipliers or {}
 
@@ -156,8 +161,8 @@ def evaluate_5_pillar_matrix(
         }
 
     liquidity_tier = get_liquidity_tier(clean_sym)
-    required_pillars = 3 if liquidity_tier == "TIER_1" else 4
-    
+    required_pillars = required_weight_override if required_weight_override is not None else (3 if liquidity_tier == "TIER_1" else 4)
+
     if df_stock is None or df_stock.empty:
         return {
             "symbol": clean_sym,

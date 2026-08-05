@@ -16,6 +16,8 @@ from typing import Dict, List, Any, Optional, Tuple
 import pandas as pd
 import yfinance as yf
 
+from strategy_manager import DEFAULT_STRATEGY_ID
+
 logger = logging.getLogger("SignalJournal")
 
 DATA_DIR = "data"
@@ -73,6 +75,14 @@ def init_journal_db():
         );
         """)
 
+        # Migration: strategy_id predates the multi-strategy system on any existing DB — add it
+        # idempotently (ALTER TABLE ADD COLUMN fails harmlessly if it's already there) so old
+        # rows backfill to the Default 5-Pillar strategy rather than breaking per-strategy filters.
+        try:
+            cursor.execute(f"ALTER TABLE signal_journal ADD COLUMN strategy_id TEXT NOT NULL DEFAULT '{DEFAULT_STRATEGY_ID}'")
+        except sqlite3.OperationalError:
+            pass
+
         # Table 2: Signal Evaluations (Next-Day Outcomes & P&L)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS signal_evaluations (
@@ -117,16 +127,38 @@ def derive_confidence_bucket(score: int) -> str:
         return "<70"
 
 
-def log_signal_entry(stock: Dict[str, Any], vix_value: float = 15.0, vix_regime: str = "NORMAL") -> bool:
-    """Log a single stock signal into SQLite Signal Journal."""
+def log_signal_entry(
+    stock: Dict[str, Any],
+    vix_value: float = 15.0,
+    vix_regime: str = "NORMAL",
+    strategy_id: str = DEFAULT_STRATEGY_ID,
+) -> bool:
+    """
+    Log a single signal (stock OR index) into the SQLite Signal Journal, tagged with the
+    strategy that produced it. Accepts either shape: stock results key off 'symbol', index
+    results (index_scoring.evaluate_index_signal) key off 'index_name' — normalized here so
+    one journal covers both.
+
+    The id includes strategy_id: without it, two different strategies signaling the same
+    symbol on the same day would collide on the same primary key and INSERT OR IGNORE would
+    silently drop the second one.
+    """
     today_date = datetime.now().strftime("%Y-%m-%d")
-    signal_id = f"{today_date}_{stock['symbol']}"
+    symbol = stock.get("symbol") or stock.get("index_name")
+    if not symbol:
+        logger.warning("log_signal_entry: no symbol/index_name on result — skipping.")
+        return False
+    signal_id = f"{today_date}_{strategy_id}_{symbol}"
 
     signal_text = stock.get("signal", "NEUTRAL")
     pred_direction = "BULLISH" if "BTST" in signal_text else ("BEARISH" if "STBT" in signal_text else "NEUTRAL")
     conf_score = int(stock.get("confidence_score", 50))
     conf_bucket = derive_confidence_bucket(conf_score)
 
+    # Stock-specific pillar names — index results use different pillar names (see
+    # index_scoring.py) and simply won't match here, leaving these columns at 0/false for
+    # index-sourced rows. total_pillar_weight (below) still carries the real confirmed weight
+    # for either shape, which is what win-rate/accuracy actually key off.
     pw = stock.get("pillar_weights", {})
     p1_w = float(pw.get("Pillar 1: Futures OI", 0.0))
     p2_w = float(pw.get("Pillar 2: Vol Persistence", 0.0))
@@ -146,16 +178,16 @@ def log_signal_entry(stock: Dict[str, Any], vix_value: float = 15.0, vix_regime:
                 pillar_1_confirmed, pillar_1_weight, pillar_2_confirmed, pillar_2_weight,
                 pillar_3_confirmed, pillar_3_weight, pillar_4_confirmed, pillar_4_weight,
                 pillar_5_confirmed, pillar_5_weight, total_pillar_weight,
-                expiry_discount_applied, vix_regime, vix_value
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                expiry_discount_applied, vix_regime, vix_value, strategy_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 signal_id,
                 time.strftime("%Y-%m-%d %H:%M:%S IST"),
                 today_date,
-                stock["symbol"],
-                stock["raw_ticker"],
-                stock.get("liquidity_tier", "TIER_1"),
-                stock.get("priority_level", "P1_HIGH"),
+                symbol,
+                stock.get("raw_ticker", symbol),
+                stock.get("liquidity_tier", "N/A"),
+                stock.get("priority_level", "P3_LOW"),
                 signal_text,
                 pred_direction,
                 stock.get("option_type", "NONE"),
@@ -163,7 +195,7 @@ def log_signal_entry(stock: Dict[str, Any], vix_value: float = 15.0, vix_regime:
                 conf_bucket,
                 float(stock.get("ltp", 0.0)),
                 float(stock.get("predicted_gap_pct", 0.0)),
-                float(stock.get("vwap", 0.0)),
+                float(stock.get("vwap", stock.get("ltp", 0.0))),
                 float(stock.get("volume_spike", 1.0)),
                 float(stock.get("rsi", 50.0)),
                 float(stock.get("range_position_pct", 50.0)),
@@ -175,7 +207,8 @@ def log_signal_entry(stock: Dict[str, Any], vix_value: float = 15.0, vix_regime:
                 float(stock.get("confirmed_pillars_weight", 0.0)),
                 1 if stock.get("expiry_discount_applied", False) else 0,
                 vix_regime,
-                vix_value
+                vix_value,
+                strategy_id
             ))
             conn.commit()
             return True
@@ -319,17 +352,28 @@ def evaluate_pending_signals() -> Dict[str, Any]:
     return {"evaluated_count": evaluated_count}
 
 
-def get_metrics_summary() -> Dict[str, Any]:
+def get_metrics_summary(strategy_id: Optional[str] = None) -> Dict[str, Any]:
     """
     Calculate full Part 1 Metrics: Directional Accuracy, Win Rate, CALL/PUT Precision,
     Expectancy, Profit Factor, VIX Regime breakdown, and Sample Size Guardrails.
+
+    strategy_id: None (default) = blended across every strategy, same as before the
+    multi-strategy system existed. Pass a specific strategy's id to see ONLY its own
+    performance — this is what powers each strategy's individual win-rate/accuracy display.
     """
     with get_db_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("""
-            SELECT j.*, e.* FROM signal_journal j
-            INNER JOIN signal_evaluations e ON j.id = e.signal_id
-        """)
+        if strategy_id:
+            cursor.execute("""
+                SELECT j.*, e.* FROM signal_journal j
+                INNER JOIN signal_evaluations e ON j.id = e.signal_id
+                WHERE j.strategy_id = ?
+            """, (strategy_id,))
+        else:
+            cursor.execute("""
+                SELECT j.*, e.* FROM signal_journal j
+                INNER JOIN signal_evaluations e ON j.id = e.signal_id
+            """)
         rows = [dict(r) for r in cursor.fetchall()]
 
     total_evaluated = len(rows)

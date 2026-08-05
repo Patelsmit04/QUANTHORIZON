@@ -29,6 +29,18 @@ fundamental and news quality gates, and grading its own predictions every tradin
 - **News section**: covers the entire F&O universe (~210 stocks), not just the day's picks.
   Refreshed by a budget-capped background job (max 3 passes/day) — page views never call the
   news API directly, so it costs the same whether one person or ten thousand check it.
+- **Index signals** (Nifty 50 / Bank Nifty / Sensex): a dedicated model, not the stock
+  5-pillar matrix — indices report zero volume via yfinance, so volume-based pillars and VWAP
+  don't apply. Built around Marubozu close position, relative strength vs Nifty (Bank
+  Nifty/Sensex only), **global cues** (US markets overnight, Asian markets same-day, crude
+  oil, USD/INR), and macro news sentiment.
+- **Strategies**: the 5-pillar matrix + index model are configurable, not fixed. Create named
+  strategies that target stocks and/or any index, toggle individual pillars on/off, override
+  the confirmation-weight threshold, and turn the fundamentals/news gates on or off per
+  strategy — each one tracks its own win rate and accuracy independently. Full CRUD via
+  `/api/strategies` or the Strategies tab in the dashboard.
+- **Paper trading**: strategies can be flagged `auto_paper_trade` to simulate acting on their
+  live signals. This is **simulated only** — see the Paper Trading section below.
 
 ## Tech stack
 
@@ -73,25 +85,66 @@ long as the process is running — leave it running through market hours for it 
 scan, lock, and grade picks on schedule.
 
 On first run, `data/` is created automatically to hold:
-- `trade_history.json`, `signal_journal.db` — locked picks and graded outcomes
+- `trade_history.json`, `signal_journal.db` — locked picks and graded outcomes (journal now
+  tracks a `strategy_id` per signal, so each strategy's performance is queryable separately)
 - `fundamentals_cache.json`, `stock_news_cache.json` — daily/budget-capped provider caches
 - `active_pillar_weights.json`, `pillar_weights_history.json` — the auto-improve state + audit trail
+- `strategies.json` — every strategy's configuration (the built-in Default 5-Pillar strategy
+  is seeded automatically on first run)
+- `paper_trades.json` — simulated order log (see Paper Trading below)
 - `last_market_scan.json` — the persisted snapshot served off-market
 
 This directory is gitignored — it's runtime state, not source.
+
+## Strategies
+
+A **Strategy** is a named configuration layered on top of the existing scoring engines — it
+does not reimplement scoring, it controls what that scoring uses:
+
+- **target_scope**: which universe(s) it scans — `STOCKS`, `NIFTY50`, `BANKNIFTY`, `SENSEX`,
+  any combination
+- **active_pillars**: which of the 5 stock pillars / 4 index pillars count toward its score —
+  a disabled pillar contributes zero weight, it isn't removed from the engine
+- **required_weight_override**: a custom confirmation bar, or `None` to use the engine's own
+  tier-based (stocks) / fixed (indices) default
+- **fundamentals_gate_enabled** / **news_gate_enabled**: toggle those quality gates per strategy
+- **auto_paper_trade**: simulate acting on this strategy's live signals (see below)
+
+The built-in **Default 5-Pillar** strategy reproduces the original, pre-strategy-system
+behavior exactly (every pillar active, tier-based thresholds, both gates on) — it can be
+edited but not deleted, so nothing changes for you unless you create or modify a strategy.
+Every strategy tracks its own win rate, directional accuracy, and paper-trade count
+independently (`GET /api/strategies/{id}/performance`).
+
+## Paper trading
+
+`auto_paper_trade` and the `/api/strategies/{id}/execute` endpoint simulate acting on a
+strategy's signals — logging a fake order to `data/paper_trades.json` — but this is
+**deliberately paper-only**, not a partial implementation:
+
+- Real retail algo trading in India requires SEBI's framework (effective Feb 2025):
+  exchange-empanelled Algo IDs and broker-level registration. An app can't legally fire live
+  retail algo orders through a generic broker API key without that in place.
+- `execution_provider.py`'s `EXECUTION_MODE` is hardcoded to `"PAPER"`. There is no code path
+  that calls a real broker network endpoint. Going live means writing a new `BrokerAdapter`
+  subclass with real credentials once registration is actually in place — nothing here does
+  that automatically.
 
 ## Project structure
 
 ```
 app.py                     FastAPI app, scheduler threads, API routes
-scoring_engine.py          The 5-pillar matrix
+scoring_engine.py          The stock 5-pillar matrix
+index_scoring.py           The index model (Nifty 50 / Bank Nifty / Sensex)
+strategy_manager.py        Strategy CRUD + pillar multiplier composition
+execution_provider.py      Paper/simulated order execution (no real broker)
 fo_universe.py             Canonical NSE F&O stock whitelist
 nse_data_provider.py       OI proxy + delivery % history (jugaad-data)
 fundamental_provider.py    Fundamental quality gate (yfinance)
 news_provider.py           News quality gate + universe-wide cache (CurrentsAPI)
 depth_analysis.py          Per-stock written narrative generator
 walk_forward_validator.py  Out-of-sample validation + auto-improving pillar weights
-signal_journal.py          SQLite journal of signals + graded outcomes
+signal_journal.py          SQLite journal of signals + graded outcomes, per strategy
 vix_provider.py            India VIX regime classifier
 json_utils.py              Atomic JSON read/write (concurrency-safe)
 scanner.py                 Standalone CLI scan script (no server)
@@ -104,9 +157,18 @@ static/                    Dashboard (HTML/CSS/JS)
 |---|---|
 | `GET /api/scan` | Current/cached scan results for the full universe |
 | `GET /api/stock/{symbol}` | Live detail + recent candles for one stock |
+| `GET /api/indices` | Current Nifty 50 / Bank Nifty / Sensex signals |
 | `GET /api/news` | Cached news for every F&O stock (never calls the news API live) |
 | `GET /api/news/{symbol}` | Cached news for one stock |
-| `GET /api/performance` | Win rate, accuracy, and locked-pick history |
+| `GET /api/strategies` | List all strategies |
+| `POST /api/strategies` | Create a strategy |
+| `PUT /api/strategies/{id}` | Update a strategy |
+| `DELETE /api/strategies/{id}` | Delete a strategy (built-in one is protected) |
+| `GET /api/strategies/{id}/performance` | This strategy's win rate/accuracy/paper stats |
+| `GET /api/strategies/{id}/signals` | This strategy's current live signals |
+| `POST /api/strategies/{id}/execute` | Manually paper-execute this strategy's current signals |
+| `GET /api/paper_trades` | Simulated order log, optionally filtered by strategy |
+| `GET /api/performance` | Win rate, accuracy, and locked-pick history (default strategy) |
 | `GET /api/validation` | Walk-forward validation, pillar hit rates, active weights + history |
 | `POST /api/lock_picks` | Manually lock the current picks |
 | `POST /api/evaluate_picks` | Manually run the next-day gap evaluation |
@@ -117,3 +179,5 @@ static/                    Dashboard (HTML/CSS/JS)
   just show `DATA_UNAVAILABLE`/empty state instead of failing.
 - The news refresh is hard-capped at 3 full passes/day to stay within CurrentsAPI's free-tier
   daily limit (see `news_provider.py` for the exact budget math).
+- Running multiple strategies doesn't multiply network calls — stock and index data are each
+  fetched once per scan tick and reused across every active strategy that targets them.

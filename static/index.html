@@ -31,10 +31,17 @@
                 </div>
             </div>
 
-            <!-- Section Nav: Scanner vs News -->
+            <!-- Section Nav -->
             <nav class="main-nav-tabs" id="mainNavTabs">
                 <button class="main-nav-tab active" data-section="scanner">
                     <i class="fa-solid fa-radar"></i> SCANNER
+                </button>
+                <button class="main-nav-tab" data-section="indices">
+                    <i class="fa-solid fa-chart-column"></i> INDICES
+                </button>
+                <button class="main-nav-tab" data-section="strategies">
+                    <i class="fa-solid fa-sliders"></i> STRATEGIES
+                    <span class="nav-badge" id="strategiesNavBadge">--</span>
                 </button>
                 <button class="main-nav-tab" data-section="news">
                     <i class="fa-solid fa-newspaper"></i> NEWS
@@ -324,7 +331,102 @@
     </div>
     <!-- ============================== END NEWS SECTION ============================== -->
 
+    <!-- ============================== INDICES SECTION ============================== -->
+    <div id="indicesSection" class="hidden">
+        <section class="index-grid" id="indexGrid">
+            <!-- Dynamic index cards injected by JS -->
+        </section>
+    </div>
+    <!-- ============================== END INDICES SECTION ============================== -->
+
+    <!-- ============================== STRATEGIES SECTION ============================== -->
+    <div id="strategiesSection" class="hidden">
+        <section class="toolbar-container">
+            <div class="legend-subtitle">Presets on top of the existing pillars/gates — add, edit, or remove any of your own; the built-in Default 5-Pillar strategy can be edited but not deleted.</div>
+            <button id="addStrategyBtn" class="btn btn-pill btn-primary">
+                <i class="fa-solid fa-plus"></i> ADD STRATEGY
+            </button>
+        </section>
+
+        <div class="paper-trade-notice">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>All strategy execution is PAPER/SIMULATED only — no real broker is connected and no real money ever moves through this system.</span>
+        </div>
+
+        <section class="strategy-grid" id="strategyGrid">
+            <!-- Dynamic strategy cards injected by JS -->
+        </section>
+    </div>
+    <!-- ============================== END STRATEGIES SECTION ============================== -->
+
     </main>
+
+    <!-- Strategy Add/Edit Modal -->
+    <div id="strategyFormModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h2 id="strategyFormTitle"><i class="fa-solid fa-sliders text-gold"></i> Add Strategy</h2>
+                </div>
+                <button id="closeStrategyFormBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="strategyForm">
+                    <input type="hidden" id="strategyFormId">
+
+                    <div class="form-group">
+                        <label class="form-label">STRATEGY NAME</label>
+                        <input type="text" id="strategyName" class="form-input" required placeholder="e.g. Conservative Blue-Chip">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">DESCRIPTION</label>
+                        <textarea id="strategyDescription" class="form-textarea" placeholder="What is this strategy for?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">TARGET SCOPE</label>
+                        <div class="checkbox-grid" id="strategyScopeCheckboxes">
+                            <label class="checkbox-item"><input type="checkbox" value="STOCKS" checked> Stocks (F&amp;O)</label>
+                            <label class="checkbox-item"><input type="checkbox" value="NIFTY50"> Nifty 50</label>
+                            <label class="checkbox-item"><input type="checkbox" value="BANKNIFTY"> Bank Nifty</label>
+                            <label class="checkbox-item"><input type="checkbox" value="SENSEX"> Sensex</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">ACTIVE PILLARS</label>
+                        <div class="form-hint" style="margin-bottom:6px;">A disabled pillar contributes zero weight to this strategy's score.</div>
+                        <div class="checkbox-grid" id="strategyPillarCheckboxes">
+                            <!-- populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">REQUIRED WEIGHT OVERRIDE (optional)</label>
+                        <input type="number" id="strategyWeightOverride" class="form-input" step="0.1" min="0" placeholder="Leave blank to use the engine's own tier/index default">
+                    </div>
+
+                    <div class="toggle-row">
+                        <span class="lbl">Fundamentals Quality Gate</span>
+                        <label class="switch"><input type="checkbox" id="strategyFundamentalsGate" checked><span class="slider round"></span></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="lbl">News Quality Gate</span>
+                        <label class="switch"><input type="checkbox" id="strategyNewsGate" checked><span class="slider round"></span></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="lbl">Auto Paper-Trade Live Signals (simulated only)</span>
+                        <label class="switch"><input type="checkbox" id="strategyAutoPaperTrade"><span class="slider round"></span></label>
+                    </div>
+
+                    <button type="submit" class="btn btn-pill btn-primary" style="width:100%;margin-top:10px;justify-content:center;">
+                        <i class="fa-solid fa-floppy-disk"></i> SAVE STRATEGY
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Win Rate & Score Tracker Modal -->
     <div id="winRateModal" class="modal-overlay hidden">
