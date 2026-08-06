@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-from env_utils import load_env_with_fallback
+from env_utils import load_env_with_fallback, get_runtime_data_dir
 load_env_with_fallback(BASE_DIR)
 
 from net_utils import call_with_retry
@@ -146,10 +146,11 @@ async def add_no_cache_headers(request, call_next):
 # Canonical Whitelisted NSE F&O Stock List (Yahoo Finance .NS format)
 FO_STOCKS = get_canonical_fo_tickers()
 
-DATA_DIR = "data"
+DATA_DIR = get_runtime_data_dir()
 TRADE_HISTORY_FILE = os.path.join(DATA_DIR, "trade_history.json")
 LAST_MARKET_SCAN_FILE = os.path.join(DATA_DIR, "last_market_scan.json")
 INDEX_INTELLIGENCE_FILE = os.path.join(DATA_DIR, "index_btst_verdicts.json")
+IS_VERCEL_SERVERLESS = os.environ.get("VERCEL") == "1"
 
 # Post-close Index BTST Intelligence run time — deliberately separate from the 3:30 PM stock
 # lock, since overnight-relevant reads (option chain positioning) settle right after close, not
@@ -1087,6 +1088,10 @@ def start_background_scheduler():
     # very first tick doesn't race capture_event_loop() not having run yet.
     ws_broadcast.capture_event_loop()
 
+    if IS_VERCEL_SERVERLESS:
+        logger.info("Vercel serverless runtime detected; skipping persistent background scheduler threads.")
+        return
+
     thread = threading.Thread(target=background_scheduler_worker, daemon=True)
     thread.start()
 
@@ -1675,11 +1680,12 @@ async def ws_live(websocket: WebSocket):
         ws_broadcast.unregister(websocket)
 
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 def serve_dashboard():
-    return FileResponse("static/index.html")
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
 if __name__ == "__main__":

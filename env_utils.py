@@ -15,3 +15,13 @@ def load_env_with_fallback(base_dir: str) -> None:
         load_dotenv(env_file, override=True)
     elif os.path.exists(example_file):
         load_dotenv(example_file, override=False)
+
+
+def get_runtime_data_dir() -> str:
+    """Runtime-writable storage path, defaulting to /tmp on Vercel serverless."""
+    configured = os.environ.get("QUANTHORIZON_DATA_DIR", "").strip()
+    if configured:
+        return configured
+    if os.environ.get("VERCEL") == "1":
+        return "/tmp/quanthorizon-data"
+    return "data"
