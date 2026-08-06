@@ -11,6 +11,7 @@ import os
 import sqlite3
 import time
 import json
+import uuid
 import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
@@ -162,6 +163,24 @@ def init_journal_db():
             FOREIGN KEY(verdict_id) REFERENCES index_verdict_journal(id)
         );
         """)
+
+        # Table 5: Notifications — the bell/history feed (M5). Deliberately scoped to the two
+        # daily headline events (closing-sequence lock, index verdict run) rather than every
+        # individual signal — this is a once/day scanner, not a continuously-firing per-signal
+        # alert system, so per-stock notifications would just be noise at 3:40 PM.
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS notifications (
+            id TEXT PRIMARY KEY,
+            type TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            title TEXT NOT NULL,
+            message TEXT NOT NULL,
+            payload_json TEXT,
+            read INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL
+        );
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_notifications_created ON notifications(created_at DESC);")
 
         # Indices (Phase-1 audit finding #14) — only the primary key was indexed before.
         # get_metrics_summary(strategy_id=...) filters on strategy_id, and every evaluation
@@ -742,3 +761,67 @@ def get_confidence_calibration() -> List[Dict[str, Any]]:
         })
 
     return calibration
+
+
+# =============================================================================
+# NOTIFICATIONS — the bell/history feed (M5), fed by the M3 WebSocket broadcast.
+# =============================================================================
+
+def log_notification(notif_type: str, title: str, message: str, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Persists one notification and returns it as a plain dict — the caller (app.py) is
+    responsible for also broadcasting it over /ws/live via ws_broadcast.broadcast_sync(), same
+    orchestration split closing_sequence.py already uses (this module doesn't know the
+    WebSocket layer exists, matching the "controls the engine, doesn't own delivery" boundary
+    every module here keeps)."""
+    notif_id = uuid.uuid4().hex[:12]
+    now = datetime.now(timezone.utc).isoformat()
+    with get_db_connection() as conn:
+        conn.execute(
+            """INSERT INTO notifications (id, type, timestamp, title, message, payload_json, read, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, 0, ?)""",
+            (notif_id, notif_type, now, title, message, json.dumps(payload or {}, default=str), now),
+        )
+        conn.commit()
+    return {
+        "id": notif_id, "type": notif_type, "timestamp": now, "title": title,
+        "message": message, "payload": payload or {}, "read": False,
+    }
+
+
+def get_notifications(limit: int = 50, before_id: Optional[str] = None, unread_only: bool = False) -> Dict[str, Any]:
+    with get_db_connection() as conn:
+        clauses, params = [], []
+        if unread_only:
+            clauses.append("read = 0")
+        if before_id:
+            row = conn.execute("SELECT created_at FROM notifications WHERE id = ?", (before_id,)).fetchone()
+            if row is not None:
+                clauses.append("created_at < ?")
+                params.append(row["created_at"])
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        rows = conn.execute(
+            f"SELECT * FROM notifications {where} ORDER BY created_at DESC LIMIT ?",
+            (*params, limit),
+        ).fetchall()
+        unread_count = conn.execute("SELECT COUNT(*) c FROM notifications WHERE read = 0").fetchone()["c"]
+
+    notifications = []
+    for r in rows:
+        d = dict(r)
+        d["payload"] = json.loads(d.pop("payload_json") or "{}")
+        d["read"] = bool(d["read"])
+        notifications.append(d)
+    return {"notifications": notifications, "unread_count": unread_count}
+
+
+def mark_notification_read(notification_id: str) -> bool:
+    with get_db_connection() as conn:
+        cur = conn.execute("UPDATE notifications SET read = 1 WHERE id = ?", (notification_id,))
+        conn.commit()
+        return cur.rowcount > 0
+
+
+def mark_all_notifications_read() -> None:
+    with get_db_connection() as conn:
+        conn.execute("UPDATE notifications SET read = 1 WHERE read = 0")
+        conn.commit()

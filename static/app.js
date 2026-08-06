@@ -91,6 +91,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const strategyFormTitle = document.getElementById("strategyFormTitle");
     const strategyPillarCheckboxes = document.getElementById("strategyPillarCheckboxes");
 
+    // Notifications DOM (M5) — bell/badge/panel + toast, fed live over /ws/live
+    const notifBell = document.getElementById("notifBell");
+    const notifBellMobile = document.getElementById("notifBellMobile");
+    const notifBadge = document.getElementById("notifBadge");
+    const notifBadgeMobile = document.getElementById("notifBadgeMobile");
+    const notifPanel = document.getElementById("notifPanel");
+    const notifList = document.getElementById("notifList");
+    const notifMarkAllBtn = document.getElementById("notifMarkAllBtn");
+    const toastContainer = document.getElementById("toastContainer");
+    let notifUnreadCount = 0;
+
     const ALL_PILLAR_NAMES = [
         "Pillar 1: Futures OI", "Pillar 2: Vol Persistence", "Pillar 3: Relative Strength",
         "Pillar 4: Volume Spike", "Pillar 5: Marubozu Close",
@@ -106,6 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupAutoRefresh();
     populatePillarCheckboxes();
     refreshStrategiesNavBadge();
+    initNotifications();
 
     // Event Listeners
     
@@ -1393,5 +1405,134 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
             alert("Could not execute strategy right now.");
         }
+    }
+
+    // -------------------------------------------------------------
+    // NOTIFICATIONS (M5) — bell/badge/panel history + live toast over /ws/live.
+    // Fed by the M3 broadcast: closing-sequence lock events and index verdicts.
+    // -------------------------------------------------------------
+    function escapeHtmlLocal(s) {
+        return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    function formatNotifTime(iso) {
+        try { return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
+        catch (e) { return ""; }
+    }
+
+    function renderNotifBadge() {
+        const show = notifUnreadCount > 0;
+        const text = notifUnreadCount > 99 ? "99+" : String(notifUnreadCount);
+        if (notifBadge) { notifBadge.textContent = text; notifBadge.classList.toggle("hidden", !show); }
+        if (notifBadgeMobile) { notifBadgeMobile.textContent = text; notifBadgeMobile.classList.toggle("hidden", !show); }
+    }
+
+    function renderNotifList(notifications) {
+        if (!notifList) return;
+        if (!notifications || notifications.length === 0) {
+            notifList.innerHTML = `<div class="notif-empty">No notifications yet.</div>`;
+            return;
+        }
+        notifList.innerHTML = notifications.map((n) => `
+            <div class="notif-item ${n.read ? "" : "unread"}">
+                <div class="notif-title">${escapeHtmlLocal(n.title)}</div>
+                <div>${escapeHtmlLocal(n.message)}</div>
+                <div class="notif-meta">${formatNotifTime(n.timestamp)}</div>
+            </div>
+        `).join("");
+    }
+
+    function showToast(title, body) {
+        if (!toastContainer) return;
+        const el = document.createElement("div");
+        el.className = "toast";
+        el.innerHTML = `<div class="toast-title">${escapeHtmlLocal(title)}</div><div class="toast-body">${escapeHtmlLocal(body)}</div>`;
+        toastContainer.appendChild(el);
+        setTimeout(() => el.remove(), 7000);
+    }
+
+    async function refreshNotifBadgeFromServer() {
+        try {
+            const response = await fetch("/api/notifications?limit=1");
+            if (!response.ok) return;
+            const data = await response.json();
+            notifUnreadCount = data.unread_count || 0;
+            renderNotifBadge();
+        } catch (e) { /* bell just shows no count until the next successful poll */ }
+    }
+
+    async function onNotifPanelOpened() {
+        try {
+            const response = await fetch("/api/notifications?limit=50");
+            if (!response.ok) return;
+            const data = await response.json();
+            renderNotifList(data.notifications || []);
+            if (notifUnreadCount > 0) {
+                await fetch("/api/notifications/read_all", { method: "POST" });
+                notifUnreadCount = 0;
+                renderNotifBadge();
+                renderNotifList((data.notifications || []).map((n) => ({ ...n, read: true })));
+            }
+        } catch (e) {
+            console.error("Failed to load notifications:", e);
+        }
+    }
+
+    function toggleNotifPanel() {
+        if (!notifPanel) return;
+        const opening = notifPanel.classList.contains("hidden");
+        notifPanel.classList.toggle("hidden");
+        if (opening) onNotifPanelOpened();
+    }
+
+    function connectNotificationWebSocket() {
+        const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+        let reconnectDelay = 1000;
+
+        function connect() {
+            const socket = new WebSocket(`${proto}//${window.location.host}/ws/live`);
+            socket.onopen = () => { reconnectDelay = 1000; };
+            socket.onclose = () => { setTimeout(connect, reconnectDelay); reconnectDelay = Math.min(reconnectDelay * 1.5, 15000); };
+            socket.onerror = () => socket.close();
+            socket.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    if (msg.type === "notification") {
+                        showToast(msg.title, msg.message);
+                        notifUnreadCount += 1;
+                        renderNotifBadge();
+                        if (notifPanel && !notifPanel.classList.contains("hidden")) onNotifPanelOpened();
+                    }
+                    // scan_update / closing_sequence_progress are lightweight status pings —
+                    // deliberately not surfaced as bell notifications (would be noisy at
+                    // several-per-minute during market hours); ignored here by design.
+                } catch (e) { console.error("Bad /ws/live message:", e); }
+            };
+        }
+        connect();
+    }
+
+    function initNotifications() {
+        if (notifBell) notifBell.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
+        if (notifBellMobile) notifBellMobile.addEventListener("click", () => {
+            if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+            if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+            if (notifPanel) { notifPanel.classList.remove("hidden"); onNotifPanelOpened(); }
+        });
+        if (notifMarkAllBtn) notifMarkAllBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            await fetch("/api/notifications/read_all", { method: "POST" });
+            notifUnreadCount = 0;
+            renderNotifBadge();
+            onNotifPanelOpened();
+        });
+        document.addEventListener("click", (e) => {
+            if (!notifPanel || notifPanel.classList.contains("hidden")) return;
+            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target))) return;
+            notifPanel.classList.add("hidden");
+        });
+
+        refreshNotifBadgeFromServer();
+        connectNotificationWebSocket();
     }
 });

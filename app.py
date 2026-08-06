@@ -29,7 +29,8 @@ from fo_universe import get_canonical_fo_tickers, NSE_FO_STOCKS, is_valid_fo_sto
 from vix_provider import fetch_india_vix
 from signal_journal import (
     log_signal_entry, evaluate_pending_signals, get_metrics_summary, get_confidence_calibration,
-    log_index_verdict, evaluate_pending_index_verdicts, get_index_verdict_metrics_summary
+    log_index_verdict, evaluate_pending_index_verdicts, get_index_verdict_metrics_summary,
+    log_notification, get_notifications, mark_notification_read, mark_all_notifications_read
 )
 from walk_forward_validator import (
     run_walk_forward_validation, compute_dynamic_pillar_weights,
@@ -666,6 +667,15 @@ def run_index_btst_intelligence() -> Dict[str, Any]:
 
     summary = {k: v["verdict"] for k, v in verdicts_output["verdicts"].items()}
     logger.info(f"[Index Intelligence] Post-close verdict run complete: {summary}")
+
+    notif = log_notification(
+        notif_type="index_verdict",
+        title="Index BTST Intelligence Complete",
+        message=" · ".join(f"{k}: {v}" for k, v in summary.items()),
+        payload={"verdicts": summary},
+    )
+    ws_broadcast.broadcast_sync({"type": "notification", **notif})
+
     return verdicts_output
 
 
@@ -814,6 +824,17 @@ def _run_closing_lock_sequence(picks: List[Dict[str, Any]]) -> Dict[str, Any]:
         if default_auto_paper:
             execute_signal(stock, strategy_id=DEFAULT_STRATEGY_ID)
     log_index_and_custom_strategy_signals(cache_store.get("index_data", []), cache_store.get("strategy_results", {}), vix_val, vix_regime)
+
+    locked_count = lock_result.get("locked_count", 0)
+    btst_n = sum(1 for p in picks if "BTST" in p.get("signal", ""))
+    stbt_n = sum(1 for p in picks if "STBT" in p.get("signal", ""))
+    notif = log_notification(
+        notif_type="lock_complete",
+        title="3:40 PM Lock Complete",
+        message=f"{locked_count} BTST/STBT pick(s) locked ({btst_n} BTST, {stbt_n} STBT).",
+        payload={"locked_count": locked_count, "btst_count": btst_n, "stbt_count": stbt_n},
+    )
+    ws_broadcast.broadcast_sync({"type": "notification", **notif})
 
     return lock_result
 
@@ -1436,6 +1457,27 @@ def get_closing_sequence_status():
     snapshotted, and the lock result once available."""
     today_date = get_ist_now().strftime("%Y-%m-%d")
     return sanitize_json_data(closing_sequence.get_today_state(today_date))
+
+
+# -------------------------------------------------------------
+# NOTIFICATIONS — history/scrollback for the bell (live push happens over /ws/live, see M3)
+# -------------------------------------------------------------
+@app.get("/api/notifications")
+def api_list_notifications(limit: int = Query(50, ge=1, le=200), before_id: Optional[str] = Query(None), unread_only: bool = Query(False)):
+    return sanitize_json_data(get_notifications(limit=limit, before_id=before_id, unread_only=unread_only))
+
+
+@app.patch("/api/notifications/{notification_id}/read")
+def api_mark_notification_read(notification_id: str):
+    if not mark_notification_read(notification_id):
+        raise HTTPException(status_code=404, detail=f"Notification {notification_id} not found.")
+    return {"status": "read", "id": notification_id}
+
+
+@app.post("/api/notifications/read_all")
+def api_mark_all_notifications_read():
+    mark_all_notifications_read()
+    return {"status": "all_read"}
 
 
 @app.post("/api/lock_picks")
