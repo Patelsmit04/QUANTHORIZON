@@ -23,10 +23,10 @@ from strategy_manager import DEFAULT_STRATEGY_ID
 from index_scoring import INDEX_TICKERS
 from net_utils import call_with_retry
 from candle_utils import fetch_post_lock_candles
+from env_utils import DATA_DIR
 
 logger = logging.getLogger("SignalJournal")
 
-DATA_DIR = "data"
 DB_FILE = os.path.join(DATA_DIR, "signal_journal.db")
 
 

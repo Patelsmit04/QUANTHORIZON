@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-from env_utils import load_env_with_fallback
+from env_utils import load_env_with_fallback, DATA_DIR
 load_env_with_fallback(BASE_DIR)
 
 from net_utils import call_with_retry
@@ -146,7 +146,6 @@ async def add_no_cache_headers(request, call_next):
 # Canonical Whitelisted NSE F&O Stock List (Yahoo Finance .NS format)
 FO_STOCKS = get_canonical_fo_tickers()
 
-DATA_DIR = "data"
 TRADE_HISTORY_FILE = os.path.join(DATA_DIR, "trade_history.json")
 LAST_MARKET_SCAN_FILE = os.path.join(DATA_DIR, "last_market_scan.json")
 INDEX_INTELLIGENCE_FILE = os.path.join(DATA_DIR, "index_btst_verdicts.json")

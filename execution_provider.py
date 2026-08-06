@@ -27,10 +27,10 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
 from json_utils import atomic_write_json, read_json, json_file_lock
+from env_utils import DATA_DIR
 
 logger = logging.getLogger("ExecutionProvider")
 
-DATA_DIR = "data"
 PAPER_TRADES_FILE = os.path.join(DATA_DIR, "paper_trades.json")
 
 EXECUTION_MODE = "PAPER"  # the only mode this file implements — see module docstring

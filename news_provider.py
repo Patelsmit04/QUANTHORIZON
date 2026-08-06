@@ -31,7 +31,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 
 from json_utils import atomic_write_json, read_json
-from env_utils import load_env_with_fallback
+from env_utils import load_env_with_fallback, DATA_DIR
 from lock_utils import file_lock
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -53,7 +53,6 @@ def get_api_key() -> Optional[str]:
     return key_clean
 
 
-DATA_DIR = "data"
 STOCK_NEWS_CACHE_FILE = os.path.join(DATA_DIR, "stock_news_cache.json")
 NEWS_REFRESH_LOCK_FILE = os.path.join(DATA_DIR, "news_refresh.lock")
 LOCK_STALE_AFTER_SECONDS = 900  # a universe pass takes longer than the fundamentals refresh

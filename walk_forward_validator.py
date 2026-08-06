@@ -17,10 +17,10 @@ from datetime import date
 from typing import Dict, List, Any
 from signal_journal import get_db_connection
 from json_utils import atomic_write_json, read_json
+from env_utils import DATA_DIR
 
 logger = logging.getLogger("WalkForwardValidator")
 
-DATA_DIR = "data"
 PILLAR_WEIGHTS_FILE = os.path.join(DATA_DIR, "active_pillar_weights.json")
 PILLAR_WEIGHTS_HISTORY_FILE = os.path.join(DATA_DIR, "pillar_weights_history.json")
 MAX_HISTORY_ENTRIES = 90

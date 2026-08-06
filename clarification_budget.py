@@ -16,10 +16,10 @@ from datetime import date
 from typing import Dict, Any
 
 from json_utils import atomic_write_json, read_json, json_file_lock
+from env_utils import DATA_DIR
 
 logger = logging.getLogger("ClarificationBudget")
 
-DATA_DIR = "data"
 BUDGET_FILE = os.path.join(DATA_DIR, "clarification_budget.json")
 
 MAX_CLARIFICATIONS_PER_DAY = int(os.environ.get("MAX_CLARIFICATIONS_PER_DAY", "20"))

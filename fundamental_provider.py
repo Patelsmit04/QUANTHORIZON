@@ -27,10 +27,9 @@ import yfinance as yf
 from json_utils import atomic_write_json, read_json
 from lock_utils import file_lock
 from net_utils import call_with_retry
+from env_utils import DATA_DIR
 
 logger = logging.getLogger("FundamentalProvider")
-
-DATA_DIR = "data"
 FUNDAMENTALS_CACHE_FILE = os.path.join(DATA_DIR, "fundamentals_cache.json")
 
 STALE_AFTER_DAYS = 14  # beyond this, treat cached fundamentals as unavailable rather than serve very old data

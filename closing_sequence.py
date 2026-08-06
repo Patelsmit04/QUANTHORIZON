@@ -45,10 +45,10 @@ import pandas as pd
 
 from json_utils import atomic_write_json, read_json
 from net_utils import call_with_retry
+from env_utils import DATA_DIR
 
 logger = logging.getLogger("ClosingSequence")
 
-DATA_DIR = "data"
 STATE_FILE = os.path.join(DATA_DIR, "closing_sequence_state.json")
 
 # Trigger times, minutes since midnight IST — same representation as every other schedule

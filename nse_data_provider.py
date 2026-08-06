@@ -26,13 +26,13 @@ import pandas as pd
 from json_utils import atomic_write_json, read_json, json_file_lock
 from net_utils import call_with_retry
 from lock_utils import file_lock
+from env_utils import DATA_DIR
 
 # Suppress jugaad_data numpy datetime warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="jugaad_data")
 
 logger = logging.getLogger("NSEDataProvider")
 
-DATA_DIR = "data"
 OI_HISTORY_FILE = os.path.join(DATA_DIR, "nse_oi_history.json")
 DELIVERY_HISTORY_FILE = os.path.join(DATA_DIR, "nse_delivery_history.json")
 NSE_REFRESH_META_FILE = os.path.join(DATA_DIR, "nse_data_refresh_meta.json")

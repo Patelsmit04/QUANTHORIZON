@@ -32,10 +32,10 @@ from typing import Dict, List, Any, Optional
 
 from json_utils import atomic_write_json, read_json, json_file_lock
 from clarification_service import generate_clarification, ClarificationUnavailableError
+from env_utils import DATA_DIR
 
 logger = logging.getLogger("StrategyManager")
 
-DATA_DIR = "data"
 STRATEGIES_FILE = os.path.join(DATA_DIR, "strategies.json")
 
 STOCK_PILLAR_NAMES = [
