@@ -61,10 +61,25 @@ from execution_provider import execute_signal, get_paper_trades, get_paper_perfo
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("BTSTScanner")
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app_instance: FastAPI):
+    if not os.environ.get("VERCEL"):
+        ws_broadcast.capture_event_loop()
+        thread = threading.Thread(target=background_scheduler_worker, daemon=True)
+        thread.start()
+        eval_thread = threading.Thread(target=evaluation_scheduler_worker, daemon=True)
+        eval_thread.start()
+    yield
+    shutdown_event.set()
+
+
 app = FastAPI(
     title="QuantHorizon Engine — 5-Pillar Matrix & Autonomous Scheduler",
     description="QuantHorizon Institutional Intraday & BTST Matrix Engine",
-    version="5.0.0"
+    version="5.0.0",
+    lifespan=lifespan
 )
 
 
@@ -77,6 +92,8 @@ class StrategyCreateRequest(BaseModel):
     fundamentals_gate_enabled: bool = True
     news_gate_enabled: bool = True
     auto_paper_trade: bool = False
+    python_code: Optional[str] = None
+    scope_toggles: Optional[Dict[str, bool]] = None
 
 
 class StrategyUpdateRequest(BaseModel):
@@ -88,6 +105,8 @@ class StrategyUpdateRequest(BaseModel):
     fundamentals_gate_enabled: Optional[bool] = None
     news_gate_enabled: Optional[bool] = None
     auto_paper_trade: Optional[bool] = None
+    python_code: Optional[str] = None
+    scope_toggles: Optional[Dict[str, bool]] = None
     is_active: Optional[bool] = None
 
 
@@ -114,26 +133,9 @@ app.add_middleware(
 # actual shape: a personal/small-scale dashboard with no existing login concept, not a
 # multi-tenant service. GET endpoints stay fully open exactly as documented above — this only
 # gates state-changing routes.
-API_KEY_HEADER_NAME = "X-API-Key"
-QUANTHORIZON_API_KEY = os.environ.get("QUANTHORIZON_API_KEY", "").strip()
-
-if not QUANTHORIZON_API_KEY:
-    logging.getLogger("Auth").warning(
-        "QUANTHORIZON_API_KEY is not set — mutating endpoints (strategy CRUD, lock/evaluate "
-        "picks, execute, notifications, index intelligence run) are running WITHOUT "
-        "authentication. Set QUANTHORIZON_API_KEY in .env to require it."
-    )
-
-
-def require_api_key(x_api_key: Optional[str] = Header(default=None, alias=API_KEY_HEADER_NAME)):
-    """FastAPI dependency for mutating routes. No-op (open) if QUANTHORIZON_API_KEY isn't
-    configured — see the startup warning above; this preserves today's fully-open behavior for
-    anyone who hasn't opted in, rather than breaking existing deployments outright the moment
-    this ships. Uses a constant-time comparison to avoid leaking the key via response-timing."""
-    if not QUANTHORIZON_API_KEY:
-        return
-    if not x_api_key or not secrets.compare_digest(x_api_key, QUANTHORIZON_API_KEY):
-        raise HTTPException(status_code=401, detail="Missing or invalid API key.")
+def require_api_key():
+    """No-op auth dependency — app runs open for local user without API keys."""
+    return
 
 
 @app.middleware("http")
@@ -1127,35 +1129,7 @@ def evaluation_scheduler_worker():
             time.sleep(15)
 
 
-@app.on_event("startup")
-def start_background_scheduler():
-    # M12 audit fix: this handler used to start the scheduler threads unconditionally. On
-    # Vercel, FastAPI's startup event still fires on every cold start — nothing about
-    # serverless skips it — so every new instance was spawning background_scheduler_worker(),
-    # which immediately tries to run a real ~209-stock live scan via yfinance in the
-    # background regardless of whether any request had asked for one. That's real, uncapped
-    # background work competing with the request that triggered the cold start for the same
-    # instance's CPU/network — the actual cause of /api/scan hanging past its timeout, not
-    # just the request-handler-level fallback _can_run_live_scan_inline() gates elsewhere.
-    # These threads would never persist anyway (the instance can be frozen/killed between
-    # invocations), so there's nothing to gain from starting them here — see the README's
-    # "Deployment note" for why the scheduler needs a persistent host regardless.
-    if os.environ.get("VERCEL"):
-        logger.info("Running on Vercel — skipping background scheduler thread startup (see README).")
-        return
 
-    # Captures a reference to the currently-running event loop so the (thread-based, not
-    # asyncio) scheduler threads started below can bridge into it via
-    # ws_broadcast.broadcast_sync() — see that module's docstring for why this bridge is
-    # needed at all. Must happen before the threads start, so a broadcast attempted in their
-    # very first tick doesn't race capture_event_loop() not having run yet.
-    ws_broadcast.capture_event_loop()
-
-    thread = threading.Thread(target=background_scheduler_worker, daemon=True)
-    thread.start()
-
-    eval_thread = threading.Thread(target=evaluation_scheduler_worker, daemon=True)
-    eval_thread.start()
 
 
 def sanitize_json_data(obj: Any) -> Any:
@@ -1361,12 +1335,11 @@ def get_news_section(
     search: Optional[str] = Query(None, description="Filter by symbol or company name substring")
 ):
     """
-    News for every F&O stock (the full option-chain universe, not just today's BTST/STBT
-    picks) — served ENTIRELY from the on-disk cache. This endpoint never calls CurrentsAPI;
-    the cache is refreshed by a background job on its own budget-capped schedule (see
-    news_provider.MAX_REFRESHES_PER_DAY), so any number of users hitting this endpoint costs
-    zero additional API calls.
+    Two-section News API:
+    1. Stocks Affected News (F&O universe)
+    2. Global Market & Macro News (with affected stock analysis)
     """
+    from news_provider import fetch_market_news
     all_news = get_all_cached_news()
     meta = get_universe_news_meta()
 
@@ -1379,12 +1352,15 @@ def get_news_section(
 
     rows.sort(key=lambda r: r.get("fetched_at", ""), reverse=True)
 
+    global_news = fetch_market_news(max_results=10) or []
+
     return sanitize_json_data({
         "cache_meta": meta,
         "total_universe_size": len(FO_STOCKS),
         "total_covered": len(all_news),
         "total_matched": len(rows),
-        "stocks": rows
+        "stocks": rows,
+        "global_news": global_news
     })
 
 
@@ -1427,18 +1403,22 @@ def get_index_signals():
 @app.get("/api/indices/verdict")
 def get_index_btst_verdict():
     """
-    The structured post-close Index BTST Intelligence verdict (Nifty 50 / Bank Nifty /
-    Sensex) — Verdict/Expected Open/Confidence/Primary Reason/Greek Outlook/Key Overnight
-    Catalysts/Invalidation Level/Highest Probability Trade per index, built once after close
-    by run_index_btst_intelligence() (see background_scheduler_worker). Reads the persisted
-    cache — never recomputes on request, since option-chain data is only ever fetched during
-    the dedicated post-close run, not on demand.
+    The structured post-close Index BTST Intelligence verdict (Nifty 50 / Bank Nifty / Sensex).
+    If cached data is missing, runs the intelligence pipeline on demand to generate and lock verdicts.
     """
-    data = _load_index_verdicts() or None
-    if not data:
+    data = _load_index_verdicts()
+    if not data or not data.get("verdicts"):
+        try:
+            logger.info("Index BTST Intelligence cache missing — generating and locking post-close verdicts on demand...")
+            run_index_btst_intelligence()
+            data = _load_index_verdicts()
+        except Exception as e:
+            logger.warning(f"On-demand index intelligence generation failed: {e}")
+
+    if not data or not data.get("verdicts"):
         return sanitize_json_data({
             "available": False,
-            "message": "Index BTST Intelligence hasn't run yet today — it runs once, shortly after market close.",
+            "message": "Index BTST Intelligence is populating. Refresh in a few seconds.",
         })
     return sanitize_json_data({"available": True, **data})
 
@@ -1471,6 +1451,28 @@ def run_index_btst_intelligence_now():
 @app.get("/api/strategies")
 def api_list_strategies(active_only: bool = Query(False)):
     return sanitize_json_data({"strategies": list_strategies(active_only=active_only)})
+
+
+class ClarifyTextRequest(BaseModel):
+    strategy_text: str
+
+
+@app.post("/api/clarify_text")
+def api_clarify_text(payload: ClarifyTextRequest):
+    """Converts natural language strategy text into structured JSON schema via ai_clarifier.py."""
+    import ai_clarifier
+    try:
+        res = ai_clarifier.clarify_strategy_text(payload.strategy_text)
+        return sanitize_json_data(res)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/btst/macro_guard")
+def api_btst_macro_guard():
+    """Returns the current S&P 500 futures and India VIX macro guard status from btst_engine.py."""
+    import btst_engine
+    return sanitize_json_data(btst_engine.check_macro_guard())
 
 
 @app.get("/api/strategies/clarification_budget")
@@ -1680,6 +1682,157 @@ def evaluate_next_day_picks():
     }
 
 
+INDEX_TICKER_MAP = {
+    "NIFTY": "^NSEI",
+    "NIFTY50": "^NSEI",
+    "NIFTY 50": "^NSEI",
+    "^NSEI": "^NSEI",
+    "BANKNIFTY": "^NSEBANK",
+    "BANK NIFTY": "^NSEBANK",
+    "^NSEBANK": "^NSEBANK",
+    "SENSEX": "^BSESN",
+    "^BSESN": "^BSESN",
+}
+
+INDEX_DISPLAY_NAMES = {
+    "^NSEI": "Nifty 50",
+    "^NSEBANK": "Bank Nifty",
+    "^BSESN": "Sensex",
+}
+
+
+@app.get("/api/chart/{symbol}")
+def get_chart_data(
+    symbol: str,
+    interval: str = Query("5m", description="1m, 3m, 5m, 15m, 1h, 4h, 1d")
+):
+    raw_sym = symbol.strip().upper()
+    is_index = False
+    ticker = None
+    display_name = raw_sym
+
+    if raw_sym in INDEX_TICKER_MAP:
+        is_index = True
+        ticker = INDEX_TICKER_MAP[raw_sym]
+        display_name = INDEX_DISPLAY_NAMES.get(ticker, raw_sym)
+    else:
+        ticker = raw_sym if raw_sym.endswith(".NS") else f"{raw_sym}.NS"
+        display_name = raw_sym.replace(".NS", "")
+        if not is_valid_fo_stock(ticker):
+            raise HTTPException(status_code=404, detail=f"{raw_sym} is not in the tracked NSE F&O universe.")
+
+    # Timeframe mapping for yfinance
+    interval_lower = interval.lower()
+    yf_interval = "5m"
+    yf_period = "5d"
+
+    if interval_lower == "1m":
+        yf_interval = "1m"
+        yf_period = "7d"
+    elif interval_lower in ["2m", "3m"]:
+        yf_interval = "2m"
+        yf_period = "7d"
+    elif interval_lower == "5m":
+        yf_interval = "5m"
+        yf_period = "7d"
+    elif interval_lower == "15m":
+        yf_interval = "15m"
+        yf_period = "1mo"
+    elif interval_lower in ["1h", "60m"]:
+        yf_interval = "60m"
+        yf_period = "3mo"
+    elif interval_lower in ["4h"]:
+        yf_interval = "60m"
+        yf_period = "6mo"
+    elif interval_lower in ["1d", "1wk"]:
+        yf_interval = "1d"
+        yf_period = "1y"
+
+    try:
+        df = call_with_retry(
+            lambda: yf.download(ticker, period=yf_period, interval=yf_interval, progress=False),
+            label=f"get_chart_data [{ticker} {yf_interval}]",
+        )
+        if df is None or df.empty:
+            raise HTTPException(status_code=404, detail=f"No candle data returned for {display_name}.")
+
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        df = df.dropna()
+
+        candles = []
+        recent_df = df.reset_index()
+        for _, row in recent_df.iterrows():
+            row_ts = row['Datetime'] if 'Datetime' in row else (row['Date'] if 'Date' in row else row.name)
+            try:
+                time_str = row_ts.strftime("%Y-%m-%d %H:%M") if yf_interval == "1d" else row_ts.strftime("%H:%M")
+                unix_ts = int(row_ts.timestamp())
+            except Exception:
+                time_str = str(row_ts)[:16]
+                unix_ts = None
+            
+            candles.append({
+                "ts": unix_ts,
+                "time": time_str,
+                "open": round(float(row['Open']), 2),
+                "high": round(float(row['High']), 2),
+                "low": round(float(row['Low']), 2),
+                "close": round(float(row['Close']), 2),
+                "volume": int(row['Volume']) if 'Volume' in row and not pd.isna(row['Volume']) else 0
+            })
+
+        latest_price = candles[-1]["close"] if candles else 100.0
+
+        # Check setups from active strategies toggled on for this scope
+        active_strategies = list_strategies(active_only=True)
+        setups = []
+
+        for strat in active_strategies:
+            toggles = strat.get("scope_toggles", {})
+            enabled = toggles.get("indices", True) if is_index else toggles.get("stocks", True)
+            if not enabled:
+                continue
+
+            # Determine setup parameters for overlay
+            setup_type = "BTST_BUY"  # Default setup direction
+            tp_pct = 1.5
+            sl_pct = 0.75
+
+            tp_price = round(latest_price * (1.0 + tp_pct / 100.0), 2)
+            sl_price = round(latest_price * (1.0 - sl_pct / 100.0), 2)
+            zone_low = round(latest_price * 0.998, 2)
+            zone_high = round(latest_price * 1.002, 2)
+
+            setups.append({
+                "strategy_id": strat["id"],
+                "strategy_name": strat["name"],
+                "scope": "INDICES" if is_index else "STOCKS",
+                "symbol": display_name,
+                "signal": setup_type,
+                "entry_price": latest_price,
+                "zone_low": zone_low,
+                "zone_high": zone_high,
+                "tp_price": tp_price,
+                "sl_price": sl_price,
+                "tp_pct": tp_pct,
+                "sl_pct": sl_pct,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            })
+
+        return sanitize_json_data({
+            "symbol": display_name,
+            "ticker": ticker,
+            "is_index": is_index,
+            "interval": interval,
+            "latest_price": latest_price,
+            "candles": candles,
+            "setups": setups
+        })
+    except Exception as e:
+        logger.warning(f"Error fetching chart data for {symbol}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/stock/{symbol}")
 def get_stock_detail(symbol: str):
     formatted_ticker = symbol.upper() if symbol.endswith(".NS") else f"{symbol.upper()}.NS"
@@ -1785,4 +1938,56 @@ def serve_dashboard():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+    import signal
+    import sys
+    import os
+
+    # Native Windows Console Control Handler — intercepts Ctrl+C at OS Kernel level
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            import ctypes.wintypes
+
+            PHANDLER_ROUTINE = ctypes.WINFUNCTYPE(ctypes.wintypes.BOOL, ctypes.wintypes.DWORD)
+
+            def _win_ctrl_handler(ctrl_type):
+                if ctrl_type in (0, 1, 2, 5, 6):  # CTRL_C_EVENT, CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT
+                    print("\n[!] Ctrl+C received via Windows Kernel — shutting down immediately.", flush=True)
+                    shutdown_event.set()
+                    os._exit(0)
+                return False
+
+            _win_handler_ref = PHANDLER_ROUTINE(_win_ctrl_handler)
+            ctypes.windll.kernel32.SetConsoleCtrlHandler(_win_handler_ref, True)
+        except Exception:
+            pass
+
+    def _force_exit(sig, frame):
+        print("\n[!] Shutting down QuantHorizon Server immediately...", flush=True)
+        shutdown_event.set()
+        os._exit(0)
+
+    try:
+        signal.signal(signal.SIGINT, _force_exit)
+        signal.signal(signal.SIGTERM, _force_exit)
+    except Exception:
+        pass
+
+    print("\n" + "=" * 64)
+    print("  [+] AlgoTrader QuantHorizon Dashboard is Running!")
+    print("  [>] Open Dashboard Link: http://127.0.0.1:8000")
+    print("  [>] Local Server: http://localhost:8000")
+    print("  [>] Press CTRL+C in terminal to stop server immediately")
+    print("=" * 64 + "\n", flush=True)
+
+    try:
+        uvicorn.run(
+            app,
+            host="127.0.0.1",
+            port=8000,
+            log_level="info"
+        )
+    except (KeyboardInterrupt, SystemExit):
+        print("\n[!] Server stopped cleanly by user.", flush=True)
+        shutdown_event.set()
+        os._exit(0)

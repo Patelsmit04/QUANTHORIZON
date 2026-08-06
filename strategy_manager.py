@@ -66,7 +66,7 @@ DEFAULT_STRATEGY_ID = "default-5-pillar"
 # that the built-in strategy's configuration must stay fixed on (see update_strategy).
 CONFIG_FIELDS = {
     "target_scope", "active_pillars", "required_weight_override",
-    "fundamentals_gate_enabled", "news_gate_enabled",
+    "fundamentals_gate_enabled", "news_gate_enabled", "python_code",
 }
 
 
@@ -110,18 +110,14 @@ def _state_lock():
 
 def _compute_config_hash(strategy: Dict[str, Any]) -> str:
     """Stable hash of the fields that actually change what a strategy DOES — scope, pillars,
-    confirmation bar, gates — never name/description/auto_paper_trade/is_active, which can
-    change freely without needing re-clarification. Sorted-key JSON dump so two configs with
-    identically-meaning-but-differently-ordered dicts always hash the same. This is
-    strategy_manager's equivalent of the sibling AlgoTrader project's AST-based logic_hash —
-    same "decide whether a real change happened, not just any write" purpose, adapted for a
-    config dict instead of Python source."""
+    confirmation bar, gates, python_code — never name/description/auto_paper_trade/is_active/scope_toggles."""
     meaningful = {
         "target_scope": sorted(strategy.get("target_scope", [])),
         "active_pillars": dict(sorted(strategy.get("active_pillars", {}).items())),
         "required_weight_override": strategy.get("required_weight_override"),
         "fundamentals_gate_enabled": strategy.get("fundamentals_gate_enabled"),
         "news_gate_enabled": strategy.get("news_gate_enabled"),
+        "python_code": (strategy.get("python_code") or "").strip(),
     }
     normalized = json.dumps(meaningful, sort_keys=True)
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
@@ -129,9 +125,24 @@ def _compute_config_hash(strategy: Dict[str, Any]) -> str:
 
 def _ensure_clarification_field(strategy: Dict[str, Any]) -> Dict[str, Any]:
     """Grandfathers in strategies that existed before the clarification gate was added —
-    never retroactively deactivates or blocks something that was already running. Mutates and
-    returns the same dict; not persisted separately since it's cheap to recompute on every
-    read and there's no correctness reason it needs to live on disk."""
+    never retroactively deactivates or blocks something that was already running."""
+    if "scope_toggles" not in strategy:
+        scope = strategy.get("target_scope", ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX"])
+        strategy["scope_toggles"] = {
+            "stocks": "STOCKS" in scope,
+            "indices": any(idx in scope for idx in ["NIFTY50", "BANKNIFTY", "SENSEX"]),
+        }
+    if "python_code" not in strategy:
+        strategy["python_code"] = (
+            "# AlgoTrader Python Strategy Logic\n"
+            "# Defines entry and exit rules for scanning\n"
+            "def evaluate_signal(df, pillars_matrix):\n"
+            "    # Standard 5-pillar confirmation gate\n"
+            "    score = sum(pillars_matrix.values())\n"
+            "    if score >= 3.0:\n"
+            "        return {'signal': 'BTST_BUY', 'tp_pct': 1.5, 'sl_pct': 0.75}\n"
+            "    return {'signal': 'NEUTRAL'}\n"
+        )
     if "clarification" not in strategy:
         strategy["clarification"] = {
             "confirmed": True,
@@ -215,11 +226,11 @@ def create_strategy_draft(
     fundamentals_gate_enabled: bool = True,
     news_gate_enabled: bool = True,
     auto_paper_trade: bool = False,
+    python_code: Optional[str] = None,
+    scope_toggles: Optional[Dict[str, bool]] = None,
 ) -> Dict[str, Any]:
     """Add flow: validate the config, generate an AI clarification of what it actually does,
-    and store it as an unconfirmed draft — is_active stays False until confirm_strategy()
-    runs. Mirrors the sibling AlgoTrader project's create_strategy_draft() pattern, adapted for
-    a config (pillars/scope/gates) being the thing that needs clarifying, not a code file."""
+    and store it as an unconfirmed draft — is_active stays False until confirm_strategy() runs."""
     _seed_default_strategy_if_missing()
 
     if not name or not name.strip():
@@ -239,6 +250,21 @@ def create_strategy_draft(
             raise ValueError(f"Unknown pillar names: {sorted(unknown)}.")
         pillars.update(active_pillars)
 
+    toggles = scope_toggles or {
+        "stocks": "STOCKS" in scope,
+        "indices": any(idx in scope for idx in ["NIFTY50", "BANKNIFTY", "SENSEX"]),
+    }
+
+    code = (python_code or "").strip() or (
+        "# AlgoTrader Python Strategy Logic\n"
+        "# Defines entry and exit rules for scanning\n"
+        "def evaluate_signal(df, pillars_matrix):\n"
+        "    score = sum(pillars_matrix.values())\n"
+        "    if score >= 3.0:\n"
+        "        return {'signal': 'BTST_BUY', 'tp_pct': 1.5, 'sl_pct': 0.75}\n"
+        "    return {'signal': 'NEUTRAL'}\n"
+    )
+
     strategy_id = uuid.uuid4().hex[:12]
     now = datetime.now(timezone.utc).isoformat()
     strategy = {
@@ -251,6 +277,8 @@ def create_strategy_draft(
         "fundamentals_gate_enabled": fundamentals_gate_enabled,
         "news_gate_enabled": news_gate_enabled,
         "auto_paper_trade": auto_paper_trade,
+        "python_code": code,
+        "scope_toggles": toggles,
         "is_active": False,
         "is_builtin": False,
         "created_at": now,
@@ -280,11 +308,8 @@ def resubmit_clarification(strategy_id: str, correction_note: str) -> Dict[str, 
     if strategy["clarification"].get("confirmed"):
         raise ValueError("This strategy is already confirmed — edit its configuration to trigger re-clarification instead.")
 
-    clarification = generate_clarification(strategy, correction_note=correction_note)  # slow network call — kept outside the lock
+    clarification = generate_clarification(strategy, correction_note=correction_note)
 
-    # M8 audit fix: re-read fresh inside the lock rather than reusing the `store`/`strategy`
-    # snapshot taken before the (potentially multi-second) Claude call above — a concurrent
-    # edit landing during that call would otherwise be silently overwritten by this stale copy.
     with _state_lock():
         store = _load_all()
         if strategy_id not in store:
@@ -299,12 +324,7 @@ def resubmit_clarification(strategy_id: str, correction_note: str) -> Dict[str, 
 
 
 def confirm_strategy(strategy_id: str) -> Dict[str, Any]:
-    """User accepted the clarification — confirms it and activates the strategy. Unlike the
-    sibling AlgoTrader project (which runs a 200-trade backtest between confirm and going
-    live), there's no separate backtest step in this milestone's scope: confirming a
-    pillar-config strategy activates it directly, since there's no custom code whose behavior
-    needs proving out first — the scoring engine itself is already the tested, shared code
-    path every strategy runs through."""
+    """User accepted the clarification — confirms it and activates the strategy."""
     with _state_lock():
         store = _load_all()
         if strategy_id not in store:
@@ -324,24 +344,7 @@ def confirm_strategy(strategy_id: str) -> Dict[str, Any]:
 
 
 def update_strategy(strategy_id: str, **fields) -> Dict[str, Any]:
-    """Update flow. Two independent things can happen in one call:
-
-    1. A REAL change to what the strategy does (target_scope, active_pillars,
-       required_weight_override, either gate) — detected via config_hash, exactly like the
-       sibling AlgoTrader project's logic_hash. This resets the strategy to unconfirmed,
-       deactivates it, and re-runs clarification against the new config, same gate a brand-new
-       strategy goes through. name/description/auto_paper_trade are NOT part of this hash —
-       editing only those never triggers re-clarification.
-    2. A request to flip is_active. Turning OFF is always allowed. Turning ON is only allowed
-       if the strategy is currently confirmed — this is what actually enforces "can't go active
-       unconfirmed"; a config change in the SAME call resets confirmation first, so a combined
-       "change the config and activate it" request correctly gets rejected rather than silently
-       activating stale-looking-confirmed state.
-    """
-    # M8 audit fix: held for the whole read-mutate-clarify-save cycle, including the
-    # conditional Claude call below. Coarser than strictly necessary (a slow clarification call
-    # blocks other strategy writes meanwhile), but this is a rare, deliberate user action, not
-    # a hot path — correctness against lost updates matters more here than lock granularity.
+    """Update flow for a strategy."""
     with _state_lock():
         store = _load_all()
         if strategy_id not in store:
@@ -355,9 +358,7 @@ def update_strategy(strategy_id: str, **fields) -> Dict[str, Any]:
             if attempted_config_change:
                 raise ValueError(
                     "The built-in Default 5-Pillar strategy's scoring configuration "
-                    f"({sorted(attempted_config_change)}) cannot be changed — it's the fixed "
-                    "baseline every custom strategy is compared against. Create a new strategy "
-                    "instead if you want different scope/pillars/weight-bar/gates."
+                    f"({sorted(attempted_config_change)}) cannot be changed."
                 )
 
         requested_active = fields.pop("is_active", None)
@@ -365,7 +366,7 @@ def update_strategy(strategy_id: str, **fields) -> Dict[str, Any]:
         editable_fields = {
             "name", "description", "target_scope", "active_pillars",
             "required_weight_override", "fundamentals_gate_enabled", "news_gate_enabled",
-            "auto_paper_trade",
+            "auto_paper_trade", "python_code", "scope_toggles",
         }
         old_hash = strategy["config_hash"]
 
@@ -385,6 +386,10 @@ def update_strategy(strategy_id: str, **fields) -> Dict[str, Any]:
                 value = merged
             if key == "required_weight_override":
                 _validate_required_weight_override(value)
+            if key == "scope_toggles" and isinstance(value, dict):
+                merged_toggles = dict(strategy.get("scope_toggles", {"stocks": True, "indices": True}))
+                merged_toggles.update(value)
+                value = merged_toggles
             strategy[key] = value
 
         new_hash = _compute_config_hash(strategy)
@@ -392,7 +397,7 @@ def update_strategy(strategy_id: str, **fields) -> Dict[str, Any]:
         strategy["config_hash"] = new_hash
 
         if config_changed and not strategy.get("is_builtin"):
-            clarification = generate_clarification(strategy)  # raises ClarificationUnavailableError
+            clarification = generate_clarification(strategy)
             clarification.update({"confirmed": False, "confirmed_at": None})
             strategy["clarification"] = clarification
             strategy["is_active"] = False

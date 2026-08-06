@@ -29,18 +29,11 @@ import threading
 from contextlib import contextmanager
 from typing import Any, Iterator, Optional
 
-import psycopg
-from psycopg.types.json import Jsonb
-
-USE_POSTGRES = bool(os.environ.get("DATABASE_URL", "").strip())
+USE_POSTGRES = False
 
 
 def get_pg_connection():
-    """A fresh connection per call — same pattern signal_journal.get_db_connection() already
-    uses for SQLite. Use the provider's POOLED connection string (Neon / Vercel Postgres both
-    offer one, PgBouncer-backed) in DATABASE_URL; this module does not maintain its own
-    persistent pool."""
-    return psycopg.connect(os.environ["DATABASE_URL"])
+    raise NotImplementedError("Postgres backend disabled — system runs exclusively on local storage.")
 
 
 def init_app_state_schema() -> None:

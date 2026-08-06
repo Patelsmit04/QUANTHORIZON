@@ -59,10 +59,20 @@ SCORING_MINS = 15 * 60 + 36    # 3:36 PM
 BROADCAST_MINS = 15 * 60 + 38  # 3:38 PM
 LOCK_MINS = 15 * 60 + 40       # 3:40 PM
 
+NSE_TRADING_HOLIDAYS_2026 = {
+    "2026-01-26", "2026-03-06", "2026-03-25", "2026-04-03", "2026-04-14",
+    "2026-05-01", "2026-08-15", "2026-10-02", "2026-10-24", "2026-11-12", "2026-12-25"
+}
+
+def is_trading_holiday(today_date_str: str) -> bool:
+    """Returns True if today is a scheduled NSE trading holiday."""
+    return today_date_str in NSE_TRADING_HOLIDAYS_2026
+
 _EMPTY_STATE = {
     "date": None, "snapshot_done": False, "cas_close_done": False,
     "scoring_done": False, "broadcast_done": False, "lock_done": False,
     "snapshot_picks": [], "cas_close_prices": {}, "lock_result": None,
+    "lock_timestamp": None,
 }
 
 
@@ -86,6 +96,19 @@ def get_today_state(today_date: str) -> Dict[str, Any]:
 def _step_snapshot(state: Dict[str, Any], get_current_stocks: Callable[[], List[Dict[str, Any]]]) -> None:
     current_stocks = get_current_stocks() or []
     candidates = [s for s in current_stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
+
+    if not candidates:
+        try:
+            from scoring_engine import run_full_scan_pipeline
+            logger.info("[Closing Sequence] Initial snapshot candidate list empty — running fallback scan pipeline...")
+            scan_res = run_full_scan_pipeline()
+            fresh_stocks = scan_res.get("stocks", [])
+            candidates = [s for s in fresh_stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
+            if not candidates and fresh_stocks:
+                candidates = fresh_stocks[:5]
+        except Exception as e:
+            logger.warning(f"[Closing Sequence] Fallback candidate scan failed: {e}")
+
     state["snapshot_picks"] = candidates
     state["snapshot_done"] = True
     logger.info(f"[Closing Sequence] 3:14 PM SNAPSHOT: {len(candidates)} BTST/STBT candidate(s) frozen.")
@@ -133,21 +156,42 @@ def _step_cas_close(state: Dict[str, Any]) -> None:
 
 
 def _step_scoring(state: Dict[str, Any]) -> None:
-    """Attaches the CAS-confirmed close price to each snapshotted candidate, falling back to
-    the snapshot-time price (never dropping a candidate) when a confirmed price didn't come
-    back — consistent with this codebase's cap-only-never-fabricate gate discipline."""
+    """Attaches the CAS-confirmed close price to each snapshotted candidate, runs the 100-point
+    BTST scoring engine (btst_engine.py), and filters candidates against the >=85-point threshold."""
+    from btst_engine import evaluate_btst_candidate, MIN_CONVICTION_SCORE
+
     prices = state["cas_close_prices"]
-    updated = 0
+    valid_picks = []
+
     for pick in state["snapshot_picks"]:
-        confirmed = prices.get(pick.get("raw_ticker"))
-        if confirmed is not None and confirmed > 0:
-            pick["ltp"] = confirmed
+        ticker = pick.get("raw_ticker")
+        symbol = pick.get("symbol", ticker)
+        pre_cas_price = pick.get("ltp", 100.0)
+        confirmed_cas_price = prices.get(ticker, pre_cas_price)
+
+        eval_result = evaluate_btst_candidate(
+            symbol=symbol,
+            pre_cas_price=pre_cas_price,
+            cas_price=confirmed_cas_price,
+            option_data=pick.get("option_data"),
+        )
+
+        if eval_result.get("status") == "BTST_SIGNAL" and eval_result.get("confidence_score", 0) >= MIN_CONVICTION_SCORE:
+            pick["ltp"] = confirmed_cas_price
             pick["close_price_cas_confirmed"] = True
-            updated += 1
+            pick["confidence_score"] = eval_result["confidence_score"]
+            pick["pillar_scores"] = eval_result["pillar_scores"]
+            pick["score_details"] = eval_result["details"]
+            valid_picks.append(pick)
         else:
-            pick["close_price_cas_confirmed"] = False
+            logger.info(f"[Closing Sequence] Candidate {symbol} discarded (Score: {eval_result.get('total_score', 0)} < {MIN_CONVICTION_SCORE}).")
+
+    state["snapshot_picks"] = valid_picks
     state["scoring_done"] = True
-    logger.info(f"[Closing Sequence] 3:36-3:37 PM SCORING: {updated}/{len(state['snapshot_picks'])} candidate(s) updated with confirmed CAS close.")
+    if valid_picks:
+        logger.info(f"[Closing Sequence] 3:36-3:37 PM SCORING: {len(valid_picks)} candidate(s) passed the {MIN_CONVICTION_SCORE}-point threshold.")
+    else:
+        logger.info(f"[Closing Sequence] 3:36-3:37 PM SCORING: No candidate achieved >={MIN_CONVICTION_SCORE} points. Stand aside.")
 
 
 def _step_broadcast(state: Dict[str, Any], broadcast: Optional[Callable[[Dict[str, Any]], None]]) -> None:

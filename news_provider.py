@@ -147,13 +147,84 @@ def fetch_stock_news(symbol: str, company_name: str, max_results: int = 5) -> Op
     return recent[:max_results]
 
 
+SECTOR_STOCK_MAP = {
+    "crude": {
+        "stocks": ["RELIANCE", "BPCL", "HPCL", "IOC", "ONGC", "OIL", "ASIANPAINT", "BERGEPAINT"],
+        "impact": "Crude price shifts directly affect oil refiners, OMCs, and paint/chemical input margins."
+    },
+    "oil": {
+        "stocks": ["RELIANCE", "BPCL", "HPCL", "IOC", "ONGC", "OIL"],
+        "impact": "Upstream & downstream oil & gas margins directly impacted."
+    },
+    "fed": {
+        "stocks": ["TCS", "INFY", "WIPRO", "HCLTECH", "TECHM", "LTIM"],
+        "impact": "US Federal Reserve rate policy directly influences US tech spending & IT margins."
+    },
+    "tech": {
+        "stocks": ["TCS", "INFY", "WIPRO", "HCLTECH", "TECHM", "LTIM"],
+        "impact": "Global tech sector sentiment impacts Indian IT exporters."
+    },
+    "rbi": {
+        "stocks": ["HDFCBANK", "ICICIBANK", "SBIN", "AXISBANK", "BANKBARODA", "KOTAKBANK", "PNB"],
+        "impact": "RBI interest rate policy & liquidity measures impact banking NIMs & credit growth."
+    },
+    "bank": {
+        "stocks": ["HDFCBANK", "ICICIBANK", "SBIN", "AXISBANK", "BANKBARODA", "KOTAKBANK"],
+        "impact": "Banking sector liquidity & rate sensitivity."
+    },
+    "metal": {
+        "stocks": ["TATASTEEL", "JSWSTEEL", "HINDALCO", "COALINDIA", "NMDC", "VEDL", "NATIONALUM"],
+        "impact": "Global commodity cycles & Chinese industrial demand impact metal pricing."
+    },
+    "china": {
+        "stocks": ["TATASTEEL", "JSWSTEEL", "HINDALCO", "VEDL", "CHAMBLFERT"],
+        "impact": "Chinese economic stimulus or slowdown affects global commodity demand."
+    },
+    "dollar": {
+        "stocks": ["TCS", "INFY", "WIPRO", "HCLTECH", "SUNPHARMA", "DRREDDY"],
+        "impact": "USD/INR exchange rate shifts impact IT & Pharma export realizations."
+    },
+    "pharma": {
+        "stocks": ["SUNPHARMA", "DRREDDY", "CIPLA", "DIVISLAB", "LUPIN", "APOLLOHOSP"],
+        "impact": "US FDA regulatory approvals and global healthcare spending."
+    },
+    "auto": {
+        "stocks": ["TATAMOTORS", "MARUTI", "M&M", "HEROMOTOCO", "EICHERMOT", "BAJAJ-AUTO"],
+        "impact": "EV trends, raw material costs, and global auto supply chains."
+    }
+}
+
+
+def analyze_global_stock_impact(headline: Dict[str, Any]) -> Dict[str, Any]:
+    text = f"{headline.get('title', '')} {headline.get('description', '')}".lower()
+    affected_stocks = []
+    impact_reasons = []
+
+    for kw, data in SECTOR_STOCK_MAP.items():
+        if kw in text:
+            for s in data["stocks"]:
+                if s not in affected_stocks:
+                    affected_stocks.append(s)
+            impact_reasons.append(data["impact"])
+
+    sentiment = classify_news_signal([headline])
+
+    return {
+        "headline": headline,
+        "affected_stocks": affected_stocks[:6],
+        "impact_reasons": list(set(impact_reasons)),
+        "verdict": sentiment.get("verdict", "NEUTRAL"),
+    }
+
+
 def fetch_market_news(max_results: int = 10) -> Optional[List[Dict[str, Any]]]:
     """Broad market/macro news likely to move Indian equities generally (index-level, not
     stock-specific): RBI/Fed policy, crude oil, global markets, India macro data."""
-    raw = _search("Nifty Sensex India stock market RBI", max_results=max_results * 2)
+    raw = _search("Nifty Sensex India stock market RBI Fed crude", max_results=max_results * 2)
     if raw is None:
         return None
-    return _filter_recent(raw)[:max_results]
+    recent = _filter_recent(raw)[:max_results]
+    return [analyze_global_stock_impact(h) for h in recent]
 
 
 def classify_news_signal(headlines: Optional[List[Dict[str, Any]]]) -> Dict[str, Any]:
@@ -345,7 +416,9 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
             is_last_chunk = (chunk_idx + BURST_SAFE_CHUNK_SIZE) >= len(symbol_items)
             if not is_last_chunk:
                 logger.info(f"Chunk done ({fetched} ok / {failed} failed so far) — cooling down {BURST_COOLDOWN_SECONDS}s for the burst limit...")
-                time.sleep(BURST_COOLDOWN_SECONDS)
+                if interruptible_sleep(BURST_COOLDOWN_SECONDS):
+                    logger.info("News refresh interrupted by shutdown signal.")
+                    break
 
         prior_meta = cache.get("_meta", {})
         prior_count = prior_meta.get("refresh_count", 0) if prior_meta.get("date") == today_str else 0

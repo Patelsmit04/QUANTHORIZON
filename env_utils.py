@@ -36,4 +36,16 @@ def _get_data_dir() -> str:
     return "data"
 
 
+import threading
+
 DATA_DIR = _get_data_dir()
+
+shutdown_event = threading.Event()
+
+
+def interruptible_sleep(seconds: float) -> bool:
+    """
+    Sleeps for `seconds` but returns immediately True if shutdown_event is set on Ctrl+C / SIGINT.
+    Returns False if the timeout elapsed normally without interruption.
+    """
+    return shutdown_event.wait(timeout=seconds)

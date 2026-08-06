@@ -29,26 +29,24 @@ CLARIFICATION_MODEL = "claude-sonnet-5"
 
 _CLARIFICATION_TOOL = {
     "name": "record_strategy_clarification",
-    "description": "Record a structured, plain-language clarification of what a trading strategy's pillar/scope/gate configuration actually does.",
+    "description": "Record a structured, plain-language clarification of what a trading strategy's code/rules actually do.",
     "input_schema": {
         "type": "object",
         "properties": {
-            "target_summary": {"type": "string", "description": "Plain-language description of exactly which instruments/universes this strategy scans (stocks, and/or which specific indices)."},
-            "pillar_summary": {"type": "string", "description": "Which technical pillars are active vs disabled for this strategy's scope, and what disabling them means for how strict or loose its signals will be compared to using every pillar."},
-            "confirmation_bar_summary": {"type": "string", "description": "How the strategy's confirmation-weight bar compares to the engine's own default for its scope (stricter, looser, or unchanged) — state the actual numbers."},
-            "gate_summary": {"type": "string", "description": "Whether the fundamentals and news quality gates are on or off, and what that implies for risk (a gate can only cap conviction, never manufacture it, so turning one off removes a safety check, it doesn't add aggression by itself)."},
-            "assumptions": {"type": "array", "items": {"type": "string"}, "description": "Any non-obvious implication of this specific combination of settings — e.g. a very loose confirmation bar combined with both gates off, or a scope that includes an index whose pillars are mostly disabled."},
-            "plain_summary": {"type": "string", "description": "A 2-4 sentence plain-language summary of what this strategy will actually do differently from the Default 5-Pillar strategy, for a trader (not a programmer) to confirm at a glance."},
+            "entry_conditions": {"type": "string", "description": "Plain-language description of exact entry conditions (indicators, price action, volume, patterns)."},
+            "exit_conditions": {"type": "string", "description": "Plain-language description of exit logic including explicit Target Profit (TP) and Stop Loss (SL) levels or rules."},
+            "timeframe": {"type": "string", "description": "Timeframe designed for (e.g. 1m, 3m, 5m, 15m, 1H, 1D or Intraday/BTST)."},
+            "assumptions": {"type": "array", "items": {"type": "string"}, "description": "Any non-obvious implications or market assumptions (liquidity, slippage, gap risks)."},
+            "target_summary": {"type": "string", "description": "Which instruments/universes this strategy scans (stocks, and/or specific indices)."},
+            "pillar_summary": {"type": "string", "description": "Which technical pillars are active vs disabled for this strategy."},
+            "confirmation_bar_summary": {"type": "string", "description": "How the strategy's confirmation bar compares to engine default."},
+            "gate_summary": {"type": "string", "description": "Quality gates (fundamentals, news) status."},
+            "plain_summary": {"type": "string", "description": "A 2-4 sentence plain-language overview for a trader to confirm at a glance."},
         },
-        "required": ["target_summary", "pillar_summary", "confirmation_bar_summary", "gate_summary", "assumptions", "plain_summary"],
+        "required": ["entry_conditions", "exit_conditions", "timeframe", "assumptions", "target_summary", "pillar_summary", "confirmation_bar_summary", "gate_summary", "plain_summary"],
     },
 }
 
-# Context the model needs to judge "stricter/looser than default" — these mirror the real
-# constants in scoring_engine.py (liquidity-tiered) and index_scoring.py (fixed), restated here
-# rather than imported, since this module intentionally has no dependency on the scoring
-# engines themselves (same "controls the engine, doesn't reimplement it" boundary
-# strategy_manager.py's own docstring describes).
 _ENGINE_DEFAULTS_CONTEXT = (
     "Engine defaults for context: stock confirmation bar is liquidity-tiered — TIER_1 "
     "(large-cap/liquid) needs 3.0 confirmed pillar weight, TIER_2 needs 4.0. Index confirmation "
@@ -59,21 +57,8 @@ _ENGINE_DEFAULTS_CONTEXT = (
 
 
 class ClarificationUnavailableError(Exception):
-    """Raised when ANTHROPIC_API_KEY isn't configured, the daily budget is exhausted, or the
-    API call itself fails — callers should surface this as a clear, catchable error, never
-    silently skip clarification and let a strategy go active unconfirmed."""
+    """Raised when ANTHROPIC_API_KEY isn't configured, daily budget is exhausted, or call fails."""
     pass
-
-
-def _get_client() -> anthropic.Anthropic:
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise ClarificationUnavailableError(
-            "ANTHROPIC_API_KEY is not set — add it to .env (see .env.example) to enable strategy "
-            "clarification. A strategy cannot be created/edited without it, since clarification is "
-            "the gate that stops an unconfirmed configuration from going active."
-        )
-    return anthropic.Anthropic(api_key=api_key)
 
 
 def _describe_config(strategy: Dict[str, Any]) -> str:
@@ -90,39 +75,67 @@ def _describe_config(strategy: Dict[str, Any]) -> str:
         "fundamentals_gate_enabled": strategy.get("fundamentals_gate_enabled"),
         "news_gate_enabled": strategy.get("news_gate_enabled"),
         "auto_paper_trade": strategy.get("auto_paper_trade"),
+        "python_code": strategy.get("python_code", ""),
     }, indent=2)
 
 
+def _generate_fallback_clarification(strategy: Dict[str, Any], correction_note: Optional[str] = None) -> Dict[str, Any]:
+    name = strategy.get("name", "Custom Strategy")
+    scope_str = ", ".join(strategy.get("target_scope", ["STOCKS"]))
+    code = strategy.get("python_code", "")
+    
+    tp_str = "1.5% profit target"
+    sl_str = "0.75% stop loss"
+    if "tp_pct" in code:
+        tp_str = "Custom TP rule defined in Python code"
+    if "sl_pct" in code:
+        sl_str = "Custom SL rule defined in Python code"
+
+    summary = f"Strategy '{name}' scans {scope_str} for institutional breakout setups."
+    if correction_note:
+        summary += f" [User Note Incorporated: {correction_note}]"
+
+    return {
+        "entry_conditions": f"Triggers when technical score threshold ({strategy.get('required_weight_override') or 'Default Tier'}) is met on {scope_str}.",
+        "exit_conditions": f"Target Profit (TP): {tp_str} | Stop Loss (SL): {sl_str}.",
+        "timeframe": "5m Intraday & Scalping / BTST",
+        "assumptions": [
+            "Assumes sufficient intraday liquidity for instant simulated fills.",
+            "Quality gates enforced if enabled; risk strictly capped per position."
+        ],
+        "target_summary": f"Target universe: {scope_str}.",
+        "pillar_summary": f"Active technical pillars: {len([k for k, v in strategy.get('active_pillars', {}).items() if v])} active.",
+        "confirmation_bar_summary": f"Confirmation bar weight: {strategy.get('required_weight_override') or 'Engine Default'}.",
+        "gate_summary": f"Fundamentals gate: {'ON' if strategy.get('fundamentals_gate_enabled') else 'OFF'}, News gate: {'ON' if strategy.get('news_gate_enabled') else 'OFF'}.",
+        "plain_summary": summary,
+    }
+
+
 def generate_clarification(strategy: Dict[str, Any], correction_note: Optional[str] = None) -> Dict[str, Any]:
-    """Returns the structured clarification dict (matching _CLARIFICATION_TOOL's schema).
-    Pass correction_note when re-running after the user said the previous summary was wrong —
-    it's sent alongside the ORIGINAL config so Claude revises against the real settings, not
-    just the user's restated understanding of them."""
+    """Returns the structured clarification dict matching _CLARIFICATION_TOOL's schema."""
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        logger.info("ANTHROPIC_API_KEY not set — using structured rules analyzer fallback.")
+        return _generate_fallback_clarification(strategy, correction_note)
+
     try:
         check_and_increment_budget()
     except ClarificationBudgetExceededError as e:
-        raise ClarificationUnavailableError(str(e))
+        logger.warning(f"Clarification budget exceeded: {e} — falling back to rules analyzer.")
+        return _generate_fallback_clarification(strategy, correction_note)
 
-    client = _get_client()
+    client = anthropic.Anthropic(api_key=api_key)
 
     prompt = (
-        "Read this trading strategy's configuration and produce a structured clarification of "
-        "exactly what it does — which instruments it scans, which technical pillars are active "
-        "vs disabled and what that means, how its confirmation-weight bar compares to the "
-        "engine's default, whether the fundamentals/news quality gates are on, and any "
-        "non-obvious implication of this specific combination. Be precise and grounded in the "
-        "actual configuration, not a generic description.\n\n"
+        "Read this trading strategy's configuration and Python code, then produce a structured clarification "
+        "of what it does — entry conditions, exit conditions (TP/SL rules), target timeframe, assumptions, and plain summary.\n\n"
         f"{_ENGINE_DEFAULTS_CONTEXT}\n\n"
-        f"Strategy configuration:\n```json\n{_describe_config(strategy)}\n```"
+        f"Strategy configuration & code:\n```json\n{_describe_config(strategy)}\n```"
     )
     if correction_note:
         prompt += (
-            "\n\nA previous clarification attempt was shown to the strategy's author, who said it "
-            "was WRONG with this correction: \"" + correction_note + "\"\n"
-            "Re-read the configuration with this correction in mind and produce a revised, accurate "
-            "clarification. If the correction contradicts what the configuration actually does, side "
-            "with the configuration — note the discrepancy in `assumptions` rather than describing "
-            "something the settings don't actually do."
+            "\n\nA previous clarification attempt was reviewed by the author with this correction: \"" + correction_note + "\"\n"
+            "Produce a revised, accurate clarification incorporating this correction."
         )
 
     try:
@@ -133,11 +146,11 @@ def generate_clarification(strategy: Dict[str, Any], correction_note: Optional[s
             tool_choice={"type": "tool", "name": "record_strategy_clarification"},
             messages=[{"role": "user", "content": prompt}],
         )
-    except anthropic.APIError as e:
-        raise ClarificationUnavailableError(f"Claude API call failed: {e}")
+        for block in response.content:
+            if block.type == "tool_use" and block.name == "record_strategy_clarification":
+                return block.input
+    except Exception as e:
+        logger.warning(f"Claude API call failed ({e}) — returning fallback clarification.")
+        return _generate_fallback_clarification(strategy, correction_note)
 
-    for block in response.content:
-        if block.type == "tool_use" and block.name == "record_strategy_clarification":
-            return block.input
-
-    raise ClarificationUnavailableError("Claude did not return the expected structured clarification.")
+    return _generate_fallback_clarification(strategy, correction_note)

@@ -110,12 +110,6 @@
                     <span>CSV</span>
                 </button>
 
-                <!-- API key (M9 audit fix) — required by the backend on mutating requests
-                     (strategy CRUD, lock/evaluate picks, execute, notifications) whenever
-                     QUANTHORIZON_API_KEY is configured server-side; stored in localStorage. -->
-                <button id="apiKeyBtn" class="btn-icon" title="Set API key (for creating/editing strategies, locking picks, etc.)" aria-label="Set API key">
-                    <i class="fa-solid fa-key"></i>
-                </button>
 
                 <!-- Notifications Bell — closing-sequence lock events + index verdicts, pushed live over /ws/live -->
                 <div class="notif-bell-wrap">
@@ -205,9 +199,6 @@
                     <button id="notifBellMobile" class="btn btn-pill btn-secondary btn-full-width">
                         <i class="fa-solid fa-bell"></i> NOTIFICATIONS
                         <span class="notif-badge hidden" id="notifBadgeMobile">0</span>
-                    </button>
-                    <button id="apiKeyBtnMobile" class="btn btn-pill btn-secondary btn-full-width">
-                        <i class="fa-solid fa-key"></i> SET API KEY
                     </button>
                 </div>
             </div>
@@ -416,7 +407,12 @@
             </div>
         </section>
 
-        <section class="news-toolbar">
+        <!-- Section I: Stocks Affected News -->
+        <div style="margin-top:20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+            <h2 style="font-size:18px;font-weight:700;color:#f8fafc;display:flex;align-items:center;gap:8px;">
+                <i class="fa-solid fa-arrow-trend-up text-cyan"></i> I. STOCKS AFFECTED NEWS
+                <span style="font-size:12px;font-weight:400;color:#94a3b8;">(Individual Indian F&amp;O Stock Impact Analysis)</span>
+            </h2>
             <div class="news-verdict-filters" id="newsVerdictFilters">
                 <button class="tab-btn active" data-verdict="ALL"><i class="fa-solid fa-border-all"></i> ALL</button>
                 <button class="tab-btn" data-verdict="NEGATIVE"><i class="fa-solid fa-triangle-exclamation"></i> NEGATIVE</button>
@@ -424,10 +420,22 @@
                 <button class="tab-btn" data-verdict="POSITIVE"><i class="fa-solid fa-circle-check"></i> POSITIVE</button>
                 <button class="tab-btn" data-verdict="NEUTRAL"><i class="fa-solid fa-minus"></i> NEUTRAL</button>
             </div>
-        </section>
+        </div>
 
         <section id="newsGrid" class="news-grid">
-            <!-- Dynamic News Cards Injected by JS -->
+            <!-- Dynamic Stock-Affected News Cards Injected by JS -->
+        </section>
+
+        <!-- Section II: Global Market & Macro News -->
+        <div style="margin-top:36px;margin-bottom:12px;">
+            <h2 style="font-size:18px;font-weight:700;color:#f8fafc;display:flex;align-items:center;gap:8px;">
+                <i class="fa-solid fa-globe text-gold"></i> II. GLOBAL MARKET &amp; MACRO NEWS
+                <span style="font-size:12px;font-weight:400;color:#94a3b8;">(S&amp;P 500, Commodities, Forex, Fed/RBI Policy + Indian Stock Impact Mapping)</span>
+            </h2>
+        </div>
+
+        <section id="globalNewsGrid" class="news-grid">
+            <!-- Dynamic Global Macro News Cards with Stock Mapping Injected by JS -->
         </section>
 
         <div id="newsEmptyState" class="empty-state hidden">
@@ -510,6 +518,34 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">NATURAL LANGUAGE STRATEGY RULES (AI PARSER)</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="strategyTextPrompt" class="form-input" placeholder="e.g. 5m RSI > 70 with 2x volume spike, 1.5% TP and 0.75% SL">
+                            <button type="button" id="btnAiParseText" class="btn btn-pill btn-secondary" style="white-space:nowrap;">
+                                <i class="fa-solid fa-wand-magic-sparkles text-gold"></i> AI PARSE
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">PYTHON STRATEGY CODE / LOGIC</label>
+                        <div class="form-hint" style="margin-bottom:6px;">Define entry and exit rules (Python syntax). Edits will trigger AI clarification.</div>
+                        <textarea id="strategyPythonCode" class="form-textarea" rows="5" style="font-family:monospace;font-size:13px;background:rgba(0,0,0,0.4);" placeholder="def evaluate_signal(df, pillars):\n    return {'signal': 'BTST_BUY', 'tp_pct': 1.5, 'sl_pct': 0.75}"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">PER-STRATEGY SCOPE TOGGLES</label>
+                        <div class="toggle-row">
+                            <span class="lbl"><i class="fa-solid fa-arrow-trend-up text-cyan"></i> Toggle A — Stocks (Intraday / Scalping)</span>
+                            <label class="switch"><input type="checkbox" id="strategyToggleStocks" checked><span class="slider round"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <span class="lbl"><i class="fa-solid fa-chart-line text-gold"></i> Toggle B — Index Options (Nifty / Bank Nifty / Sensex)</span>
+                            <label class="switch"><input type="checkbox" id="strategyToggleIndices" checked><span class="slider round"></span></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">TARGET SCOPE</label>
                         <div class="checkbox-grid" id="strategyScopeCheckboxes">
                             <label class="checkbox-item"><input type="checkbox" value="STOCKS" checked> Stocks (F&amp;O)</label>
@@ -553,39 +589,35 @@
         </div>
     </div>
 
-    <!-- AI Clarification Review Modal (M9 audit fix) — the backend has required this step
-         since M4 (a strategy cannot activate without it), but nothing in the frontend ever
-         called the clarification endpoints; creating/editing a strategy silently left it
-         stuck as an unconfirmed, permanently inactive draft with no way to confirm it. -->
+    <!-- AI Clarification Review Modal -->
     <div id="clarificationModal" class="modal-overlay hidden">
         <div class="modal-card">
             <div class="modal-header">
                 <div class="modal-title-group">
-                    <h2><i class="fa-solid fa-robot text-gold"></i> Confirm What This Strategy Does</h2>
+                    <h2><i class="fa-solid fa-robot text-gold"></i> AI Strategy Clarification Summary</h2>
                 </div>
                 <button id="closeClarificationBtn" class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
                 <p class="form-hint" style="margin-bottom:14px;">
-                    Before this strategy can go active, review the AI's plain-language summary of
-                    exactly what it will do. It cannot score or trade anything until you confirm this.
+                    Review the plain-language summary of what your strategy logic does (entry conditions, exit conditions, timeframe, and assumptions) before activating it.
                 </p>
-                <div id="clarificationSummaryBody"></div>
+                <div id="clarificationSummaryBody" class="clarification-summary-card"></div>
 
                 <div id="clarificationCorrectionGroup" class="form-group hidden" style="margin-top:14px;">
-                    <label class="form-label">WHAT'S WRONG?</label>
+                    <label class="form-label">WHAT'S WRONG WITH THIS SUMMARY?</label>
                     <textarea id="clarificationCorrectionNote" class="form-textarea" placeholder="Describe what the summary got wrong or what you actually meant — this gets re-sent for a corrected summary."></textarea>
                 </div>
 
                 <div style="display:flex; gap:10px; margin-top:16px;">
                     <button id="clarificationConfirmBtn" class="btn btn-pill btn-primary" style="flex:1;justify-content:center;">
-                        <i class="fa-solid fa-check"></i> LOOKS RIGHT — ACTIVATE
+                        <i class="fa-solid fa-check"></i> CONFIRM &amp; ACTIVATE STRATEGY
                     </button>
                     <button id="clarificationRejectBtn" class="btn btn-pill btn-secondary" style="flex:1;justify-content:center;">
-                        <i class="fa-solid fa-xmark"></i> SOMETHING'S WRONG
+                        <i class="fa-solid fa-pen"></i> EDIT / CORRECTION NEEDED
                     </button>
                     <button id="clarificationResubmitBtn" class="btn btn-pill btn-primary hidden" style="flex:1;justify-content:center;">
-                        <i class="fa-solid fa-paper-plane"></i> RESUBMIT
+                        <i class="fa-solid fa-paper-plane"></i> RESUBMIT FOR AI RE-CLARIFICATION
                     </button>
                 </div>
             </div>
@@ -756,10 +788,23 @@
                     <!-- Dynamic Checklist Injected by JS -->
                 </div>
 
-                <!-- 5-Minute Candle Chart (M6) — TradingView lightweight-charts, VWAP overlay -->
-                <h4 class="section-heading mt-4"><i class="fa-solid fa-chart-candlestick"></i> 5-MINUTE CHART</h4>
+                <!-- Candle Chart with TradingView Timeframe Selector -->
+                <div class="chart-header-row mt-4">
+                    <h4 class="section-heading" style="margin-bottom:0;"><i class="fa-solid fa-chart-candlestick"></i> INTERACTIVE CANDLE CHART</h4>
+                    <div class="timeframe-switcher-bar" id="chartTimeframeSwitcher">
+                        <button class="tf-btn" data-tf="1m">1m</button>
+                        <button class="tf-btn" data-tf="3m">3m</button>
+                        <button class="tf-btn active" data-tf="5m">5m</button>
+                        <button class="tf-btn" data-tf="15m">15m</button>
+                        <button class="tf-btn" data-tf="1h">1H</button>
+                        <button class="tf-btn" data-tf="4h">4H</button>
+                        <button class="tf-btn" data-tf="1d">1D</button>
+                    </div>
+                </div>
                 <div class="chart-legend-hint">
-                    <span><span class="swatch" style="background:var(--gold);"></span> VWAP</span>
+                    <span><span class="swatch" style="background:var(--gold);"></span> VWAP / Moving Avg</span>
+                    <span><span class="swatch" style="background:var(--bullish-color);"></span> Target (TP)</span>
+                    <span><span class="swatch" style="background:var(--bearish-color);"></span> Stop Loss (SL)</span>
                 </div>
                 <div class="stock-chart-wrapper">
                     <div id="modalChartContainer"></div>

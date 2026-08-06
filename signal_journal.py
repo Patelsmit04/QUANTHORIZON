@@ -18,7 +18,10 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 import pandas as pd
 import yfinance as yf
-from psycopg.rows import dict_row
+try:
+    from psycopg.rows import dict_row
+except ImportError:
+    dict_row = None
 
 from strategy_manager import DEFAULT_STRATEGY_ID
 from index_scoring import INDEX_TICKERS
@@ -901,6 +904,13 @@ def evaluate_pending_signals() -> Dict[str, Any]:
                 gross_pnl = round(((est_exit_premium - est_entry_premium) / est_entry_premium) * 100, 2)
                 net_pnl = round(gross_pnl - (2 * spread_haircut), 2)
                 is_win = 1 if net_pnl > 0 else 0
+
+                postmortem_reason = (
+                    f"WIN: {pred_direction} gap {actual_gap}% matched predicted direction."
+                    if is_win else
+                    f"LOSS: {pred_direction} gap {actual_gap}% contradicted direction."
+                )
+                logger.info(f"[Postmortem] Signal {sig['id']}: {postmortem_reason}")
 
                 # Reuses the batch-level connection opened above (Phase-1 audit finding #15) —
                 # this used to open a brand new connection here, per row, inside the loop.
