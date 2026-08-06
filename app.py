@@ -777,6 +777,25 @@ def _run_full_scan_pipeline_impl() -> Dict[str, Any]:
     default_strategy = get_strategy(DEFAULT_STRATEGY_ID)
 
     stocks = score_stock_universe(raw_stocks, default_strategy)
+
+    # M13 audit fix: fetch_raw_stock_universe's yfinance batch download has no guaranteed
+    # success — a transient failure (timeout, or Yahoo Finance rate-limiting/blocking the
+    # host's outbound IP, which happens often on shared cloud IP ranges) makes it return an
+    # empty DataFrame, which scores down to an empty `stocks` list here. Previously this empty
+    # result was saved unconditionally, permanently overwriting a perfectly good prior snapshot
+    # with all-zero counts until the next successful scan happened to land — exactly the
+    # "total_scanned: 0, cache_hit: true" state a real deployment was observed serving for
+    # hours after one bad fetch. If we already have a real snapshot cached, prefer serving that
+    # stale-but-real data over a fresh-but-empty one; only a genuine first-ever run (nothing
+    # cached yet) has no better option than persisting the empty result.
+    existing_summary = cache_store.get("scan_summary")
+    if not stocks and existing_summary and existing_summary.get("stocks"):
+        logger.warning(
+            "Full scan pipeline returned 0 stocks (raw data fetch likely failed) — keeping the "
+            "last known-good cached scan instead of overwriting it with an empty result."
+        )
+        return existing_summary
+
     annotate_bestest_5(stocks)
     annotate_depth_analysis(stocks)
 
