@@ -16,6 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const guideBtnMobile = document.getElementById("guideBtnMobile");
     const winRateBtnMobile = document.getElementById("winRateBtnMobile");
     const exportCsvBtnMobile = document.getElementById("exportCsvBtnMobile");
+    const priorityOnlyToggleMobile = document.getElementById("priorityOnlyToggleMobile");
+    const autoRefreshToggleMobile = document.getElementById("autoRefreshToggleMobile");
 
     // DOM Elements
     const scanBtn = document.getElementById("scanBtn");

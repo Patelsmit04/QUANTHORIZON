@@ -29,23 +29,13 @@ from typing import Dict, List, Any, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
-from dotenv import load_dotenv
 
 from json_utils import atomic_write_json, read_json
+from env_utils import load_env_with_fallback
+from lock_utils import file_lock
 
 BASE_DIR = Path(__file__).resolve().parent
-ENV_PATH = BASE_DIR / ".env"
-EXAMPLE_ENV_PATH = BASE_DIR / ".env.example"
-
-
-def _load_env() -> None:
-    if ENV_PATH.exists():
-        load_dotenv(dotenv_path=ENV_PATH, override=True)
-    elif EXAMPLE_ENV_PATH.exists():
-        load_dotenv(dotenv_path=EXAMPLE_ENV_PATH, override=False)
-
-
-_load_env()
+load_env_with_fallback(str(BASE_DIR))
 
 logger = logging.getLogger("NewsProvider")
 
@@ -53,7 +43,7 @@ CURRENTS_API_BASE = "https://api.currentsapi.services/v1"
 
 
 def get_api_key() -> Optional[str]:
-    _load_env()
+    load_env_with_fallback(str(BASE_DIR))
     key = os.environ.get("CURRENTS_API_KEY")
     if not key:
         return None
@@ -126,7 +116,6 @@ def _search(keywords: str, max_results: int = 8) -> Optional[List[Dict[str, Any]
         return data.get("news", [])[:max_results]
     except Exception as e:
         logger.warning(f"CurrentsAPI search failed for '{keywords}': {e}")
-        return None
         return None
 
 
@@ -290,17 +279,10 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
     must check should_refresh_universe_news() first.
     """
     _ensure_data_dir()
-    if os.path.exists(NEWS_REFRESH_LOCK_FILE):
-        lock_age = time.time() - os.path.getmtime(NEWS_REFRESH_LOCK_FILE)
-        if lock_age < LOCK_STALE_AFTER_SECONDS:
-            logger.warning(f"Universe news refresh already in progress elsewhere (lock is {lock_age:.0f}s old) — skipping.")
+    with file_lock(NEWS_REFRESH_LOCK_FILE, LOCK_STALE_AFTER_SECONDS, label="Universe news refresh") as acquired:
+        if not acquired:
             return {"fetched": 0, "failed": 0, "skipped": "ALREADY_IN_PROGRESS"}
-        logger.warning(f"Stale news refresh lock ({lock_age:.0f}s old) — assuming a crashed run and proceeding.")
 
-    with open(NEWS_REFRESH_LOCK_FILE, "w") as f:
-        f.write(str(time.time()))
-
-    try:
         if not _api_available():
             return {"fetched": 0, "failed": 0, "skipped": "NO_API_KEY"}
 
@@ -367,11 +349,6 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
             f"(pass #{prior_count + 1}/{MAX_REFRESHES_PER_DAY} today)."
         )
         return {"fetched": fetched, "failed": failed, "elapsed_sec": elapsed, "refresh_number_today": prior_count + 1}
-    finally:
-        try:
-            os.remove(NEWS_REFRESH_LOCK_FILE)
-        except OSError:
-            pass
 
 
 def get_cached_stock_news(symbol: str) -> Optional[Dict[str, Any]]:

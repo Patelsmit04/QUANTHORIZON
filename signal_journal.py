@@ -19,6 +19,8 @@ import yfinance as yf
 
 from strategy_manager import DEFAULT_STRATEGY_ID
 from index_scoring import INDEX_TICKERS
+from net_utils import call_with_retry
+from candle_utils import fetch_post_lock_candles
 
 logger = logging.getLogger("SignalJournal")
 
@@ -31,6 +33,10 @@ def get_db_connection():
         os.makedirs(DATA_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_FILE, timeout=30.0)
     conn.row_factory = sqlite3.Row
+    # WAL mode (Phase-1 audit finding #16) — the default rollback-journal mode serializes
+    # more aggressively under concurrent readers+writers than WAL does, and this DB is hit by
+    # two background scheduler threads plus request-handler reads/writes.
+    conn.execute("PRAGMA journal_mode=WAL")
     return conn
 
 
@@ -156,6 +162,15 @@ def init_journal_db():
             FOREIGN KEY(verdict_id) REFERENCES index_verdict_journal(id)
         );
         """)
+
+        # Indices (Phase-1 audit finding #14) — only the primary key was indexed before.
+        # get_metrics_summary(strategy_id=...) filters on strategy_id, and every evaluation
+        # pass filters/joins on date columns; invisible at today's volume, a full-table-scan
+        # once history accumulates over months.
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_signal_journal_strategy ON signal_journal(strategy_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_signal_journal_date ON signal_journal(signal_date);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_index_verdict_date ON index_verdict_journal(verdict_date, index_name);")
+
         conn.commit()
     logger.info("Signal Journal SQLite DB initialized successfully.")
 
@@ -346,56 +361,44 @@ def evaluate_pending_index_verdicts() -> Dict[str, Any]:
     evaluated_count = 0
     today_date_str = datetime.now().strftime("%Y-%m-%d")
 
-    for v in unevaluated:
-        if v["verdict_date"] == today_date_str:
-            continue
-
-        ticker = v["raw_ticker"]
-        try:
-            df = yf.download(ticker, period="5d", interval="5m", progress=False)
-            if df is None or df.empty:
-                continue
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-
-            df = df.dropna().copy()
-            if df.empty:
+    # One connection reused for the whole batch (Phase-1 audit finding #15) — this used to
+    # open/close a fresh connection per row inside the loop.
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        for v in unevaluated:
+            if v["verdict_date"] == today_date_str:
                 continue
 
-            df.reset_index(inplace=True)
-            time_col = 'Datetime' if 'Datetime' in df.columns else ('Date' if 'Date' in df.columns else df.columns[0])
-            df['DateStr'] = df[time_col].astype(str).str.slice(0, 10)
+            ticker = v["raw_ticker"]
+            try:
+                post_lock_df = fetch_post_lock_candles(ticker, v["verdict_date"], label=f"evaluate_pending_index_verdicts [{ticker}]")
+                if post_lock_df is None:
+                    continue
 
-            post_lock_df = df[df['DateStr'] > v["verdict_date"]]
-            if post_lock_df.empty:
-                continue
+                open_915 = float(post_lock_df.iloc[0]['Open'])
+                price_325 = float(v["price"]) if v["price"] is not None else 0.0
+                if price_325 <= 0 or open_915 <= 0:
+                    continue
 
-            open_915 = float(post_lock_df.iloc[0]['Open'])
-            price_325 = float(v["price"]) if v["price"] is not None else 0.0
-            if price_325 <= 0 or open_915 <= 0:
-                continue
+                exit_candle_idx = min(3, len(post_lock_df) - 1)
+                close_930 = float(post_lock_df.iloc[exit_candle_idx]['Close'])
 
-            exit_candle_idx = min(3, len(post_lock_df) - 1)
-            close_930 = float(post_lock_df.iloc[exit_candle_idx]['Close'])
+                actual_gap = round(((open_915 - price_325) / price_325) * 100, 2)
+                actual_move_points = round(open_915 - price_325, 1)
 
-            actual_gap = round(((open_915 - price_325) / price_325) * 100, 2)
-            actual_move_points = round(open_915 - price_325, 1)
+                is_dir_correct = 0
+                if v["verdict"] == "Buy Call" and actual_gap > 0:
+                    is_dir_correct = 1
+                elif v["verdict"] == "Buy Put" and actual_gap < 0:
+                    is_dir_correct = 1
 
-            is_dir_correct = 0
-            if v["verdict"] == "Buy Call" and actual_gap > 0:
-                is_dir_correct = 1
-            elif v["verdict"] == "Buy Put" and actual_gap < 0:
-                is_dir_correct = 1
+                expected_points = v["expected_open_points"]
+                variance_err = round(abs(abs(actual_move_points) - expected_points), 2) if expected_points is not None else 0.0
 
-            expected_points = v["expected_open_points"]
-            variance_err = round(abs(abs(actual_move_points) - expected_points), 2) if expected_points is not None else 0.0
+                move_within_range = None
+                if v["expected_range_low"] is not None and v["expected_range_high"] is not None:
+                    move_within_range = 1 if v["expected_range_low"] <= open_915 <= v["expected_range_high"] else 0
 
-            move_within_range = None
-            if v["expected_range_low"] is not None and v["expected_range_high"] is not None:
-                move_within_range = 1 if v["expected_range_low"] <= open_915 <= v["expected_range_high"] else 0
-
-            with get_db_connection() as conn:
-                cursor = conn.cursor()
                 cursor.execute("""
                 INSERT OR REPLACE INTO index_verdict_evaluations (
                     verdict_id, eval_date, eval_timestamp, next_open_915, next_close_930,
@@ -418,8 +421,8 @@ def evaluate_pending_index_verdicts() -> Dict[str, Any]:
                 evaluated_count += 1
                 logger.info(f"Index verdict evaluated {v['index_name']}: Dir Correct={is_dir_correct}, Gap={actual_gap}%, Within Expected Range={move_within_range}")
 
-        except Exception as e:
-            logger.warning(f"Error evaluating index verdict for {ticker}: {e}")
+            except Exception as e:
+                logger.warning(f"Error evaluating index verdict for {ticker}: {e}")
 
     return {"evaluated_count": evaluated_count}
 
@@ -493,117 +496,102 @@ def evaluate_pending_signals() -> Dict[str, Any]:
     evaluated_count = 0
     today_date_str = datetime.now().strftime("%Y-%m-%d")
 
-    for sig in unevaluated:
-        # Skip signals generated today before market opens tomorrow
-        if sig["signal_date"] == today_date_str:
-            continue
-
-        ticker = sig["raw_ticker"]
-        try:
-            df = yf.download(ticker, period="5d", interval="5m", progress=False)
-            if df is None or df.empty:
+    # One connection reused for the whole batch (Phase-1 audit finding #15) — this used to
+    # open/close a fresh connection per row inside the loop.
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        for sig in unevaluated:
+            # Skip signals generated today before market opens tomorrow
+            if sig["signal_date"] == today_date_str:
                 continue
 
-            # This yfinance version returns MultiIndex columns like ('Close', 'TICKER.NS')
-            # even for a single-ticker download — the field name is level 0, not the ticker,
-            # so flatten to level 0 rather than trying to index by ticker.
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            stock_df = df
+            ticker = sig["raw_ticker"]
+            try:
+                post_lock_df = fetch_post_lock_candles(ticker, sig["signal_date"], label=f"evaluate_pending_signals [{ticker}]")
+                if post_lock_df is None:
+                    continue
 
-            stock_df = stock_df.dropna().copy()
-            if stock_df.empty:
-                continue
+                open_915 = float(post_lock_df.iloc[0]['Open'])
+                close_325 = float(sig["close_price_325"])
 
-            stock_df.reset_index(inplace=True)
-            time_col = 'Datetime' if 'Datetime' in stock_df.columns else ('Date' if 'Date' in stock_df.columns else stock_df.columns[0])
-            stock_df['DateStr'] = stock_df[time_col].astype(str).str.slice(0, 10)
+                # Get 9:30 AM price (3rd 5-min candle of the day, index 2 or 3)
+                exit_candle_idx = min(3, len(post_lock_df) - 1)
+                close_930 = float(post_lock_df.iloc[exit_candle_idx]['Close'])
+                high_day = float(post_lock_df['High'].max())
+                low_day = float(post_lock_df['Low'].min())
 
-            post_lock_df = stock_df[stock_df['DateStr'] > sig["signal_date"]]
-            if post_lock_df.empty:
-                continue
+                if close_325 <= 0 or open_915 <= 0:
+                    continue
 
-            open_915 = float(post_lock_df.iloc[0]['Open'])
-            close_325 = float(sig["close_price_325"])
-            
-            # Get 9:30 AM price (3rd 5-min candle of the day, index 2 or 3)
-            exit_candle_idx = min(3, len(post_lock_df) - 1)
-            close_930 = float(post_lock_df.iloc[exit_candle_idx]['Close'])
-            high_day = float(post_lock_df['High'].max())
-            low_day = float(post_lock_df['Low'].min())
+                actual_gap = round(((open_915 - close_325) / close_325) * 100, 2)
+                predicted_gap = float(sig["predicted_gap_pct"])
+                pred_direction = sig["predicted_direction"]
 
-            if close_325 <= 0 or open_915 <= 0:
-                continue
+                # Directional Accuracy check
+                is_dir_correct = 0
+                if pred_direction == "BULLISH" and actual_gap > 0:
+                    is_dir_correct = 1
+                elif pred_direction == "BEARISH" and actual_gap < 0:
+                    is_dir_correct = 1
 
-            actual_gap = round(((open_915 - close_325) / close_325) * 100, 2)
-            predicted_gap = float(sig["predicted_gap_pct"])
-            pred_direction = sig["predicted_direction"]
+                variance_err = round(abs(actual_gap - predicted_gap), 2)
+                acc_score = max(0.0, round(100.0 - (variance_err * 15.0), 1))
 
-            # Directional Accuracy check
-            is_dir_correct = 0
-            if pred_direction == "BULLISH" and actual_gap > 0:
-                is_dir_correct = 1
-            elif pred_direction == "BEARISH" and actual_gap < 0:
-                is_dir_correct = 1
+                # SIMULATED OPTIONS TRADE P&L (15-Min Exit Rule at 9:30 AM with 3.0% Spread Haircut)
+                trade_taken = 1 if sig["priority_level"] in ["P1_HIGH", "P2_MEDIUM"] else 0
+                spread_haircut = 3.0  # 3% haircut on entry and exit
 
-            variance_err = round(abs(actual_gap - predicted_gap), 2)
-            acc_score = max(0.0, round(100.0 - (variance_err * 15.0), 1))
+                # Premium estimation: ~1.5% of spot price
+                est_entry_premium = max(1.0, open_915 * 0.015)
 
-            # SIMULATED OPTIONS TRADE P&L (15-Min Exit Rule at 9:30 AM with 3.0% Spread Haircut)
-            trade_taken = 1 if sig["priority_level"] in ["P1_HIGH", "P2_MEDIUM"] else 0
-            spread_haircut = 3.0  # 3% haircut on entry and exit
-            
-            # Premium estimation: ~1.5% of spot price
-            est_entry_premium = max(1.0, open_915 * 0.015)
-            
-            if pred_direction == "BULLISH":
-                # CALL option gain tracking spot delta
-                spot_delta = close_930 - open_915
-                est_exit_premium = max(0.1, est_entry_premium + spot_delta)
-            else:
-                # PUT option gain tracking inverse spot delta
-                spot_delta = open_915 - close_930
-                est_exit_premium = max(0.1, est_entry_premium + spot_delta)
+                if pred_direction == "BULLISH":
+                    # CALL option gain tracking spot delta
+                    spot_delta = close_930 - open_915
+                    est_exit_premium = max(0.1, est_entry_premium + spot_delta)
+                else:
+                    # PUT option gain tracking inverse spot delta
+                    spot_delta = open_915 - close_930
+                    est_exit_premium = max(0.1, est_entry_premium + spot_delta)
 
-            gross_pnl = round(((est_exit_premium - est_entry_premium) / est_entry_premium) * 100, 2)
-            net_pnl = round(gross_pnl - (2 * spread_haircut), 2)
-            is_win = 1 if net_pnl > 0 else 0
+                gross_pnl = round(((est_exit_premium - est_entry_premium) / est_entry_premium) * 100, 2)
+                net_pnl = round(gross_pnl - (2 * spread_haircut), 2)
+                is_win = 1 if net_pnl > 0 else 0
 
-            with get_db_connection() as conn:
-                cursor = conn.cursor()
+                # Reuses the batch-level connection opened above (Phase-1 audit finding #15) —
+                # this used to open a brand new connection here, per row, inside the loop.
                 cursor.execute("""
-                INSERT OR REPLACE INTO signal_evaluations (
-                    signal_id, eval_date, eval_timestamp, next_open_915, next_high, next_low,
-                    next_close_930, actual_gap_pct, is_direction_correct, variance_error_pct,
-                    directional_accuracy_score, trade_taken, est_entry_premium, est_exit_premium,
-                    spread_haircut_pct, gross_pnl_pct, net_pnl_pct, is_trade_win
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    sig["id"],
-                    today_date_str,
-                    time.strftime("%Y-%m-%d %H:%M:%S IST"),
-                    round(open_915, 2),
-                    round(high_day, 2),
-                    round(low_day, 2),
-                    round(close_930, 2),
-                    actual_gap,
-                    is_dir_correct,
-                    variance_err,
-                    acc_score,
-                    trade_taken,
-                    round(est_entry_premium, 2),
-                    round(est_exit_premium, 2),
-                    spread_haircut,
-                    gross_pnl,
-                    net_pnl,
-                    is_win
-                ))
+                    INSERT OR REPLACE INTO signal_evaluations (
+                        signal_id, eval_date, eval_timestamp, next_open_915, next_high, next_low,
+                        next_close_930, actual_gap_pct, is_direction_correct, variance_error_pct,
+                        directional_accuracy_score, trade_taken, est_entry_premium, est_exit_premium,
+                        spread_haircut_pct, gross_pnl_pct, net_pnl_pct, is_trade_win
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        sig["id"],
+                        today_date_str,
+                        time.strftime("%Y-%m-%d %H:%M:%S IST"),
+                        round(open_915, 2),
+                        round(high_day, 2),
+                        round(low_day, 2),
+                        round(close_930, 2),
+                        actual_gap,
+                        is_dir_correct,
+                        variance_err,
+                        acc_score,
+                        trade_taken,
+                        round(est_entry_premium, 2),
+                        round(est_exit_premium, 2),
+                        spread_haircut,
+                        gross_pnl,
+                        net_pnl,
+                        is_win
+                    ))
                 conn.commit()
                 evaluated_count += 1
                 logger.info(f"Journal Evaluated {sig['symbol']}: Dir Correct={is_dir_correct}, Gap={actual_gap}%, Net PnL={net_pnl}% (Win={is_win})")
 
-        except Exception as e:
-            logger.warning(f"Error evaluating journal entry for {ticker}: {e}")
+            except Exception as e:
+                logger.warning(f"Error evaluating journal entry for {ticker}: {e}")
 
     return {"evaluated_count": evaluated_count}
 

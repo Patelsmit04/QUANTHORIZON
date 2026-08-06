@@ -24,6 +24,7 @@ from typing import Dict, Any, Optional, List
 import pandas as pd
 
 from json_utils import atomic_write_json, read_json
+from net_utils import call_with_retry
 
 # Suppress jugaad_data numpy datetime warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="jugaad_data")
@@ -89,13 +90,15 @@ def fetch_stock_delivery_history(symbol: str, lookback_days: int = 20) -> Option
     to_date = date.today()
     from_date = to_date - timedelta(days=lookback_days + 10)
 
+    df = call_with_retry(
+        lambda: nse_stock_df(symbol, from_date=from_date, to_date=to_date, series="EQ"),
+        label=f"NSE delivery history [{symbol}]",
+    )
+    if df is None or df.empty:
+        logger.warning(f"No historical data returned for {symbol}")
+        return None
+
     try:
-        df = nse_stock_df(symbol, from_date=from_date, to_date=to_date, series="EQ")
-
-        if df is None or df.empty:
-            logger.warning(f"No historical data returned for {symbol}")
-            return None
-
         records = []
         for _, row in df.iterrows():
             dt = row.get("DATE", "")

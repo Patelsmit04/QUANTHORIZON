@@ -11,6 +11,8 @@ import logging
 from typing import Dict, Any, Tuple
 import yfinance as yf
 
+from net_utils import call_with_retry
+
 logger = logging.getLogger("IndiaVIXProvider")
 
 def fetch_india_vix() -> Tuple[float, str]:
@@ -20,7 +22,10 @@ def fetch_india_vix() -> Tuple[float, str]:
     tickers = ["^INDIAVIX", "INDIAVIX.NS"]
     for ticker in tickers:
         try:
-            df = yf.download(ticker, period="5d", interval="1d", progress=False)
+            df = call_with_retry(
+                lambda t=ticker: yf.download(t, period="5d", interval="1d", progress=False),
+                label=f"VIX fetch [{ticker}]",
+            )
             if df is not None and not df.empty:
                 # This yfinance version returns MultiIndex columns like ('Close', 'TICKER')
                 # even for a single-ticker download — flatten before selecting 'Close'.
