@@ -1663,6 +1663,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const reviewBtn = card.querySelector("[data-strategy-review]");
         if (reviewBtn) reviewBtn.addEventListener("click", () => openClarificationModal(strategy));
 
+        const reviewBtn = card.querySelector("[data-strategy-review]");
+        if (reviewBtn) reviewBtn.addEventListener("click", () => openClarificationModal(strategy));
+
         const editBtn = card.querySelector("[data-strategy-edit]");
         if (editBtn) editBtn.addEventListener("click", () => openStrategyForm(strategy));
 
