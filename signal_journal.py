@@ -26,7 +26,7 @@ from candle_utils import fetch_post_lock_candles
 
 logger = logging.getLogger("SignalJournal")
 
-DATA_DIR = "data"
+DATA_DIR = "/tmp/data" if os.environ.get("VERCEL") else "data"
 DB_FILE = os.path.join(DATA_DIR, "signal_journal.db")
 
 
