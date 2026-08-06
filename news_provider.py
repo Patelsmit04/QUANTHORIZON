@@ -29,23 +29,14 @@ from typing import Dict, List, Any, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
-from dotenv import load_dotenv
 
 from json_utils import atomic_write_json, read_json
+from env_utils import load_env_with_fallback, DATA_DIR
+from lock_utils import file_lock
+from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json
 
 BASE_DIR = Path(__file__).resolve().parent
-ENV_PATH = BASE_DIR / ".env"
-EXAMPLE_ENV_PATH = BASE_DIR / ".env.example"
-
-
-def _load_env() -> None:
-    if ENV_PATH.exists():
-        load_dotenv(dotenv_path=ENV_PATH, override=True)
-    elif EXAMPLE_ENV_PATH.exists():
-        load_dotenv(dotenv_path=EXAMPLE_ENV_PATH, override=False)
-
-
-_load_env()
+load_env_with_fallback(str(BASE_DIR))
 
 logger = logging.getLogger("NewsProvider")
 
@@ -53,7 +44,7 @@ CURRENTS_API_BASE = "https://api.currentsapi.services/v1"
 
 
 def get_api_key() -> Optional[str]:
-    _load_env()
+    load_env_with_fallback(str(BASE_DIR))
     key = os.environ.get("CURRENTS_API_KEY")
     if not key:
         return None
@@ -63,7 +54,6 @@ def get_api_key() -> Optional[str]:
     return key_clean
 
 
-DATA_DIR = "data"
 STOCK_NEWS_CACHE_FILE = os.path.join(DATA_DIR, "stock_news_cache.json")
 NEWS_REFRESH_LOCK_FILE = os.path.join(DATA_DIR, "news_refresh.lock")
 LOCK_STALE_AFTER_SECONDS = 900  # a universe pass takes longer than the fundamentals refresh
@@ -127,7 +117,6 @@ def _search(keywords: str, max_results: int = 8) -> Optional[List[Dict[str, Any]
     except Exception as e:
         logger.warning(f"CurrentsAPI search failed for '{keywords}': {e}")
         return None
-        return None
 
 
 def _filter_recent(headlines: List[Dict[str, Any]], hours: int = RECENCY_HOURS) -> List[Dict[str, Any]]:
@@ -158,13 +147,84 @@ def fetch_stock_news(symbol: str, company_name: str, max_results: int = 5) -> Op
     return recent[:max_results]
 
 
+SECTOR_STOCK_MAP = {
+    "crude": {
+        "stocks": ["RELIANCE", "BPCL", "HPCL", "IOC", "ONGC", "OIL", "ASIANPAINT", "BERGEPAINT"],
+        "impact": "Crude price shifts directly affect oil refiners, OMCs, and paint/chemical input margins."
+    },
+    "oil": {
+        "stocks": ["RELIANCE", "BPCL", "HPCL", "IOC", "ONGC", "OIL"],
+        "impact": "Upstream & downstream oil & gas margins directly impacted."
+    },
+    "fed": {
+        "stocks": ["TCS", "INFY", "WIPRO", "HCLTECH", "TECHM", "LTIM"],
+        "impact": "US Federal Reserve rate policy directly influences US tech spending & IT margins."
+    },
+    "tech": {
+        "stocks": ["TCS", "INFY", "WIPRO", "HCLTECH", "TECHM", "LTIM"],
+        "impact": "Global tech sector sentiment impacts Indian IT exporters."
+    },
+    "rbi": {
+        "stocks": ["HDFCBANK", "ICICIBANK", "SBIN", "AXISBANK", "BANKBARODA", "KOTAKBANK", "PNB"],
+        "impact": "RBI interest rate policy & liquidity measures impact banking NIMs & credit growth."
+    },
+    "bank": {
+        "stocks": ["HDFCBANK", "ICICIBANK", "SBIN", "AXISBANK", "BANKBARODA", "KOTAKBANK"],
+        "impact": "Banking sector liquidity & rate sensitivity."
+    },
+    "metal": {
+        "stocks": ["TATASTEEL", "JSWSTEEL", "HINDALCO", "COALINDIA", "NMDC", "VEDL", "NATIONALUM"],
+        "impact": "Global commodity cycles & Chinese industrial demand impact metal pricing."
+    },
+    "china": {
+        "stocks": ["TATASTEEL", "JSWSTEEL", "HINDALCO", "VEDL", "CHAMBLFERT"],
+        "impact": "Chinese economic stimulus or slowdown affects global commodity demand."
+    },
+    "dollar": {
+        "stocks": ["TCS", "INFY", "WIPRO", "HCLTECH", "SUNPHARMA", "DRREDDY"],
+        "impact": "USD/INR exchange rate shifts impact IT & Pharma export realizations."
+    },
+    "pharma": {
+        "stocks": ["SUNPHARMA", "DRREDDY", "CIPLA", "DIVISLAB", "LUPIN", "APOLLOHOSP"],
+        "impact": "US FDA regulatory approvals and global healthcare spending."
+    },
+    "auto": {
+        "stocks": ["TATAMOTORS", "MARUTI", "M&M", "HEROMOTOCO", "EICHERMOT", "BAJAJ-AUTO"],
+        "impact": "EV trends, raw material costs, and global auto supply chains."
+    }
+}
+
+
+def analyze_global_stock_impact(headline: Dict[str, Any]) -> Dict[str, Any]:
+    text = f"{headline.get('title', '')} {headline.get('description', '')}".lower()
+    affected_stocks = []
+    impact_reasons = []
+
+    for kw, data in SECTOR_STOCK_MAP.items():
+        if kw in text:
+            for s in data["stocks"]:
+                if s not in affected_stocks:
+                    affected_stocks.append(s)
+            impact_reasons.append(data["impact"])
+
+    sentiment = classify_news_signal([headline])
+
+    return {
+        "headline": headline,
+        "affected_stocks": affected_stocks[:6],
+        "impact_reasons": list(set(impact_reasons)),
+        "verdict": sentiment.get("verdict", "NEUTRAL"),
+    }
+
+
 def fetch_market_news(max_results: int = 10) -> Optional[List[Dict[str, Any]]]:
     """Broad market/macro news likely to move Indian equities generally (index-level, not
     stock-specific): RBI/Fed policy, crude oil, global markets, India macro data."""
-    raw = _search("Nifty Sensex India stock market RBI", max_results=max_results * 2)
+    raw = _search("Nifty Sensex India stock market RBI Fed crude", max_results=max_results * 2)
     if raw is None:
         return None
-    return _filter_recent(raw)[:max_results]
+    recent = _filter_recent(raw)[:max_results]
+    return [analyze_global_stock_impact(h) for h in recent]
 
 
 def classify_news_signal(headlines: Optional[List[Dict[str, Any]]]) -> Dict[str, Any]:
@@ -247,8 +307,22 @@ def _ensure_data_dir():
     os.makedirs(DATA_DIR, exist_ok=True)
 
 
+def _load_news_cache() -> Dict[str, Any]:
+    if USE_POSTGRES:
+        return pg_read_json("stock_news_cache", default={})
+    return read_json(STOCK_NEWS_CACHE_FILE, default={})
+
+
+def _save_news_cache(cache: Dict[str, Any]) -> None:
+    if USE_POSTGRES:
+        pg_write_json("stock_news_cache", cache)
+        return
+    _ensure_data_dir()
+    atomic_write_json(STOCK_NEWS_CACHE_FILE, cache)
+
+
 def get_universe_news_meta() -> Dict[str, Any]:
-    cache = read_json(STOCK_NEWS_CACHE_FILE, default={})
+    cache = _load_news_cache()
     return cache.get("_meta", {})
 
 
@@ -290,21 +364,14 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
     must check should_refresh_universe_news() first.
     """
     _ensure_data_dir()
-    if os.path.exists(NEWS_REFRESH_LOCK_FILE):
-        lock_age = time.time() - os.path.getmtime(NEWS_REFRESH_LOCK_FILE)
-        if lock_age < LOCK_STALE_AFTER_SECONDS:
-            logger.warning(f"Universe news refresh already in progress elsewhere (lock is {lock_age:.0f}s old) — skipping.")
+    with file_lock(NEWS_REFRESH_LOCK_FILE, LOCK_STALE_AFTER_SECONDS, label="Universe news refresh") as acquired:
+        if not acquired:
             return {"fetched": 0, "failed": 0, "skipped": "ALREADY_IN_PROGRESS"}
-        logger.warning(f"Stale news refresh lock ({lock_age:.0f}s old) — assuming a crashed run and proceeding.")
 
-    with open(NEWS_REFRESH_LOCK_FILE, "w") as f:
-        f.write(str(time.time()))
-
-    try:
         if not _api_available():
             return {"fetched": 0, "failed": 0, "skipped": "NO_API_KEY"}
 
-        cache = read_json(STOCK_NEWS_CACHE_FILE, default={})
+        cache = _load_news_cache()
         today_str = date.today().isoformat()
         fetched, failed = 0, 0
         t0 = time.time()
@@ -344,12 +411,14 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
                         failed += 1
 
             # Checkpoint after every chunk — a chunk-interrupting reload doesn't lose prior chunks.
-            atomic_write_json(STOCK_NEWS_CACHE_FILE, cache)
+            _save_news_cache(cache)
 
             is_last_chunk = (chunk_idx + BURST_SAFE_CHUNK_SIZE) >= len(symbol_items)
             if not is_last_chunk:
                 logger.info(f"Chunk done ({fetched} ok / {failed} failed so far) — cooling down {BURST_COOLDOWN_SECONDS}s for the burst limit...")
-                time.sleep(BURST_COOLDOWN_SECONDS)
+                if interruptible_sleep(BURST_COOLDOWN_SECONDS):
+                    logger.info("News refresh interrupted by shutdown signal.")
+                    break
 
         prior_meta = cache.get("_meta", {})
         prior_count = prior_meta.get("refresh_count", 0) if prior_meta.get("date") == today_str else 0
@@ -360,18 +429,13 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
             "last_refresh_completed_at": datetime.now(timezone.utc).isoformat(),
             "symbol_count": fetched,
         }
-        atomic_write_json(STOCK_NEWS_CACHE_FILE, cache)
+        _save_news_cache(cache)
         elapsed = round(time.time() - t0, 1)
         logger.info(
             f"Universe news refresh complete: {fetched} fetched, {failed} failed, {elapsed}s "
             f"(pass #{prior_count + 1}/{MAX_REFRESHES_PER_DAY} today)."
         )
         return {"fetched": fetched, "failed": failed, "elapsed_sec": elapsed, "refresh_number_today": prior_count + 1}
-    finally:
-        try:
-            os.remove(NEWS_REFRESH_LOCK_FILE)
-        except OSError:
-            pass
 
 
 def get_cached_stock_news(symbol: str) -> Optional[Dict[str, Any]]:
@@ -380,11 +444,11 @@ def get_cached_stock_news(symbol: str) -> Optional[Dict[str, Any]]:
     reads this same cached file; nobody's page view ever triggers a CurrentsAPI request.
     """
     clean_sym = symbol.replace(".NS", "").upper()
-    cache = read_json(STOCK_NEWS_CACHE_FILE, default={})
+    cache = _load_news_cache()
     return cache.get(clean_sym)
 
 
 def get_all_cached_news() -> Dict[str, Any]:
     """Full cached news set for the News section — one disk read, served to unlimited users."""
-    cache = read_json(STOCK_NEWS_CACHE_FILE, default={})
+    cache = _load_news_cache()
     return {k: v for k, v in cache.items() if k != "_meta"}

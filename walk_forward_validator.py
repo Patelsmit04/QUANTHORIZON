@@ -14,13 +14,14 @@ WALK-FORWARD VALIDATOR & DYNAMIC PILLAR WEIGHTING ENGINE
 import os
 import logging
 from datetime import date
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from signal_journal import get_db_connection
 from json_utils import atomic_write_json, read_json
+from env_utils import DATA_DIR
+from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json
 
 logger = logging.getLogger("WalkForwardValidator")
 
-DATA_DIR = "data"
 PILLAR_WEIGHTS_FILE = os.path.join(DATA_DIR, "active_pillar_weights.json")
 PILLAR_WEIGHTS_HISTORY_FILE = os.path.join(DATA_DIR, "pillar_weights_history.json")
 MAX_HISTORY_ENTRIES = 90
@@ -191,6 +192,19 @@ def compute_dynamic_pillar_weights() -> Dict[str, Any]:
     }
 
 
+def _load_pillar_weights() -> Optional[Dict[str, Any]]:
+    if USE_POSTGRES:
+        return pg_read_json("active_pillar_weights", default=None)
+    return read_json(PILLAR_WEIGHTS_FILE, default=None)
+
+
+def _save_pillar_weights(data: Dict[str, Any]) -> None:
+    if USE_POSTGRES:
+        pg_write_json("active_pillar_weights", data)
+        return
+    atomic_write_json(PILLAR_WEIGHTS_FILE, data)
+
+
 def get_active_pillar_weights() -> Dict[str, float]:
     """
     The pillar weight multipliers currently LIVE in scoring (used by
@@ -199,7 +213,7 @@ def get_active_pillar_weights() -> Dict[str, float]:
     sufficient sample. This is what scoring reads; compute_dynamic_pillar_weights() above is
     just the (uncapped, unapplied) recommendation.
     """
-    stored = read_json(PILLAR_WEIGHTS_FILE, default=None)
+    stored = _load_pillar_weights()
     if not stored or "weights" not in stored:
         return dict(DEFAULT_PILLAR_WEIGHTS)
     return {**DEFAULT_PILLAR_WEIGHTS, **stored["weights"]}
@@ -214,15 +228,28 @@ def _apply_daily_cap(current: float, recommended: float) -> float:
     return round(min(max_up, max(max_down, recommended)), 3)
 
 
-def _append_weight_history(entry: Dict[str, Any]):
-    history = read_json(PILLAR_WEIGHTS_HISTORY_FILE, default=[])
-    history.append(entry)
-    history = history[-MAX_HISTORY_ENTRIES:]
+def _load_weight_history() -> List[Dict[str, Any]]:
+    if USE_POSTGRES:
+        return pg_read_json("pillar_weights_history", default=[])
+    return read_json(PILLAR_WEIGHTS_HISTORY_FILE, default=[])
+
+
+def _save_weight_history(history: List[Dict[str, Any]]) -> None:
+    if USE_POSTGRES:
+        pg_write_json("pillar_weights_history", history)
+        return
     atomic_write_json(PILLAR_WEIGHTS_HISTORY_FILE, history)
 
 
+def _append_weight_history(entry: Dict[str, Any]):
+    history = _load_weight_history()
+    history.append(entry)
+    history = history[-MAX_HISTORY_ENTRIES:]
+    _save_weight_history(history)
+
+
 def get_pillar_weights_history(limit: int = 30) -> List[Dict[str, Any]]:
-    history = read_json(PILLAR_WEIGHTS_HISTORY_FILE, default=[])
+    history = _load_weight_history()
     return history[-limit:]
 
 
@@ -238,9 +265,20 @@ def apply_dynamic_pillar_weights() -> Dict[str, Any]:
     weight trajectory is fully auditable — this is auto-improvement with a paper trail, not a
     black box quietly reweighting itself.
     """
-    computation = compute_dynamic_pillar_weights()
     current_weights = get_active_pillar_weights()
     today_str = date.today().isoformat()
+
+    # Disk-backed guard against double-application, same pattern as fundamental_provider's
+    # was_refresh_completed_today() — the caller (app.py's evaluation_scheduler_worker) only
+    # tracks "already ran today" in an in-memory local variable, which resets on restart. A
+    # restart between 9:17 AM and the 15:40 catch-up cutoff would otherwise re-enter the catch-up
+    # window and apply another +/-15% move on top of today's already-applied one.
+    stored = _load_pillar_weights()
+    if stored and stored.get("last_updated") == today_str:
+        logger.info("Dynamic pillar weights already applied today — skipping duplicate application.")
+        return {"status": "ALREADY_APPLIED_TODAY", "applied": False, "active_weights": current_weights}
+
+    computation = compute_dynamic_pillar_weights()
 
     if computation["status"] != "DYNAMIC_WEIGHTS_COMPUTED":
         _append_weight_history({
@@ -266,7 +304,7 @@ def apply_dynamic_pillar_weights() -> Dict[str, Any]:
         if abs(capped_val - current_val) > 0.001:
             changes[pillar_name] = {"from": current_val, "to": capped_val, "recommended": rec_val}
 
-    atomic_write_json(PILLAR_WEIGHTS_FILE, {
+    _save_pillar_weights({
         "weights": new_weights,
         "last_updated": today_str,
         "sample_size": computation["sample_size"],

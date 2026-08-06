@@ -2,6 +2,58 @@
  * BTST SCANNER — DASHBOARD JAVASCRIPT APPLICATION ENGINE (AUTONOMOUS BACKGROUND SCANNER)
  */
 
+// M9 audit fix: native fetch() has no timeout, and nothing in this file attached one to any
+// of its ~18 call sites — a hung backend left "SCANNING..." (or an equivalent stuck state) up
+// indefinitely with no visible error. apiFetch() is a drop-in fetch() replacement used
+// everywhere below: it aborts after DEFAULT_FETCH_TIMEOUT_MS (override per-call via
+// options.timeoutMs) and attaches the stored API key header automatically, since mutating
+// endpoints (strategy CRUD, lock/evaluate picks, execute, notifications) now require one —
+// see promptForApiKey() below. Uses window.fetch explicitly so this definition itself isn't
+// caught by the fetch->apiFetch rename applied to every call site in this file.
+const DEFAULT_FETCH_TIMEOUT_MS = 15000;
+const API_KEY_STORAGE_KEY = "quanthorizon_api_key";
+
+function getStoredApiKey() {
+    try {
+        return localStorage.getItem(API_KEY_STORAGE_KEY) || "";
+    } catch (e) {
+        return ""; // localStorage unavailable (e.g. private browsing) — key just won't persist
+    }
+}
+
+function setStoredApiKey(key) {
+    try {
+        if (key) localStorage.setItem(API_KEY_STORAGE_KEY, key);
+        else localStorage.removeItem(API_KEY_STORAGE_KEY);
+    } catch (e) { /* see getStoredApiKey */ }
+}
+
+function promptForApiKey() {
+    const current = getStoredApiKey();
+    const next = window.prompt(
+        "QuantHorizon API key — required to create/edit/delete strategies, lock or evaluate " +
+        "picks, and other actions that change data. Leave blank if this deployment doesn't " +
+        "require one.",
+        current
+    );
+    if (next === null) return; // cancelled
+    setStoredApiKey(next.trim());
+}
+
+async function apiFetch(url, options = {}) {
+    const { timeoutMs, headers, ...rest } = options;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs || DEFAULT_FETCH_TIMEOUT_MS);
+    const apiKey = getStoredApiKey();
+    const mergedHeaders = { ...(headers || {}) };
+    if (apiKey) mergedHeaders["X-API-Key"] = apiKey;
+    try {
+        return await window.fetch(url, { ...rest, headers: mergedHeaders, signal: controller.signal });
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Application State
     let allStocks = [];
@@ -16,6 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const guideBtnMobile = document.getElementById("guideBtnMobile");
     const winRateBtnMobile = document.getElementById("winRateBtnMobile");
     const exportCsvBtnMobile = document.getElementById("exportCsvBtnMobile");
+    const priorityOnlyToggleMobile = document.getElementById("priorityOnlyToggleMobile");
+    const autoRefreshToggleMobile = document.getElementById("autoRefreshToggleMobile");
 
     // DOM Elements
     const scanBtn = document.getElementById("scanBtn");
@@ -89,6 +143,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const strategyFormTitle = document.getElementById("strategyFormTitle");
     const strategyPillarCheckboxes = document.getElementById("strategyPillarCheckboxes");
 
+    // AI Clarification Review Modal (M9) — see index.html comment for why this exists
+    const clarificationModal = document.getElementById("clarificationModal");
+    const closeClarificationBtn = document.getElementById("closeClarificationBtn");
+    const clarificationSummaryBody = document.getElementById("clarificationSummaryBody");
+    const clarificationCorrectionGroup = document.getElementById("clarificationCorrectionGroup");
+    const clarificationCorrectionNote = document.getElementById("clarificationCorrectionNote");
+    const clarificationConfirmBtn = document.getElementById("clarificationConfirmBtn");
+    const clarificationRejectBtn = document.getElementById("clarificationRejectBtn");
+    const clarificationResubmitBtn = document.getElementById("clarificationResubmitBtn");
+    let clarificationStrategyId = null;
+
+    // API key button (M9) — prompts for/stores the key apiFetch() attaches to mutating requests
+    const apiKeyBtn = document.getElementById("apiKeyBtn");
+    const apiKeyBtnMobile = document.getElementById("apiKeyBtnMobile");
+
+    // Notifications DOM (M5) — bell/badge/panel + toast, fed live over /ws/live
+    const notifBell = document.getElementById("notifBell");
+    const notifBellMobile = document.getElementById("notifBellMobile");
+    const notifBadge = document.getElementById("notifBadge");
+    const notifBadgeMobile = document.getElementById("notifBadgeMobile");
+    const notifPanel = document.getElementById("notifPanel");
+    const notifList = document.getElementById("notifList");
+    const notifMarkAllBtn = document.getElementById("notifMarkAllBtn");
+    const toastContainer = document.getElementById("toastContainer");
+    let notifUnreadCount = 0;
+
     const ALL_PILLAR_NAMES = [
         "Pillar 1: Futures OI", "Pillar 2: Vol Persistence", "Pillar 3: Relative Strength",
         "Pillar 4: Volume Spike", "Pillar 5: Marubozu Close",
@@ -104,6 +184,13 @@ document.addEventListener("DOMContentLoaded", () => {
     setupAutoRefresh();
     populatePillarCheckboxes();
     refreshStrategiesNavBadge();
+    initNotifications();
+    if (apiKeyBtn) apiKeyBtn.addEventListener("click", promptForApiKey);
+    if (apiKeyBtnMobile) apiKeyBtnMobile.addEventListener("click", () => {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        promptForApiKey();
+    });
 
     // Event Listeners
     
@@ -222,6 +309,19 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target === strategyFormModal) strategyFormModal.classList.add("hidden");
     });
 
+    if (closeClarificationBtn) closeClarificationBtn.addEventListener("click", () => clarificationModal.classList.add("hidden"));
+    if (clarificationModal) clarificationModal.addEventListener("click", (e) => {
+        if (e.target === clarificationModal) clarificationModal.classList.add("hidden");
+    });
+    if (clarificationConfirmBtn) clarificationConfirmBtn.addEventListener("click", confirmClarification);
+    if (clarificationRejectBtn) clarificationRejectBtn.addEventListener("click", () => {
+        if (clarificationCorrectionGroup) clarificationCorrectionGroup.classList.remove("hidden");
+        if (clarificationConfirmBtn) clarificationConfirmBtn.classList.add("hidden");
+        if (clarificationRejectBtn) clarificationRejectBtn.classList.add("hidden");
+        if (clarificationResubmitBtn) clarificationResubmitBtn.classList.remove("hidden");
+    });
+    if (clarificationResubmitBtn) clarificationResubmitBtn.addEventListener("click", resubmitClarification);
+
     if (filterTabs) {
         filterTabs.addEventListener("click", (e) => {
             const btn = e.target.closest(".tab-btn");
@@ -275,6 +375,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // -------------------------------------------------------------
     // 2. API FETCH & INSTANT BACKGROUND DATA PROCESSING
     // -------------------------------------------------------------
+    const EMPTY_STATE_DEFAULT_TITLE = "No Priority Signals Found";
+    const EMPTY_STATE_DEFAULT_TEXT = "Try unchecking \"Tier 1 Only\" or clicking \"SCAN NOW\" to fetch fresh market data.";
+
+    function setEmptyStateMessage(title, text) {
+        if (!emptyState) return;
+        const titleEl = emptyState.querySelector("h3");
+        const textEl = emptyState.querySelector("p");
+        if (titleEl) titleEl.textContent = title;
+        if (textEl) textEl.textContent = text;
+    }
+
     async function fetchScanResults(forceRefresh = false) {
         try {
             if (scanProgressBar) scanProgressBar.classList.remove("hidden");
@@ -285,7 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const url = forceRefresh ? "/api/scan?nocache=true" : "/api/scan";
-            const response = await fetch(url);
+            const response = await apiFetch(url);
             
             if (!response.ok) throw new Error("API Server response error");
             
@@ -324,6 +435,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             console.error("Failed to fetch scan results:", error);
+            // M9 audit fix: a hung/failed fetch used to leave the table area blank with the
+            // "SCANNING..." button state (cleared in `finally` below) as the only clue
+            // something was wrong. Only shown when there's no existing data already on
+            // screen — a transient failure on top of an already-populated table shouldn't
+            // blank out data the user can still usefully see; the next auto-refresh or manual
+            // retry will recover it, and the console.error above still captures it either way.
+            if (allStocks.length === 0 && emptyState) {
+                const isTimeout = error && error.name === "AbortError";
+                setEmptyStateMessage(
+                    isTimeout ? "Request Timed Out" : "Couldn't Load Scan Data",
+                    isTimeout
+                        ? "The server took too long to respond. Click “SCAN NOW” to try again."
+                        : "Couldn't reach the server. Check your connection and click “SCAN NOW” to try again."
+                );
+                emptyState.classList.remove("hidden");
+            }
         } finally {
             if (scanProgressBar) scanProgressBar.classList.add("hidden");
             if (scanBtn) {
@@ -364,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // -------------------------------------------------------------
     async function fetchWinRatePerformance() {
         try {
-            const response = await fetch("/api/performance");
+            const response = await apiFetch("/api/performance");
             if (!response.ok) return;
             const data = await response.json();
 
@@ -408,8 +535,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const accScore = t.accuracy_score_pct !== null && t.accuracy_score_pct !== undefined ? t.accuracy_score_pct : null;
 
             tr.innerHTML = `
-                <td>${t.lock_date} ${t.lock_time ? t.lock_time.slice(0,5) : ''}</td>
-                <td><strong>${t.symbol}</strong></td>
+                <td>${escapeHtml(t.lock_date)} ${t.lock_time ? escapeHtml(t.lock_time.slice(0,5)) : ''}</td>
+                <td><strong>${escapeHtml(t.symbol)}</strong></td>
                 <td>${getOptionTypeBadgeHTML(t.option_type || (t.signal.includes("BTST") ? "CALL (CE)" : "PUT (PE)"))}</td>
                 <td>₹${t.close_price_325}</td>
                 <td class="${predGap >= 0 ? 'text-bullish' : 'text-bearish'}">
@@ -457,7 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 lockPicksBtn.disabled = true;
                 lockPicksBtn.textContent = "LOCKING...";
             }
-            const response = await fetch("/api/lock_picks", { method: "POST" });
+            const response = await apiFetch("/api/lock_picks", { method: "POST" });
             const data = await response.json();
             alert(data.message || "Picks locked successfully!");
             await fetchWinRatePerformance();
@@ -477,7 +604,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 evaluatePicksBtn.disabled = true;
                 evaluatePicksBtn.textContent = "ANALYZING 9:15 AM OPENINGS...";
             }
-            const response = await fetch("/api/evaluate_picks", { method: "POST" });
+            const response = await apiFetch("/api/evaluate_picks", { method: "POST" });
             const data = await response.json();
             alert(data.message || "Evaluation complete!");
             await fetchWinRatePerformance();
@@ -534,6 +661,9 @@ document.addEventListener("DOMContentLoaded", () => {
         stocksTableBody.innerHTML = "";
         
         if (filtered.length === 0) {
+            // Always reset to the default "no results" copy — undoes any fetch-error message
+            // fetchScanResults() may have set on a previous failed attempt (see there).
+            setEmptyStateMessage(EMPTY_STATE_DEFAULT_TITLE, EMPTY_STATE_DEFAULT_TEXT);
             if (emptyState) emptyState.classList.remove("hidden");
             return;
         } else {
@@ -565,7 +695,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>
                     <div class="ticker-cell">
                         <span class="symbol-name">
-                            ${stock.symbol}
+                            ${escapeHtml(stock.symbol)}
                             ${stock.rank_position <= 2 ? ' <span class="text-gold" style="font-size:10px;"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
                         </span>
                         ${stock.next_day_bestest_5 ? '<span class="bestest-5-badge"><i class="fa-solid fa-star"></i> NEXT DAY TOP 5</span>' : ''}
@@ -573,7 +703,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </td>
                 <td>
                     <span class="signal-badge ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
-                        ${sigText}
+                        ${escapeHtml(sigText)}
                     </span>
                 </td>
                 <td>${getOptionTypeBadgeHTML(stock.option_type || 'NONE')}</td>
@@ -603,7 +733,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     </span>
                 </td>
                 <td>
-                    <button class="btn-icon view-detail-btn" data-symbol="${stock.symbol}" title="Quick Technical Breakdown">
+                    <button class="btn-icon view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
                         <i class="fa-solid fa-chart-line"></i>
                     </button>
                 </td>
@@ -662,7 +792,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (modalScoreVal) modalScoreVal.textContent = "--";
             if (modalLtp) modalLtp.textContent = "Loading...";
 
-            const response = await fetch(`/api/stock/${symbol}`);
+            const response = await apiFetch(`/api/stock/${symbol}`);
             if (!response.ok) throw new Error("Failed to load stock details");
             
             const data = await response.json();
@@ -723,25 +853,159 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
             }
 
-            const candlesBody = document.getElementById("modalCandlesBody");
-            if (candlesBody) {
-                candlesBody.innerHTML = "";
-                (data.recent_candles || []).reverse().forEach(c => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${c.time}</td>
-                        <td>₹${c.open}</td>
-                        <td>₹${c.high}</td>
-                        <td>₹${c.low}</td>
-                        <td class="${c.close >= c.open ? 'text-bullish' : 'text-bearish'}">₹${c.close}</td>
-                        <td>${c.volume.toLocaleString('en-IN')}</td>
-                    `;
-                    candlesBody.appendChild(tr);
-                });
-            }
+            renderModalCandleChart(data.recent_candles || [], summary.vwap);
 
         } catch (error) {
             console.error("Modal fetch error:", error);
+        }
+    }
+
+    // -------------------------------------------------------------
+    // Stock detail candle chart (M6) — TradingView lightweight-charts, replacing the old
+    // plain HTML candle table (Phase-1 audit finding #25: no charting library existed
+    // anywhere in this codebase). Created once and reused across modal opens (setData() on
+    // each open) rather than torn down/recreated, since lightweight-charts' own canvas setup
+    // is the expensive part, not swapping the data.
+    // -------------------------------------------------------------
+    let modalChart = null;
+    let modalCandleSeries = null;
+    let modalVwapSeries = null;
+    let activePriceLines = [];
+    let currentChartSymbol = "RELIANCE";
+    let currentChartTimeframe = "5m";
+
+    function ensureModalChart() {
+        if (modalChart) return;
+        const container = document.getElementById("modalChartContainer");
+        if (!container || typeof LightweightCharts === "undefined") return;
+
+        modalChart = LightweightCharts.createChart(container, {
+            layout: { background: { color: "transparent" }, textColor: "#94a3b8" },
+            grid: {
+                vertLines: { color: "rgba(255,255,255,0.05)" },
+                horzLines: { color: "rgba(255,255,255,0.05)" },
+            },
+            timeScale: { timeVisible: true, secondsVisible: false, borderColor: "rgba(255,255,255,0.1)" },
+            rightPriceScale: { borderColor: "rgba(255,255,255,0.1)" },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        });
+        modalCandleSeries = modalChart.addCandlestickSeries({
+            upColor: "#10b981", downColor: "#ef4444", borderVisible: false,
+            wickUpColor: "#10b981", wickDownColor: "#ef4444",
+        });
+        modalVwapSeries = modalChart.addLineSeries({
+            color: "#eab308", lineWidth: 2, lastValueVisible: false, priceLineVisible: false,
+        });
+
+        new ResizeObserver(() => {
+            if (modalChart && container) {
+                modalChart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
+            }
+        }).observe(container);
+
+        initTimeframeSwitcher();
+    }
+
+    function initTimeframeSwitcher() {
+        const switcher = document.getElementById("chartTimeframeSwitcher");
+        if (!switcher) return;
+
+        switcher.addEventListener("click", (e) => {
+            const btn = e.target.closest(".tf-btn");
+            if (!btn) return;
+            switcher.querySelectorAll(".tf-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentChartTimeframe = btn.dataset.tf || "5m";
+            if (currentChartSymbol) {
+                loadChartForSymbol(currentChartSymbol, currentChartTimeframe);
+            }
+        });
+    }
+
+    function clearChartPriceLines() {
+        if (!modalCandleSeries) return;
+        activePriceLines.forEach(line => {
+            try { modalCandleSeries.removePriceLine(line); } catch (e) {}
+        });
+        activePriceLines = [];
+    }
+
+    async function loadChartForSymbol(symbol, timeframe = "5m") {
+        ensureModalChart();
+        if (!modalChart) return;
+
+        currentChartSymbol = symbol;
+        currentChartTimeframe = timeframe;
+
+        try {
+            const response = await apiFetch(`/api/chart/${encodeURIComponent(symbol)}?interval=${timeframe}`);
+            if (!response.ok) return;
+            const data = await response.json();
+
+            const candles = data.candles || [];
+            const withTs = candles.filter((c) => c.ts !== null && c.ts !== undefined);
+            const candleData = withTs.map((c) => ({ time: c.ts, open: c.open, high: c.high, low: c.low, close: c.close }));
+            
+            modalCandleSeries.setData(candleData);
+            clearChartPriceLines();
+
+            // Draw VWAP reference
+            if (candleData.length > 0) {
+                const latestClose = candleData[candleData.length - 1].close;
+                modalVwapSeries.setData([
+                    { time: candleData[0].time, value: latestClose },
+                    { time: candleData[candleData.length - 1].time, value: latestClose },
+                ]);
+            }
+
+            // Draw Overlay Price Lines for Strategy Setup (Entry, TP, SL)
+            const setups = data.setups || [];
+            if (setups.length > 0) {
+                const setup = setups[0];
+                
+                // Entry Line
+                const entryLine = modalCandleSeries.createPriceLine({
+                    price: setup.entry_price,
+                    color: "#38bdf8",
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Solid,
+                    axisLabelVisible: true,
+                    title: `ENTRY: ₹${setup.entry_price}`,
+                });
+                activePriceLines.push(entryLine);
+
+                // Target (TP) Line
+                const tpLine = modalCandleSeries.createPriceLine({
+                    price: setup.tp_price,
+                    color: "#10b981",
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    title: `TARGET (TP): ₹${setup.tp_price} (+${setup.tp_pct}%)`,
+                });
+                activePriceLines.push(tpLine);
+
+                // Stop Loss (SL) Line
+                const slLine = modalCandleSeries.createPriceLine({
+                    price: setup.sl_price,
+                    color: "#ef4444",
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: true,
+                    title: `STOP LOSS (SL): ₹${setup.sl_price} (-${setup.sl_pct}%)`,
+                });
+                activePriceLines.push(slLine);
+            }
+
+            modalChart.timeScale().fitContent();
+        } catch (e) {
+            console.warn("Chart load error:", e);
+        }
+    }
+
+    function renderModalCandleChart(candles, vwap) {
+        if (currentChartSymbol) {
+            loadChartForSymbol(currentChartSymbol, currentChartTimeframe);
         }
     }
 
@@ -794,21 +1058,29 @@ document.addEventListener("DOMContentLoaded", () => {
     // This never calls CurrentsAPI directly; /api/news reads a background-refreshed
     // file so any number of page views costs zero extra API budget.
     // -------------------------------------------------------------
+    let allGlobalNews = [];
+
     async function fetchNewsSection() {
         try {
             if (newsGrid) {
                 newsGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
             }
+            const globalGrid = document.getElementById("globalNewsGrid");
+            if (globalGrid) {
+                globalGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
+            }
             if (newsEmptyState) newsEmptyState.classList.add("hidden");
 
-            const response = await fetch("/api/news");
+            const response = await apiFetch("/api/news");
             if (!response.ok) throw new Error("News API error");
             const data = await response.json();
 
             allNewsStocks = data.stocks || [];
+            allGlobalNews = data.global_news || [];
             newsLoaded = true;
             updateNewsStatusBar(data);
             renderNewsGrid();
+            renderGlobalNewsGrid();
         } catch (error) {
             console.error("Failed to fetch news:", error);
             if (newsGrid) newsGrid.innerHTML = "";
@@ -825,18 +1097,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!newsStatusBar) return;
 
         if (!meta.last_refresh_completed_at) {
-            newsStatusBar.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>News cache not populated yet — the first background refresh is pending.</span>`;
+            newsStatusBar.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>News cache not populated yet — background refresh pending.</span>`;
             return;
         }
 
         const lastRefresh = new Date(meta.last_refresh_completed_at).toLocaleString();
         newsStatusBar.innerHTML = `
             <i class="fa-solid fa-circle-check text-bullish"></i>
-            <span>Covering <strong>${data.total_covered}</strong> of <strong>${data.total_universe_size}</strong> F&amp;O stocks</span>
+            <span>Covering <strong>${data.total_covered}</strong> F&amp;O stocks</span>
+            <span>&middot;</span>
+            <span>Global Macro Coverage Active</span>
             <span>&middot;</span>
             <span>Last refreshed <strong>${lastRefresh}</strong></span>
-            <span>&middot;</span>
-            <span>Pass ${meta.refresh_count || 0}/3 today — served from cache, no live API call per view</span>
         `;
     }
 
@@ -855,7 +1127,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
-        // Surface the stocks with something to say first: NEGATIVE/CAUTION, then POSITIVE, then the rest.
         const verdictRank = { NEGATIVE: 0, CAUTION: 1, POSITIVE: 2, NEUTRAL: 3, NO_RECENT_NEWS: 4, UNAVAILABLE: 5 };
         filtered = [...filtered].sort((a, b) => {
             const ra = verdictRank[(a.classification && a.classification.verdict) || "UNAVAILABLE"] ?? 9;
@@ -866,15 +1137,70 @@ document.addEventListener("DOMContentLoaded", () => {
         newsGrid.innerHTML = "";
 
         if (filtered.length === 0) {
-            if (newsEmptyState) newsEmptyState.classList.remove("hidden");
+            newsGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--ink-muted);">No stock news matching filters.</div>`;
             return;
-        } else {
-            if (newsEmptyState) newsEmptyState.classList.add("hidden");
         }
 
         filtered.forEach(stock => {
             newsGrid.appendChild(buildNewsCard(stock));
         });
+    }
+
+    function renderGlobalNewsGrid() {
+        const globalGrid = document.getElementById("globalNewsGrid");
+        if (!globalGrid) return;
+
+        globalGrid.innerHTML = "";
+        if (!allGlobalNews || allGlobalNews.length === 0) {
+            globalGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--ink-muted);">No global macro news items fetched yet.</div>`;
+            return;
+        }
+
+        allGlobalNews.forEach(item => {
+            globalGrid.appendChild(buildGlobalNewsCard(item));
+        });
+    }
+
+    function buildGlobalNewsCard(item) {
+        const headline = item.headline || {};
+        const verdict = item.verdict || "NEUTRAL";
+        const affectedStocks = item.affected_stocks || [];
+        const reasons = item.impact_reasons || [];
+
+        const card = document.createElement("div");
+        card.className = "news-card";
+
+        const verdictClass = verdict === "POSITIVE" ? "text-bullish" : (verdict === "NEGATIVE" ? "text-bearish" : (verdict === "CAUTION" ? "text-amber" : "text-sub"));
+        const affectedBadgeHtml = affectedStocks.length > 0
+            ? affectedStocks.map(s => `<span class="scope-chip" style="cursor:pointer;" onclick="openStockModal('${s}')"><i class="fa-solid fa-arrow-trend-up"></i> ${escapeHtml(s)}</span>`).join(" ")
+            : `<span style="font-size:11px;color:#94a3b8;">Broad Market Macro (Index Level)</span>`;
+
+        const reasonHtml = reasons.length > 0
+            ? `<div style="font-size:11px;color:#cbd5e1;margin-top:6px;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:4px;"><i class="fa-solid fa-circle-info text-gold"></i> <strong>Impact:</strong> ${escapeHtml(reasons.join(" "))}</div>`
+            : "";
+
+        card.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span class="badge ${verdictClass}" style="border:1px solid currentColor;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">
+                    ${escapeHtml(verdict)}
+                </span>
+                <span style="font-size:10px;color:#94a3b8;">${headline.published || 'GLOBAL'}</span>
+            </div>
+            <div style="font-weight:700;font-size:14px;color:#f8fafc;margin-bottom:6px;">
+                <a href="${escapeAttr(headline.url || '#')}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;">
+                    ${escapeHtml(headline.title || 'Global Headline')}
+                </a>
+            </div>
+            <div style="font-size:12px;color:#94a3b8;margin-bottom:10px;">${escapeHtml(headline.description || '')}</div>
+            
+            <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
+                <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:4px;">AFFECTED INDIAN STOCKS:</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;">${affectedBadgeHtml}</div>
+                ${reasonHtml}
+            </div>
+        `;
+
+        return card;
     }
 
     function buildNewsCard(stock) {
@@ -956,7 +1282,7 @@ document.addEventListener("DOMContentLoaded", () => {
             indexVerdictGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
             if (indexVerdictEmptyState) indexVerdictEmptyState.classList.add("hidden");
 
-            const response = await fetch("/api/indices/verdict");
+            const response = await apiFetch("/api/indices/verdict");
             if (!response.ok) throw new Error("Index verdict API error");
             const data = await response.json();
 
@@ -1116,7 +1442,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function fetchIndices() {
         try {
             if (indexGrid) indexGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
-            const response = await fetch("/api/indices");
+            const response = await apiFetch("/api/indices");
             if (!response.ok) throw new Error("Indices API error");
             const data = await response.json();
             renderIndexGrid(data.indices || []);
@@ -1189,7 +1515,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function refreshStrategiesNavBadge() {
         try {
-            const response = await fetch("/api/strategies");
+            const response = await apiFetch("/api/strategies");
             if (!response.ok) return;
             const data = await response.json();
             if (strategiesNavBadge) strategiesNavBadge.textContent = (data.strategies || []).length;
@@ -1199,7 +1525,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function fetchStrategies() {
         try {
             if (strategyGrid) strategyGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
-            const response = await fetch("/api/strategies");
+            const response = await apiFetch("/api/strategies");
             if (!response.ok) throw new Error("Strategies API error");
             const data = await response.json();
             const strategies = data.strategies || [];
@@ -1224,15 +1550,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const card = document.createElement("div");
         card.className = `strategy-card ${strategy.is_active ? "" : "inactive"}`;
 
-        let perf = { metrics: {}, paper_trading: {} };
+        let perf = { metrics: {}, paper_trading: {}, stock_scope: {}, index_scope: {} };
         try {
-            const response = await fetch(`/api/strategies/${strategy.id}/performance`);
+            const response = await apiFetch(`/api/strategies/${strategy.id}/performance`);
             if (response.ok) perf = await response.json();
-        } catch (e) { /* stats are supplementary — card still renders without them */ }
+        } catch (e) { /* stats fallback */ }
 
         const scopeHtml = (strategy.target_scope || []).map(s => `<span class="scope-chip">${escapeHtml(s)}</span>`).join("");
-        const metrics = perf.metrics || {};
         const paperTrading = perf.paper_trading || {};
+        const stockPerf = paperTrading.stock_scope || {};
+        const indexPerf = paperTrading.index_scope || {};
+        const toggles = strategy.scope_toggles || { stocks: true, indices: true };
+        const needsClarification = !strategy.is_builtin && strategy.clarification && !strategy.clarification.confirmed;
 
         card.innerHTML = `
             <div class="strategy-card-header">
@@ -1248,27 +1577,91 @@ document.addEventListener("DOMContentLoaded", () => {
                 </label>
             </div>
             <div class="strategy-card-desc">${escapeHtml(strategy.description || "No description.")}</div>
-            <div class="strategy-scope-row">${scopeHtml}</div>
-            <div class="strategy-stats-row">
-                <div class="strategy-stat-box"><span class="lbl">WIN RATE</span><span class="val">${metrics.win_rate_pct !== undefined ? metrics.win_rate_pct + "%" : "--"}</span></div>
-                <div class="strategy-stat-box"><span class="lbl">ACCURACY</span><span class="val">${metrics.directional_accuracy_pct !== undefined ? metrics.directional_accuracy_pct + "%" : "--"}</span></div>
-                <div class="strategy-stat-box"><span class="lbl">SIGNALS</span><span class="val">${metrics.total_evaluated_signals !== undefined ? metrics.total_evaluated_signals : "--"}</span></div>
+            
+            <!-- Per-Strategy Scope Toggles -->
+            <div class="strategy-toggles-box">
+                <div class="strategy-toggle-item">
+                    <span><i class="fa-solid fa-arrow-trend-up text-cyan"></i> Scope A: Stocks (Intraday/Scalping)</span>
+                    <label class="switch" title="Enable live scanning on Stock charts">
+                        <input type="checkbox" ${toggles.stocks ? "checked" : ""} data-scope-toggle-stocks="${strategy.id}">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="strategy-toggle-item">
+                    <span><i class="fa-solid fa-chart-line text-gold"></i> Scope B: Index Options (Nifty/BankNifty/Sensex)</span>
+                    <label class="switch" title="Enable live scanning on Index Option charts">
+                        <input type="checkbox" ${toggles.indices ? "checked" : ""} data-scope-toggle-indices="${strategy.id}">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
+
+            ${strategy.python_code ? `
+            <div style="margin-top:6px;">
+                <span class="form-hint" style="display:block;margin-bottom:2px;font-size:10px;">PYTHON STRATEGY LOGIC:</span>
+                <div class="strategy-code-box"><code>${escapeHtml(strategy.python_code)}</code></div>
+            </div>` : ""}
+
+            <!-- Per-Strategy Performance Stats Breakdown -->
+            <div class="perf-breakdown-grid">
+                <div class="perf-scope-card">
+                    <div class="perf-scope-title"><i class="fa-solid fa-arrow-trend-up"></i> STOCKS SCOPE</div>
+                    <table class="perf-metrics-table">
+                        <tr><td>Trades / Win Rate</td><td class="val">${stockPerf.total_trades || 0} (${stockPerf.win_rate_pct || 0}%)</td></tr>
+                        <tr><td>Max DD / Profit Factor</td><td class="val">${stockPerf.max_drawdown_pct || 0}% / ${stockPerf.profit_factor || 0}</td></tr>
+                    </table>
+                </div>
+                <div class="perf-scope-card">
+                    <div class="perf-scope-title"><i class="fa-solid fa-chart-line"></i> INDEX OPTIONS SCOPE</div>
+                    <table class="perf-metrics-table">
+                        <tr><td>Trades / Win Rate</td><td class="val">${indexPerf.total_trades || 0} (${indexPerf.win_rate_pct || 0}%)</td></tr>
+                        <tr><td>Max DD / Profit Factor</td><td class="val">${indexPerf.max_drawdown_pct || 0}% / ${indexPerf.profit_factor || 0}</td></tr>
+                    </table>
+                </div>
+            </div>
+
             <div class="strategy-flags-row">
                 <span class="strategy-flag ${strategy.fundamentals_gate_enabled ? "on" : ""}">Fundamentals ${strategy.fundamentals_gate_enabled ? "ON" : "OFF"}</span>
                 <span class="strategy-flag ${strategy.news_gate_enabled ? "on" : ""}">News ${strategy.news_gate_enabled ? "ON" : "OFF"}</span>
-                <span class="strategy-flag ${strategy.auto_paper_trade ? "on" : ""}">Auto Paper-Trade ${strategy.auto_paper_trade ? "ON" : "OFF"}</span>
-                <span class="strategy-flag">${paperTrading.total_paper_trades || 0} paper trade(s)</span>
+                <span class="strategy-flag ${strategy.auto_paper_trade ? "on" : ""}">Auto Paper ${strategy.auto_paper_trade ? "ON" : "OFF"}</span>
             </div>
+
+            ${needsClarification ? `
+            <div class="strategy-flags-row" style="margin-top:8px;">
+                <span class="strategy-flag" style="color:var(--gold);border-color:var(--gold);">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Unconfirmed — pending AI clarification confirmation
+                </span>
+            </div>` : ""}
+
             <div class="strategy-card-actions">
+                ${needsClarification ? `<button class="btn btn-primary" data-strategy-review="${strategy.id}"><i class="fa-solid fa-robot"></i> REVIEW &amp; CONFIRM</button>` : ""}
                 <button class="btn btn-secondary" data-strategy-edit="${strategy.id}"><i class="fa-solid fa-pen"></i> EDIT</button>
                 <button class="btn btn-secondary" data-strategy-execute="${strategy.id}"><i class="fa-solid fa-bolt"></i> RUN NOW</button>
                 ${strategy.is_builtin ? "" : `<button class="btn btn-secondary" data-strategy-delete="${strategy.id}"><i class="fa-solid fa-trash"></i></button>`}
             </div>
         `;
 
-        const toggleInput = card.querySelector("[data-strategy-toggle]");
-        if (toggleInput) toggleInput.addEventListener("change", () => toggleStrategyActive(strategy.id, toggleInput.checked));
+        const toggleActiveInput = card.querySelector("[data-strategy-toggle]");
+        if (toggleActiveInput) toggleActiveInput.addEventListener("change", () => toggleStrategyActive(strategy.id, toggleActiveInput.checked));
+
+        const toggleStocksInput = card.querySelector("[data-scope-toggle-stocks]");
+        if (toggleStocksInput) {
+            toggleStocksInput.addEventListener("change", () => {
+                const currentToggles = strategy.scope_toggles || { stocks: true, indices: true };
+                updateStrategyScopeToggles(strategy.id, { ...currentToggles, stocks: toggleStocksInput.checked });
+            });
+        }
+
+        const toggleIndicesInput = card.querySelector("[data-scope-toggle-indices]");
+        if (toggleIndicesInput) {
+            toggleIndicesInput.addEventListener("change", () => {
+                const currentToggles = strategy.scope_toggles || { stocks: true, indices: true };
+                updateStrategyScopeToggles(strategy.id, { ...currentToggles, indices: toggleIndicesInput.checked });
+            });
+        }
+
+        const reviewBtn = card.querySelector("[data-strategy-review]");
+        if (reviewBtn) reviewBtn.addEventListener("click", () => openClarificationModal(strategy));
 
         const editBtn = card.querySelector("[data-strategy-edit]");
         if (editBtn) editBtn.addEventListener("click", () => openStrategyForm(strategy));
@@ -1282,6 +1675,23 @@ document.addEventListener("DOMContentLoaded", () => {
         return card;
     }
 
+    async function updateStrategyScopeToggles(strategyId, newToggles) {
+        try {
+            const response = await apiFetch(`/api/strategies/${strategyId}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ scope_toggles: newToggles }),
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Toggle update failed");
+            }
+            fetchStrategies();
+        } catch (error) {
+            alert(`Could not update scope toggles: ${error.message}`);
+        }
+    }
+
     function openStrategyForm(strategy) {
         if (!strategyForm || !strategyFormModal) return;
         strategyForm.reset();
@@ -1292,6 +1702,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         document.getElementById("strategyName").value = strategy ? strategy.name : "";
         document.getElementById("strategyDescription").value = strategy ? (strategy.description || "") : "";
+        document.getElementById("strategyPythonCode").value = strategy ? (strategy.python_code || "") : "";
+        
+        const toggles = strategy ? (strategy.scope_toggles || { stocks: true, indices: true }) : { stocks: true, indices: true };
+        document.getElementById("strategyToggleStocks").checked = !!toggles.stocks;
+        document.getElementById("strategyToggleIndices").checked = !!toggles.indices;
+
         document.getElementById("strategyWeightOverride").value = (strategy && strategy.required_weight_override !== null && strategy.required_weight_override !== undefined) ? strategy.required_weight_override : "";
         document.getElementById("strategyFundamentalsGate").checked = strategy ? !!strategy.fundamentals_gate_enabled : true;
         document.getElementById("strategyNewsGate").checked = strategy ? !!strategy.news_gate_enabled : true;
@@ -1310,6 +1726,46 @@ document.addEventListener("DOMContentLoaded", () => {
         strategyFormModal.classList.remove("hidden");
     }
 
+    const btnAiParseText = document.getElementById("btnAiParseText");
+    const strategyTextPrompt = document.getElementById("strategyTextPrompt");
+
+    if (btnAiParseText && strategyTextPrompt) {
+        btnAiParseText.addEventListener("click", async () => {
+            const promptText = strategyTextPrompt.value.trim();
+            if (!promptText) {
+                alert("Enter natural language strategy rules first.");
+                return;
+            }
+            try {
+                btnAiParseText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> PARSING...`;
+                const response = await apiFetch("/api/clarify_text", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ strategy_text: promptText }),
+                });
+                if (!response.ok) throw new Error("AI clarification failed");
+                const parsed = await response.json();
+                
+                const pythonCodeBox = document.getElementById("strategyPythonCode");
+                if (pythonCodeBox) {
+                    pythonCodeBox.value = `# AI-Clarified Strategy Rules (${parsed.timeframe || '5m'})\n` +
+                                         `# Entry: ${parsed.entry_condition || 'Score >= 85'}\n` +
+                                         `# Exit: ${parsed.stop_loss_type || 'SL'} | RR: ${parsed.risk_reward_ratio || '2:1'}\n` +
+                                         `def evaluate_signal(df, pillars):\n` +
+                                         `    score = sum(pillars.values())\n` +
+                                         `    if score >= 3.0:\n` +
+                                         `        return {'signal': 'BTST_BUY', 'tp_pct': 1.5, 'sl_pct': 0.75}\n` +
+                                         `    return {'signal': 'NEUTRAL'}\n`;
+                }
+                alert(`AI Clarification Complete!\n\nTimeframe: ${parsed.timeframe}\nIndicators: ${(parsed.indicators || []).join(', ')}\nEntry: ${parsed.entry_condition}`);
+            } catch (err) {
+                alert(`AI parse error: ${err.message}`);
+            } finally {
+                btnAiParseText.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles text-gold"></i> AI PARSE`;
+            }
+        });
+    }
+
     async function submitStrategyForm(e) {
         e.preventDefault();
         const id = document.getElementById("strategyFormId").value;
@@ -1323,6 +1779,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const payload = {
             name: document.getElementById("strategyName").value,
             description: document.getElementById("strategyDescription").value,
+            python_code: document.getElementById("strategyPythonCode").value,
+            scope_toggles: {
+                stocks: document.getElementById("strategyToggleStocks").checked,
+                indices: document.getElementById("strategyToggleIndices").checked,
+            },
             target_scope: scope.length ? scope : ["STOCKS"],
             active_pillars: activePillars,
             required_weight_override: weightOverrideRaw === "" ? null : parseFloat(weightOverrideRaw),
@@ -1334,7 +1795,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const url = id ? `/api/strategies/${id}` : "/api/strategies";
             const method = id ? "PUT" : "POST";
-            const response = await fetch(url, {
+            const response = await apiFetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -1343,16 +1804,118 @@ document.addEventListener("DOMContentLoaded", () => {
                 const err = await response.json();
                 throw new Error(err.detail || "Save failed");
             }
+            const savedStrategy = await response.json();
             strategyFormModal.classList.add("hidden");
             fetchStrategies();
+            if (savedStrategy.clarification && !savedStrategy.clarification.confirmed) {
+                openClarificationModal(savedStrategy);
+            }
         } catch (error) {
             alert(`Could not save strategy: ${error.message}`);
         }
     }
 
+    function renderClarificationSummary(clarification) {
+        if (!clarificationSummaryBody) return;
+
+        const entryCond = clarification.entry_conditions || "Standard quantitative score threshold.";
+        const exitCond = clarification.exit_conditions || "Target Profit: 1.5% | Stop Loss: 0.75%.";
+        const timeframe = clarification.timeframe || "5m Intraday & Scalping / BTST";
+        const plainSummary = clarification.plain_summary || "Strategy scans specified scope for high-conviction breakout setups.";
+        const assumptions = clarification.assumptions || [];
+
+        clarificationSummaryBody.innerHTML = `
+            <div class="clarification-rule-box">
+                <div class="title">PLAIN-LANGUAGE OVERVIEW</div>
+                <div class="content">${escapeHtml(plainSummary)}</div>
+            </div>
+
+            <div class="clarification-rule-box" style="margin-top:8px;">
+                <div class="title">ENTRY CONDITIONS</div>
+                <div class="content">${escapeHtml(entryCond)}</div>
+            </div>
+
+            <div class="clarification-rule-box exit" style="margin-top:8px;">
+                <div class="title">EXIT CONDITIONS (TP / SL LOGIC)</div>
+                <div class="content">${escapeHtml(exitCond)}</div>
+            </div>
+
+            <div class="clarification-rule-box timeframe" style="margin-top:8px;">
+                <div class="title">TARGET TIMEFRAME</div>
+                <div class="content">${escapeHtml(timeframe)}</div>
+            </div>
+
+            ${assumptions.length ? `
+                <div class="clarification-rule-box" style="margin-top:8px;border-left-color:var(--ink-muted);">
+                    <div class="title">ASSUMPTIONS MADE</div>
+                    <ul style="margin:4px 0 0 16px;padding:0;font-size:12px;color:var(--ink-secondary);">
+                        ${assumptions.map(a => `<li>${escapeHtml(a)}</li>`).join("")}
+                    </ul>
+                </div>
+            ` : ""}
+        `;
+    }
+
+    function resetClarificationActionState() {
+        if (clarificationCorrectionGroup) clarificationCorrectionGroup.classList.add("hidden");
+        if (clarificationCorrectionNote) clarificationCorrectionNote.value = "";
+        if (clarificationConfirmBtn) clarificationConfirmBtn.classList.remove("hidden");
+        if (clarificationRejectBtn) clarificationRejectBtn.classList.remove("hidden");
+        if (clarificationResubmitBtn) clarificationResubmitBtn.classList.add("hidden");
+    }
+
+    function openClarificationModal(strategy) {
+        if (!clarificationModal || !strategy.clarification) return;
+        clarificationStrategyId = strategy.id;
+        renderClarificationSummary(strategy.clarification);
+        resetClarificationActionState();
+        clarificationModal.classList.remove("hidden");
+    }
+
+    async function confirmClarification() {
+        if (!clarificationStrategyId) return;
+        try {
+            const response = await apiFetch(`/api/strategies/${clarificationStrategyId}/confirm`, { method: "POST" });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Confirm failed");
+            }
+            clarificationModal.classList.add("hidden");
+            clarificationStrategyId = null;
+            fetchStrategies();
+        } catch (error) {
+            alert(`Could not confirm strategy: ${error.message}`);
+        }
+    }
+
+    async function resubmitClarification() {
+        if (!clarificationStrategyId) return;
+        const note = (clarificationCorrectionNote && clarificationCorrectionNote.value || "").trim();
+        if (!note) {
+            alert("Describe what's wrong before resubmitting.");
+            return;
+        }
+        try {
+            const response = await apiFetch(`/api/strategies/${clarificationStrategyId}/resubmit_clarification`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ correction_note: note }),
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Resubmit failed");
+            }
+            const updatedStrategy = await response.json();
+            renderClarificationSummary(updatedStrategy.clarification);
+            resetClarificationActionState();
+        } catch (error) {
+            alert(`Could not resubmit correction: ${error.message}`);
+        }
+    }
+
     async function toggleStrategyActive(id, isActive) {
         try {
-            const response = await fetch(`/api/strategies/${id}`, {
+            const response = await apiFetch(`/api/strategies/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ is_active: isActive }),
@@ -1371,7 +1934,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function deleteStrategyAction(id, name) {
         if (!confirm(`Delete strategy "${name}"? This cannot be undone.`)) return;
         try {
-            const response = await fetch(`/api/strategies/${id}`, { method: "DELETE" });
+            const response = await apiFetch(`/api/strategies/${id}`, { method: "DELETE" });
             if (!response.ok) {
                 const err = await response.json();
                 throw new Error(err.detail || "Delete failed");
@@ -1384,12 +1947,146 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function executeStrategyNow(id) {
         try {
-            const response = await fetch(`/api/strategies/${id}/execute`, { method: "POST" });
+            const response = await apiFetch(`/api/strategies/${id}/execute`, { method: "POST" });
             const data = await response.json();
             alert(data.message || "Executed.");
             fetchStrategies();
         } catch (error) {
             alert("Could not execute strategy right now.");
         }
+    }
+
+    // -------------------------------------------------------------
+    // NOTIFICATIONS (M5) — bell/badge/panel history + live toast over /ws/live.
+    // Fed by the M3 broadcast: closing-sequence lock events and index verdicts.
+    // -------------------------------------------------------------
+    function escapeHtmlLocal(s) {
+        return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    function formatNotifTime(iso) {
+        try { return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); }
+        catch (e) { return ""; }
+    }
+
+    function renderNotifBadge() {
+        const show = notifUnreadCount > 0;
+        const text = notifUnreadCount > 99 ? "99+" : String(notifUnreadCount);
+        if (notifBadge) { notifBadge.textContent = text; notifBadge.classList.toggle("hidden", !show); }
+        if (notifBadgeMobile) { notifBadgeMobile.textContent = text; notifBadgeMobile.classList.toggle("hidden", !show); }
+    }
+
+    function renderNotifList(notifications) {
+        if (!notifList) return;
+        if (!notifications || notifications.length === 0) {
+            notifList.innerHTML = `<div class="notif-empty">No notifications yet.</div>`;
+            return;
+        }
+        notifList.innerHTML = notifications.map((n) => `
+            <div class="notif-item ${n.read ? "" : "unread"}">
+                <div class="notif-title">${escapeHtmlLocal(n.title)}</div>
+                <div>${escapeHtmlLocal(n.message)}</div>
+                <div class="notif-meta">${formatNotifTime(n.timestamp)}</div>
+            </div>
+        `).join("");
+    }
+
+    function showToast(title, body) {
+        if (!toastContainer) return;
+        const el = document.createElement("div");
+        el.className = "toast";
+        el.innerHTML = `<div class="toast-title">${escapeHtmlLocal(title)}</div><div class="toast-body">${escapeHtmlLocal(body)}</div>`;
+        toastContainer.appendChild(el);
+        setTimeout(() => el.remove(), 7000);
+    }
+
+    async function refreshNotifBadgeFromServer() {
+        try {
+            const response = await apiFetch("/api/notifications?limit=1");
+            if (!response.ok) return;
+            const data = await response.json();
+            notifUnreadCount = data.unread_count || 0;
+            renderNotifBadge();
+        } catch (e) { /* bell just shows no count until the next successful poll */ }
+    }
+
+    async function onNotifPanelOpened() {
+        try {
+            const response = await apiFetch("/api/notifications?limit=50");
+            if (!response.ok) return;
+            const data = await response.json();
+            renderNotifList(data.notifications || []);
+            if (notifUnreadCount > 0) {
+                await apiFetch("/api/notifications/read_all", { method: "POST" });
+                notifUnreadCount = 0;
+                renderNotifBadge();
+                renderNotifList((data.notifications || []).map((n) => ({ ...n, read: true })));
+            }
+        } catch (e) {
+            console.error("Failed to load notifications:", e);
+        }
+    }
+
+    function toggleNotifPanel() {
+        if (!notifPanel) return;
+        const opening = notifPanel.classList.contains("hidden");
+        notifPanel.classList.toggle("hidden");
+        if (opening) onNotifPanelOpened();
+    }
+
+    function connectNotificationWebSocket() {
+        const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+        let reconnectDelay = 1000;
+
+        function connect() {
+            const socket = new WebSocket(`${proto}//${window.location.host}/ws/live`);
+            socket.onopen = () => { reconnectDelay = 1000; };
+            socket.onclose = () => { setTimeout(connect, reconnectDelay); reconnectDelay = Math.min(reconnectDelay * 1.5, 15000); };
+            socket.onerror = () => socket.close();
+            socket.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    if (msg.type === "notification") {
+                        showToast(msg.title, msg.message);
+                        notifUnreadCount += 1;
+                        renderNotifBadge();
+                        if (notifPanel && !notifPanel.classList.contains("hidden")) onNotifPanelOpened();
+                    }
+                    // scan_update / closing_sequence_progress are lightweight status pings —
+                    // deliberately not surfaced as bell notifications (would be noisy at
+                    // several-per-minute during market hours); ignored here by design.
+                } catch (e) { console.error("Bad /ws/live message:", e); }
+            };
+        }
+        connect();
+    }
+
+    function initNotifications() {
+        if (notifBell) notifBell.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
+        if (notifBellMobile) notifBellMobile.addEventListener("click", () => {
+            if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+            if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+            if (notifPanel) { notifPanel.classList.remove("hidden"); onNotifPanelOpened(); }
+        });
+        if (notifMarkAllBtn) notifMarkAllBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            await apiFetch("/api/notifications/read_all", { method: "POST" });
+            notifUnreadCount = 0;
+            renderNotifBadge();
+            onNotifPanelOpened();
+        });
+        document.addEventListener("click", (e) => {
+            if (!notifPanel || notifPanel.classList.contains("hidden")) return;
+            // M9 audit fix: notifBellMobile wasn't in this exception list, so opening the panel
+            // from the mobile bell triggered this SAME click's document-level listener right
+            // after (clicks bubble from the button up to document), instantly re-hiding it —
+            // the panel would flash open and close within one tap, even once it was made
+            // structurally reachable on mobile.
+            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target)) || (notifBellMobile && notifBellMobile.contains(e.target))) return;
+            notifPanel.classList.add("hidden");
+        });
+
+        refreshNotifBadgeFromServer();
+        connectNotificationWebSocket();
     }
 });

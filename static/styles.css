@@ -1206,6 +1206,21 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 .recent-candles-wrapper { overflow-x: auto; border: 1px solid var(--gridline); border-radius: var(--radius-sm); }
 
+/* Stock detail chart (M6) */
+.stock-chart-wrapper {
+    border: 1px solid var(--gridline);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--page-bg-2);
+}
+#modalChartContainer { width: 100%; height: 320px; }
+.chart-legend-hint {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 11px; color: var(--ink-muted);
+    margin: 6px 0 10px;
+}
+.chart-legend-hint .swatch { width: 12px; height: 2px; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
 .winrate-action-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
 
 .winrate-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
@@ -1695,4 +1710,335 @@ input:checked + .slider:before { transform: translateX(16px); }
     .modal-body {
         padding: 12px 14px;
     }
+}
+
+/* ==========================================
+   NOTIFICATIONS — bell, badge, panel, toast (M5)
+   ========================================== */
+
+.notif-bell-wrap { position: relative; }
+
+#notifBell { position: relative; }
+
+.notif-badge {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: var(--bearish);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    min-width: 16px; height: 16px;
+    border-radius: var(--radius-pill);
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+    box-shadow: 0 0 0 2px var(--glass-bg-strong);
+}
+
+/* Mobile bell reuses .btn-full-width's layout — badge sits inline after the label instead of
+   absolutely positioned, since the button is full-width text+icon, not a bare circle. */
+#notifBadgeMobile { position: static; margin-left: 6px; box-shadow: none; }
+
+.notif-panel {
+    position: fixed;
+    top: 84px; right: 20px;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    max-height: 440px;
+    overflow-y: auto;
+    z-index: 300;
+    padding: 0;
+}
+
+.notif-panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    font-family: var(--font-heading);
+    font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+    color: var(--ink-secondary);
+    position: sticky; top: 0;
+    background: var(--glass-bg-strong);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+}
+
+.notif-mark-all-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 10.5px; font-weight: 700; color: var(--gold);
+    letter-spacing: 0.3px;
+}
+.notif-mark-all-btn:hover { text-decoration: underline; }
+
+.notif-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 12.5px;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item .notif-title { font-weight: 700; color: var(--ink-primary); margin-bottom: 3px; }
+.notif-item .notif-meta { color: var(--ink-muted); font-size: 11px; margin-top: 4px; }
+.notif-item.unread { background: var(--gold-bg); }
+.notif-item.unread .notif-title::before {
+    content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); margin-right: 6px; vertical-align: middle;
+}
+
+.notif-empty { padding: 36px 16px; text-align: center; color: var(--ink-muted); font-size: 12px; }
+
+/* ---------------- Toast ---------------- */
+#toastContainer {
+    position: fixed; top: 84px; right: 20px; z-index: 300;
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.toast {
+    background: var(--glass-bg-strong);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border-strong);
+    border-left: 3px solid var(--gold);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--glass-shadow-hover);
+    padding: 12px 16px;
+    min-width: 280px;
+    max-width: 360px;
+    animation: toast-in 0.25s ease-out;
+}
+.toast .toast-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; color: var(--ink-primary); }
+.toast .toast-body { font-size: 12px; color: var(--ink-secondary); }
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateX(24px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+/* M9 audit fix: #notifPanel used to be nested inside .notif-bell-wrap/.header-actions, which
+   is display:none below 900px — that made the panel structurally unreachable from the mobile
+   drawer's #notifBellMobile even though its own "hidden" class was correctly removed (a
+   display:none ancestor hides all descendants regardless of their own display value). It's now
+   a standalone position:fixed overlay (see index.html) so both the desktop bell and
+   #notifBellMobile open the same reachable element. */
+
+/* ==========================================
+   TIMEFRAME SWITCHER BAR & CHART OVERLAYS
+   ========================================== */
+
+.chart-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    margin-bottom: 8px;
+}
+
+.timeframe-switcher-bar {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+    gap: 2px;
+}
+
+.tf-btn {
+    background: transparent;
+    border: none;
+    color: var(--ink-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.tf-btn:hover {
+    color: var(--ink-primary);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.tf-btn.active {
+    background: var(--gold);
+    color: #000;
+    font-weight: 800;
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.35);
+}
+
+/* ==========================================
+   SCOPE TOGGLES & STRATEGY CARD ENHANCEMENTS
+   ========================================== */
+
+.strategy-toggles-box {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.strategy-toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-primary);
+}
+
+.strategy-code-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #38bdf8;
+    max-height: 90px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* ==========================================
+   AI CLARIFICATION SUMMARY CARD
+   ========================================== */
+
+.clarification-summary-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.clarification-rule-box {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    padding: 8px 12px;
+}
+
+.clarification-rule-box.exit {
+    border-left-color: var(--bullish-color);
+}
+
+.clarification-rule-box.timeframe {
+    border-left-color: var(--cyan);
+}
+
+.clarification-rule-box .title {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--ink-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.clarification-rule-box .content {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-primary);
+    line-height: 1.4;
+}
+
+/* ==========================================
+   PER-STRATEGY PERFORMANCE BREAKDOWN & PREMIUM STRATEGY CARDS
+   ========================================== */
+
+.strategy-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg, 12px);
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(16px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+}
+
+.strategy-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #38bdf8, #f59e0b, #10b981);
+    opacity: 0.8;
+}
+
+.strategy-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(56, 189, 248, 0.35);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.15);
+}
+
+.strategy-card.inactive {
+    opacity: 0.75;
+    filter: grayscale(0.2);
+}
+
+.perf-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.perf-scope-card {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md, 8px);
+    padding: 12px 14px;
+    transition: border-color 0.2s ease;
+}
+
+.perf-scope-card:hover {
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.perf-scope-title {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--gold, #f59e0b);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.5px;
+}
+
+.perf-metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.perf-metrics-table td {
+    padding: 4px 0;
+    color: var(--ink-secondary, #94a3b8);
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
+}
+
+.perf-metrics-table tr:last-child td {
+    border-bottom: none;
+}
+
+.perf-metrics-table td.val {
+    text-align: right;
+    font-weight: 700;
+    color: var(--ink-primary, #f8fafc);
 }

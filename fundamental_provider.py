@@ -25,10 +25,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import yfinance as yf
 
 from json_utils import atomic_write_json, read_json
+from lock_utils import file_lock
+from net_utils import call_with_retry
+from env_utils import DATA_DIR
 
 logger = logging.getLogger("FundamentalProvider")
-
-DATA_DIR = "data"
 FUNDAMENTALS_CACHE_FILE = os.path.join(DATA_DIR, "fundamentals_cache.json")
 
 STALE_AFTER_DAYS = 14  # beyond this, treat cached fundamentals as unavailable rather than serve very old data
@@ -127,17 +128,14 @@ def compute_fundamental_quality(fields: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _fetch_single_stock_fundamentals(symbol: str) -> Optional[Dict[str, Any]]:
-    """Fetch and extract fields of interest for one symbol. Returns None on total failure."""
-    try:
-        info = yf.Ticker(symbol).info
-        if not info or len(info) < 3:
-            return None
-        fields = {k: info.get(k) for k in FIELDS_OF_INTEREST}
-        quality = compute_fundamental_quality(fields)
-        return {**fields, "quality": quality}
-    except Exception as e:
-        logger.warning(f"[{symbol}] Fundamental fetch failed: {e}")
+    """Fetch and extract fields of interest for one symbol. Returns None on total failure
+    (after retrying — Phase-1 audit finding #4/#5, this had neither a timeout nor a retry)."""
+    info = call_with_retry(lambda: yf.Ticker(symbol).info, label=f"fundamentals [{symbol}]", timeout=15.0)
+    if not info or len(info) < 3:
         return None
+    fields = {k: info.get(k) for k in FIELDS_OF_INTEREST}
+    quality = compute_fundamental_quality(fields)
+    return {**fields, "quality": quality}
 
 
 REFRESH_LOCK_FILE = os.path.join(DATA_DIR, "fundamentals_refresh.lock")
@@ -168,17 +166,10 @@ def refresh_fundamentals_cache(symbols: List[str], max_workers: int = 8) -> Dict
     JSON file and the slower one's partial results silently clobber the faster one's complete ones.
     """
     _ensure_data_dir()
-    if os.path.exists(REFRESH_LOCK_FILE):
-        lock_age = time.time() - os.path.getmtime(REFRESH_LOCK_FILE)
-        if lock_age < LOCK_STALE_AFTER_SECONDS:
-            logger.warning(f"Fundamentals refresh already in progress elsewhere (lock is {lock_age:.0f}s old) — skipping.")
+    with file_lock(REFRESH_LOCK_FILE, LOCK_STALE_AFTER_SECONDS, label="Fundamentals refresh") as acquired:
+        if not acquired:
             return {"fetched": 0, "failed": 0, "elapsed_sec": 0.0, "skipped": "ALREADY_IN_PROGRESS"}
-        logger.warning(f"Stale fundamentals refresh lock ({lock_age:.0f}s old) — assuming a crashed run and proceeding.")
 
-    with open(REFRESH_LOCK_FILE, "w") as f:
-        f.write(str(time.time()))
-
-    try:
         today_str = date.today().isoformat()
         cache = _load_cache()
         fetched, failed = 0, 0
@@ -203,11 +194,6 @@ def refresh_fundamentals_cache(symbols: List[str], max_workers: int = 8) -> Dict
         elapsed = round(time.time() - t0, 1)
         logger.info(f"Fundamentals cache refresh complete: {fetched} fetched, {failed} failed, {elapsed}s.")
         return {"fetched": fetched, "failed": failed, "elapsed_sec": elapsed, "as_of_date": today_str}
-    finally:
-        try:
-            os.remove(REFRESH_LOCK_FILE)
-        except OSError:
-            pass
 
 
 def load_all_fundamentals() -> Dict[str, Any]:

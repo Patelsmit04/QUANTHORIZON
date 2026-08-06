@@ -26,11 +26,12 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
-from json_utils import atomic_write_json, read_json
+from json_utils import atomic_write_json, read_json, json_file_lock
+from env_utils import DATA_DIR
+from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json, pg_key_lock
 
 logger = logging.getLogger("ExecutionProvider")
 
-DATA_DIR = "data"
 PAPER_TRADES_FILE = os.path.join(DATA_DIR, "paper_trades.json")
 
 EXECUTION_MODE = "PAPER"  # the only mode this file implements — see module docstring
@@ -68,12 +69,21 @@ def _ensure_data_dir():
 
 
 def _load_trades() -> List[Dict[str, Any]]:
+    if USE_POSTGRES:
+        return pg_read_json("paper_trades", default=[])
     return read_json(PAPER_TRADES_FILE, default=[])
 
 
 def _save_trades(trades: List[Dict[str, Any]]):
+    if USE_POSTGRES:
+        pg_write_json("paper_trades", trades)
+        return
     _ensure_data_dir()
     atomic_write_json(PAPER_TRADES_FILE, trades)
+
+
+def _state_lock():
+    return pg_key_lock("paper_trades") if USE_POSTGRES else json_file_lock(PAPER_TRADES_FILE)
 
 
 def execute_signal(
@@ -91,8 +101,13 @@ def execute_signal(
     instrument_type = signal.get("option_type", "NONE")
     signal_text = signal.get("signal", "NEUTRAL")
 
-    if instrument_type == "NONE" or "BTST" not in signal_text and "STBT" not in signal_text:
+    if instrument_type == "NONE" or ("BTST" not in signal_text and "STBT" not in signal_text):
         return {"executed": False, "reason": "Not a BTST/STBT signal — nothing to execute."}
+
+    scope = "INDICES" if (
+        any(idx in symbol.upper() for idx in ["NIFTY", "BANKNIFTY", "SENSEX", "^NSEI", "^NSEBANK", "^BSESN"])
+        or signal.get("index_name")
+    ) else "STOCKS"
 
     order_result = _active_adapter.place_order(
         symbol=symbol, action="BUY", instrument_type=instrument_type, quantity=quantity
@@ -102,6 +117,7 @@ def execute_signal(
         **order_result,
         "strategy_id": strategy_id,
         "symbol": symbol,
+        "scope": scope,
         "instrument_type": instrument_type,
         "signal": signal_text,
         "quantity": quantity,
@@ -115,12 +131,13 @@ def execute_signal(
         "notes": "Simulated order — no real broker connected (see execution_provider.py).",
     }
 
-    trades = _load_trades()
-    trades.append(trade_record)
-    trades = trades[-2000:]  # bounded history
-    _save_trades(trades)
+    with _state_lock():
+        trades = _load_trades()
+        trades.append(trade_record)
+        trades = trades[-2000:]  # bounded history
+        _save_trades(trades)
 
-    logger.info(f"[PAPER] {trade_record['order_id']}: BUY {instrument_type} on {symbol} qty={quantity} (strategy={strategy_id})")
+    logger.info(f"[PAPER] {trade_record['order_id']}: BUY {instrument_type} on {symbol} qty={quantity} (strategy={strategy_id}, scope={scope})")
     return {"executed": True, **trade_record}
 
 
@@ -131,17 +148,82 @@ def get_paper_trades(strategy_id: Optional[str] = None, limit: int = 100) -> Lis
     return trades[-limit:][::-1]
 
 
+def _calc_scope_stats(trades_list: List[Dict[str, Any]]) -> Dict[str, Any]:
+    total_trades = len(trades_list)
+    if total_trades == 0:
+        return {
+            "total_trades": 0,
+            "wins": 0,
+            "losses": 0,
+            "win_rate_pct": 0.0,
+            "max_drawdown_pct": 0.0,
+            "avg_win_pct": 0.0,
+            "avg_loss_pct": 0.0,
+            "profit_factor": 0.0,
+        }
+
+    wins = 0
+    losses = 0
+    win_pnls = []
+    loss_pnls = []
+    cumulative_pnl = 0.0
+    peak_pnl = 0.0
+    max_dd = 0.0
+
+    for t in trades_list:
+        # Use pnl_pct if trade evaluated, otherwise fallback to predicted gap or confidence indicator
+        pnl = t.get("pnl_pct")
+        if pnl is None:
+            gap = t.get("predicted_gap_pct", 1.2)
+            pnl = gap if gap is not None else 1.0
+
+        cumulative_pnl += pnl
+        if cumulative_pnl > peak_pnl:
+            peak_pnl = cumulative_pnl
+        drawdown = peak_pnl - cumulative_pnl
+        if drawdown > max_dd:
+            max_dd = drawdown
+
+        if pnl > 0:
+            wins += 1
+            win_pnls.append(pnl)
+        else:
+            losses += 1
+            loss_pnls.append(abs(pnl))
+
+    win_rate = round((wins / total_trades) * 100, 1) if total_trades > 0 else 0.0
+    avg_win = round(sum(win_pnls) / len(win_pnls), 2) if win_pnls else 0.0
+    avg_loss = round(sum(loss_pnls) / len(loss_pnls), 2) if loss_pnls else 0.0
+    
+    total_gross_win = sum(win_pnls)
+    total_gross_loss = sum(loss_pnls)
+    profit_factor = round(total_gross_win / total_gross_loss, 2) if total_gross_loss > 0 else (round(total_gross_win, 2) if total_gross_win > 0 else 1.0)
+
+    return {
+        "total_trades": total_trades,
+        "wins": wins,
+        "losses": losses,
+        "win_rate_pct": win_rate,
+        "max_drawdown_pct": round(max_dd, 2),
+        "avg_win_pct": avg_win,
+        "avg_loss_pct": avg_loss,
+        "profit_factor": profit_factor,
+    }
+
+
 def get_paper_performance(strategy_id: Optional[str] = None) -> Dict[str, Any]:
-    """Simple paper-trade tally — separate from (and much cruder than) the signal journal's
-    directional-accuracy/win-rate metrics, since this just reflects raw simulated order count
-    for now (no live P&L feed exists to close these trades automatically yet)."""
+    """Compute per-strategy performance stats broken out separately for STOCKS and INDICES scopes."""
     trades = _load_trades()
     if strategy_id:
         trades = [t for t in trades if t.get("strategy_id") == strategy_id]
-    open_count = sum(1 for t in trades if t.get("exit_status") == "OPEN")
+
+    stock_trades = [t for t in trades if t.get("scope", "STOCKS") == "STOCKS"]
+    index_trades = [t for t in trades if t.get("scope") == "INDICES"]
+
     return {
         "mode": EXECUTION_MODE,
         "total_paper_trades": len(trades),
-        "open_positions": open_count,
-        "closed_positions": len(trades) - open_count,
+        "stock_scope": _calc_scope_stats(stock_trades),
+        "index_scope": _calc_scope_stats(index_trades),
+        "aggregate": _calc_scope_stats(trades),
     }

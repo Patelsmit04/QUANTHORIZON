@@ -59,7 +59,8 @@ fundamental and news quality gates, and grading its own predictions every tradin
 ## Tech stack
 
 - **Backend**: Python, FastAPI, yfinance (price data), jugaad-data (NSE delivery %),
-  SQLite (signal journal), CurrentsAPI (news)
+  SQLite (signal journal), CurrentsAPI (news), optionally Postgres (see "Shared Postgres
+  backend" below) if the scanner and dashboard run on separate hosts
 - **Frontend**: static HTML/CSS/JS — no build step, no framework
 
 ## Prerequisites
@@ -97,6 +98,45 @@ The dashboard is served at **http://127.0.0.1:8000**. A background thread starts
 automatically on launch and runs the scan/lock/evaluate schedule described above for as
 long as the process is running — leave it running through market hours for it to actually
 scan, lock, and grade picks on schedule.
+
+> **Deployment note (2026 audit finding):** this scheduler is implemented as plain OS
+> `daemon` threads started on process startup, not as externally-triggered jobs. That
+> requires a **persistent host** — `python app.py` kept running on a VM / always-on
+> dyno / bare-metal box through market hours. `vercel.json` in this repo deploys the app
+> as a serverless function; serverless instances have no process that persists between
+> requests, so the 3:14–3:40 PM closing sequence, the 5-min/1-min scan loop, and every
+> "survives restarts" guarantee described above **do not run** under that deployment as
+> currently configured. `GET /api/scan` and `GET /api/indices` know this and never attempt
+> a live scan inline there (it would just time out) — see "Shared Postgres backend" below
+> for actually serving real data from a serverless deployment instead of an empty response.
+
+## Shared Postgres backend (optional — running the scanner and the dashboard on separate hosts)
+
+If you want the actual autonomous scanner running on one machine (your own always-on host,
+`python app.py`) and a separate stateless deployment (e.g. Vercel) serving the dashboard/API off
+the SAME live data, set `DATABASE_URL` (a Postgres connection string — Neon and Vercel Postgres
+both work, use their **pooled** connection string) in **both** places:
+
+1. Create a Postgres database (e.g. a free [Neon](https://neon.tech) project, or Vercel's own
+   Postgres add-on).
+2. Set `DATABASE_URL` in your local `.env` (the persistent host) and in the Vercel project's
+   Environment Variables — same value in both.
+3. If you have existing local history you don't want to lose, run the one-time migration
+   **before** your first Postgres-backed run: `python scripts/migrate_to_postgres.py` (reads
+   `DATABASE_URL` from the environment; safe to re-run, it only upserts).
+4. Restart the local host and redeploy Vercel. Both now read/write the same `strategies.json`,
+   `trade_history.json`, `paper_trades.json`, `active_pillar_weights.json`,
+   `pillar_weights_history.json`, `last_market_scan.json`, `index_btst_verdicts.json`,
+   `clarification_budget.json`, `stock_news_cache.json` (all via one generic `app_state` table),
+   plus the full SQLite signal journal (`signal_journal`, `signal_evaluations`,
+   `index_verdict_journal`, `index_verdict_evaluations`, `notifications`) as real Postgres
+   tables.
+
+Leave `DATABASE_URL` unset (the default) to keep everything on local files/SQLite exactly as
+before — nothing above is required for a normal single-host run, and every module falls back to
+its pre-existing local behavior automatically. Provider-internal caches that the scanner alone
+ever reads (fundamentals, OI/delivery history, the daily refresh-job lock files) intentionally
+stay local-only either way — a serverless reader never touches them.
 
 On first run, `data/` is created automatically to hold:
 - `trade_history.json`, `signal_journal.db` — locked picks and graded outcomes (journal now
@@ -169,8 +209,11 @@ walk_forward_validator.py     Out-of-sample validation + auto-improving pillar w
 signal_journal.py             SQLite journal of signals + graded outcomes, per strategy + index
 vix_provider.py               India VIX regime classifier
 json_utils.py                 Atomic JSON read/write (concurrency-safe)
+pg_utils.py                   Optional shared Postgres backend (see "Shared Postgres backend")
+scripts/migrate_to_postgres.py  One-time local-data -> Postgres migration
 scanner.py                    Standalone CLI scan script (no server)
 static/                       Dashboard (HTML/CSS/JS)
+tests/                        pytest suite — `pytest tests/`
 ```
 
 ## Key API endpoints
@@ -198,8 +241,18 @@ static/                       Dashboard (HTML/CSS/JS)
 | `POST /api/lock_picks` | Manually lock the current picks |
 | `POST /api/evaluate_picks` | Manually run the next-day gap evaluation |
 
+Every `POST`/`PUT`/`DELETE` endpoint above requires the `X-API-Key` header (see
+`QUANTHORIZON_API_KEY` below) if that env var is set. All `GET` endpoints stay fully open,
+unauthenticated, exactly as before.
+
 ## Notes
 
+- **Authentication (2026 audit finding):** every mutating endpoint used to be callable by
+  anyone with the URL. Set `QUANTHORIZON_API_KEY` in `.env` to require an `X-API-Key: <key>`
+  header on all of them — the dashboard's own UI will prompt for this key the first time you
+  try to change anything (🔑 button in the header) and remembers it in your browser's
+  `localStorage` afterward. Leave it unset to keep the previous fully-open behavior (a startup
+  log warning calls this out explicitly so it's never silently insecure).
 - If `CURRENTS_API_KEY` isn't set, the app still runs — news gates and the News section
   just show `DATA_UNAVAILABLE`/empty state instead of failing.
 - The news refresh is hard-capped at 3 full passes/day to stay within CurrentsAPI's free-tier

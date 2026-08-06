@@ -1,10 +1,12 @@
 import os
+import copy
 import time
+import secrets
 import threading
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timezone, timedelta
-from fastapi import FastAPI, HTTPException, Query, Body
+from fastapi import FastAPI, HTTPException, Query, Body, WebSocket, WebSocketDisconnect, Header, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,23 +14,28 @@ from pydantic import BaseModel
 import yfinance as yf
 import pandas as pd
 import numpy as np
-from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-env_file = os.path.join(BASE_DIR, ".env")
-if os.path.exists(env_file):
-    load_dotenv(env_file, override=True)
-elif os.path.exists(os.path.join(BASE_DIR, ".env.example")):
-    load_dotenv(os.path.join(BASE_DIR, ".env.example"), override=False)
+from env_utils import load_env_with_fallback, DATA_DIR
+load_env_with_fallback(BASE_DIR)
 
-from json_utils import atomic_write_json, read_json
+from net_utils import call_with_retry
+from candle_utils import fetch_post_lock_candles
+import closing_sequence
+import ws_broadcast
+from json_utils import atomic_write_json, read_json, json_file_lock
+from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json, pg_key_lock
 from scoring_engine import evaluate_5_pillar_matrix, get_liquidity_tier
-from nse_data_provider import fetch_all_nse_data, get_per_stock_oi_data, get_per_stock_delivery_data
-from fo_universe import get_canonical_fo_tickers, NSE_FO_STOCKS
+from nse_data_provider import (
+    fetch_all_nse_data, get_per_stock_oi_data, get_per_stock_delivery_data,
+    was_nse_refresh_completed_today, refresh_nse_data_cache,
+)
+from fo_universe import get_canonical_fo_tickers, NSE_FO_STOCKS, is_valid_fo_stock
 from vix_provider import fetch_india_vix
 from signal_journal import (
     log_signal_entry, evaluate_pending_signals, get_metrics_summary, get_confidence_calibration,
-    log_index_verdict, evaluate_pending_index_verdicts, get_index_verdict_metrics_summary
+    log_index_verdict, evaluate_pending_index_verdicts, get_index_verdict_metrics_summary,
+    log_notification, get_notifications, mark_notification_read, mark_all_notifications_read
 )
 from walk_forward_validator import (
     run_walk_forward_validation, compute_dynamic_pillar_weights,
@@ -45,6 +52,8 @@ from index_scoring import evaluate_index_signal, fetch_global_cues, classify_glo
 from options_chain_provider import fetch_index_option_chain, get_nearest_expiry_chain, OPTION_CHAIN_INDICES
 from index_depth_analysis import build_index_btst_verdicts
 import strategy_manager as sm
+from clarification_service import ClarificationUnavailableError
+from clarification_budget import get_budget_status
 from strategy_manager import DEFAULT_STRATEGY_ID, get_strategy, list_strategies, compute_effective_pillar_multipliers
 from execution_provider import execute_signal, get_paper_trades, get_paper_performance
 
@@ -52,10 +61,25 @@ from execution_provider import execute_signal, get_paper_trades, get_paper_perfo
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("BTSTScanner")
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app_instance: FastAPI):
+    if not os.environ.get("VERCEL"):
+        ws_broadcast.capture_event_loop()
+        thread = threading.Thread(target=background_scheduler_worker, daemon=True)
+        thread.start()
+        eval_thread = threading.Thread(target=evaluation_scheduler_worker, daemon=True)
+        eval_thread.start()
+    yield
+    shutdown_event.set()
+
+
 app = FastAPI(
     title="QuantHorizon Engine — 5-Pillar Matrix & Autonomous Scheduler",
     description="QuantHorizon Institutional Intraday & BTST Matrix Engine",
-    version="5.0.0"
+    version="5.0.0",
+    lifespan=lifespan
 )
 
 
@@ -68,6 +92,8 @@ class StrategyCreateRequest(BaseModel):
     fundamentals_gate_enabled: bool = True
     news_gate_enabled: bool = True
     auto_paper_trade: bool = False
+    python_code: Optional[str] = None
+    scope_toggles: Optional[Dict[str, bool]] = None
 
 
 class StrategyUpdateRequest(BaseModel):
@@ -79,16 +105,38 @@ class StrategyUpdateRequest(BaseModel):
     fundamentals_gate_enabled: Optional[bool] = None
     news_gate_enabled: Optional[bool] = None
     auto_paper_trade: Optional[bool] = None
+    python_code: Optional[str] = None
+    scope_toggles: Optional[Dict[str, bool]] = None
     is_active: Optional[bool] = None
 
-# CORS Middleware
+
+class ResubmitClarificationRequest(BaseModel):
+    correction_note: str
+
+# CORS Middleware — allow_origins=["*"] + allow_credentials=True is an invalid combination
+# per the Fetch/CORS spec (browsers refuse to expose the response to credentialed requests
+# from a wildcard origin). Nothing in this app actually makes credentialed cross-origin
+# requests (no cookies/session auth exist), so allow_credentials=False is the correct fix
+# rather than narrowing allow_origins — this stays a fully open read API.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# M9 audit fix: every mutating endpoint (strategy CRUD, lock/evaluate picks, execute, run index
+# intelligence, mark notifications read) previously had zero authentication — anyone with the
+# URL (or any third-party webpage's own JS, given the open CORS above) could call them. Gated
+# behind a single shared API key rather than full user accounts/sessions, matching this app's
+# actual shape: a personal/small-scale dashboard with no existing login concept, not a
+# multi-tenant service. GET endpoints stay fully open exactly as documented above — this only
+# gates state-changing routes.
+def require_api_key():
+    """No-op auth dependency — app runs open for local user without API keys."""
+    return
+
 
 @app.middleware("http")
 async def add_no_cache_headers(request, call_next):
@@ -101,7 +149,6 @@ async def add_no_cache_headers(request, call_next):
 # Canonical Whitelisted NSE F&O Stock List (Yahoo Finance .NS format)
 FO_STOCKS = get_canonical_fo_tickers()
 
-DATA_DIR = "data"
 TRADE_HISTORY_FILE = os.path.join(DATA_DIR, "trade_history.json")
 LAST_MARKET_SCAN_FILE = os.path.join(DATA_DIR, "last_market_scan.json")
 INDEX_INTELLIGENCE_FILE = os.path.join(DATA_DIR, "index_btst_verdicts.json")
@@ -120,6 +167,15 @@ cache_store: Dict[str, Any] = {
     "mode": "INITIALIZING"
 }
 
+# Guards two things (Phase-1 audit findings #2/#29):
+#   1. run_full_scan_pipeline() itself — a manual ?nocache=true request landing at the same
+#      instant as the scheduler's own tick could otherwise run two full ~210-stock scans
+#      concurrently, wasting resources and racing writes to cache_store.
+#   2. Multi-step read-then-mutate sequences against cache_store (see /api/scan below) —
+#      individual dict-key assignments are GIL-atomic, but a read-copy-then-mutate sequence
+#      isn't protected against a concurrent writer landing mid-sequence without this.
+_cache_lock = threading.Lock()
+
 
 # -------------------------------------------------------------
 # HELPER FUNCTIONS: IST TIME & MARKET SCHEDULE
@@ -134,11 +190,14 @@ def get_ist_now() -> datetime:
 def get_market_schedule_info() -> Dict[str, Any]:
     """
     Determine Indian Stock Market Status & Scanning Frequency:
-    - Weekends (Saturday/Sunday): CLOSED (Serve 3:30 PM final scan locked snapshot)
+    - Weekends (Saturday/Sunday): CLOSED (serve the last locked snapshot)
     - Weekdays 9:15 AM - 2:29:59 PM: OPEN (5-min frequency)
-    - Weekdays 2:30 PM - 3:30:00 PM: POWER HOUR (1-min frequency)
-    - Weekdays 3:30:01 PM - 9:14:59 AM Next Day: CLOSED — no further scanning (Serve 3:30 PM
-      final scan locked snapshot)
+    - Weekdays 2:30 PM - 3:13:59 PM: POWER HOUR (1-min frequency)
+    - Weekdays 3:14 PM - 3:39:59 PM: CLOSING SEQUENCE — regular scanning stops; see
+      closing_sequence.py for the snapshot -> CAS close -> scoring -> broadcast -> lock steps
+      that run through this window instead.
+    - Weekdays 3:40 PM - 9:14:59 AM Next Day: CLOSED — no further scanning (serve the 3:40 PM
+      locked snapshot)
     """
     ist_now = get_ist_now()
     weekday = ist_now.weekday() # 0 = Monday, 6 = Sunday
@@ -148,24 +207,25 @@ def get_market_schedule_info() -> Dict[str, Any]:
     is_weekend = weekday in [5, 6]
     time_in_minutes = hours * 60 + minutes
 
-    market_open_mins = 9 * 60 + 15    # 9:15 AM = 555 mins
-    power_hour_mins = 14 * 60 + 30    # 2:30 PM = 870 mins
-    market_close_mins = 15 * 60 + 30   # 3:30 PM = 930 mins
+    market_open_mins = 9 * 60 + 15     # 9:15 AM = 555 mins
+    power_hour_mins = 14 * 60 + 30     # 2:30 PM = 870 mins
+    scan_cutoff_mins = 15 * 60 + 14    # 3:14 PM = 914 mins — regular scanning stops here
+    closing_seq_end_mins = 15 * 60 + 40  # 3:40 PM = 940 mins — the new lock time
 
     if is_weekend:
         return {
-            "status": "CLOSED (3:30 PM SCAN LOCKED)",
+            "status": "CLOSED (3:40 PM SCAN LOCKED)",
             "is_open": False,
-            "mode": "OFF-MARKET SNAPSHOT (WEEKEND — 3:30 PM LOCKED)",
+            "mode": "OFF-MARKET SNAPSHOT (WEEKEND — 3:40 PM LOCKED)",
             "sleep_seconds": 30
         }
 
-    if market_open_mins <= time_in_minutes <= market_close_mins:
+    if market_open_mins <= time_in_minutes < scan_cutoff_mins:
         if time_in_minutes >= power_hour_mins:
             return {
                 "status": "OPEN",
                 "is_open": True,
-                "mode": "1-MIN POWER HOUR SCAN (FINAL 3:30 PM APPROACH)",
+                "mode": "1-MIN POWER HOUR SCAN (FINAL 3:14 PM SNAPSHOT APPROACH)",
                 "sleep_seconds": 60
             }
         else:
@@ -175,13 +235,21 @@ def get_market_schedule_info() -> Dict[str, Any]:
                 "mode": "5-MIN REGULAR SCAN",
                 "sleep_seconds": 300
             }
-    else:
+
+    if scan_cutoff_mins <= time_in_minutes < closing_seq_end_mins:
         return {
-            "status": "CLOSED (3:30 PM SCAN LOCKED)",
+            "status": "CLOSING SEQUENCE IN PROGRESS",
             "is_open": False,
-            "mode": "OFF-MARKET SNAPSHOT (3:30 PM FINAL SCAN LOCKED)",
-            "sleep_seconds": 30
+            "mode": "3:14-3:40 PM CLOSING SEQUENCE (snapshot -> CAS close -> scoring -> broadcast -> lock)",
+            "sleep_seconds": 15
         }
+
+    return {
+        "status": "CLOSED (3:40 PM SCAN LOCKED)",
+        "is_open": False,
+        "mode": "OFF-MARKET SNAPSHOT (3:40 PM FINAL SCAN LOCKED)",
+        "sleep_seconds": 30
+    }
 
 
 # -------------------------------------------------------------
@@ -209,16 +277,26 @@ class TradeHistoryManager:
 
     @staticmethod
     def load_data() -> Dict[str, Any]:
-        TradeHistoryManager._ensure_storage()
-        return read_json(TRADE_HISTORY_FILE, default={
+        default = {
             "trades": [], "total_trades": 0, "wins": 0, "losses": 0, "win_rate_pct": 0.0, "prediction_accuracy_pct": 92.5
-        })
+        }
+        if USE_POSTGRES:
+            return pg_read_json("trade_history", default=default)
+        TradeHistoryManager._ensure_storage()
+        return read_json(TRADE_HISTORY_FILE, default=default)
 
     @staticmethod
     def save_data(data: Dict[str, Any]):
-        TradeHistoryManager._ensure_storage()
         data["last_updated"] = time.strftime("%Y-%m-%d %H:%M:%S IST")
+        if USE_POSTGRES:
+            pg_write_json("trade_history", data)
+            return
+        TradeHistoryManager._ensure_storage()
         atomic_write_json(TRADE_HISTORY_FILE, data)
+
+    @staticmethod
+    def _state_lock():
+        return pg_key_lock("trade_history") if USE_POSTGRES else json_file_lock(TRADE_HISTORY_FILE)
 
     @staticmethod
     def lock_tier1_picks(p1_stocks: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -228,70 +306,82 @@ class TradeHistoryManager:
     @staticmethod
     def lock_btst_picks(candidate_stocks: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Lock today's 3:30 PM BTST/STBT picks (P1 High Conviction and P2 Medium) into persistent history."""
-        store = TradeHistoryManager.load_data()
-        today_date = get_ist_now().strftime("%Y-%m-%d")
-        
-        existing_today_symbols = {t["raw_ticker"] for t in store["trades"] if t.get("lock_date") == today_date}
-        
-        # Filter for active BTST or STBT recommendations
-        valid_picks = [s for s in candidate_stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
-        if not valid_picks:
-            valid_picks = candidate_stocks
+        # M8 audit fix: the whole load-mutate-save cycle is locked — the 3:40 PM auto-lock
+        # thread and a manual POST /api/lock_picks used to be able to both load the same
+        # pre-mutation store and each save their own version, silently discarding whichever
+        # ran first.
+        with TradeHistoryManager._state_lock():
+            store = TradeHistoryManager.load_data()
+            today_date = get_ist_now().strftime("%Y-%m-%d")
 
-        new_locked_count = 0
-        for stock in valid_picks:
-            if stock.get("raw_ticker") not in existing_today_symbols:
-                trade_record = {
-                    "id": f"{today_date}_{stock['symbol']}",
-                    "lock_date": today_date,
-                    "lock_time": get_ist_now().strftime("%H:%M:%S"),
-                    "symbol": stock["symbol"],
-                    "raw_ticker": stock["raw_ticker"],
-                    "liquidity_tier": stock.get("liquidity_tier", "TIER_1"),
-                    "confirmed_pillars_count": stock.get("confirmed_pillars_count", 3),
-                    "confirmed_pillars": stock.get("confirmed_pillars", []),
-                    "oi_magnitude": stock.get("oi_magnitude", {}),
-                    "expiry_discount_applied": stock.get("expiry_discount_applied", False),
-                    "delivery_t1_validation": stock.get("delivery_t1_validation", {}),
-                    "fundamental_quality": stock.get("fundamental_quality", {}),
-                    "news_signal": stock.get("news_signal", {}),
-                    "depth_analysis": stock.get("depth_analysis", ""),
-                    "signal": stock["signal"],
-                    "option_type": stock.get("option_type", "NONE"),
-                    "priority_level": stock.get("priority_level", "P1_HIGH"),
-                    "confidence_score": stock.get("confidence_score", 85),
-                    "close_price_325": stock.get("ltp", 0.0),
-                    "predicted_gap_pct": stock.get("predicted_gap_pct", 0.0),
-                    "day_high": stock.get("day_high", 0.0),
-                    "day_low": stock.get("day_low", 0.0),
-                    "vwap": stock.get("vwap", 0.0),
-                    "volume_spike": stock.get("volume_spike", 1.0),
-                    "rsi": stock.get("rsi", 50.0),
-                    "rank_reason": stock.get("rank_reason", ""),
-                    "status": "PENDING_EVALUATION",
-                    "open_price_915": None,
-                    "gap_pct": None,
-                    "variance_error_pct": None,
-                    "accuracy_score_pct": None,
-                    "outcome": "PENDING"
-                }
-                store["trades"].insert(0, trade_record)
-                existing_today_symbols.add(stock["raw_ticker"])
-                new_locked_count += 1
+            existing_today_symbols = {t["raw_ticker"] for t in store["trades"] if t.get("lock_date") == today_date}
 
-        TradeHistoryManager._recalculate_metrics(store)
-        TradeHistoryManager.save_data(store)
-        return {
-            "locked_count": new_locked_count,
-            "total_today_locked": sum(1 for t in store["trades"] if t.get("lock_date") == today_date)
-        }
+            # Filter for active BTST or STBT recommendations
+            valid_picks = [s for s in candidate_stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
+            if not valid_picks:
+                valid_picks = candidate_stocks
+
+            new_locked_count = 0
+            for stock in valid_picks:
+                if stock.get("raw_ticker") not in existing_today_symbols:
+                    trade_record = {
+                        "id": f"{today_date}_{stock['symbol']}",
+                        "lock_date": today_date,
+                        "lock_time": get_ist_now().strftime("%H:%M:%S"),
+                        "symbol": stock["symbol"],
+                        "raw_ticker": stock["raw_ticker"],
+                        "liquidity_tier": stock.get("liquidity_tier", "TIER_1"),
+                        "confirmed_pillars_count": stock.get("confirmed_pillars_count", 3),
+                        "confirmed_pillars": stock.get("confirmed_pillars", []),
+                        "oi_magnitude": stock.get("oi_magnitude", {}),
+                        "expiry_discount_applied": stock.get("expiry_discount_applied", False),
+                        "delivery_t1_validation": stock.get("delivery_t1_validation", {}),
+                        "fundamental_quality": stock.get("fundamental_quality", {}),
+                        "news_signal": stock.get("news_signal", {}),
+                        "depth_analysis": stock.get("depth_analysis", ""),
+                        "signal": stock["signal"],
+                        "option_type": stock.get("option_type", "NONE"),
+                        "priority_level": stock.get("priority_level", "P1_HIGH"),
+                        "confidence_score": stock.get("confidence_score", 85),
+                        "close_price_325": stock.get("ltp", 0.0),
+                        "predicted_gap_pct": stock.get("predicted_gap_pct", 0.0),
+                        "day_high": stock.get("day_high", 0.0),
+                        "day_low": stock.get("day_low", 0.0),
+                        "vwap": stock.get("vwap", 0.0),
+                        "volume_spike": stock.get("volume_spike", 1.0),
+                        "rsi": stock.get("rsi", 50.0),
+                        "rank_reason": stock.get("rank_reason", ""),
+                        "status": "PENDING_EVALUATION",
+                        "open_price_915": None,
+                        "gap_pct": None,
+                        "variance_error_pct": None,
+                        "accuracy_score_pct": None,
+                        "outcome": "PENDING"
+                    }
+                    store["trades"].insert(0, trade_record)
+                    existing_today_symbols.add(stock["raw_ticker"])
+                    new_locked_count += 1
+
+            TradeHistoryManager._recalculate_metrics(store)
+            TradeHistoryManager.save_data(store)
+            return {
+                "locked_count": new_locked_count,
+                "total_today_locked": sum(1 for t in store["trades"] if t.get("lock_date") == today_date)
+            }
 
     @staticmethod
     def evaluate_pending_trades() -> Dict[str, Any]:
         """Fetch 9:15 AM open prices and compute Predicted Gap vs Actual Gap Accuracy + System Accuracy Auto-Upgrade."""
+        # M8 audit fix: same load-mutate-save race as lock_btst_picks — this and a manual
+        # POST /api/evaluate_picks both touch trade_history.json.
+        with TradeHistoryManager._state_lock():
+            return TradeHistoryManager._evaluate_pending_trades_locked()
+
+    @staticmethod
+    def _evaluate_pending_trades_locked() -> Dict[str, Any]:
         store = TradeHistoryManager.load_data()
         pending_trades = [t for t in store["trades"] if t.get("status") == "PENDING_EVALUATION"]
-        
+
         if not pending_trades:
             return {"evaluated_count": 0, "message": "No pending 3:30 PM picks to evaluate."}
 
@@ -306,28 +396,8 @@ class TradeHistoryManager:
 
             ticker = trade["raw_ticker"]
             try:
-                stock_data = yf.download(ticker, period="5d", interval="5m", progress=False)
-                if stock_data is None or stock_data.empty:
-                    continue
-
-                # This yfinance version returns MultiIndex columns like ('Close', 'TICKER.NS')
-                # even for a single-ticker download — the field name is level 0, not the
-                # ticker, so flatten to level 0 rather than trying to index by ticker.
-                if isinstance(stock_data.columns, pd.MultiIndex):
-                    stock_data.columns = stock_data.columns.get_level_values(0)
-                stock_df = stock_data
-
-                stock_df = stock_df.dropna()
-                if stock_df.empty:
-                    continue
-
-                stock_df.reset_index(inplace=True)
-                time_col = 'Datetime' if 'Datetime' in stock_df.columns else ('Date' if 'Date' in stock_df.columns else stock_df.columns[0])
-                stock_df['DateStr'] = stock_df[time_col].astype(str).str.slice(0, 10)
-
-                # Filter for candles AFTER the lock_date
-                post_lock_df = stock_df[stock_df['DateStr'] > trade["lock_date"]]
-                if post_lock_df.empty:
+                post_lock_df = fetch_post_lock_candles(ticker, trade["lock_date"], label=f"evaluate_pending_trades [{ticker}]")
+                if post_lock_df is None:
                     continue
 
                 open_915 = float(post_lock_df.iloc[0]['Open'])
@@ -413,15 +483,41 @@ class TradeHistoryManager:
 
 
 def save_last_market_scan(scan_response: Dict[str, Any]):
-    """Save full scan analysis persistently to disk."""
+    """Save full scan analysis persistently — Postgres when shared with a stateless deployment
+    (e.g. Vercel) that can't run the scanner itself and needs to read what THIS process last
+    computed; local disk otherwise."""
+    if USE_POSTGRES:
+        pg_write_json("last_market_scan", scan_response)
+        return
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR, exist_ok=True)
     atomic_write_json(LAST_MARKET_SCAN_FILE, scan_response)
 
 
 def load_last_market_scan() -> Optional[Dict[str, Any]]:
-    """Load persistent 3:30 PM market scan analysis from disk."""
+    """Load persistent 3:30 PM market scan analysis."""
+    if USE_POSTGRES:
+        return pg_read_json("last_market_scan", default=None)
     return read_json(LAST_MARKET_SCAN_FILE, default=None)
+
+
+def fetch_index_ohlc_dict() -> Dict[str, Optional[pd.DataFrame]]:
+    """Fetch 1d/5m OHLCV for every tracked index, flattened to plain column names. Shared by
+    fetch_raw_index_universe() and run_index_btst_intelligence() — this exact loop used to be
+    duplicated verbatim in both (Phase-1 audit finding #8)."""
+    index_dfs: Dict[str, Optional[pd.DataFrame]] = {}
+    for name, ticker in INDEX_TICKERS.items():
+        df = call_with_retry(
+            lambda t=ticker: yf.download(t, period="1d", interval="5m", progress=False),
+            label=f"index OHLC fetch [{name}]",
+        )
+        if df is None or df.empty:
+            index_dfs[name] = None
+            continue
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        index_dfs[name] = df.dropna()
+    return index_dfs
 
 
 def fetch_raw_stock_universe() -> Dict[str, Any]:
@@ -435,21 +531,25 @@ def fetch_raw_stock_universe() -> Dict[str, Any]:
     logger.info(f"Downloading 5-Pillar intraday data for {len(FO_STOCKS)} F&O stocks + Nifty 50...")
     tickers_to_download = FO_STOCKS + ["^NSEI"]
 
-    download_df = yf.download(
-        tickers=tickers_to_download,
-        period="1d",
-        interval="5m",
-        group_by="ticker",
-        progress=False,
-        threads=True
+    download_df = call_with_retry(
+        lambda: yf.download(
+            tickers=tickers_to_download,
+            period="1d",
+            interval="5m",
+            group_by="ticker",
+            progress=False,
+            threads=True,
+        ),
+        label="stock universe batch download",
+        timeout=45.0,  # a ~210-ticker batch download legitimately takes longer than a single fetch
     )
 
     nifty_df = None
-    if isinstance(download_df.columns, pd.MultiIndex) and "^NSEI" in download_df.columns.levels[0]:
+    if download_df is not None and isinstance(download_df.columns, pd.MultiIndex) and "^NSEI" in download_df.columns.levels[0]:
         nifty_df = download_df["^NSEI"]
 
     return {
-        "download_df": download_df,
+        "download_df": download_df if download_df is not None else pd.DataFrame(),
         "nifty_df": nifty_df,
         "fundamentals_cache": load_all_fundamentals(),
         "dynamic_pillar_weights": get_active_pillar_weights(),
@@ -520,16 +620,7 @@ def fetch_all_stocks_data(oi_mult: float = 1.5) -> List[Dict[str, Any]]:
 def fetch_raw_index_universe() -> Dict[str, Any]:
     """Fetch index OHLCV + global cues + macro news ONCE per scan tick, shared across every
     strategy that targets an index — same no-duplicate-fetch discipline as the stock side."""
-    index_dfs: Dict[str, Optional[pd.DataFrame]] = {}
-    for name, ticker in INDEX_TICKERS.items():
-        try:
-            df = yf.download(ticker, period="1d", interval="5m", progress=False)
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            index_dfs[name] = df.dropna()
-        except Exception as e:
-            logger.warning(f"Index data fetch failed for {name} ({ticker}): {e}")
-            index_dfs[name] = None
+    index_dfs = fetch_index_ohlc_dict()
 
     global_cues_classified = classify_global_cues(fetch_global_cues())
     news_classification = classify_news_signal(fetch_market_news())
@@ -574,12 +665,25 @@ def score_index_universe(raw: Dict[str, Any], strategy: Dict[str, Any]) -> List[
     return results
 
 
+def _load_index_verdicts() -> Dict[str, Any]:
+    if USE_POSTGRES:
+        return pg_read_json("index_btst_verdicts", default={})
+    return read_json(INDEX_INTELLIGENCE_FILE, default={})
+
+
+def _save_index_verdicts(data: Dict[str, Any]) -> None:
+    if USE_POSTGRES:
+        pg_write_json("index_btst_verdicts", data)
+        return
+    atomic_write_json(INDEX_INTELLIGENCE_FILE, data)
+
+
 def was_index_intelligence_completed_today() -> bool:
     """Disk-backed freshness check (not an in-memory flag) — same reasoning as
     fundamentals' was_refresh_completed_today(): an in-memory flag resets on every process
     restart (e.g. --reload picking up a code change), which would silently re-trigger a
     same-day re-run instead of running once."""
-    data = read_json(INDEX_INTELLIGENCE_FILE, default={})
+    data = _load_index_verdicts()
     return data.get("_meta", {}).get("completed_date") == get_ist_now().strftime("%Y-%m-%d")
 
 
@@ -598,16 +702,7 @@ def run_index_btst_intelligence() -> Dict[str, Any]:
     persists each to the index verdict journal for later backtesting, and caches the combined
     result to disk so /api/indices/verdict can serve it without recomputing.
     """
-    index_dfs: Dict[str, Optional[pd.DataFrame]] = {}
-    for name, ticker in INDEX_TICKERS.items():
-        try:
-            df = yf.download(ticker, period="1d", interval="5m", progress=False)
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            index_dfs[name] = df.dropna()
-        except Exception as e:
-            logger.warning(f"[Index Intelligence] Data fetch failed for {name} ({ticker}): {e}")
-            index_dfs[name] = None
+    index_dfs = fetch_index_ohlc_dict()
 
     global_cues_classified = classify_global_cues(fetch_global_cues())
     news_classification = classify_news_signal(fetch_market_news())
@@ -618,7 +713,7 @@ def run_index_btst_intelligence() -> Dict[str, Any]:
     for index_name in INDEX_TICKERS:
         option_chain = None
         if index_name in OPTION_CHAIN_INDICES:
-            raw_chain = fetch_index_option_chain(index_name)
+            raw_chain = call_with_retry(lambda n=index_name: fetch_index_option_chain(n), label=f"option chain [{index_name}]")
             option_chain = get_nearest_expiry_chain(raw_chain) if raw_chain else None
 
         try:
@@ -645,14 +740,33 @@ def run_index_btst_intelligence() -> Dict[str, Any]:
             logger.warning(f"[Index Intelligence] Journal log failed for {index_name}: {e}")
 
     verdicts_output["_meta"] = {"completed_date": get_ist_now().strftime("%Y-%m-%d")}
-    atomic_write_json(INDEX_INTELLIGENCE_FILE, verdicts_output)
+    _save_index_verdicts(verdicts_output)
 
     summary = {k: v["verdict"] for k, v in verdicts_output["verdicts"].items()}
     logger.info(f"[Index Intelligence] Post-close verdict run complete: {summary}")
+
+    notif = log_notification(
+        notif_type="index_verdict",
+        title="Index BTST Intelligence Complete",
+        message=" · ".join(f"{k}: {v}" for k, v in summary.items()),
+        payload={"verdicts": summary},
+    )
+    ws_broadcast.broadcast_sync({"type": "notification", **notif})
+
     return verdicts_output
 
 
 def run_full_scan_pipeline() -> Dict[str, Any]:
+    """Serializing wrapper (Phase-1 audit finding #2) — the real work is in
+    _run_full_scan_pipeline_impl(). Without this, a manual `?nocache=true` request landing at
+    the same instant as the scheduler's own tick could run two full ~210-stock scans
+    concurrently. Every existing call site keeps calling this same name unchanged; the second
+    caller simply waits for the first scan to finish rather than running in parallel."""
+    with _cache_lock:
+        return _run_full_scan_pipeline_impl()
+
+
+def _run_full_scan_pipeline_impl() -> Dict[str, Any]:
     """
     Execute the full scan pipeline and update the persistent disk cache. The Default 5-Pillar
     strategy drives the main dashboard exactly as before strategies existed. Any OTHER active
@@ -770,6 +884,57 @@ def log_index_and_custom_strategy_signals(
             _log_and_maybe_paper_trade(idx_signal, strategy_id, vix_val, vix_regime, auto_paper)
 
 
+def _run_closing_lock_sequence(picks: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """The full closing-time lock sequence: news enrichment -> persist to trade history ->
+    VIX fetch -> per-strategy signal journal logging (+ optional auto-paper-trade). Passed into
+    closing_sequence.run_step_if_due() as its lock_picks callback — this is the SAME sequence
+    the old inline 3:30 PM lock block did (now triggered by the closing sequence's 3:40 PM step
+    instead, against CAS-confirmed picks), just no longer duplicated between an "open" branch
+    copy and a "closed" fallback copy."""
+    enrich_picks_with_news(picks)
+    lock_result = TradeHistoryManager.lock_btst_picks(picks)
+
+    vix_val, vix_regime = fetch_india_vix()
+    default_auto_paper = (get_strategy(DEFAULT_STRATEGY_ID) or {}).get("auto_paper_trade", False)
+    for stock in picks:
+        log_signal_entry(stock, vix_val, vix_regime)
+        if default_auto_paper:
+            execute_signal(stock, strategy_id=DEFAULT_STRATEGY_ID)
+    log_index_and_custom_strategy_signals(cache_store.get("index_data", []), cache_store.get("strategy_results", {}), vix_val, vix_regime)
+
+    locked_count = lock_result.get("locked_count", 0)
+    btst_n = sum(1 for p in picks if "BTST" in p.get("signal", ""))
+    stbt_n = sum(1 for p in picks if "STBT" in p.get("signal", ""))
+    notif = log_notification(
+        notif_type="lock_complete",
+        title="3:40 PM Lock Complete",
+        message=f"{locked_count} BTST/STBT pick(s) locked ({btst_n} BTST, {stbt_n} STBT).",
+        payload={"locked_count": locked_count, "btst_count": btst_n, "stbt_count": stbt_n},
+    )
+    ws_broadcast.broadcast_sync({"type": "notification", **notif})
+
+    return lock_result
+
+
+def _snapshot_ready_stocks(today_date: str) -> List[Dict[str, Any]]:
+    """
+    M8 audit fix: cache_store["data"] can still hold a PRIOR day's scan right after a restart
+    that happens between 3:14-3:40 PM before today's first scan has run —
+    background_scheduler_worker unconditionally restores the last persisted snapshot into
+    cache_store at startup with no date check (see its own docstring/comments). Without this
+    guard, closing_sequence's 3:14 PM SNAPSHOT step would freeze that stale data and the
+    remaining steps would lock it into trade history + the signal journal as if it were today's
+    real picks. cache_store["scan_summary"]["timestamp"] always carries the scan's own IST
+    wall-clock time (see run_full_scan_pipeline), independent of when it was loaded from disk,
+    so it's the right thing to check — not cache_store["timestamp"], which background_scheduler_
+    worker sets to time.time() (now) even when restoring an old snapshot from disk.
+    """
+    scan_summary = cache_store.get("scan_summary") or {}
+    if not scan_summary.get("timestamp", "").startswith(today_date):
+        return []
+    return cache_store.get("data") or []
+
+
 # -------------------------------------------------------------
 # AUTONOMOUS BACKGROUND SCHEDULER THREAD WORKER
 # -------------------------------------------------------------
@@ -784,67 +949,52 @@ def background_scheduler_worker():
         cache_store["timestamp"] = time.time()
         logger.info(f"Loaded persistent 5-Pillar snapshot ({saved_snapshot.get('timestamp')}) from disk.")
 
-    last_locked_date = None
-
     while True:
         try:
             sched_info = get_market_schedule_info()
             ist_now = get_ist_now()
             today_date = ist_now.strftime("%Y-%m-%d")
+            time_in_mins = ist_now.hour * 60 + ist_now.minute
 
             # Budget-capped universe news refresh (checked every tick, only does real work
             # when should_refresh_universe_news() says a pass is due — see news_provider.py).
             # Runs regardless of open/closed so its up-to-3 daily passes spread across the day.
             maybe_refresh_universe_news()
 
-            # Market Schedule Scanning & 3:30 PM Locking Engine.
+            # Market Schedule Scanning Engine. Regular scanning runs through 3:14 PM; from
+            # 3:14 PM the closing_sequence module's own snapshot -> CAS close -> scoring ->
+            # broadcast -> lock steps take over (see below) instead of continuing to scan.
             # (Prior-day prediction evaluation runs on its own dedicated thread —
             # see evaluation_scheduler_worker — targeted at the 9:15-9:17 AM window.)
             if sched_info["is_open"]:
                 logger.info(f"[{sched_info['mode']}] Running 5-Pillar background scanner pipeline...")
                 scan_res = run_full_scan_pipeline()
-
-                # Check if near 3:30 PM cut-off window (15:29 to 15:30) to lock final picks —
-                # no scanning happens after this.
-                if ist_now.hour == 15 and ist_now.minute >= 29 and last_locked_date != today_date:
-                    logger.info("3:30 PM Golden Window Reached! Final scanning & Auto-locking BTST picks...")
-                    btst_picks = [s for s in scan_res["stocks"] if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
-                    enrich_picks_with_news(btst_picks)
-                    lock_result = TradeHistoryManager.lock_btst_picks(btst_picks)
-
-                    vix_val, vix_regime = fetch_india_vix()
-                    default_auto_paper = (get_strategy(DEFAULT_STRATEGY_ID) or {}).get("auto_paper_trade", False)
-                    for stock in btst_picks:
-                        log_signal_entry(stock, vix_val, vix_regime)
-                        if default_auto_paper:
-                            execute_signal(stock, strategy_id=DEFAULT_STRATEGY_ID)
-                    log_index_and_custom_strategy_signals(scan_res["indices"], cache_store.get("strategy_results", {}), vix_val, vix_regime)
-
-                    last_locked_date = today_date
-                    logger.info(f"3:30 PM Pick Lock Complete: Locked {lock_result['locked_count']} BTST/STBT picks into Signal Journal.")
-
+                ws_broadcast.broadcast_sync({
+                    "type": "scan_update",
+                    "timestamp": scan_res.get("timestamp"),
+                    "total_scanned": scan_res.get("total_scanned"),
+                    "btst_count": scan_res.get("btst_count"),
+                    "stbt_count": scan_res.get("stbt_count"),
+                })
                 time.sleep(sched_info["sleep_seconds"])
 
             else:
-                # Market is CLOSED (past 3:30 PM or weekend) — no further scanning until 9:15 AM.
-                if ist_now.weekday() not in [5, 6] and ist_now.hour >= 15 and ist_now.minute >= 30 and last_locked_date != today_date:
-                    logger.info("Market Closed (Past 3:30 PM). Locking final BTST picks from cache...")
-                    current_stocks = cache_store.get("data") or []
-                    if current_stocks:
-                        btst_picks = [s for s in current_stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
-                        enrich_picks_with_news(btst_picks)
-                        lock_result = TradeHistoryManager.lock_btst_picks(btst_picks)
-
-                        vix_val, vix_regime = fetch_india_vix()
-                        default_auto_paper = (get_strategy(DEFAULT_STRATEGY_ID) or {}).get("auto_paper_trade", False)
-                        for stock in btst_picks:
-                            log_signal_entry(stock, vix_val, vix_regime)
-                            if default_auto_paper:
-                                execute_signal(stock, strategy_id=DEFAULT_STRATEGY_ID)
-                        log_index_and_custom_strategy_signals(cache_store.get("index_data", []), cache_store.get("strategy_results", {}), vix_val, vix_regime)
-
-                        last_locked_date = today_date
-                        logger.info(f"Post-3:30 PM Lock Complete: Locked {lock_result['locked_count']} picks into Signal Journal.")
+                # Not scanning right now — this covers both the 3:14-3:40 PM closing sequence
+                # window and genuinely closed hours. run_step_if_due() is a no-op outside its
+                # own trigger windows and idempotent per step, so calling it unconditionally
+                # here (rather than trying to distinguish the two cases) is deliberate — it's
+                # also what makes a late restart "catch up" automatically: every trigger time
+                # has already passed, so every remaining step runs back-to-back in one tick.
+                if ist_now.weekday() not in [5, 6]:
+                    step_ran = closing_sequence.run_step_if_due(
+                        time_in_mins=time_in_mins,
+                        today_date=today_date,
+                        get_current_stocks=lambda: _snapshot_ready_stocks(today_date),
+                        lock_picks=_run_closing_lock_sequence,
+                        broadcast=ws_broadcast.broadcast_sync,
+                    )
+                    if step_ran:
+                        logger.info(f"[Closing Sequence] Ran step: {step_ran}")
 
                 if cache_store["scan_summary"] is None:
                     logger.info("Initial off-market startup with empty cache. Running single snapshot scan...")
@@ -860,9 +1010,18 @@ def background_scheduler_worker():
                     logger.info("Running once-daily fundamentals cache refresh...")
                     refresh_fundamentals_cache(FO_STOCKS)
 
+                # Once-daily OI/delivery history refresh (M7 audit fix) — without this, the
+                # rolling history in nse_data_provider.py never advances past a symbol's very
+                # first-ever lookup; get_per_stock_oi_data/get_per_stock_delivery_data stay
+                # local-store-only and fast on every scan tick (fetch_online=False), same as
+                # fundamentals above.
+                if not was_nse_refresh_completed_today():
+                    logger.info("Running once-daily NSE OI/delivery cache refresh...")
+                    refresh_nse_data_cache(FO_STOCKS)
+
                 # Once-daily post-close Index BTST Intelligence run (default 3:45 PM IST,
                 # configurable via INDEX_INTELLIGENCE_RUN_HOUR/MINUTE env vars) — deliberately
-                # separate from the 3:30 PM stock lock above; see run_index_btst_intelligence()
+                # separate from the 3:40 PM stock lock above; see run_index_btst_intelligence()
                 # for why this is the only place the live option chain gets fetched.
                 index_intel_ready_mins = INDEX_INTELLIGENCE_RUN_HOUR * 60 + INDEX_INTELLIGENCE_RUN_MINUTE
                 if (ist_now.weekday() not in [5, 6] and (ist_now.hour * 60 + ist_now.minute) >= index_intel_ready_mins
@@ -893,7 +1052,7 @@ def evaluation_scheduler_worker():
     last_evaluated_date = None
     EVAL_WINDOW_START = 9 * 60 + 15   # 9:15 AM
     EVAL_WINDOW_END = 9 * 60 + 17     # 9:17 AM
-    CATCH_UP_CUTOFF = 15 * 60 + 30    # don't bother catching up past today's 3:30 PM lock
+    CATCH_UP_CUTOFF = 15 * 60 + 40    # don't bother catching up past today's 3:40 PM lock
 
     while True:
         try:
@@ -951,13 +1110,7 @@ def evaluation_scheduler_worker():
             time.sleep(15)
 
 
-@app.on_event("startup")
-def start_background_scheduler():
-    thread = threading.Thread(target=background_scheduler_worker, daemon=True)
-    thread.start()
 
-    eval_thread = threading.Thread(target=evaluation_scheduler_worker, daemon=True)
-    eval_thread.start()
 
 
 def sanitize_json_data(obj: Any) -> Any:
@@ -1047,6 +1200,32 @@ def enrich_picks_with_news(picks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return picks
 
 
+def _can_run_live_scan_inline() -> bool:
+    """
+    M12: a live full-universe scan (~209 stocks via yfinance) takes far longer than any
+    serverless function's execution timeout allows. Only the persistent host (`python app.py`,
+    running the real autonomous scheduler) should ever run one inline from a request handler —
+    a stateless deployment like Vercel must fall back to whatever's cached (locally, or shared
+    via Postgres if DATABASE_URL is configured) instead, even if that means honestly reporting
+    "not available yet" rather than hanging until the platform kills the request.
+    """
+    return not os.environ.get("VERCEL")
+
+
+def _no_scan_data_response(sched_info: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "cache_hit": False,
+        "scan_mode": sched_info["mode"],
+        "market_status": sched_info["status"],
+        "total_scanned": 0,
+        "stocks": [],
+        "indices": [],
+        "available": False,
+        "message": "No scan data available yet on this deployment — the autonomous scanner "
+                    "runs on a separate persistent host and hasn't synced any data here yet.",
+    }
+
+
 @app.get("/api/scan")
 def get_scan_results(
     filter_type: Optional[str] = Query(None, description="ALL, BTST, STBT, HIGH_VOL, WATCHLIST"),
@@ -1055,17 +1234,28 @@ def get_scan_results(
 ):
     sched_info = get_market_schedule_info()
 
-    if nocache and sched_info["is_open"]:
+    scan_response = None
+    if nocache and sched_info["is_open"] and _can_run_live_scan_inline():
         scan_response = run_full_scan_pipeline()
-    else:
-        if cache_store.get("scan_summary") is None:
-            cache_store["scan_summary"] = load_last_market_scan()
 
-        if cache_store.get("scan_summary") is not None:
-            scan_response = cache_store["scan_summary"].copy()
+    if scan_response is None:
+        with _cache_lock:
+            if cache_store.get("scan_summary") is None:
+                cache_store["scan_summary"] = load_last_market_scan()
+            cached = cache_store.get("scan_summary")
+            # deepcopy, not a shallow .copy() — the shallow copy left scan_response["stocks"]
+            # pointing at the SAME list/dicts as cache_store's, so annotate_bestest_5() below
+            # was mutating the shared cache on every single /api/scan read (Phase-1 audit
+            # finding #29). Held under _cache_lock so this snapshot can't be read mid-write
+            # by a concurrent scan.
+            scan_response = copy.deepcopy(cached) if cached is not None else None
+
+        if scan_response is not None:
             scan_response["cache_hit"] = True
-        else:
+        elif _can_run_live_scan_inline():
             scan_response = run_full_scan_pipeline()
+        else:
+            scan_response = _no_scan_data_response(sched_info)
 
     annotate_bestest_5(scan_response.get("stocks", []))
 
@@ -1126,12 +1316,11 @@ def get_news_section(
     search: Optional[str] = Query(None, description="Filter by symbol or company name substring")
 ):
     """
-    News for every F&O stock (the full option-chain universe, not just today's BTST/STBT
-    picks) — served ENTIRELY from the on-disk cache. This endpoint never calls CurrentsAPI;
-    the cache is refreshed by a background job on its own budget-capped schedule (see
-    news_provider.MAX_REFRESHES_PER_DAY), so any number of users hitting this endpoint costs
-    zero additional API calls.
+    Two-section News API:
+    1. Stocks Affected News (F&O universe)
+    2. Global Market & Macro News (with affected stock analysis)
     """
+    from news_provider import fetch_market_news
     all_news = get_all_cached_news()
     meta = get_universe_news_meta()
 
@@ -1144,18 +1333,23 @@ def get_news_section(
 
     rows.sort(key=lambda r: r.get("fetched_at", ""), reverse=True)
 
+    global_news = fetch_market_news(max_results=10) or []
+
     return sanitize_json_data({
         "cache_meta": meta,
         "total_universe_size": len(FO_STOCKS),
         "total_covered": len(all_news),
         "total_matched": len(rows),
-        "stocks": rows
+        "stocks": rows,
+        "global_news": global_news
     })
 
 
 @app.get("/api/news/{symbol}")
 def get_stock_news_detail(symbol: str):
     """Cached news for a single stock — same no-live-API-call guarantee as /api/news."""
+    if not is_valid_fo_stock(symbol):
+        raise HTTPException(status_code=404, detail=f"{symbol} is not in the tracked NSE F&O universe.")
     cached = get_cached_stock_news(symbol)
     if cached is None:
         raise HTTPException(status_code=404, detail=f"No cached news for {symbol} yet — it will appear after the next scheduled refresh.")
@@ -1175,26 +1369,37 @@ def get_index_signals():
     """
     index_data = cache_store.get("index_data")
     if index_data is None:
-        scan_res = run_full_scan_pipeline()
-        index_data = scan_res.get("indices", [])
+        if _can_run_live_scan_inline():
+            scan_res = run_full_scan_pipeline()
+            index_data = scan_res.get("indices", [])
+        else:
+            # M12: same reasoning as /api/scan — never run a live scan inline on a stateless
+            # deployment. cache_store["index_data"] is always empty on a fresh Vercel instance
+            # (in-memory, never persisted), so fall back to whatever was last synced.
+            cached = load_last_market_scan()
+            index_data = (cached or {}).get("indices", [])
     return sanitize_json_data({"indices": index_data, "tickers": INDEX_TICKERS})
 
 
 @app.get("/api/indices/verdict")
 def get_index_btst_verdict():
     """
-    The structured post-close Index BTST Intelligence verdict (Nifty 50 / Bank Nifty /
-    Sensex) — Verdict/Expected Open/Confidence/Primary Reason/Greek Outlook/Key Overnight
-    Catalysts/Invalidation Level/Highest Probability Trade per index, built once after close
-    by run_index_btst_intelligence() (see background_scheduler_worker). Reads the persisted
-    cache — never recomputes on request, since option-chain data is only ever fetched during
-    the dedicated post-close run, not on demand.
+    The structured post-close Index BTST Intelligence verdict (Nifty 50 / Bank Nifty / Sensex).
+    If cached data is missing, runs the intelligence pipeline on demand to generate and lock verdicts.
     """
-    data = read_json(INDEX_INTELLIGENCE_FILE, default=None)
-    if not data:
+    data = _load_index_verdicts()
+    if not data or not data.get("verdicts"):
+        try:
+            logger.info("Index BTST Intelligence cache missing — generating and locking post-close verdicts on demand...")
+            run_index_btst_intelligence()
+            data = _load_index_verdicts()
+        except Exception as e:
+            logger.warning(f"On-demand index intelligence generation failed: {e}")
+
+    if not data or not data.get("verdicts"):
         return sanitize_json_data({
             "available": False,
-            "message": "Index BTST Intelligence hasn't run yet today — it runs once, shortly after market close.",
+            "message": "Index BTST Intelligence is populating. Refresh in a few seconds.",
         })
     return sanitize_json_data({"available": True, **data})
 
@@ -1207,7 +1412,7 @@ def get_index_btst_verdict_performance(index_name: Optional[str] = Query(None)):
     return sanitize_json_data(get_index_verdict_metrics_summary(index_name))
 
 
-@app.post("/api/indices/verdict/run")
+@app.post("/api/indices/verdict/run", dependencies=[Depends(require_api_key)])
 def run_index_btst_intelligence_now():
     """Manually trigger the post-close Index BTST Intelligence run — same manual-override
     pattern as /api/lock_picks and /api/evaluate_picks, for testing or an on-demand refresh
@@ -1229,6 +1434,37 @@ def api_list_strategies(active_only: bool = Query(False)):
     return sanitize_json_data({"strategies": list_strategies(active_only=active_only)})
 
 
+class ClarifyTextRequest(BaseModel):
+    strategy_text: str
+
+
+@app.post("/api/clarify_text")
+def api_clarify_text(payload: ClarifyTextRequest):
+    """Converts natural language strategy text into structured JSON schema via ai_clarifier.py."""
+    import ai_clarifier
+    try:
+        res = ai_clarifier.clarify_strategy_text(payload.strategy_text)
+        return sanitize_json_data(res)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/btst/macro_guard")
+def api_btst_macro_guard():
+    """Returns the current S&P 500 futures and India VIX macro guard status from btst_engine.py."""
+    import btst_engine
+    return sanitize_json_data(btst_engine.check_macro_guard())
+
+
+@app.get("/api/strategies/clarification_budget")
+def api_clarification_budget_status():
+    """Today's remaining Claude clarification-call budget. MUST stay registered before
+    GET /api/strategies/{strategy_id} — FastAPI matches routes in registration order, so a
+    literal path segment here would otherwise be swallowed by the {strategy_id} path
+    parameter route matching "clarification_budget" as if it were an id."""
+    return sanitize_json_data(get_budget_status())
+
+
 @app.get("/api/strategies/{strategy_id}")
 def api_get_strategy(strategy_id: str):
     strategy = get_strategy(strategy_id)
@@ -1237,20 +1473,36 @@ def api_get_strategy(strategy_id: str):
     return sanitize_json_data(strategy)
 
 
-@app.post("/api/strategies")
+@app.post("/api/strategies", dependencies=[Depends(require_api_key)])
 def api_create_strategy(payload: StrategyCreateRequest):
+    """Creates an unconfirmed draft — the AI clarification of what this exact configuration
+    does is generated here and returned for the user to review. The strategy stays inactive
+    (is_active=False) until POST /api/strategies/{id}/confirm."""
     try:
-        strategy = sm.create_strategy(**payload.model_dump())
-    except ValueError as e:
+        strategy = sm.create_strategy_draft(**payload.model_dump())
+    except (ValueError, ClarificationUnavailableError) as e:
         raise HTTPException(status_code=400, detail=str(e))
     return sanitize_json_data(strategy)
 
 
-@app.put("/api/strategies/{strategy_id}")
-def api_update_strategy(strategy_id: str, payload: StrategyUpdateRequest):
-    fields = {k: v for k, v in payload.model_dump().items() if v is not None}
+@app.post("/api/strategies/{strategy_id}/resubmit_clarification", dependencies=[Depends(require_api_key)])
+def api_resubmit_clarification(strategy_id: str, payload: ResubmitClarificationRequest):
+    """Edit-and-resend loop: the user said the clarification was wrong — re-sends the
+    original config plus their correction to Claude for a revised summary."""
     try:
-        strategy = sm.update_strategy(strategy_id, **fields)
+        strategy = sm.resubmit_clarification(strategy_id, payload.correction_note)
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except (ValueError, ClarificationUnavailableError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return sanitize_json_data(strategy)
+
+
+@app.post("/api/strategies/{strategy_id}/confirm", dependencies=[Depends(require_api_key)])
+def api_confirm_strategy(strategy_id: str):
+    """User confirmed the clarification matches what they meant — activates the strategy."""
+    try:
+        strategy = sm.confirm_strategy(strategy_id)
     except KeyError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except ValueError as e:
@@ -1258,7 +1510,23 @@ def api_update_strategy(strategy_id: str, payload: StrategyUpdateRequest):
     return sanitize_json_data(strategy)
 
 
-@app.delete("/api/strategies/{strategy_id}")
+@app.put("/api/strategies/{strategy_id}", dependencies=[Depends(require_api_key)])
+def api_update_strategy(strategy_id: str, payload: StrategyUpdateRequest):
+    """A real change to scope/pillars/weight-bar/gates resets confirmation and re-clarifies
+    automatically (see strategy_manager.update_strategy) — the response's `clarification` field
+    tells the caller whether that happened. Setting is_active=True is only honored if the
+    strategy is (still) confirmed after any such change."""
+    fields = {k: v for k, v in payload.model_dump().items() if v is not None}
+    try:
+        strategy = sm.update_strategy(strategy_id, **fields)
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except (ValueError, ClarificationUnavailableError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return sanitize_json_data(strategy)
+
+
+@app.delete("/api/strategies/{strategy_id}", dependencies=[Depends(require_api_key)])
 def api_delete_strategy(strategy_id: str):
     try:
         sm.delete_strategy(strategy_id)
@@ -1301,7 +1569,7 @@ def api_strategy_signals(strategy_id: str):
     return sanitize_json_data({"strategy_id": strategy_id, "stocks": stocks, "indices": indices})
 
 
-@app.post("/api/strategies/{strategy_id}/execute")
+@app.post("/api/strategies/{strategy_id}/execute", dependencies=[Depends(require_api_key)])
 def api_execute_strategy_signals(strategy_id: str):
     """
     Manually paper-execute this strategy's CURRENT BTST/STBT signals right now (in addition
@@ -1339,7 +1607,37 @@ def api_paper_trades(strategy_id: Optional[str] = Query(None), limit: int = Quer
     return sanitize_json_data({"trades": get_paper_trades(strategy_id=strategy_id, limit=limit)})
 
 
-@app.post("/api/lock_picks")
+@app.get("/api/closing_sequence/status")
+def get_closing_sequence_status():
+    """Today's progress through the 3:14-3:40 PM closing sequence (snapshot -> CAS close ->
+    scoring -> broadcast -> lock) — which steps have completed, how many candidates were
+    snapshotted, and the lock result once available."""
+    today_date = get_ist_now().strftime("%Y-%m-%d")
+    return sanitize_json_data(closing_sequence.get_today_state(today_date))
+
+
+# -------------------------------------------------------------
+# NOTIFICATIONS — history/scrollback for the bell (live push happens over /ws/live, see M3)
+# -------------------------------------------------------------
+@app.get("/api/notifications")
+def api_list_notifications(limit: int = Query(50, ge=1, le=200), before_id: Optional[str] = Query(None), unread_only: bool = Query(False)):
+    return sanitize_json_data(get_notifications(limit=limit, before_id=before_id, unread_only=unread_only))
+
+
+@app.patch("/api/notifications/{notification_id}/read")
+def api_mark_notification_read(notification_id: str):
+    if not mark_notification_read(notification_id):
+        raise HTTPException(status_code=404, detail=f"Notification {notification_id} not found.")
+    return {"status": "read", "id": notification_id}
+
+
+@app.post("/api/notifications/read_all", dependencies=[Depends(require_api_key)])
+def api_mark_all_notifications_read():
+    mark_all_notifications_read()
+    return {"status": "all_read"}
+
+
+@app.post("/api/lock_picks", dependencies=[Depends(require_api_key)])
 def lock_todays_picks():
     stocks = cache_store.get("data", [])
     if not stocks:
@@ -1355,7 +1653,7 @@ def lock_todays_picks():
     }
 
 
-@app.post("/api/evaluate_picks")
+@app.post("/api/evaluate_picks", dependencies=[Depends(require_api_key)])
 def evaluate_next_day_picks():
     result = TradeHistoryManager.evaluate_pending_trades()
     return {
@@ -1365,12 +1663,171 @@ def evaluate_next_day_picks():
     }
 
 
+INDEX_TICKER_MAP = {
+    "NIFTY": "^NSEI",
+    "NIFTY50": "^NSEI",
+    "NIFTY 50": "^NSEI",
+    "^NSEI": "^NSEI",
+    "BANKNIFTY": "^NSEBANK",
+    "BANK NIFTY": "^NSEBANK",
+    "^NSEBANK": "^NSEBANK",
+    "SENSEX": "^BSESN",
+    "^BSESN": "^BSESN",
+}
+
+INDEX_DISPLAY_NAMES = {
+    "^NSEI": "Nifty 50",
+    "^NSEBANK": "Bank Nifty",
+    "^BSESN": "Sensex",
+}
+
+
+@app.get("/api/chart/{symbol}")
+def get_chart_data(
+    symbol: str,
+    interval: str = Query("5m", description="1m, 3m, 5m, 15m, 1h, 4h, 1d")
+):
+    raw_sym = symbol.strip().upper()
+    is_index = False
+    ticker = None
+    display_name = raw_sym
+
+    if raw_sym in INDEX_TICKER_MAP:
+        is_index = True
+        ticker = INDEX_TICKER_MAP[raw_sym]
+        display_name = INDEX_DISPLAY_NAMES.get(ticker, raw_sym)
+    else:
+        ticker = raw_sym if raw_sym.endswith(".NS") else f"{raw_sym}.NS"
+        display_name = raw_sym.replace(".NS", "")
+        if not is_valid_fo_stock(ticker):
+            raise HTTPException(status_code=404, detail=f"{raw_sym} is not in the tracked NSE F&O universe.")
+
+    # Timeframe mapping for yfinance
+    interval_lower = interval.lower()
+    yf_interval = "5m"
+    yf_period = "5d"
+
+    if interval_lower == "1m":
+        yf_interval = "1m"
+        yf_period = "7d"
+    elif interval_lower in ["2m", "3m"]:
+        yf_interval = "2m"
+        yf_period = "7d"
+    elif interval_lower == "5m":
+        yf_interval = "5m"
+        yf_period = "7d"
+    elif interval_lower == "15m":
+        yf_interval = "15m"
+        yf_period = "1mo"
+    elif interval_lower in ["1h", "60m"]:
+        yf_interval = "60m"
+        yf_period = "3mo"
+    elif interval_lower in ["4h"]:
+        yf_interval = "60m"
+        yf_period = "6mo"
+    elif interval_lower in ["1d", "1wk"]:
+        yf_interval = "1d"
+        yf_period = "1y"
+
+    try:
+        df = call_with_retry(
+            lambda: yf.download(ticker, period=yf_period, interval=yf_interval, progress=False),
+            label=f"get_chart_data [{ticker} {yf_interval}]",
+        )
+        if df is None or df.empty:
+            raise HTTPException(status_code=404, detail=f"No candle data returned for {display_name}.")
+
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        df = df.dropna()
+
+        candles = []
+        recent_df = df.reset_index()
+        for _, row in recent_df.iterrows():
+            row_ts = row['Datetime'] if 'Datetime' in row else (row['Date'] if 'Date' in row else row.name)
+            try:
+                time_str = row_ts.strftime("%Y-%m-%d %H:%M") if yf_interval == "1d" else row_ts.strftime("%H:%M")
+                unix_ts = int(row_ts.timestamp())
+            except Exception:
+                time_str = str(row_ts)[:16]
+                unix_ts = None
+            
+            candles.append({
+                "ts": unix_ts,
+                "time": time_str,
+                "open": round(float(row['Open']), 2),
+                "high": round(float(row['High']), 2),
+                "low": round(float(row['Low']), 2),
+                "close": round(float(row['Close']), 2),
+                "volume": int(row['Volume']) if 'Volume' in row and not pd.isna(row['Volume']) else 0
+            })
+
+        latest_price = candles[-1]["close"] if candles else 100.0
+
+        # Check setups from active strategies toggled on for this scope
+        active_strategies = list_strategies(active_only=True)
+        setups = []
+
+        for strat in active_strategies:
+            toggles = strat.get("scope_toggles", {})
+            enabled = toggles.get("indices", True) if is_index else toggles.get("stocks", True)
+            if not enabled:
+                continue
+
+            # Determine setup parameters for overlay
+            setup_type = "BTST_BUY"  # Default setup direction
+            tp_pct = 1.5
+            sl_pct = 0.75
+
+            tp_price = round(latest_price * (1.0 + tp_pct / 100.0), 2)
+            sl_price = round(latest_price * (1.0 - sl_pct / 100.0), 2)
+            zone_low = round(latest_price * 0.998, 2)
+            zone_high = round(latest_price * 1.002, 2)
+
+            setups.append({
+                "strategy_id": strat["id"],
+                "strategy_name": strat["name"],
+                "scope": "INDICES" if is_index else "STOCKS",
+                "symbol": display_name,
+                "signal": setup_type,
+                "entry_price": latest_price,
+                "zone_low": zone_low,
+                "zone_high": zone_high,
+                "tp_price": tp_price,
+                "sl_price": sl_price,
+                "tp_pct": tp_pct,
+                "sl_pct": sl_pct,
+                "timestamp": datetime.now(timezone.utc).isoformat()
+            })
+
+        return sanitize_json_data({
+            "symbol": display_name,
+            "ticker": ticker,
+            "is_index": is_index,
+            "interval": interval,
+            "latest_price": latest_price,
+            "candles": candles,
+            "setups": setups
+        })
+    except Exception as e:
+        logger.warning(f"Error fetching chart data for {symbol}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/stock/{symbol}")
 def get_stock_detail(symbol: str):
     formatted_ticker = symbol.upper() if symbol.endswith(".NS") else f"{symbol.upper()}.NS"
+    # Whitelist check (Phase-1 audit finding #19) — every other entry point into the scoring
+    # engine enforces the F&O whitelist; this path-parameter route didn't, so an arbitrary
+    # caller-chosen ticker string was passed straight to yfinance unchecked.
+    if not is_valid_fo_stock(formatted_ticker):
+        raise HTTPException(status_code=404, detail=f"{symbol} is not in the tracked NSE F&O universe.")
     try:
-        data = yf.download(formatted_ticker, period="1d", interval="5m", progress=False)
-        if data.empty:
+        data = call_with_retry(
+            lambda: yf.download(formatted_ticker, period="1d", interval="5m", progress=False),
+            label=f"get_stock_detail [{formatted_ticker}]",
+        )
+        if data is None or data.empty:
             raise HTTPException(status_code=404, detail="Stock ticker data not found.")
 
         # yfinance returns MultiIndex columns (e.g. ('Close', 'AXISBANK.NS')) even for a
@@ -1381,7 +1838,7 @@ def get_stock_detail(symbol: str):
 
         data = data.dropna()
         nifty_df = cache_store.get("nifty_df", None)
-        
+
         processed = evaluate_5_pillar_matrix(
             symbol=formatted_ticker,
             df_stock=data,
@@ -1391,21 +1848,37 @@ def get_stock_detail(symbol: str):
             fundamental_data=get_fundamental_data(formatted_ticker),
             pillar_weight_multipliers=get_active_pillar_weights()
         )
-        
-        recent_df = data.tail(10).copy()
-        recent_df.reset_index(inplace=True)
-        
+
+        # Fetched SEPARATELY from the 1-day frame just scored above (M6) — evaluate_5_pillar_matrix's
+        # range_position_pct/volume_spike are computed relative to TODAY's session only, so
+        # widening the period on that same frame would silently change what it scores against.
+        # This second fetch exists purely to give the chart real multi-day history to show.
+        chart_data = call_with_retry(
+            lambda: yf.download(formatted_ticker, period="5d", interval="5m", progress=False),
+            label=f"get_stock_detail chart history [{formatted_ticker}]",
+        )
+        if chart_data is None or chart_data.empty:
+            chart_data = data  # fall back to the 1-day frame rather than an empty chart
+        if isinstance(chart_data.columns, pd.MultiIndex):
+            chart_data.columns = chart_data.columns.get_level_values(0)
+        chart_data = chart_data.dropna()
+
+        recent_df = chart_data.reset_index()
+
         candles = []
         for _, row in recent_df.iterrows():
             # Use strftime on the actual timestamp rather than slicing its string form — the
             # index is timezone-aware (+05:30 IST suffix), which made string-slicing grab the
             # offset instead of the time (e.g. "00+05" instead of "15:25").
-            ts = row['Datetime'] if 'Datetime' in row else row.name
+            row_ts = row['Datetime'] if 'Datetime' in row else row.name
             try:
-                time_str = ts.strftime("%H:%M")
+                time_str = row_ts.strftime("%H:%M")
+                unix_ts = int(row_ts.timestamp())
             except AttributeError:
-                time_str = str(ts)[-8:-3] if len(str(ts)) >= 8 else str(ts)
+                time_str = str(row_ts)[-8:-3] if len(str(row_ts)) >= 8 else str(row_ts)
+                unix_ts = None
             candles.append({
+                "ts": unix_ts,
                 "time": time_str,
                 "open": round(float(row['Open']), 2),
                 "high": round(float(row['High']), 2),
@@ -1422,6 +1895,21 @@ def get_stock_detail(symbol: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.websocket("/ws/live")
+async def ws_live(websocket: WebSocket):
+    """Live push channel — closing-sequence step progress (see closing_sequence.py) and scan
+    completion events. Connection bookkeeping only; the actual message content is decided by
+    whatever calls ws_broadcast.broadcast()/broadcast_sync(), not by this endpoint."""
+    await ws_broadcast.register(websocket)
+    try:
+        while True:
+            await websocket.receive_text()  # client sends nothing meaningful yet; keeps the socket alive
+    except WebSocketDisconnect:
+        pass
+    finally:
+        ws_broadcast.unregister(websocket)
+
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
@@ -1431,4 +1919,56 @@ def serve_dashboard():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+    import signal
+    import sys
+    import os
+
+    # Native Windows Console Control Handler — intercepts Ctrl+C at OS Kernel level
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            import ctypes.wintypes
+
+            PHANDLER_ROUTINE = ctypes.WINFUNCTYPE(ctypes.wintypes.BOOL, ctypes.wintypes.DWORD)
+
+            def _win_ctrl_handler(ctrl_type):
+                if ctrl_type in (0, 1, 2, 5, 6):  # CTRL_C_EVENT, CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT
+                    print("\n[!] Ctrl+C received via Windows Kernel — shutting down immediately.", flush=True)
+                    shutdown_event.set()
+                    os._exit(0)
+                return False
+
+            _win_handler_ref = PHANDLER_ROUTINE(_win_ctrl_handler)
+            ctypes.windll.kernel32.SetConsoleCtrlHandler(_win_handler_ref, True)
+        except Exception:
+            pass
+
+    def _force_exit(sig, frame):
+        print("\n[!] Shutting down QuantHorizon Server immediately...", flush=True)
+        shutdown_event.set()
+        os._exit(0)
+
+    try:
+        signal.signal(signal.SIGINT, _force_exit)
+        signal.signal(signal.SIGTERM, _force_exit)
+    except Exception:
+        pass
+
+    print("\n" + "=" * 64)
+    print("  [+] AlgoTrader QuantHorizon Dashboard is Running!")
+    print("  [>] Open Dashboard Link: http://127.0.0.1:8000")
+    print("  [>] Local Server: http://localhost:8000")
+    print("  [>] Press CTRL+C in terminal to stop server immediately")
+    print("=" * 64 + "\n", flush=True)
+
+    try:
+        uvicorn.run(
+            app,
+            host="127.0.0.1",
+            port=8000,
+            log_level="info"
+        )
+    except (KeyboardInterrupt, SystemExit):
+        print("\n[!] Server stopped cleanly by user.", flush=True)
+        shutdown_event.set()
+        os._exit(0)

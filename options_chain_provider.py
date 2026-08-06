@@ -17,6 +17,8 @@ import logging
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
+from net_utils import call_with_retry
+
 logger = logging.getLogger("OptionsChainProvider")
 
 _NSE_LIVE_AVAILABLE = False
@@ -54,12 +56,7 @@ def fetch_index_option_chain(index_name: str) -> Optional[Dict[str, Any]]:
     if client is None:
         return None
 
-    try:
-        raw = client.index_option_chain(nse_symbol)
-    except Exception as e:
-        logger.warning(f"[{index_name}] Option chain fetch failed: {e}")
-        return None
-
+    raw = call_with_retry(lambda: client.index_option_chain(nse_symbol), label=f"option chain [{index_name}]", timeout=15.0)
     records = (raw or {}).get("records", {})
     underlying_value = records.get("underlyingValue")
     raw_rows = records.get("data", [])
