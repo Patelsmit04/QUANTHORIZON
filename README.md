@@ -98,6 +98,19 @@ automatically on launch and runs the scan/lock/evaluate schedule described above
 long as the process is running — leave it running through market hours for it to actually
 scan, lock, and grade picks on schedule.
 
+> **Deployment note (2026 audit finding):** this scheduler is implemented as plain OS
+> `daemon` threads started on process startup, not as externally-triggered jobs. That
+> requires a **persistent host** — `python app.py` kept running on a VM / always-on
+> dyno / bare-metal box through market hours. `vercel.json` in this repo deploys the app
+> as a serverless function; serverless instances have no process that persists between
+> requests, so the 3:14–3:40 PM closing sequence, the 5-min/1-min scan loop, and every
+> "survives restarts" guarantee described above **do not run** under that deployment as
+> currently configured. If you deploy to Vercel (or any other serverless platform), the
+> dashboard/API will serve whatever was last written to disk, but nothing will actually
+> scan, lock, or evaluate on schedule — run it on a persistent host instead, or adapt the
+> scheduler to externally-triggered endpoints (e.g. platform cron hitting a tick endpoint)
+> before relying on serverless for the autonomous behavior.
+
 On first run, `data/` is created automatically to hold:
 - `trade_history.json`, `signal_journal.db` — locked picks and graded outcomes (journal now
   tracks a `strategy_id` per signal, so each strategy's performance is queryable separately;
@@ -198,8 +211,18 @@ static/                       Dashboard (HTML/CSS/JS)
 | `POST /api/lock_picks` | Manually lock the current picks |
 | `POST /api/evaluate_picks` | Manually run the next-day gap evaluation |
 
+Every `POST`/`PUT`/`DELETE` endpoint above requires the `X-API-Key` header (see
+`QUANTHORIZON_API_KEY` below) if that env var is set. All `GET` endpoints stay fully open,
+unauthenticated, exactly as before.
+
 ## Notes
 
+- **Authentication (2026 audit finding):** every mutating endpoint used to be callable by
+  anyone with the URL. Set `QUANTHORIZON_API_KEY` in `.env` to require an `X-API-Key: <key>`
+  header on all of them — the dashboard's own UI will prompt for this key the first time you
+  try to change anything (🔑 button in the header) and remembers it in your browser's
+  `localStorage` afterward. Leave it unset to keep the previous fully-open behavior (a startup
+  log warning calls this out explicitly so it's never silently insecure).
 - If `CURRENTS_API_KEY` isn't set, the app still runs — news gates and the News section
   just show `DATA_UNAVAILABLE`/empty state instead of failing.
 - The news refresh is hard-capped at 3 full passes/day to stay within CurrentsAPI's free-tier

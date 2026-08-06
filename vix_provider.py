@@ -8,16 +8,20 @@ Fetches live India VIX benchmark and classifies market volatility regime:
 """
 
 import logging
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Optional, Tuple
 import yfinance as yf
 
 from net_utils import call_with_retry
 
 logger = logging.getLogger("IndiaVIXProvider")
 
-def fetch_india_vix() -> Tuple[float, str]:
+def fetch_india_vix() -> Tuple[Optional[float], str]:
     """
     Fetch current India VIX index value and return (vix_value, regime_name).
+    Returns (None, "UNAVAILABLE") if every ticker fails after retrying — never a fabricated
+    reading. This journal's downstream consumers (walk_forward_validator's pillar-weight
+    training in particular) need to be able to tell "we don't know" apart from a real 15.0
+    NORMAL print; the two used to be indistinguishable.
     """
     tickers = ["^INDIAVIX", "INDIAVIX.NS"]
     for ticker in tickers:
@@ -41,9 +45,8 @@ def fetch_india_vix() -> Tuple[float, str]:
         except Exception as e:
             logger.warning(f"Failed to fetch VIX via {ticker}: {e}")
 
-    # Fallback to default NORMAL regime if VIX feed is unreachable
-    logger.warning("India VIX feed unavailable — defaulting to 15.0 (NORMAL)")
-    return 15.0, "NORMAL"
+    logger.warning("India VIX feed unavailable after retrying all tickers — reporting UNAVAILABLE.")
+    return None, "UNAVAILABLE"
 
 
 def classify_vix_regime(vix_value: float) -> str:

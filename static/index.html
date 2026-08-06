@@ -110,19 +110,19 @@
                     <span>CSV</span>
                 </button>
 
+                <!-- API key (M9 audit fix) — required by the backend on mutating requests
+                     (strategy CRUD, lock/evaluate picks, execute, notifications) whenever
+                     QUANTHORIZON_API_KEY is configured server-side; stored in localStorage. -->
+                <button id="apiKeyBtn" class="btn-icon" title="Set API key (for creating/editing strategies, locking picks, etc.)" aria-label="Set API key">
+                    <i class="fa-solid fa-key"></i>
+                </button>
+
                 <!-- Notifications Bell — closing-sequence lock events + index verdicts, pushed live over /ws/live -->
                 <div class="notif-bell-wrap">
                     <button id="notifBell" class="btn-icon" title="Notifications" aria-label="Notifications">
                         <i class="fa-solid fa-bell"></i>
                         <span class="notif-badge hidden" id="notifBadge">0</span>
                     </button>
-                    <div class="notif-panel hidden glass-panel" id="notifPanel">
-                        <div class="notif-panel-header">
-                            <span>NOTIFICATIONS</span>
-                            <button class="notif-mark-all-btn" id="notifMarkAllBtn">Mark all read</button>
-                        </div>
-                        <div id="notifList"><div class="notif-empty">No notifications yet.</div></div>
-                    </div>
                 </div>
             </div>
 
@@ -130,6 +130,20 @@
             <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
                 <i class="fa-solid fa-bars"></i>
             </button>
+        </div>
+
+        <!-- Notification panel (M9 audit fix): a fixed-position overlay, NOT nested inside
+             .header-actions/.notif-bell-wrap — that subtree is display:none below 900px, which
+             made this panel structurally unreachable from the mobile bell (#notifBellMobile)
+             even though its click handler removed the "hidden" class and marked everything
+             read server-side. Both the desktop bell and the mobile drawer bell now open this
+             SAME element, positioned relative to the viewport instead of a hidden ancestor. -->
+        <div class="notif-panel hidden glass-panel" id="notifPanel">
+            <div class="notif-panel-header">
+                <span>NOTIFICATIONS</span>
+                <button class="notif-mark-all-btn" id="notifMarkAllBtn">Mark all read</button>
+            </div>
+            <div id="notifList"><div class="notif-empty">No notifications yet.</div></div>
         </div>
 
         <!-- Mobile Menu Drawer -->
@@ -191,6 +205,9 @@
                     <button id="notifBellMobile" class="btn btn-pill btn-secondary btn-full-width">
                         <i class="fa-solid fa-bell"></i> NOTIFICATIONS
                         <span class="notif-badge hidden" id="notifBadgeMobile">0</span>
+                    </button>
+                    <button id="apiKeyBtnMobile" class="btn btn-pill btn-secondary btn-full-width">
+                        <i class="fa-solid fa-key"></i> SET API KEY
                     </button>
                 </div>
             </div>
@@ -532,6 +549,45 @@
                         <i class="fa-solid fa-floppy-disk"></i> SAVE STRATEGY
                     </button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Clarification Review Modal (M9 audit fix) — the backend has required this step
+         since M4 (a strategy cannot activate without it), but nothing in the frontend ever
+         called the clarification endpoints; creating/editing a strategy silently left it
+         stuck as an unconfirmed, permanently inactive draft with no way to confirm it. -->
+    <div id="clarificationModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h2><i class="fa-solid fa-robot text-gold"></i> Confirm What This Strategy Does</h2>
+                </div>
+                <button id="closeClarificationBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="form-hint" style="margin-bottom:14px;">
+                    Before this strategy can go active, review the AI's plain-language summary of
+                    exactly what it will do. It cannot score or trade anything until you confirm this.
+                </p>
+                <div id="clarificationSummaryBody"></div>
+
+                <div id="clarificationCorrectionGroup" class="form-group hidden" style="margin-top:14px;">
+                    <label class="form-label">WHAT'S WRONG?</label>
+                    <textarea id="clarificationCorrectionNote" class="form-textarea" placeholder="Describe what the summary got wrong or what you actually meant — this gets re-sent for a corrected summary."></textarea>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:16px;">
+                    <button id="clarificationConfirmBtn" class="btn btn-pill btn-primary" style="flex:1;justify-content:center;">
+                        <i class="fa-solid fa-check"></i> LOOKS RIGHT — ACTIVATE
+                    </button>
+                    <button id="clarificationRejectBtn" class="btn btn-pill btn-secondary" style="flex:1;justify-content:center;">
+                        <i class="fa-solid fa-xmark"></i> SOMETHING'S WRONG
+                    </button>
+                    <button id="clarificationResubmitBtn" class="btn btn-pill btn-primary hidden" style="flex:1;justify-content:center;">
+                        <i class="fa-solid fa-paper-plane"></i> RESUBMIT
+                    </button>
+                </div>
             </div>
         </div>
     </div>

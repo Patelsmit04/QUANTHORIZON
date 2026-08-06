@@ -26,7 +26,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
-from json_utils import atomic_write_json, read_json
+from json_utils import atomic_write_json, read_json, json_file_lock
 
 logger = logging.getLogger("ExecutionProvider")
 
@@ -115,10 +115,14 @@ def execute_signal(
         "notes": "Simulated order — no real broker connected (see execution_provider.py).",
     }
 
-    trades = _load_trades()
-    trades.append(trade_record)
-    trades = trades[-2000:]  # bounded history
-    _save_trades(trades)
+    # M8 audit fix: the 3:40 PM auto-lock thread and a manual POST /api/strategies/{id}/execute
+    # can both reach this at once — without a lock around the whole load-append-save cycle,
+    # whichever writes last would silently discard the other's trade record.
+    with json_file_lock(PAPER_TRADES_FILE):
+        trades = _load_trades()
+        trades.append(trade_record)
+        trades = trades[-2000:]  # bounded history
+        _save_trades(trades)
 
     logger.info(f"[PAPER] {trade_record['order_id']}: BUY {instrument_type} on {symbol} qty={quantity} (strategy={strategy_id})")
     return {"executed": True, **trade_record}

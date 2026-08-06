@@ -52,7 +52,11 @@ async def broadcast(message: Dict[str, Any]) -> None:
         return
     payload = json.dumps(message, default=str)
     dead = []
-    for ws in _active_connections:
+    # M8 audit fix: iterate a snapshot, not the live list. `await ws.send_text(...)` yields
+    # control back to the event loop, where another coroutine (e.g. a client disconnecting)
+    # can call unregister() and mutate _active_connections mid-loop — iterating the list
+    # directly could then skip the connection that shifted into the just-removed index.
+    for ws in list(_active_connections):
         try:
             await ws.send_text(payload)
         except Exception:

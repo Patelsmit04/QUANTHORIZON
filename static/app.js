@@ -2,6 +2,58 @@
  * BTST SCANNER — DASHBOARD JAVASCRIPT APPLICATION ENGINE (AUTONOMOUS BACKGROUND SCANNER)
  */
 
+// M9 audit fix: native fetch() has no timeout, and nothing in this file attached one to any
+// of its ~18 call sites — a hung backend left "SCANNING..." (or an equivalent stuck state) up
+// indefinitely with no visible error. apiFetch() is a drop-in fetch() replacement used
+// everywhere below: it aborts after DEFAULT_FETCH_TIMEOUT_MS (override per-call via
+// options.timeoutMs) and attaches the stored API key header automatically, since mutating
+// endpoints (strategy CRUD, lock/evaluate picks, execute, notifications) now require one —
+// see promptForApiKey() below. Uses window.fetch explicitly so this definition itself isn't
+// caught by the fetch->apiFetch rename applied to every call site in this file.
+const DEFAULT_FETCH_TIMEOUT_MS = 15000;
+const API_KEY_STORAGE_KEY = "quanthorizon_api_key";
+
+function getStoredApiKey() {
+    try {
+        return localStorage.getItem(API_KEY_STORAGE_KEY) || "";
+    } catch (e) {
+        return ""; // localStorage unavailable (e.g. private browsing) — key just won't persist
+    }
+}
+
+function setStoredApiKey(key) {
+    try {
+        if (key) localStorage.setItem(API_KEY_STORAGE_KEY, key);
+        else localStorage.removeItem(API_KEY_STORAGE_KEY);
+    } catch (e) { /* see getStoredApiKey */ }
+}
+
+function promptForApiKey() {
+    const current = getStoredApiKey();
+    const next = window.prompt(
+        "QuantHorizon API key — required to create/edit/delete strategies, lock or evaluate " +
+        "picks, and other actions that change data. Leave blank if this deployment doesn't " +
+        "require one.",
+        current
+    );
+    if (next === null) return; // cancelled
+    setStoredApiKey(next.trim());
+}
+
+async function apiFetch(url, options = {}) {
+    const { timeoutMs, headers, ...rest } = options;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs || DEFAULT_FETCH_TIMEOUT_MS);
+    const apiKey = getStoredApiKey();
+    const mergedHeaders = { ...(headers || {}) };
+    if (apiKey) mergedHeaders["X-API-Key"] = apiKey;
+    try {
+        return await window.fetch(url, { ...rest, headers: mergedHeaders, signal: controller.signal });
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Application State
     let allStocks = [];
@@ -91,6 +143,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const strategyFormTitle = document.getElementById("strategyFormTitle");
     const strategyPillarCheckboxes = document.getElementById("strategyPillarCheckboxes");
 
+    // AI Clarification Review Modal (M9) — see index.html comment for why this exists
+    const clarificationModal = document.getElementById("clarificationModal");
+    const closeClarificationBtn = document.getElementById("closeClarificationBtn");
+    const clarificationSummaryBody = document.getElementById("clarificationSummaryBody");
+    const clarificationCorrectionGroup = document.getElementById("clarificationCorrectionGroup");
+    const clarificationCorrectionNote = document.getElementById("clarificationCorrectionNote");
+    const clarificationConfirmBtn = document.getElementById("clarificationConfirmBtn");
+    const clarificationRejectBtn = document.getElementById("clarificationRejectBtn");
+    const clarificationResubmitBtn = document.getElementById("clarificationResubmitBtn");
+    let clarificationStrategyId = null;
+
+    // API key button (M9) — prompts for/stores the key apiFetch() attaches to mutating requests
+    const apiKeyBtn = document.getElementById("apiKeyBtn");
+    const apiKeyBtnMobile = document.getElementById("apiKeyBtnMobile");
+
     // Notifications DOM (M5) — bell/badge/panel + toast, fed live over /ws/live
     const notifBell = document.getElementById("notifBell");
     const notifBellMobile = document.getElementById("notifBellMobile");
@@ -118,6 +185,12 @@ document.addEventListener("DOMContentLoaded", () => {
     populatePillarCheckboxes();
     refreshStrategiesNavBadge();
     initNotifications();
+    if (apiKeyBtn) apiKeyBtn.addEventListener("click", promptForApiKey);
+    if (apiKeyBtnMobile) apiKeyBtnMobile.addEventListener("click", () => {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        promptForApiKey();
+    });
 
     // Event Listeners
     
@@ -236,6 +309,19 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target === strategyFormModal) strategyFormModal.classList.add("hidden");
     });
 
+    if (closeClarificationBtn) closeClarificationBtn.addEventListener("click", () => clarificationModal.classList.add("hidden"));
+    if (clarificationModal) clarificationModal.addEventListener("click", (e) => {
+        if (e.target === clarificationModal) clarificationModal.classList.add("hidden");
+    });
+    if (clarificationConfirmBtn) clarificationConfirmBtn.addEventListener("click", confirmClarification);
+    if (clarificationRejectBtn) clarificationRejectBtn.addEventListener("click", () => {
+        if (clarificationCorrectionGroup) clarificationCorrectionGroup.classList.remove("hidden");
+        if (clarificationConfirmBtn) clarificationConfirmBtn.classList.add("hidden");
+        if (clarificationRejectBtn) clarificationRejectBtn.classList.add("hidden");
+        if (clarificationResubmitBtn) clarificationResubmitBtn.classList.remove("hidden");
+    });
+    if (clarificationResubmitBtn) clarificationResubmitBtn.addEventListener("click", resubmitClarification);
+
     if (filterTabs) {
         filterTabs.addEventListener("click", (e) => {
             const btn = e.target.closest(".tab-btn");
@@ -289,6 +375,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // -------------------------------------------------------------
     // 2. API FETCH & INSTANT BACKGROUND DATA PROCESSING
     // -------------------------------------------------------------
+    const EMPTY_STATE_DEFAULT_TITLE = "No Priority Signals Found";
+    const EMPTY_STATE_DEFAULT_TEXT = "Try unchecking \"Tier 1 Only\" or clicking \"SCAN NOW\" to fetch fresh market data.";
+
+    function setEmptyStateMessage(title, text) {
+        if (!emptyState) return;
+        const titleEl = emptyState.querySelector("h3");
+        const textEl = emptyState.querySelector("p");
+        if (titleEl) titleEl.textContent = title;
+        if (textEl) textEl.textContent = text;
+    }
+
     async function fetchScanResults(forceRefresh = false) {
         try {
             if (scanProgressBar) scanProgressBar.classList.remove("hidden");
@@ -299,7 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             const url = forceRefresh ? "/api/scan?nocache=true" : "/api/scan";
-            const response = await fetch(url);
+            const response = await apiFetch(url);
             
             if (!response.ok) throw new Error("API Server response error");
             
@@ -338,6 +435,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
             console.error("Failed to fetch scan results:", error);
+            // M9 audit fix: a hung/failed fetch used to leave the table area blank with the
+            // "SCANNING..." button state (cleared in `finally` below) as the only clue
+            // something was wrong. Only shown when there's no existing data already on
+            // screen — a transient failure on top of an already-populated table shouldn't
+            // blank out data the user can still usefully see; the next auto-refresh or manual
+            // retry will recover it, and the console.error above still captures it either way.
+            if (allStocks.length === 0 && emptyState) {
+                const isTimeout = error && error.name === "AbortError";
+                setEmptyStateMessage(
+                    isTimeout ? "Request Timed Out" : "Couldn't Load Scan Data",
+                    isTimeout
+                        ? "The server took too long to respond. Click “SCAN NOW” to try again."
+                        : "Couldn't reach the server. Check your connection and click “SCAN NOW” to try again."
+                );
+                emptyState.classList.remove("hidden");
+            }
         } finally {
             if (scanProgressBar) scanProgressBar.classList.add("hidden");
             if (scanBtn) {
@@ -378,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // -------------------------------------------------------------
     async function fetchWinRatePerformance() {
         try {
-            const response = await fetch("/api/performance");
+            const response = await apiFetch("/api/performance");
             if (!response.ok) return;
             const data = await response.json();
 
@@ -422,8 +535,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const accScore = t.accuracy_score_pct !== null && t.accuracy_score_pct !== undefined ? t.accuracy_score_pct : null;
 
             tr.innerHTML = `
-                <td>${t.lock_date} ${t.lock_time ? t.lock_time.slice(0,5) : ''}</td>
-                <td><strong>${t.symbol}</strong></td>
+                <td>${escapeHtml(t.lock_date)} ${t.lock_time ? escapeHtml(t.lock_time.slice(0,5)) : ''}</td>
+                <td><strong>${escapeHtml(t.symbol)}</strong></td>
                 <td>${getOptionTypeBadgeHTML(t.option_type || (t.signal.includes("BTST") ? "CALL (CE)" : "PUT (PE)"))}</td>
                 <td>₹${t.close_price_325}</td>
                 <td class="${predGap >= 0 ? 'text-bullish' : 'text-bearish'}">
@@ -471,7 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 lockPicksBtn.disabled = true;
                 lockPicksBtn.textContent = "LOCKING...";
             }
-            const response = await fetch("/api/lock_picks", { method: "POST" });
+            const response = await apiFetch("/api/lock_picks", { method: "POST" });
             const data = await response.json();
             alert(data.message || "Picks locked successfully!");
             await fetchWinRatePerformance();
@@ -491,7 +604,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 evaluatePicksBtn.disabled = true;
                 evaluatePicksBtn.textContent = "ANALYZING 9:15 AM OPENINGS...";
             }
-            const response = await fetch("/api/evaluate_picks", { method: "POST" });
+            const response = await apiFetch("/api/evaluate_picks", { method: "POST" });
             const data = await response.json();
             alert(data.message || "Evaluation complete!");
             await fetchWinRatePerformance();
@@ -548,6 +661,9 @@ document.addEventListener("DOMContentLoaded", () => {
         stocksTableBody.innerHTML = "";
         
         if (filtered.length === 0) {
+            // Always reset to the default "no results" copy — undoes any fetch-error message
+            // fetchScanResults() may have set on a previous failed attempt (see there).
+            setEmptyStateMessage(EMPTY_STATE_DEFAULT_TITLE, EMPTY_STATE_DEFAULT_TEXT);
             if (emptyState) emptyState.classList.remove("hidden");
             return;
         } else {
@@ -579,7 +695,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>
                     <div class="ticker-cell">
                         <span class="symbol-name">
-                            ${stock.symbol}
+                            ${escapeHtml(stock.symbol)}
                             ${stock.rank_position <= 2 ? ' <span class="text-gold" style="font-size:10px;"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
                         </span>
                         ${stock.next_day_bestest_5 ? '<span class="bestest-5-badge"><i class="fa-solid fa-star"></i> NEXT DAY TOP 5</span>' : ''}
@@ -587,7 +703,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </td>
                 <td>
                     <span class="signal-badge ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
-                        ${sigText}
+                        ${escapeHtml(sigText)}
                     </span>
                 </td>
                 <td>${getOptionTypeBadgeHTML(stock.option_type || 'NONE')}</td>
@@ -617,7 +733,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     </span>
                 </td>
                 <td>
-                    <button class="btn-icon view-detail-btn" data-symbol="${stock.symbol}" title="Quick Technical Breakdown">
+                    <button class="btn-icon view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
                         <i class="fa-solid fa-chart-line"></i>
                     </button>
                 </td>
@@ -676,7 +792,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (modalScoreVal) modalScoreVal.textContent = "--";
             if (modalLtp) modalLtp.textContent = "Loading...";
 
-            const response = await fetch(`/api/stock/${symbol}`);
+            const response = await apiFetch(`/api/stock/${symbol}`);
             if (!response.ok) throw new Error("Failed to load stock details");
             
             const data = await response.json();
@@ -863,7 +979,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if (newsEmptyState) newsEmptyState.classList.add("hidden");
 
-            const response = await fetch("/api/news");
+            const response = await apiFetch("/api/news");
             if (!response.ok) throw new Error("News API error");
             const data = await response.json();
 
@@ -1018,7 +1134,7 @@ document.addEventListener("DOMContentLoaded", () => {
             indexVerdictGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
             if (indexVerdictEmptyState) indexVerdictEmptyState.classList.add("hidden");
 
-            const response = await fetch("/api/indices/verdict");
+            const response = await apiFetch("/api/indices/verdict");
             if (!response.ok) throw new Error("Index verdict API error");
             const data = await response.json();
 
@@ -1178,7 +1294,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function fetchIndices() {
         try {
             if (indexGrid) indexGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
-            const response = await fetch("/api/indices");
+            const response = await apiFetch("/api/indices");
             if (!response.ok) throw new Error("Indices API error");
             const data = await response.json();
             renderIndexGrid(data.indices || []);
@@ -1251,7 +1367,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function refreshStrategiesNavBadge() {
         try {
-            const response = await fetch("/api/strategies");
+            const response = await apiFetch("/api/strategies");
             if (!response.ok) return;
             const data = await response.json();
             if (strategiesNavBadge) strategiesNavBadge.textContent = (data.strategies || []).length;
@@ -1261,7 +1377,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function fetchStrategies() {
         try {
             if (strategyGrid) strategyGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
-            const response = await fetch("/api/strategies");
+            const response = await apiFetch("/api/strategies");
             if (!response.ok) throw new Error("Strategies API error");
             const data = await response.json();
             const strategies = data.strategies || [];
@@ -1288,13 +1404,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let perf = { metrics: {}, paper_trading: {} };
         try {
-            const response = await fetch(`/api/strategies/${strategy.id}/performance`);
+            const response = await apiFetch(`/api/strategies/${strategy.id}/performance`);
             if (response.ok) perf = await response.json();
         } catch (e) { /* stats are supplementary — card still renders without them */ }
 
         const scopeHtml = (strategy.target_scope || []).map(s => `<span class="scope-chip">${escapeHtml(s)}</span>`).join("");
         const metrics = perf.metrics || {};
         const paperTrading = perf.paper_trading || {};
+        // M9 audit fix: a strategy whose config change reset it to unconfirmed (or one created
+        // before this fix shipped, back when nothing could ever confirm it) needs a visible way
+        // back into the review flow — not just at the moment it's first saved.
+        const needsClarification = !strategy.is_builtin && strategy.clarification && !strategy.clarification.confirmed;
 
         card.innerHTML = `
             <div class="strategy-card-header">
@@ -1322,7 +1442,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="strategy-flag ${strategy.auto_paper_trade ? "on" : ""}">Auto Paper-Trade ${strategy.auto_paper_trade ? "ON" : "OFF"}</span>
                 <span class="strategy-flag">${paperTrading.total_paper_trades || 0} paper trade(s)</span>
             </div>
+            ${needsClarification ? `
+            <div class="strategy-flags-row" style="margin-top:8px;">
+                <span class="strategy-flag" style="color:var(--gold);border-color:var(--gold);">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Unconfirmed — can't go active until reviewed
+                </span>
+            </div>` : ""}
             <div class="strategy-card-actions">
+                ${needsClarification ? `<button class="btn btn-primary" data-strategy-review="${strategy.id}"><i class="fa-solid fa-robot"></i> REVIEW &amp; CONFIRM</button>` : ""}
                 <button class="btn btn-secondary" data-strategy-edit="${strategy.id}"><i class="fa-solid fa-pen"></i> EDIT</button>
                 <button class="btn btn-secondary" data-strategy-execute="${strategy.id}"><i class="fa-solid fa-bolt"></i> RUN NOW</button>
                 ${strategy.is_builtin ? "" : `<button class="btn btn-secondary" data-strategy-delete="${strategy.id}"><i class="fa-solid fa-trash"></i></button>`}
@@ -1331,6 +1458,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const toggleInput = card.querySelector("[data-strategy-toggle]");
         if (toggleInput) toggleInput.addEventListener("change", () => toggleStrategyActive(strategy.id, toggleInput.checked));
+
+        const reviewBtn = card.querySelector("[data-strategy-review]");
+        if (reviewBtn) reviewBtn.addEventListener("click", () => openClarificationModal(strategy));
 
         const editBtn = card.querySelector("[data-strategy-edit]");
         if (editBtn) editBtn.addEventListener("click", () => openStrategyForm(strategy));
@@ -1396,7 +1526,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const url = id ? `/api/strategies/${id}` : "/api/strategies";
             const method = id ? "PUT" : "POST";
-            const response = await fetch(url, {
+            const response = await apiFetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -1405,16 +1535,114 @@ document.addEventListener("DOMContentLoaded", () => {
                 const err = await response.json();
                 throw new Error(err.detail || "Save failed");
             }
+            const savedStrategy = await response.json();
             strategyFormModal.classList.add("hidden");
             fetchStrategies();
+            // M9 audit fix: a create/edit that actually changed scope/pillars/weight/gates
+            // comes back with an unconfirmed clarification and is_active=false — it used to
+            // just sit there with no way to ever confirm it from the UI. Walk straight into
+            // the review modal instead of leaving it stranded.
+            if (savedStrategy.clarification && !savedStrategy.clarification.confirmed) {
+                openClarificationModal(savedStrategy);
+            }
         } catch (error) {
             alert(`Could not save strategy: ${error.message}`);
         }
     }
 
+    function renderClarificationSummary(clarification) {
+        if (!clarificationSummaryBody) return;
+        const rows = [
+            ["WHAT IT SCANS", clarification.target_summary],
+            ["PILLARS", clarification.pillar_summary],
+            ["CONFIRMATION BAR", clarification.confirmation_bar_summary],
+            ["QUALITY GATES", clarification.gate_summary],
+        ].filter(([, value]) => !!value);
+
+        const assumptions = clarification.assumptions || [];
+
+        clarificationSummaryBody.innerHTML = `
+            <div class="form-group">
+                <label class="form-label">IN PLAIN TERMS</label>
+                <p style="font-size:13px;color:var(--ink-primary);line-height:1.5;">${escapeHtml(clarification.plain_summary || "No summary available.")}</p>
+            </div>
+            ${rows.map(([label, value]) => `
+                <div class="form-group" style="margin-top:10px;">
+                    <label class="form-label">${escapeHtml(label)}</label>
+                    <p style="font-size:12.5px;color:var(--ink-secondary);line-height:1.4;">${escapeHtml(value)}</p>
+                </div>
+            `).join("")}
+            ${assumptions.length ? `
+                <div class="form-group" style="margin-top:10px;">
+                    <label class="form-label">ASSUMPTIONS MADE</label>
+                    <ul style="margin:4px 0 0 18px;padding:0;font-size:12px;color:var(--ink-muted);">
+                        ${assumptions.map(a => `<li>${escapeHtml(a)}</li>`).join("")}
+                    </ul>
+                </div>
+            ` : ""}
+        `;
+    }
+
+    function resetClarificationActionState() {
+        if (clarificationCorrectionGroup) clarificationCorrectionGroup.classList.add("hidden");
+        if (clarificationCorrectionNote) clarificationCorrectionNote.value = "";
+        if (clarificationConfirmBtn) clarificationConfirmBtn.classList.remove("hidden");
+        if (clarificationRejectBtn) clarificationRejectBtn.classList.remove("hidden");
+        if (clarificationResubmitBtn) clarificationResubmitBtn.classList.add("hidden");
+    }
+
+    function openClarificationModal(strategy) {
+        if (!clarificationModal || !strategy.clarification) return;
+        clarificationStrategyId = strategy.id;
+        renderClarificationSummary(strategy.clarification);
+        resetClarificationActionState();
+        clarificationModal.classList.remove("hidden");
+    }
+
+    async function confirmClarification() {
+        if (!clarificationStrategyId) return;
+        try {
+            const response = await apiFetch(`/api/strategies/${clarificationStrategyId}/confirm`, { method: "POST" });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Confirm failed");
+            }
+            clarificationModal.classList.add("hidden");
+            clarificationStrategyId = null;
+            fetchStrategies();
+        } catch (error) {
+            alert(`Could not confirm strategy: ${error.message}`);
+        }
+    }
+
+    async function resubmitClarification() {
+        if (!clarificationStrategyId) return;
+        const note = (clarificationCorrectionNote && clarificationCorrectionNote.value || "").trim();
+        if (!note) {
+            alert("Describe what's wrong before resubmitting.");
+            return;
+        }
+        try {
+            const response = await apiFetch(`/api/strategies/${clarificationStrategyId}/resubmit_clarification`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ correction_note: note }),
+            });
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.detail || "Resubmit failed");
+            }
+            const updatedStrategy = await response.json();
+            renderClarificationSummary(updatedStrategy.clarification);
+            resetClarificationActionState();
+        } catch (error) {
+            alert(`Could not resubmit correction: ${error.message}`);
+        }
+    }
+
     async function toggleStrategyActive(id, isActive) {
         try {
-            const response = await fetch(`/api/strategies/${id}`, {
+            const response = await apiFetch(`/api/strategies/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ is_active: isActive }),
@@ -1433,7 +1661,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function deleteStrategyAction(id, name) {
         if (!confirm(`Delete strategy "${name}"? This cannot be undone.`)) return;
         try {
-            const response = await fetch(`/api/strategies/${id}`, { method: "DELETE" });
+            const response = await apiFetch(`/api/strategies/${id}`, { method: "DELETE" });
             if (!response.ok) {
                 const err = await response.json();
                 throw new Error(err.detail || "Delete failed");
@@ -1446,7 +1674,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function executeStrategyNow(id) {
         try {
-            const response = await fetch(`/api/strategies/${id}/execute`, { method: "POST" });
+            const response = await apiFetch(`/api/strategies/${id}/execute`, { method: "POST" });
             const data = await response.json();
             alert(data.message || "Executed.");
             fetchStrategies();
@@ -1501,7 +1729,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function refreshNotifBadgeFromServer() {
         try {
-            const response = await fetch("/api/notifications?limit=1");
+            const response = await apiFetch("/api/notifications?limit=1");
             if (!response.ok) return;
             const data = await response.json();
             notifUnreadCount = data.unread_count || 0;
@@ -1511,12 +1739,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function onNotifPanelOpened() {
         try {
-            const response = await fetch("/api/notifications?limit=50");
+            const response = await apiFetch("/api/notifications?limit=50");
             if (!response.ok) return;
             const data = await response.json();
             renderNotifList(data.notifications || []);
             if (notifUnreadCount > 0) {
-                await fetch("/api/notifications/read_all", { method: "POST" });
+                await apiFetch("/api/notifications/read_all", { method: "POST" });
                 notifUnreadCount = 0;
                 renderNotifBadge();
                 renderNotifList((data.notifications || []).map((n) => ({ ...n, read: true })));
@@ -1569,14 +1797,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         if (notifMarkAllBtn) notifMarkAllBtn.addEventListener("click", async (e) => {
             e.stopPropagation();
-            await fetch("/api/notifications/read_all", { method: "POST" });
+            await apiFetch("/api/notifications/read_all", { method: "POST" });
             notifUnreadCount = 0;
             renderNotifBadge();
             onNotifPanelOpened();
         });
         document.addEventListener("click", (e) => {
             if (!notifPanel || notifPanel.classList.contains("hidden")) return;
-            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target))) return;
+            // M9 audit fix: notifBellMobile wasn't in this exception list, so opening the panel
+            // from the mobile bell triggered this SAME click's document-level listener right
+            // after (clicks bubble from the button up to document), instantly re-hiding it —
+            // the panel would flash open and close within one tap, even once it was made
+            // structurally reachable on mobile.
+            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target)) || (notifBellMobile && notifBellMobile.contains(e.target))) return;
             notifPanel.classList.add("hidden");
         });
 

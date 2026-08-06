@@ -1,11 +1,12 @@
 import os
 import copy
 import time
+import secrets
 import threading
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timezone, timedelta
-from fastapi import FastAPI, HTTPException, Query, Body, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Query, Body, WebSocket, WebSocketDisconnect, Header, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,9 +23,12 @@ from net_utils import call_with_retry
 from candle_utils import fetch_post_lock_candles
 import closing_sequence
 import ws_broadcast
-from json_utils import atomic_write_json, read_json
+from json_utils import atomic_write_json, read_json, json_file_lock
 from scoring_engine import evaluate_5_pillar_matrix, get_liquidity_tier
-from nse_data_provider import fetch_all_nse_data, get_per_stock_oi_data, get_per_stock_delivery_data
+from nse_data_provider import (
+    fetch_all_nse_data, get_per_stock_oi_data, get_per_stock_delivery_data,
+    was_nse_refresh_completed_today, refresh_nse_data_cache,
+)
 from fo_universe import get_canonical_fo_tickers, NSE_FO_STOCKS, is_valid_fo_stock
 from vix_provider import fetch_india_vix
 from signal_journal import (
@@ -101,6 +105,35 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# M9 audit fix: every mutating endpoint (strategy CRUD, lock/evaluate picks, execute, run index
+# intelligence, mark notifications read) previously had zero authentication — anyone with the
+# URL (or any third-party webpage's own JS, given the open CORS above) could call them. Gated
+# behind a single shared API key rather than full user accounts/sessions, matching this app's
+# actual shape: a personal/small-scale dashboard with no existing login concept, not a
+# multi-tenant service. GET endpoints stay fully open exactly as documented above — this only
+# gates state-changing routes.
+API_KEY_HEADER_NAME = "X-API-Key"
+QUANTHORIZON_API_KEY = os.environ.get("QUANTHORIZON_API_KEY", "").strip()
+
+if not QUANTHORIZON_API_KEY:
+    logging.getLogger("Auth").warning(
+        "QUANTHORIZON_API_KEY is not set — mutating endpoints (strategy CRUD, lock/evaluate "
+        "picks, execute, notifications, index intelligence run) are running WITHOUT "
+        "authentication. Set QUANTHORIZON_API_KEY in .env to require it."
+    )
+
+
+def require_api_key(x_api_key: Optional[str] = Header(default=None, alias=API_KEY_HEADER_NAME)):
+    """FastAPI dependency for mutating routes. No-op (open) if QUANTHORIZON_API_KEY isn't
+    configured — see the startup warning above; this preserves today's fully-open behavior for
+    anyone who hasn't opted in, rather than breaking existing deployments outright the moment
+    this ships. Uses a constant-time comparison to avoid leaking the key via response-timing."""
+    if not QUANTHORIZON_API_KEY:
+        return
+    if not x_api_key or not secrets.compare_digest(x_api_key, QUANTHORIZON_API_KEY):
+        raise HTTPException(status_code=401, detail="Missing or invalid API key.")
+
 
 @app.middleware("http")
 async def add_no_cache_headers(request, call_next):
@@ -261,70 +294,82 @@ class TradeHistoryManager:
     @staticmethod
     def lock_btst_picks(candidate_stocks: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Lock today's 3:30 PM BTST/STBT picks (P1 High Conviction and P2 Medium) into persistent history."""
-        store = TradeHistoryManager.load_data()
-        today_date = get_ist_now().strftime("%Y-%m-%d")
-        
-        existing_today_symbols = {t["raw_ticker"] for t in store["trades"] if t.get("lock_date") == today_date}
-        
-        # Filter for active BTST or STBT recommendations
-        valid_picks = [s for s in candidate_stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
-        if not valid_picks:
-            valid_picks = candidate_stocks
+        # M8 audit fix: the whole load-mutate-save cycle is locked — the 3:40 PM auto-lock
+        # thread and a manual POST /api/lock_picks used to be able to both load the same
+        # pre-mutation store and each save their own version, silently discarding whichever
+        # ran first.
+        with json_file_lock(TRADE_HISTORY_FILE):
+            store = TradeHistoryManager.load_data()
+            today_date = get_ist_now().strftime("%Y-%m-%d")
 
-        new_locked_count = 0
-        for stock in valid_picks:
-            if stock.get("raw_ticker") not in existing_today_symbols:
-                trade_record = {
-                    "id": f"{today_date}_{stock['symbol']}",
-                    "lock_date": today_date,
-                    "lock_time": get_ist_now().strftime("%H:%M:%S"),
-                    "symbol": stock["symbol"],
-                    "raw_ticker": stock["raw_ticker"],
-                    "liquidity_tier": stock.get("liquidity_tier", "TIER_1"),
-                    "confirmed_pillars_count": stock.get("confirmed_pillars_count", 3),
-                    "confirmed_pillars": stock.get("confirmed_pillars", []),
-                    "oi_magnitude": stock.get("oi_magnitude", {}),
-                    "expiry_discount_applied": stock.get("expiry_discount_applied", False),
-                    "delivery_t1_validation": stock.get("delivery_t1_validation", {}),
-                    "fundamental_quality": stock.get("fundamental_quality", {}),
-                    "news_signal": stock.get("news_signal", {}),
-                    "depth_analysis": stock.get("depth_analysis", ""),
-                    "signal": stock["signal"],
-                    "option_type": stock.get("option_type", "NONE"),
-                    "priority_level": stock.get("priority_level", "P1_HIGH"),
-                    "confidence_score": stock.get("confidence_score", 85),
-                    "close_price_325": stock.get("ltp", 0.0),
-                    "predicted_gap_pct": stock.get("predicted_gap_pct", 0.0),
-                    "day_high": stock.get("day_high", 0.0),
-                    "day_low": stock.get("day_low", 0.0),
-                    "vwap": stock.get("vwap", 0.0),
-                    "volume_spike": stock.get("volume_spike", 1.0),
-                    "rsi": stock.get("rsi", 50.0),
-                    "rank_reason": stock.get("rank_reason", ""),
-                    "status": "PENDING_EVALUATION",
-                    "open_price_915": None,
-                    "gap_pct": None,
-                    "variance_error_pct": None,
-                    "accuracy_score_pct": None,
-                    "outcome": "PENDING"
-                }
-                store["trades"].insert(0, trade_record)
-                existing_today_symbols.add(stock["raw_ticker"])
-                new_locked_count += 1
+            existing_today_symbols = {t["raw_ticker"] for t in store["trades"] if t.get("lock_date") == today_date}
 
-        TradeHistoryManager._recalculate_metrics(store)
-        TradeHistoryManager.save_data(store)
-        return {
-            "locked_count": new_locked_count,
-            "total_today_locked": sum(1 for t in store["trades"] if t.get("lock_date") == today_date)
-        }
+            # Filter for active BTST or STBT recommendations
+            valid_picks = [s for s in candidate_stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
+            if not valid_picks:
+                valid_picks = candidate_stocks
+
+            new_locked_count = 0
+            for stock in valid_picks:
+                if stock.get("raw_ticker") not in existing_today_symbols:
+                    trade_record = {
+                        "id": f"{today_date}_{stock['symbol']}",
+                        "lock_date": today_date,
+                        "lock_time": get_ist_now().strftime("%H:%M:%S"),
+                        "symbol": stock["symbol"],
+                        "raw_ticker": stock["raw_ticker"],
+                        "liquidity_tier": stock.get("liquidity_tier", "TIER_1"),
+                        "confirmed_pillars_count": stock.get("confirmed_pillars_count", 3),
+                        "confirmed_pillars": stock.get("confirmed_pillars", []),
+                        "oi_magnitude": stock.get("oi_magnitude", {}),
+                        "expiry_discount_applied": stock.get("expiry_discount_applied", False),
+                        "delivery_t1_validation": stock.get("delivery_t1_validation", {}),
+                        "fundamental_quality": stock.get("fundamental_quality", {}),
+                        "news_signal": stock.get("news_signal", {}),
+                        "depth_analysis": stock.get("depth_analysis", ""),
+                        "signal": stock["signal"],
+                        "option_type": stock.get("option_type", "NONE"),
+                        "priority_level": stock.get("priority_level", "P1_HIGH"),
+                        "confidence_score": stock.get("confidence_score", 85),
+                        "close_price_325": stock.get("ltp", 0.0),
+                        "predicted_gap_pct": stock.get("predicted_gap_pct", 0.0),
+                        "day_high": stock.get("day_high", 0.0),
+                        "day_low": stock.get("day_low", 0.0),
+                        "vwap": stock.get("vwap", 0.0),
+                        "volume_spike": stock.get("volume_spike", 1.0),
+                        "rsi": stock.get("rsi", 50.0),
+                        "rank_reason": stock.get("rank_reason", ""),
+                        "status": "PENDING_EVALUATION",
+                        "open_price_915": None,
+                        "gap_pct": None,
+                        "variance_error_pct": None,
+                        "accuracy_score_pct": None,
+                        "outcome": "PENDING"
+                    }
+                    store["trades"].insert(0, trade_record)
+                    existing_today_symbols.add(stock["raw_ticker"])
+                    new_locked_count += 1
+
+            TradeHistoryManager._recalculate_metrics(store)
+            TradeHistoryManager.save_data(store)
+            return {
+                "locked_count": new_locked_count,
+                "total_today_locked": sum(1 for t in store["trades"] if t.get("lock_date") == today_date)
+            }
 
     @staticmethod
     def evaluate_pending_trades() -> Dict[str, Any]:
         """Fetch 9:15 AM open prices and compute Predicted Gap vs Actual Gap Accuracy + System Accuracy Auto-Upgrade."""
+        # M8 audit fix: same load-mutate-save race as lock_btst_picks — this and a manual
+        # POST /api/evaluate_picks both touch trade_history.json.
+        with json_file_lock(TRADE_HISTORY_FILE):
+            return TradeHistoryManager._evaluate_pending_trades_locked()
+
+    @staticmethod
+    def _evaluate_pending_trades_locked() -> Dict[str, Any]:
         store = TradeHistoryManager.load_data()
         pending_trades = [t for t in store["trades"] if t.get("status") == "PENDING_EVALUATION"]
-        
+
         if not pending_trades:
             return {"evaluated_count": 0, "message": "No pending 3:30 PM picks to evaluate."}
 
@@ -839,6 +884,25 @@ def _run_closing_lock_sequence(picks: List[Dict[str, Any]]) -> Dict[str, Any]:
     return lock_result
 
 
+def _snapshot_ready_stocks(today_date: str) -> List[Dict[str, Any]]:
+    """
+    M8 audit fix: cache_store["data"] can still hold a PRIOR day's scan right after a restart
+    that happens between 3:14-3:40 PM before today's first scan has run —
+    background_scheduler_worker unconditionally restores the last persisted snapshot into
+    cache_store at startup with no date check (see its own docstring/comments). Without this
+    guard, closing_sequence's 3:14 PM SNAPSHOT step would freeze that stale data and the
+    remaining steps would lock it into trade history + the signal journal as if it were today's
+    real picks. cache_store["scan_summary"]["timestamp"] always carries the scan's own IST
+    wall-clock time (see run_full_scan_pipeline), independent of when it was loaded from disk,
+    so it's the right thing to check — not cache_store["timestamp"], which background_scheduler_
+    worker sets to time.time() (now) even when restoring an old snapshot from disk.
+    """
+    scan_summary = cache_store.get("scan_summary") or {}
+    if not scan_summary.get("timestamp", "").startswith(today_date):
+        return []
+    return cache_store.get("data") or []
+
+
 # -------------------------------------------------------------
 # AUTONOMOUS BACKGROUND SCHEDULER THREAD WORKER
 # -------------------------------------------------------------
@@ -893,7 +957,7 @@ def background_scheduler_worker():
                     step_ran = closing_sequence.run_step_if_due(
                         time_in_mins=time_in_mins,
                         today_date=today_date,
-                        get_current_stocks=lambda: cache_store.get("data") or [],
+                        get_current_stocks=lambda: _snapshot_ready_stocks(today_date),
                         lock_picks=_run_closing_lock_sequence,
                         broadcast=ws_broadcast.broadcast_sync,
                     )
@@ -913,6 +977,15 @@ def background_scheduler_worker():
                 if not was_refresh_completed_today():
                     logger.info("Running once-daily fundamentals cache refresh...")
                     refresh_fundamentals_cache(FO_STOCKS)
+
+                # Once-daily OI/delivery history refresh (M7 audit fix) — without this, the
+                # rolling history in nse_data_provider.py never advances past a symbol's very
+                # first-ever lookup; get_per_stock_oi_data/get_per_stock_delivery_data stay
+                # local-store-only and fast on every scan tick (fetch_online=False), same as
+                # fundamentals above.
+                if not was_nse_refresh_completed_today():
+                    logger.info("Running once-daily NSE OI/delivery cache refresh...")
+                    refresh_nse_data_cache(FO_STOCKS)
 
                 # Once-daily post-close Index BTST Intelligence run (default 3:45 PM IST,
                 # configurable via INDEX_INTELLIGENCE_RUN_HOUR/MINUTE env vars) — deliberately
@@ -1277,7 +1350,7 @@ def get_index_btst_verdict_performance(index_name: Optional[str] = Query(None)):
     return sanitize_json_data(get_index_verdict_metrics_summary(index_name))
 
 
-@app.post("/api/indices/verdict/run")
+@app.post("/api/indices/verdict/run", dependencies=[Depends(require_api_key)])
 def run_index_btst_intelligence_now():
     """Manually trigger the post-close Index BTST Intelligence run — same manual-override
     pattern as /api/lock_picks and /api/evaluate_picks, for testing or an on-demand refresh
@@ -1316,7 +1389,7 @@ def api_get_strategy(strategy_id: str):
     return sanitize_json_data(strategy)
 
 
-@app.post("/api/strategies")
+@app.post("/api/strategies", dependencies=[Depends(require_api_key)])
 def api_create_strategy(payload: StrategyCreateRequest):
     """Creates an unconfirmed draft — the AI clarification of what this exact configuration
     does is generated here and returned for the user to review. The strategy stays inactive
@@ -1328,7 +1401,7 @@ def api_create_strategy(payload: StrategyCreateRequest):
     return sanitize_json_data(strategy)
 
 
-@app.post("/api/strategies/{strategy_id}/resubmit_clarification")
+@app.post("/api/strategies/{strategy_id}/resubmit_clarification", dependencies=[Depends(require_api_key)])
 def api_resubmit_clarification(strategy_id: str, payload: ResubmitClarificationRequest):
     """Edit-and-resend loop: the user said the clarification was wrong — re-sends the
     original config plus their correction to Claude for a revised summary."""
@@ -1341,7 +1414,7 @@ def api_resubmit_clarification(strategy_id: str, payload: ResubmitClarificationR
     return sanitize_json_data(strategy)
 
 
-@app.post("/api/strategies/{strategy_id}/confirm")
+@app.post("/api/strategies/{strategy_id}/confirm", dependencies=[Depends(require_api_key)])
 def api_confirm_strategy(strategy_id: str):
     """User confirmed the clarification matches what they meant — activates the strategy."""
     try:
@@ -1353,7 +1426,7 @@ def api_confirm_strategy(strategy_id: str):
     return sanitize_json_data(strategy)
 
 
-@app.put("/api/strategies/{strategy_id}")
+@app.put("/api/strategies/{strategy_id}", dependencies=[Depends(require_api_key)])
 def api_update_strategy(strategy_id: str, payload: StrategyUpdateRequest):
     """A real change to scope/pillars/weight-bar/gates resets confirmation and re-clarifies
     automatically (see strategy_manager.update_strategy) — the response's `clarification` field
@@ -1369,7 +1442,7 @@ def api_update_strategy(strategy_id: str, payload: StrategyUpdateRequest):
     return sanitize_json_data(strategy)
 
 
-@app.delete("/api/strategies/{strategy_id}")
+@app.delete("/api/strategies/{strategy_id}", dependencies=[Depends(require_api_key)])
 def api_delete_strategy(strategy_id: str):
     try:
         sm.delete_strategy(strategy_id)
@@ -1412,7 +1485,7 @@ def api_strategy_signals(strategy_id: str):
     return sanitize_json_data({"strategy_id": strategy_id, "stocks": stocks, "indices": indices})
 
 
-@app.post("/api/strategies/{strategy_id}/execute")
+@app.post("/api/strategies/{strategy_id}/execute", dependencies=[Depends(require_api_key)])
 def api_execute_strategy_signals(strategy_id: str):
     """
     Manually paper-execute this strategy's CURRENT BTST/STBT signals right now (in addition
@@ -1474,13 +1547,13 @@ def api_mark_notification_read(notification_id: str):
     return {"status": "read", "id": notification_id}
 
 
-@app.post("/api/notifications/read_all")
+@app.post("/api/notifications/read_all", dependencies=[Depends(require_api_key)])
 def api_mark_all_notifications_read():
     mark_all_notifications_read()
     return {"status": "all_read"}
 
 
-@app.post("/api/lock_picks")
+@app.post("/api/lock_picks", dependencies=[Depends(require_api_key)])
 def lock_todays_picks():
     stocks = cache_store.get("data", [])
     if not stocks:
@@ -1496,7 +1569,7 @@ def lock_todays_picks():
     }
 
 
-@app.post("/api/evaluate_picks")
+@app.post("/api/evaluate_picks", dependencies=[Depends(require_api_key)])
 def evaluate_next_day_picks():
     result = TradeHistoryManager.evaluate_pending_trades()
     return {

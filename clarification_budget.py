@@ -15,7 +15,7 @@ import logging
 from datetime import date
 from typing import Dict, Any
 
-from json_utils import atomic_write_json, read_json
+from json_utils import atomic_write_json, read_json, json_file_lock
 
 logger = logging.getLogger("ClarificationBudget")
 
@@ -49,19 +49,25 @@ def check_and_increment_budget() -> None:
     """Call immediately before making a real Claude API call. Raises
     ClarificationBudgetExceededError if today's cap is already used up; otherwise increments
     the counter and returns normally. The increment happens before the call succeeds/fails —
-    a failed call still spent a real API request, so it still counts against the budget."""
+    a failed call still spent a real API request, so it still counts against the budget.
+
+    M8 audit fix: check-then-increment used to be a classic TOCTOU race — two concurrent
+    strategy create/edit requests could both read count=19, both pass the <20 check, and both
+    fire a real billed call, with the loser's increment overwriting the winner's. The whole
+    read-check-write cycle is now serialized per-process via json_file_lock."""
     today_str = date.today().isoformat()
-    data = _load()
+    with json_file_lock(BUDGET_FILE):
+        data = _load()
 
-    count = data.get("count", 0) if data.get("date") == today_str else 0
-    if count >= MAX_CLARIFICATIONS_PER_DAY:
-        raise ClarificationBudgetExceededError(
-            f"Daily clarification budget ({MAX_CLARIFICATIONS_PER_DAY} calls) reached — "
-            f"try again tomorrow, or raise MAX_CLARIFICATIONS_PER_DAY in .env if this limit "
-            f"is too low for real usage."
-        )
+        count = data.get("count", 0) if data.get("date") == today_str else 0
+        if count >= MAX_CLARIFICATIONS_PER_DAY:
+            raise ClarificationBudgetExceededError(
+                f"Daily clarification budget ({MAX_CLARIFICATIONS_PER_DAY} calls) reached — "
+                f"try again tomorrow, or raise MAX_CLARIFICATIONS_PER_DAY in .env if this limit "
+                f"is too low for real usage."
+            )
 
-    _save({"date": today_str, "count": count + 1, "last_call_ts": time.time()})
+        _save({"date": today_str, "count": count + 1, "last_call_ts": time.time()})
 
 
 def get_budget_status() -> Dict[str, Any]:

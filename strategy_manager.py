@@ -30,7 +30,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 
-from json_utils import atomic_write_json, read_json
+from json_utils import atomic_write_json, read_json, json_file_lock
 from clarification_service import generate_clarification, ClarificationUnavailableError
 
 logger = logging.getLogger("StrategyManager")
@@ -60,6 +60,26 @@ ALL_PILLAR_NAMES = STOCK_PILLAR_NAMES + INDEX_PILLAR_NAMES
 VALID_SCOPES = {"STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX"}
 
 DEFAULT_STRATEGY_ID = "default-5-pillar"
+
+# The fields _compute_config_hash treats as "what the strategy actually does" — the same set
+# that the built-in strategy's configuration must stay fixed on (see update_strategy).
+CONFIG_FIELDS = {
+    "target_scope", "active_pillars", "required_weight_override",
+    "fundamentals_gate_enabled", "news_gate_enabled",
+}
+
+
+def _validate_required_weight_override(value: Optional[float]):
+    """A confirmation-weight bar of 0 or negative would make `confirmed_pillars_weight >=
+    required_weight_override` always true, silently defeating the confirmation gate entirely
+    for that strategy. target_scope/active_pillars already get this kind of validation; this
+    field previously had none."""
+    if value is None:
+        return
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"required_weight_override must be a positive number or None, got {value!r}.")
+    if not (value > 0):
+        raise ValueError(f"required_weight_override must be greater than 0, got {value!r}.")
 
 
 def _ensure_data_dir():
@@ -118,40 +138,44 @@ def _seed_default_strategy_if_missing():
     it's the documented original behavior, not a user-authored configuration, so there's
     nothing to clarify and no reason to spend a real API call seeding it on first run.
     """
-    store = _load_all()
-    if DEFAULT_STRATEGY_ID in store:
-        return
-    now = datetime.now(timezone.utc).isoformat()
-    strategy = {
-        "id": DEFAULT_STRATEGY_ID,
-        "name": "Default 5-Pillar",
-        "description": "The original scanner behavior: every pillar active, liquidity-tiered "
-                        "thresholds for stocks, both fundamentals and news gates on.",
-        "target_scope": ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX"],
-        "active_pillars": {p: True for p in ALL_PILLAR_NAMES},
-        "required_weight_override": None,
-        "fundamentals_gate_enabled": True,
-        "news_gate_enabled": True,
-        "auto_paper_trade": False,
-        "is_active": True,
-        "is_builtin": True,
-        "clarification": {
-            "confirmed": True,
-            "confirmed_at": now,
-            "target_summary": "Every tracked stock plus Nifty 50, Bank Nifty, and Sensex.",
-            "pillar_summary": "All 5 stock pillars and all 6 index pillars active — no pillar disabled.",
-            "confirmation_bar_summary": "Engine defaults unchanged: liquidity-tiered for stocks (3.0/4.0), fixed 2.0 for indices.",
-            "gate_summary": "Both the fundamentals and news quality gates are on.",
-            "assumptions": [],
-            "plain_summary": "The baseline scanner behavior every custom strategy is compared against — nothing disabled, nothing loosened.",
-            "auto_confirmed_reason": "Built-in default strategy — matches the original scanner behavior exactly, no clarification needed.",
-        },
-        "created_at": now,
-        "updated_at": now,
-    }
-    strategy["config_hash"] = _compute_config_hash(strategy)
-    store[DEFAULT_STRATEGY_ID] = strategy
-    _save_all(store)
+    # M8 audit fix: read-check-write, wrapped so two threads racing this at startup can't both
+    # pass the "missing" check and both write (harmless duplicate work today, but the same
+    # pattern as every other read-modify-write in this file, kept consistent).
+    with json_file_lock(STRATEGIES_FILE):
+        store = _load_all()
+        if DEFAULT_STRATEGY_ID in store:
+            return
+        now = datetime.now(timezone.utc).isoformat()
+        strategy = {
+            "id": DEFAULT_STRATEGY_ID,
+            "name": "Default 5-Pillar",
+            "description": "The original scanner behavior: every pillar active, liquidity-tiered "
+                            "thresholds for stocks, both fundamentals and news gates on.",
+            "target_scope": ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX"],
+            "active_pillars": {p: True for p in ALL_PILLAR_NAMES},
+            "required_weight_override": None,
+            "fundamentals_gate_enabled": True,
+            "news_gate_enabled": True,
+            "auto_paper_trade": False,
+            "is_active": True,
+            "is_builtin": True,
+            "clarification": {
+                "confirmed": True,
+                "confirmed_at": now,
+                "target_summary": "Every tracked stock plus Nifty 50, Bank Nifty, and Sensex.",
+                "pillar_summary": "All 5 stock pillars and all 6 index pillars active — no pillar disabled.",
+                "confirmation_bar_summary": "Engine defaults unchanged: liquidity-tiered for stocks (3.0/4.0), fixed 2.0 for indices.",
+                "gate_summary": "Both the fundamentals and news quality gates are on.",
+                "assumptions": [],
+                "plain_summary": "The baseline scanner behavior every custom strategy is compared against — nothing disabled, nothing loosened.",
+                "auto_confirmed_reason": "Built-in default strategy — matches the original scanner behavior exactly, no clarification needed.",
+            },
+            "created_at": now,
+            "updated_at": now,
+        }
+        strategy["config_hash"] = _compute_config_hash(strategy)
+        store[DEFAULT_STRATEGY_ID] = strategy
+        _save_all(store)
 
 
 def list_strategies(active_only: bool = False) -> List[Dict[str, Any]]:
@@ -193,6 +217,8 @@ def create_strategy_draft(
     if invalid_scopes:
         raise ValueError(f"Invalid target_scope values: {sorted(invalid_scopes)}. Must be from {sorted(VALID_SCOPES)}.")
 
+    _validate_required_weight_override(required_weight_override)
+
     pillars = {p: True for p in ALL_PILLAR_NAMES}
     if active_pillars:
         unknown = set(active_pillars.keys()) - set(ALL_PILLAR_NAMES)
@@ -223,9 +249,10 @@ def create_strategy_draft(
     clarification.update({"confirmed": False, "confirmed_at": None})
     strategy["clarification"] = clarification
 
-    store = _load_all()
-    store[strategy_id] = strategy
-    _save_all(store)
+    with json_file_lock(STRATEGIES_FILE):
+        store = _load_all()
+        store[strategy_id] = strategy
+        _save_all(store)
     logger.info(f"Strategy draft created: {strategy_id} ({name})")
     return strategy
 
@@ -240,12 +267,21 @@ def resubmit_clarification(strategy_id: str, correction_note: str) -> Dict[str, 
     if strategy["clarification"].get("confirmed"):
         raise ValueError("This strategy is already confirmed — edit its configuration to trigger re-clarification instead.")
 
-    clarification = generate_clarification(strategy, correction_note=correction_note)
-    clarification.update({"confirmed": False, "confirmed_at": None})
-    strategy["clarification"] = clarification
-    strategy["updated_at"] = datetime.now(timezone.utc).isoformat()
-    store[strategy_id] = strategy
-    _save_all(store)
+    clarification = generate_clarification(strategy, correction_note=correction_note)  # slow network call — kept outside the lock
+
+    # M8 audit fix: re-read fresh inside the lock rather than reusing the `store`/`strategy`
+    # snapshot taken before the (potentially multi-second) Claude call above — a concurrent
+    # edit landing during that call would otherwise be silently overwritten by this stale copy.
+    with json_file_lock(STRATEGIES_FILE):
+        store = _load_all()
+        if strategy_id not in store:
+            raise KeyError(f"Strategy {strategy_id} not found.")
+        strategy = _ensure_clarification_field(store[strategy_id])
+        clarification.update({"confirmed": False, "confirmed_at": None})
+        strategy["clarification"] = clarification
+        strategy["updated_at"] = datetime.now(timezone.utc).isoformat()
+        store[strategy_id] = strategy
+        _save_all(store)
     return strategy
 
 
@@ -256,19 +292,20 @@ def confirm_strategy(strategy_id: str) -> Dict[str, Any]:
     pillar-config strategy activates it directly, since there's no custom code whose behavior
     needs proving out first — the scoring engine itself is already the tested, shared code
     path every strategy runs through."""
-    store = _load_all()
-    if strategy_id not in store:
-        raise KeyError(f"Strategy {strategy_id} not found.")
-    strategy = _ensure_clarification_field(store[strategy_id])
-    if "clarification" not in strategy:
-        raise ValueError(f"Strategy {strategy_id} has no pending clarification to confirm.")
+    with json_file_lock(STRATEGIES_FILE):
+        store = _load_all()
+        if strategy_id not in store:
+            raise KeyError(f"Strategy {strategy_id} not found.")
+        strategy = _ensure_clarification_field(store[strategy_id])
+        if "clarification" not in strategy:
+            raise ValueError(f"Strategy {strategy_id} has no pending clarification to confirm.")
 
-    strategy["clarification"]["confirmed"] = True
-    strategy["clarification"]["confirmed_at"] = datetime.now(timezone.utc).isoformat()
-    strategy["is_active"] = True
-    strategy["updated_at"] = datetime.now(timezone.utc).isoformat()
-    store[strategy_id] = strategy
-    _save_all(store)
+        strategy["clarification"]["confirmed"] = True
+        strategy["clarification"]["confirmed_at"] = datetime.now(timezone.utc).isoformat()
+        strategy["is_active"] = True
+        strategy["updated_at"] = datetime.now(timezone.utc).isoformat()
+        store[strategy_id] = strategy
+        _save_all(store)
     logger.info(f"Strategy confirmed and activated: {strategy_id}")
     return strategy
 
@@ -288,72 +325,89 @@ def update_strategy(strategy_id: str, **fields) -> Dict[str, Any]:
        "change the config and activate it" request correctly gets rejected rather than silently
        activating stale-looking-confirmed state.
     """
-    store = _load_all()
-    if strategy_id not in store:
-        raise KeyError(f"Strategy {strategy_id} not found.")
+    # M8 audit fix: held for the whole read-mutate-clarify-save cycle, including the
+    # conditional Claude call below. Coarser than strictly necessary (a slow clarification call
+    # blocks other strategy writes meanwhile), but this is a rare, deliberate user action, not
+    # a hot path — correctness against lost updates matters more here than lock granularity.
+    with json_file_lock(STRATEGIES_FILE):
+        store = _load_all()
+        if strategy_id not in store:
+            raise KeyError(f"Strategy {strategy_id} not found.")
 
-    strategy = _ensure_clarification_field(store[strategy_id])
-    if strategy.get("is_builtin") and fields.get("is_active") is False:
-        raise ValueError("The built-in Default 5-Pillar strategy can be edited but not deactivated.")
+        strategy = _ensure_clarification_field(store[strategy_id])
+        if strategy.get("is_builtin"):
+            if fields.get("is_active") is False:
+                raise ValueError("The built-in Default 5-Pillar strategy can be edited but not deactivated.")
+            attempted_config_change = CONFIG_FIELDS & {k for k, v in fields.items() if v is not None}
+            if attempted_config_change:
+                raise ValueError(
+                    "The built-in Default 5-Pillar strategy's scoring configuration "
+                    f"({sorted(attempted_config_change)}) cannot be changed — it's the fixed "
+                    "baseline every custom strategy is compared against. Create a new strategy "
+                    "instead if you want different scope/pillars/weight-bar/gates."
+                )
 
-    requested_active = fields.pop("is_active", None)
+        requested_active = fields.pop("is_active", None)
 
-    editable_fields = {
-        "name", "description", "target_scope", "active_pillars",
-        "required_weight_override", "fundamentals_gate_enabled", "news_gate_enabled",
-        "auto_paper_trade",
-    }
-    old_hash = strategy["config_hash"]
+        editable_fields = {
+            "name", "description", "target_scope", "active_pillars",
+            "required_weight_override", "fundamentals_gate_enabled", "news_gate_enabled",
+            "auto_paper_trade",
+        }
+        old_hash = strategy["config_hash"]
 
-    for key, value in fields.items():
-        if key not in editable_fields:
-            continue
-        if key == "target_scope" and value is not None:
-            invalid_scopes = set(value) - VALID_SCOPES
-            if invalid_scopes:
-                raise ValueError(f"Invalid target_scope values: {sorted(invalid_scopes)}.")
-        if key == "active_pillars" and value is not None:
-            unknown = set(value.keys()) - set(ALL_PILLAR_NAMES)
-            if unknown:
-                raise ValueError(f"Unknown pillar names: {sorted(unknown)}.")
-            merged = dict(strategy.get("active_pillars", {}))
-            merged.update(value)
-            value = merged
-        strategy[key] = value
+        for key, value in fields.items():
+            if key not in editable_fields:
+                continue
+            if key == "target_scope" and value is not None:
+                invalid_scopes = set(value) - VALID_SCOPES
+                if invalid_scopes:
+                    raise ValueError(f"Invalid target_scope values: {sorted(invalid_scopes)}.")
+            if key == "active_pillars" and value is not None:
+                unknown = set(value.keys()) - set(ALL_PILLAR_NAMES)
+                if unknown:
+                    raise ValueError(f"Unknown pillar names: {sorted(unknown)}.")
+                merged = dict(strategy.get("active_pillars", {}))
+                merged.update(value)
+                value = merged
+            if key == "required_weight_override":
+                _validate_required_weight_override(value)
+            strategy[key] = value
 
-    new_hash = _compute_config_hash(strategy)
-    config_changed = new_hash != old_hash
-    strategy["config_hash"] = new_hash
+        new_hash = _compute_config_hash(strategy)
+        config_changed = new_hash != old_hash
+        strategy["config_hash"] = new_hash
 
-    if config_changed and not strategy.get("is_builtin"):
-        clarification = generate_clarification(strategy)  # raises ClarificationUnavailableError
-        clarification.update({"confirmed": False, "confirmed_at": None})
-        strategy["clarification"] = clarification
-        strategy["is_active"] = False
-        logger.info(f"Strategy {strategy_id} config changed — re-clarification required, deactivated.")
+        if config_changed and not strategy.get("is_builtin"):
+            clarification = generate_clarification(strategy)  # raises ClarificationUnavailableError
+            clarification.update({"confirmed": False, "confirmed_at": None})
+            strategy["clarification"] = clarification
+            strategy["is_active"] = False
+            logger.info(f"Strategy {strategy_id} config changed — re-clarification required, deactivated.")
 
-    if requested_active is True:
-        if not strategy["clarification"].get("confirmed", False) and not strategy.get("is_builtin"):
-            raise ValueError("This strategy isn't confirmed yet — confirm its clarification before activating it.")
-        strategy["is_active"] = True
-    elif requested_active is False:
-        strategy["is_active"] = False
+        if requested_active is True:
+            if not strategy["clarification"].get("confirmed", False) and not strategy.get("is_builtin"):
+                raise ValueError("This strategy isn't confirmed yet — confirm its clarification before activating it.")
+            strategy["is_active"] = True
+        elif requested_active is False:
+            strategy["is_active"] = False
 
-    strategy["updated_at"] = datetime.now(timezone.utc).isoformat()
-    store[strategy_id] = strategy
-    _save_all(store)
+        strategy["updated_at"] = datetime.now(timezone.utc).isoformat()
+        store[strategy_id] = strategy
+        _save_all(store)
     logger.info(f"Strategy updated: {strategy_id}")
     return strategy
 
 
 def delete_strategy(strategy_id: str):
-    store = _load_all()
-    if strategy_id not in store:
-        raise KeyError(f"Strategy {strategy_id} not found.")
-    if store[strategy_id].get("is_builtin"):
-        raise ValueError("The built-in Default 5-Pillar strategy cannot be deleted — deactivate custom strategies instead, or edit this one.")
-    del store[strategy_id]
-    _save_all(store)
+    with json_file_lock(STRATEGIES_FILE):
+        store = _load_all()
+        if strategy_id not in store:
+            raise KeyError(f"Strategy {strategy_id} not found.")
+        if store[strategy_id].get("is_builtin"):
+            raise ValueError("The built-in Default 5-Pillar strategy cannot be deleted — deactivate custom strategies instead, or edit this one.")
+        del store[strategy_id]
+        _save_all(store)
     logger.info(f"Strategy deleted: {strategy_id}")
 
 

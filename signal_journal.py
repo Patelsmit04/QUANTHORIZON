@@ -13,6 +13,7 @@ import time
 import json
 import uuid
 import logging
+from contextlib import contextmanager
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 import pandas as pd
@@ -29,7 +30,19 @@ DATA_DIR = "data"
 DB_FILE = os.path.join(DATA_DIR, "signal_journal.db")
 
 
+@contextmanager
 def get_db_connection():
+    """
+    M8 audit fix: sqlite3.Connection's own context-manager protocol only commits/rolls back on
+    exit — it does NOT close the connection. Every call site in this module uses
+    `with get_db_connection() as conn:`, which used to rely on CPython refcounting GC to
+    eventually close the underlying connection. Under WAL mode with two background scheduler
+    threads plus request-handler traffic all hitting this DB, that risks connections
+    outliving their scope and blocking WAL checkpointing, growing signal_journal.db-wal
+    unbounded. Wrapping this as its own generator-based context manager replicates the
+    commit/rollback semantics callers already depend on while guaranteeing an explicit
+    close() no matter what — no call site needs to change.
+    """
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_FILE, timeout=30.0)
@@ -38,7 +51,14 @@ def get_db_connection():
     # more aggressively under concurrent readers+writers than WAL does, and this DB is hit by
     # two background scheduler threads plus request-handler reads/writes.
     conn.execute("PRAGMA journal_mode=WAL")
-    return conn
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def init_journal_db():
@@ -212,7 +232,7 @@ def derive_confidence_bucket(score: int) -> str:
 
 def log_signal_entry(
     stock: Dict[str, Any],
-    vix_value: float = 15.0,
+    vix_value: Optional[float] = 15.0,
     vix_regime: str = "NORMAL",
     strategy_id: str = DEFAULT_STRATEGY_ID,
 ) -> bool:
@@ -232,6 +252,14 @@ def log_signal_entry(
         logger.warning("log_signal_entry: no symbol/index_name on result — skipping.")
         return False
     signal_id = f"{today_date}_{strategy_id}_{symbol}"
+
+    # vix_value is a NOT NULL column — a live VIX-fetch failure now comes through as
+    # (None, "UNAVAILABLE") from vix_provider rather than a fabricated 15.0/"NORMAL". -1.0 can
+    # never collide with a real reading (VIX is always positive), so it stays distinguishable
+    # in analytics (e.g. vix_regime_breakdown groups by the still-honest "UNAVAILABLE" regime
+    # text) instead of silently passing as a normal-vol day.
+    if vix_value is None:
+        vix_value = -1.0
 
     signal_text = stock.get("signal", "NEUTRAL")
     pred_direction = "BULLISH" if "BTST" in signal_text else ("BEARISH" if "STBT" in signal_text else "NEUTRAL")

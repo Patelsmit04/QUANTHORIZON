@@ -238,9 +238,20 @@ def apply_dynamic_pillar_weights() -> Dict[str, Any]:
     weight trajectory is fully auditable — this is auto-improvement with a paper trail, not a
     black box quietly reweighting itself.
     """
-    computation = compute_dynamic_pillar_weights()
     current_weights = get_active_pillar_weights()
     today_str = date.today().isoformat()
+
+    # Disk-backed guard against double-application, same pattern as fundamental_provider's
+    # was_refresh_completed_today() — the caller (app.py's evaluation_scheduler_worker) only
+    # tracks "already ran today" in an in-memory local variable, which resets on restart. A
+    # restart between 9:17 AM and the 15:40 catch-up cutoff would otherwise re-enter the catch-up
+    # window and apply another +/-15% move on top of today's already-applied one.
+    stored = read_json(PILLAR_WEIGHTS_FILE, default=None)
+    if stored and stored.get("last_updated") == today_str:
+        logger.info("Dynamic pillar weights already applied today — skipping duplicate application.")
+        return {"status": "ALREADY_APPLIED_TODAY", "applied": False, "active_weights": current_weights}
+
+    computation = compute_dynamic_pillar_weights()
 
     if computation["status"] != "DYNAMIC_WEIGHTS_COMPUTED":
         _append_weight_history({

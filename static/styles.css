@@ -1739,12 +1739,13 @@ input:checked + .slider:before { transform: translateX(16px); }
 #notifBadgeMobile { position: static; margin-left: 6px; box-shadow: none; }
 
 .notif-panel {
-    position: absolute;
-    top: 44px; right: 0;
+    position: fixed;
+    top: 84px; right: 20px;
     width: 360px;
+    max-width: calc(100vw - 32px);
     max-height: 440px;
     overflow-y: auto;
-    z-index: 200;
+    z-index: 300;
     padding: 0;
 }
 
@@ -1810,6 +1811,9 @@ input:checked + .slider:before { transform: translateX(16px); }
     from { opacity: 0; transform: translateX(24px); }
     to { opacity: 1; transform: translateX(0); }
 }
-/* Desktop bell (.notif-bell-wrap, inside .header-actions) is already hidden below 900px by
-   .header-actions' own display:none in the existing responsive rules — the mobile drawer's
-   #notifBellMobile is the equivalent below that breakpoint, no extra rule needed here. */
+/* M9 audit fix: #notifPanel used to be nested inside .notif-bell-wrap/.header-actions, which
+   is display:none below 900px — that made the panel structurally unreachable from the mobile
+   drawer's #notifBellMobile even though its own "hidden" class was correctly removed (a
+   display:none ancestor hides all descendants regardless of their own display value). It's now
+   a standalone position:fixed overlay (see index.html) so both the desktop bell and
+   #notifBellMobile open the same reachable element. */
