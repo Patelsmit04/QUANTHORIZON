@@ -33,6 +33,7 @@ from typing import Dict, List, Any, Optional
 from json_utils import atomic_write_json, read_json, json_file_lock
 from clarification_service import generate_clarification, ClarificationUnavailableError
 from env_utils import DATA_DIR
+from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json, pg_key_lock
 
 logger = logging.getLogger("StrategyManager")
 
@@ -87,12 +88,24 @@ def _ensure_data_dir():
 
 
 def _load_all() -> Dict[str, Any]:
+    if USE_POSTGRES:
+        return pg_read_json("strategies", default={})
     return read_json(STRATEGIES_FILE, default={})
 
 
 def _save_all(store: Dict[str, Any]):
+    if USE_POSTGRES:
+        pg_write_json("strategies", store)
+        return
     _ensure_data_dir()
     atomic_write_json(STRATEGIES_FILE, store)
+
+
+def _state_lock():
+    """Cross-process lock when shared via Postgres, in-process-only lock otherwise — see
+    pg_utils.py's module docstring for why json_file_lock alone isn't enough once a second
+    process (e.g. a Vercel instance) can write strategies.json's Postgres-backed equivalent."""
+    return pg_key_lock("strategies") if USE_POSTGRES else json_file_lock(STRATEGIES_FILE)
 
 
 def _compute_config_hash(strategy: Dict[str, Any]) -> str:
@@ -141,7 +154,7 @@ def _seed_default_strategy_if_missing():
     # M8 audit fix: read-check-write, wrapped so two threads racing this at startup can't both
     # pass the "missing" check and both write (harmless duplicate work today, but the same
     # pattern as every other read-modify-write in this file, kept consistent).
-    with json_file_lock(STRATEGIES_FILE):
+    with _state_lock():
         store = _load_all()
         if DEFAULT_STRATEGY_ID in store:
             return
@@ -249,7 +262,7 @@ def create_strategy_draft(
     clarification.update({"confirmed": False, "confirmed_at": None})
     strategy["clarification"] = clarification
 
-    with json_file_lock(STRATEGIES_FILE):
+    with _state_lock():
         store = _load_all()
         store[strategy_id] = strategy
         _save_all(store)
@@ -272,7 +285,7 @@ def resubmit_clarification(strategy_id: str, correction_note: str) -> Dict[str, 
     # M8 audit fix: re-read fresh inside the lock rather than reusing the `store`/`strategy`
     # snapshot taken before the (potentially multi-second) Claude call above — a concurrent
     # edit landing during that call would otherwise be silently overwritten by this stale copy.
-    with json_file_lock(STRATEGIES_FILE):
+    with _state_lock():
         store = _load_all()
         if strategy_id not in store:
             raise KeyError(f"Strategy {strategy_id} not found.")
@@ -292,7 +305,7 @@ def confirm_strategy(strategy_id: str) -> Dict[str, Any]:
     pillar-config strategy activates it directly, since there's no custom code whose behavior
     needs proving out first — the scoring engine itself is already the tested, shared code
     path every strategy runs through."""
-    with json_file_lock(STRATEGIES_FILE):
+    with _state_lock():
         store = _load_all()
         if strategy_id not in store:
             raise KeyError(f"Strategy {strategy_id} not found.")
@@ -329,7 +342,7 @@ def update_strategy(strategy_id: str, **fields) -> Dict[str, Any]:
     # conditional Claude call below. Coarser than strictly necessary (a slow clarification call
     # blocks other strategy writes meanwhile), but this is a rare, deliberate user action, not
     # a hot path — correctness against lost updates matters more here than lock granularity.
-    with json_file_lock(STRATEGIES_FILE):
+    with _state_lock():
         store = _load_all()
         if strategy_id not in store:
             raise KeyError(f"Strategy {strategy_id} not found.")
@@ -400,7 +413,7 @@ def update_strategy(strategy_id: str, **fields) -> Dict[str, Any]:
 
 
 def delete_strategy(strategy_id: str):
-    with json_file_lock(STRATEGIES_FILE):
+    with _state_lock():
         store = _load_all()
         if strategy_id not in store:
             raise KeyError(f"Strategy {strategy_id} not found.")

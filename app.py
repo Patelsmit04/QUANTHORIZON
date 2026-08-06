@@ -24,6 +24,7 @@ from candle_utils import fetch_post_lock_candles
 import closing_sequence
 import ws_broadcast
 from json_utils import atomic_write_json, read_json, json_file_lock
+from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json, pg_key_lock
 from scoring_engine import evaluate_5_pillar_matrix, get_liquidity_tier
 from nse_data_provider import (
     fetch_all_nse_data, get_per_stock_oi_data, get_per_stock_delivery_data,
@@ -274,16 +275,26 @@ class TradeHistoryManager:
 
     @staticmethod
     def load_data() -> Dict[str, Any]:
-        TradeHistoryManager._ensure_storage()
-        return read_json(TRADE_HISTORY_FILE, default={
+        default = {
             "trades": [], "total_trades": 0, "wins": 0, "losses": 0, "win_rate_pct": 0.0, "prediction_accuracy_pct": 92.5
-        })
+        }
+        if USE_POSTGRES:
+            return pg_read_json("trade_history", default=default)
+        TradeHistoryManager._ensure_storage()
+        return read_json(TRADE_HISTORY_FILE, default=default)
 
     @staticmethod
     def save_data(data: Dict[str, Any]):
-        TradeHistoryManager._ensure_storage()
         data["last_updated"] = time.strftime("%Y-%m-%d %H:%M:%S IST")
+        if USE_POSTGRES:
+            pg_write_json("trade_history", data)
+            return
+        TradeHistoryManager._ensure_storage()
         atomic_write_json(TRADE_HISTORY_FILE, data)
+
+    @staticmethod
+    def _state_lock():
+        return pg_key_lock("trade_history") if USE_POSTGRES else json_file_lock(TRADE_HISTORY_FILE)
 
     @staticmethod
     def lock_tier1_picks(p1_stocks: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -297,7 +308,7 @@ class TradeHistoryManager:
         # thread and a manual POST /api/lock_picks used to be able to both load the same
         # pre-mutation store and each save their own version, silently discarding whichever
         # ran first.
-        with json_file_lock(TRADE_HISTORY_FILE):
+        with TradeHistoryManager._state_lock():
             store = TradeHistoryManager.load_data()
             today_date = get_ist_now().strftime("%Y-%m-%d")
 
@@ -361,7 +372,7 @@ class TradeHistoryManager:
         """Fetch 9:15 AM open prices and compute Predicted Gap vs Actual Gap Accuracy + System Accuracy Auto-Upgrade."""
         # M8 audit fix: same load-mutate-save race as lock_btst_picks — this and a manual
         # POST /api/evaluate_picks both touch trade_history.json.
-        with json_file_lock(TRADE_HISTORY_FILE):
+        with TradeHistoryManager._state_lock():
             return TradeHistoryManager._evaluate_pending_trades_locked()
 
     @staticmethod
@@ -470,14 +481,21 @@ class TradeHistoryManager:
 
 
 def save_last_market_scan(scan_response: Dict[str, Any]):
-    """Save full scan analysis persistently to disk."""
+    """Save full scan analysis persistently — Postgres when shared with a stateless deployment
+    (e.g. Vercel) that can't run the scanner itself and needs to read what THIS process last
+    computed; local disk otherwise."""
+    if USE_POSTGRES:
+        pg_write_json("last_market_scan", scan_response)
+        return
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR, exist_ok=True)
     atomic_write_json(LAST_MARKET_SCAN_FILE, scan_response)
 
 
 def load_last_market_scan() -> Optional[Dict[str, Any]]:
-    """Load persistent 3:30 PM market scan analysis from disk."""
+    """Load persistent 3:30 PM market scan analysis."""
+    if USE_POSTGRES:
+        return pg_read_json("last_market_scan", default=None)
     return read_json(LAST_MARKET_SCAN_FILE, default=None)
 
 
@@ -645,12 +663,25 @@ def score_index_universe(raw: Dict[str, Any], strategy: Dict[str, Any]) -> List[
     return results
 
 
+def _load_index_verdicts() -> Dict[str, Any]:
+    if USE_POSTGRES:
+        return pg_read_json("index_btst_verdicts", default={})
+    return read_json(INDEX_INTELLIGENCE_FILE, default={})
+
+
+def _save_index_verdicts(data: Dict[str, Any]) -> None:
+    if USE_POSTGRES:
+        pg_write_json("index_btst_verdicts", data)
+        return
+    atomic_write_json(INDEX_INTELLIGENCE_FILE, data)
+
+
 def was_index_intelligence_completed_today() -> bool:
     """Disk-backed freshness check (not an in-memory flag) — same reasoning as
     fundamentals' was_refresh_completed_today(): an in-memory flag resets on every process
     restart (e.g. --reload picking up a code change), which would silently re-trigger a
     same-day re-run instead of running once."""
-    data = read_json(INDEX_INTELLIGENCE_FILE, default={})
+    data = _load_index_verdicts()
     return data.get("_meta", {}).get("completed_date") == get_ist_now().strftime("%Y-%m-%d")
 
 
@@ -707,7 +738,7 @@ def run_index_btst_intelligence() -> Dict[str, Any]:
             logger.warning(f"[Index Intelligence] Journal log failed for {index_name}: {e}")
 
     verdicts_output["_meta"] = {"completed_date": get_ist_now().strftime("%Y-%m-%d")}
-    atomic_write_json(INDEX_INTELLIGENCE_FILE, verdicts_output)
+    _save_index_verdicts(verdicts_output)
 
     summary = {k: v["verdict"] for k, v in verdicts_output["verdicts"].items()}
     logger.info(f"[Index Intelligence] Post-close verdict run complete: {summary}")
@@ -1180,6 +1211,32 @@ def enrich_picks_with_news(picks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return picks
 
 
+def _can_run_live_scan_inline() -> bool:
+    """
+    M12: a live full-universe scan (~209 stocks via yfinance) takes far longer than any
+    serverless function's execution timeout allows. Only the persistent host (`python app.py`,
+    running the real autonomous scheduler) should ever run one inline from a request handler —
+    a stateless deployment like Vercel must fall back to whatever's cached (locally, or shared
+    via Postgres if DATABASE_URL is configured) instead, even if that means honestly reporting
+    "not available yet" rather than hanging until the platform kills the request.
+    """
+    return not os.environ.get("VERCEL")
+
+
+def _no_scan_data_response(sched_info: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "cache_hit": False,
+        "scan_mode": sched_info["mode"],
+        "market_status": sched_info["status"],
+        "total_scanned": 0,
+        "stocks": [],
+        "indices": [],
+        "available": False,
+        "message": "No scan data available yet on this deployment — the autonomous scanner "
+                    "runs on a separate persistent host and hasn't synced any data here yet.",
+    }
+
+
 @app.get("/api/scan")
 def get_scan_results(
     filter_type: Optional[str] = Query(None, description="ALL, BTST, STBT, HIGH_VOL, WATCHLIST"),
@@ -1188,9 +1245,11 @@ def get_scan_results(
 ):
     sched_info = get_market_schedule_info()
 
-    if nocache and sched_info["is_open"]:
+    scan_response = None
+    if nocache and sched_info["is_open"] and _can_run_live_scan_inline():
         scan_response = run_full_scan_pipeline()
-    else:
+
+    if scan_response is None:
         with _cache_lock:
             if cache_store.get("scan_summary") is None:
                 cache_store["scan_summary"] = load_last_market_scan()
@@ -1204,8 +1263,10 @@ def get_scan_results(
 
         if scan_response is not None:
             scan_response["cache_hit"] = True
-        else:
+        elif _can_run_live_scan_inline():
             scan_response = run_full_scan_pipeline()
+        else:
+            scan_response = _no_scan_data_response(sched_info)
 
     annotate_bestest_5(scan_response.get("stocks", []))
 
@@ -1317,8 +1378,15 @@ def get_index_signals():
     """
     index_data = cache_store.get("index_data")
     if index_data is None:
-        scan_res = run_full_scan_pipeline()
-        index_data = scan_res.get("indices", [])
+        if _can_run_live_scan_inline():
+            scan_res = run_full_scan_pipeline()
+            index_data = scan_res.get("indices", [])
+        else:
+            # M12: same reasoning as /api/scan — never run a live scan inline on a stateless
+            # deployment. cache_store["index_data"] is always empty on a fresh Vercel instance
+            # (in-memory, never persisted), so fall back to whatever was last synced.
+            cached = load_last_market_scan()
+            index_data = (cached or {}).get("indices", [])
     return sanitize_json_data({"indices": index_data, "tickers": INDEX_TICKERS})
 
 
@@ -1332,7 +1400,7 @@ def get_index_btst_verdict():
     cache — never recomputes on request, since option-chain data is only ever fetched during
     the dedicated post-close run, not on demand.
     """
-    data = read_json(INDEX_INTELLIGENCE_FILE, default=None)
+    data = _load_index_verdicts() or None
     if not data:
         return sanitize_json_data({
             "available": False,

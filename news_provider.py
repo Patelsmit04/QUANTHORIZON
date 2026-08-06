@@ -33,6 +33,7 @@ import requests
 from json_utils import atomic_write_json, read_json
 from env_utils import load_env_with_fallback, DATA_DIR
 from lock_utils import file_lock
+from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json
 
 BASE_DIR = Path(__file__).resolve().parent
 load_env_with_fallback(str(BASE_DIR))
@@ -235,8 +236,22 @@ def _ensure_data_dir():
     os.makedirs(DATA_DIR, exist_ok=True)
 
 
+def _load_news_cache() -> Dict[str, Any]:
+    if USE_POSTGRES:
+        return pg_read_json("stock_news_cache", default={})
+    return read_json(STOCK_NEWS_CACHE_FILE, default={})
+
+
+def _save_news_cache(cache: Dict[str, Any]) -> None:
+    if USE_POSTGRES:
+        pg_write_json("stock_news_cache", cache)
+        return
+    _ensure_data_dir()
+    atomic_write_json(STOCK_NEWS_CACHE_FILE, cache)
+
+
 def get_universe_news_meta() -> Dict[str, Any]:
-    cache = read_json(STOCK_NEWS_CACHE_FILE, default={})
+    cache = _load_news_cache()
     return cache.get("_meta", {})
 
 
@@ -285,7 +300,7 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
         if not _api_available():
             return {"fetched": 0, "failed": 0, "skipped": "NO_API_KEY"}
 
-        cache = read_json(STOCK_NEWS_CACHE_FILE, default={})
+        cache = _load_news_cache()
         today_str = date.today().isoformat()
         fetched, failed = 0, 0
         t0 = time.time()
@@ -325,7 +340,7 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
                         failed += 1
 
             # Checkpoint after every chunk — a chunk-interrupting reload doesn't lose prior chunks.
-            atomic_write_json(STOCK_NEWS_CACHE_FILE, cache)
+            _save_news_cache(cache)
 
             is_last_chunk = (chunk_idx + BURST_SAFE_CHUNK_SIZE) >= len(symbol_items)
             if not is_last_chunk:
@@ -341,7 +356,7 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
             "last_refresh_completed_at": datetime.now(timezone.utc).isoformat(),
             "symbol_count": fetched,
         }
-        atomic_write_json(STOCK_NEWS_CACHE_FILE, cache)
+        _save_news_cache(cache)
         elapsed = round(time.time() - t0, 1)
         logger.info(
             f"Universe news refresh complete: {fetched} fetched, {failed} failed, {elapsed}s "
@@ -356,11 +371,11 @@ def get_cached_stock_news(symbol: str) -> Optional[Dict[str, Any]]:
     reads this same cached file; nobody's page view ever triggers a CurrentsAPI request.
     """
     clean_sym = symbol.replace(".NS", "").upper()
-    cache = read_json(STOCK_NEWS_CACHE_FILE, default={})
+    cache = _load_news_cache()
     return cache.get(clean_sym)
 
 
 def get_all_cached_news() -> Dict[str, Any]:
     """Full cached news set for the News section — one disk read, served to unlimited users."""
-    cache = read_json(STOCK_NEWS_CACHE_FILE, default={})
+    cache = _load_news_cache()
     return {k: v for k, v in cache.items() if k != "_meta"}

@@ -18,16 +18,73 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 import pandas as pd
 import yfinance as yf
+from psycopg.rows import dict_row
 
 from strategy_manager import DEFAULT_STRATEGY_ID
 from index_scoring import INDEX_TICKERS
 from net_utils import call_with_retry
 from candle_utils import fetch_post_lock_candles
 from env_utils import DATA_DIR
+from pg_utils import USE_POSTGRES, get_pg_connection
 
 logger = logging.getLogger("SignalJournal")
 
 DB_FILE = os.path.join(DATA_DIR, "signal_journal.db")
+
+
+class _PgCursorCompat:
+    """Wraps a psycopg cursor so every existing `cursor.execute("... ? ...", params)` call
+    site in this module keeps working unchanged against Postgres — translates `?` to `%s`
+    (safe here: every query in this file was read end-to-end to confirm none contains a
+    literal `?` outside a placeholder position) and mimics sqlite3.Cursor's .rowcount."""
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    def execute(self, sql: str, params=()):
+        self._cursor.execute(sql.replace("?", "%s"), params)
+        return self
+
+    def fetchone(self):
+        return self._cursor.fetchone()
+
+    def fetchall(self):
+        return self._cursor.fetchall()
+
+    @property
+    def rowcount(self):
+        return self._cursor.rowcount
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return False
+
+
+class _PgConnCompat:
+    """Wraps a psycopg connection so it's a drop-in stand-in for the sqlite3.Connection every
+    call site in this module already expects — including sqlite3's `conn.execute(...)`
+    convenience shortcut (log_notification, get_notifications, mark_*_read use it directly;
+    psycopg's Connection has no equivalent method, only .cursor().execute())."""
+    def __init__(self, pg_conn):
+        self._conn = pg_conn
+
+    def cursor(self):
+        return _PgCursorCompat(self._conn.cursor(row_factory=dict_row))
+
+    def execute(self, sql: str, params=()):
+        cur = self.cursor()
+        cur.execute(sql, params)
+        return cur
+
+    def commit(self):
+        self._conn.commit()
+
+    def rollback(self):
+        self._conn.rollback()
+
+    def close(self):
+        self._conn.close()
 
 
 @contextmanager
@@ -42,7 +99,23 @@ def get_db_connection():
     unbounded. Wrapping this as its own generator-based context manager replicates the
     commit/rollback semantics callers already depend on while guaranteeing an explicit
     close() no matter what — no call site needs to change.
+
+    M11: when DATABASE_URL is set, this yields a Postgres connection (wrapped in
+    _PgConnCompat) instead — same commit/rollback/close contract, so every function below
+    that already does `with get_db_connection() as conn:` needs no changes at all.
     """
+    if USE_POSTGRES:
+        conn = _PgConnCompat(get_pg_connection())
+        try:
+            yield conn
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+        return
+
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_FILE, timeout=30.0)
@@ -61,11 +134,149 @@ def get_db_connection():
         conn.close()
 
 
-def init_journal_db():
-    """Initialize SQLite tables for Signal Journal & Evaluations."""
+def _init_journal_db_postgres():
+    """
+    Postgres-flavored schema — same 5 tables, DOUBLE PRECISION instead of REAL (SQLite's REAL
+    is always 8-byte, matching Postgres DOUBLE PRECISION rather than Postgres's 4-byte REAL),
+    strategy_id included directly in CREATE TABLE (no separate ALTER TABLE migration needed —
+    unlike an existing SQLite file, a fresh Postgres database has no pre-multi-strategy rows to
+    backfill), and `ADD COLUMN IF NOT EXISTS` if this ever needs a future migration since
+    Postgres supports it natively (SQLite's try/except OperationalError above was a workaround
+    for not having that).
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor()
-        
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS signal_journal (
+            id TEXT PRIMARY KEY,
+            timestamp TEXT NOT NULL,
+            signal_date TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            raw_ticker TEXT NOT NULL,
+            liquidity_tier TEXT NOT NULL,
+            priority_level TEXT NOT NULL,
+            signal TEXT NOT NULL,
+            predicted_direction TEXT NOT NULL,
+            option_type TEXT NOT NULL,
+            confidence_score INTEGER NOT NULL,
+            confidence_bucket TEXT NOT NULL,
+            close_price_325 DOUBLE PRECISION NOT NULL,
+            predicted_gap_pct DOUBLE PRECISION NOT NULL,
+            vwap DOUBLE PRECISION NOT NULL,
+            volume_spike DOUBLE PRECISION NOT NULL,
+            rsi DOUBLE PRECISION NOT NULL,
+            range_position_pct DOUBLE PRECISION NOT NULL,
+            pillar_1_confirmed INTEGER NOT NULL,
+            pillar_1_weight DOUBLE PRECISION NOT NULL,
+            pillar_2_confirmed INTEGER NOT NULL,
+            pillar_2_weight DOUBLE PRECISION NOT NULL,
+            pillar_3_confirmed INTEGER NOT NULL,
+            pillar_3_weight DOUBLE PRECISION NOT NULL,
+            pillar_4_confirmed INTEGER NOT NULL,
+            pillar_4_weight DOUBLE PRECISION NOT NULL,
+            pillar_5_confirmed INTEGER NOT NULL,
+            pillar_5_weight DOUBLE PRECISION NOT NULL,
+            total_pillar_weight DOUBLE PRECISION NOT NULL,
+            expiry_discount_applied INTEGER NOT NULL,
+            vix_regime TEXT NOT NULL,
+            vix_value DOUBLE PRECISION NOT NULL,
+            strategy_id TEXT NOT NULL DEFAULT 'default-5-pillar'
+        );
+        """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS signal_evaluations (
+            signal_id TEXT PRIMARY KEY,
+            eval_date TEXT NOT NULL,
+            eval_timestamp TEXT NOT NULL,
+            next_open_915 DOUBLE PRECISION NOT NULL,
+            next_high DOUBLE PRECISION,
+            next_low DOUBLE PRECISION,
+            next_close_930 DOUBLE PRECISION,
+            actual_gap_pct DOUBLE PRECISION NOT NULL,
+            is_direction_correct INTEGER NOT NULL,
+            variance_error_pct DOUBLE PRECISION NOT NULL,
+            directional_accuracy_score DOUBLE PRECISION NOT NULL,
+            trade_taken INTEGER NOT NULL,
+            est_entry_premium DOUBLE PRECISION NOT NULL,
+            est_exit_premium DOUBLE PRECISION NOT NULL,
+            spread_haircut_pct DOUBLE PRECISION NOT NULL,
+            gross_pnl_pct DOUBLE PRECISION NOT NULL,
+            net_pnl_pct DOUBLE PRECISION NOT NULL,
+            is_trade_win INTEGER NOT NULL,
+            FOREIGN KEY(signal_id) REFERENCES signal_journal(id)
+        );
+        """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS index_verdict_journal (
+            id TEXT PRIMARY KEY,
+            verdict_date TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            index_name TEXT NOT NULL,
+            raw_ticker TEXT NOT NULL,
+            price DOUBLE PRECISION,
+            price_verified INTEGER NOT NULL,
+            verdict TEXT NOT NULL,
+            confidence_level_pct INTEGER NOT NULL,
+            expected_open_direction TEXT,
+            expected_open_points DOUBLE PRECISION,
+            expected_range_low DOUBLE PRECISION,
+            expected_range_high DOUBLE PRECISION,
+            primary_reason TEXT NOT NULL,
+            invalidation_level TEXT NOT NULL,
+            highest_probability_trade_type TEXT NOT NULL,
+            full_verdict_json TEXT NOT NULL,
+            raw_pillar_inputs_json TEXT NOT NULL
+        );
+        """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS index_verdict_evaluations (
+            verdict_id TEXT PRIMARY KEY,
+            eval_date TEXT NOT NULL,
+            eval_timestamp TEXT NOT NULL,
+            next_open_915 DOUBLE PRECISION NOT NULL,
+            next_close_930 DOUBLE PRECISION,
+            actual_gap_pct DOUBLE PRECISION NOT NULL,
+            is_direction_correct INTEGER NOT NULL,
+            variance_error_pct DOUBLE PRECISION NOT NULL,
+            actual_move_points DOUBLE PRECISION NOT NULL,
+            move_within_expected_range INTEGER,
+            FOREIGN KEY(verdict_id) REFERENCES index_verdict_journal(id)
+        );
+        """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS notifications (
+            id TEXT PRIMARY KEY,
+            type TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            title TEXT NOT NULL,
+            message TEXT NOT NULL,
+            payload_json TEXT,
+            read INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL
+        );
+        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_notifications_created ON notifications(created_at DESC);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_signal_journal_strategy ON signal_journal(strategy_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_signal_journal_date ON signal_journal(signal_date);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_index_verdict_date ON index_verdict_journal(verdict_date, index_name);")
+
+        conn.commit()
+    logger.info("Signal Journal Postgres schema initialized successfully.")
+
+
+def init_journal_db():
+    """Initialize SQLite tables for Signal Journal & Evaluations."""
+    if USE_POSTGRES:
+        _init_journal_db_postgres()
+        return
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+
         # Table 1: Signal Journal (Daily 3:30 PM Signals)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS signal_journal (
@@ -277,10 +488,23 @@ def log_signal_entry(
     p4_w = float(pw.get("Pillar 4: Volume Spike", 0.0))
     p5_w = float(pw.get("Pillar 5: Marubozu Close", 0.0))
 
-    try:
-        with get_db_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
+    # M11: same column/value list either dialect — _PgCursorCompat.execute() (see
+    # get_db_connection) translates `?` to `%s` transparently, so only the conflict-handling
+    # clause itself needs to branch (SQLite has no ON CONFLICT-with-DO-NOTHING equivalent
+    # named that way, and Postgres has no INSERT OR IGNORE).
+    insert_signal_sql = ("""
+            INSERT INTO signal_journal (
+                id, timestamp, signal_date, symbol, raw_ticker, liquidity_tier,
+                priority_level, signal, predicted_direction, option_type,
+                confidence_score, confidence_bucket, close_price_325, predicted_gap_pct,
+                vwap, volume_spike, rsi, range_position_pct,
+                pillar_1_confirmed, pillar_1_weight, pillar_2_confirmed, pillar_2_weight,
+                pillar_3_confirmed, pillar_3_weight, pillar_4_confirmed, pillar_4_weight,
+                pillar_5_confirmed, pillar_5_weight, total_pillar_weight,
+                expiry_discount_applied, vix_regime, vix_value, strategy_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (id) DO NOTHING
+            """ if USE_POSTGRES else """
             INSERT OR IGNORE INTO signal_journal (
                 id, timestamp, signal_date, symbol, raw_ticker, liquidity_tier,
                 priority_level, signal, predicted_direction, option_type,
@@ -291,7 +515,12 @@ def log_signal_entry(
                 pillar_5_confirmed, pillar_5_weight, total_pillar_weight,
                 expiry_discount_applied, vix_regime, vix_value, strategy_id
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
+            """)
+
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(insert_signal_sql, (
                 signal_id,
                 time.strftime("%Y-%m-%d %H:%M:%S IST"),
                 today_date,
@@ -348,17 +577,40 @@ def log_index_verdict(verdict: Dict[str, Any], raw_index_result: Dict[str, Any])
     expected_open = verdict.get("expected_open") or {}
     trade = verdict.get("highest_probability_btst_trade") or {}
 
-    try:
-        with get_db_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
+    upsert_verdict_sql = ("""
+            INSERT INTO index_verdict_journal (
+                id, verdict_date, timestamp, index_name, raw_ticker, price, price_verified,
+                verdict, confidence_level_pct, expected_open_direction, expected_open_points,
+                expected_range_low, expected_range_high, primary_reason, invalidation_level,
+                highest_probability_trade_type, full_verdict_json, raw_pillar_inputs_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (id) DO UPDATE SET
+                verdict_date = EXCLUDED.verdict_date, timestamp = EXCLUDED.timestamp,
+                index_name = EXCLUDED.index_name, raw_ticker = EXCLUDED.raw_ticker,
+                price = EXCLUDED.price, price_verified = EXCLUDED.price_verified,
+                verdict = EXCLUDED.verdict, confidence_level_pct = EXCLUDED.confidence_level_pct,
+                expected_open_direction = EXCLUDED.expected_open_direction,
+                expected_open_points = EXCLUDED.expected_open_points,
+                expected_range_low = EXCLUDED.expected_range_low,
+                expected_range_high = EXCLUDED.expected_range_high,
+                primary_reason = EXCLUDED.primary_reason,
+                invalidation_level = EXCLUDED.invalidation_level,
+                highest_probability_trade_type = EXCLUDED.highest_probability_trade_type,
+                full_verdict_json = EXCLUDED.full_verdict_json,
+                raw_pillar_inputs_json = EXCLUDED.raw_pillar_inputs_json
+            """ if USE_POSTGRES else """
             INSERT OR REPLACE INTO index_verdict_journal (
                 id, verdict_date, timestamp, index_name, raw_ticker, price, price_verified,
                 verdict, confidence_level_pct, expected_open_direction, expected_open_points,
                 expected_range_low, expected_range_high, primary_reason, invalidation_level,
                 highest_probability_trade_type, full_verdict_json, raw_pillar_inputs_json
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
+            """)
+
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(upsert_verdict_sql, (
                 verdict_id,
                 verdict_date,
                 time.strftime("%Y-%m-%d %H:%M:%S IST"),
@@ -408,6 +660,28 @@ def evaluate_pending_index_verdicts() -> Dict[str, Any]:
     evaluated_count = 0
     today_date_str = datetime.now().strftime("%Y-%m-%d")
 
+    upsert_index_eval_sql = ("""
+                INSERT INTO index_verdict_evaluations (
+                    verdict_id, eval_date, eval_timestamp, next_open_915, next_close_930,
+                    actual_gap_pct, is_direction_correct, variance_error_pct,
+                    actual_move_points, move_within_expected_range
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (verdict_id) DO UPDATE SET
+                    eval_date = EXCLUDED.eval_date, eval_timestamp = EXCLUDED.eval_timestamp,
+                    next_open_915 = EXCLUDED.next_open_915, next_close_930 = EXCLUDED.next_close_930,
+                    actual_gap_pct = EXCLUDED.actual_gap_pct,
+                    is_direction_correct = EXCLUDED.is_direction_correct,
+                    variance_error_pct = EXCLUDED.variance_error_pct,
+                    actual_move_points = EXCLUDED.actual_move_points,
+                    move_within_expected_range = EXCLUDED.move_within_expected_range
+                """ if USE_POSTGRES else """
+                INSERT OR REPLACE INTO index_verdict_evaluations (
+                    verdict_id, eval_date, eval_timestamp, next_open_915, next_close_930,
+                    actual_gap_pct, is_direction_correct, variance_error_pct,
+                    actual_move_points, move_within_expected_range
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """)
+
     # One connection reused for the whole batch (Phase-1 audit finding #15) — this used to
     # open/close a fresh connection per row inside the loop.
     with get_db_connection() as conn:
@@ -446,13 +720,7 @@ def evaluate_pending_index_verdicts() -> Dict[str, Any]:
                 if v["expected_range_low"] is not None and v["expected_range_high"] is not None:
                     move_within_range = 1 if v["expected_range_low"] <= open_915 <= v["expected_range_high"] else 0
 
-                cursor.execute("""
-                INSERT OR REPLACE INTO index_verdict_evaluations (
-                    verdict_id, eval_date, eval_timestamp, next_open_915, next_close_930,
-                    actual_gap_pct, is_direction_correct, variance_error_pct,
-                    actual_move_points, move_within_expected_range
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
+                cursor.execute(upsert_index_eval_sql, (
                     v["id"],
                     today_date_str,
                     time.strftime("%Y-%m-%d %H:%M:%S IST"),
@@ -543,6 +811,36 @@ def evaluate_pending_signals() -> Dict[str, Any]:
     evaluated_count = 0
     today_date_str = datetime.now().strftime("%Y-%m-%d")
 
+    upsert_signal_eval_sql = ("""
+                    INSERT INTO signal_evaluations (
+                        signal_id, eval_date, eval_timestamp, next_open_915, next_high, next_low,
+                        next_close_930, actual_gap_pct, is_direction_correct, variance_error_pct,
+                        directional_accuracy_score, trade_taken, est_entry_premium, est_exit_premium,
+                        spread_haircut_pct, gross_pnl_pct, net_pnl_pct, is_trade_win
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT (signal_id) DO UPDATE SET
+                        eval_date = EXCLUDED.eval_date, eval_timestamp = EXCLUDED.eval_timestamp,
+                        next_open_915 = EXCLUDED.next_open_915, next_high = EXCLUDED.next_high,
+                        next_low = EXCLUDED.next_low, next_close_930 = EXCLUDED.next_close_930,
+                        actual_gap_pct = EXCLUDED.actual_gap_pct,
+                        is_direction_correct = EXCLUDED.is_direction_correct,
+                        variance_error_pct = EXCLUDED.variance_error_pct,
+                        directional_accuracy_score = EXCLUDED.directional_accuracy_score,
+                        trade_taken = EXCLUDED.trade_taken,
+                        est_entry_premium = EXCLUDED.est_entry_premium,
+                        est_exit_premium = EXCLUDED.est_exit_premium,
+                        spread_haircut_pct = EXCLUDED.spread_haircut_pct,
+                        gross_pnl_pct = EXCLUDED.gross_pnl_pct, net_pnl_pct = EXCLUDED.net_pnl_pct,
+                        is_trade_win = EXCLUDED.is_trade_win
+                    """ if USE_POSTGRES else """
+                    INSERT OR REPLACE INTO signal_evaluations (
+                        signal_id, eval_date, eval_timestamp, next_open_915, next_high, next_low,
+                        next_close_930, actual_gap_pct, is_direction_correct, variance_error_pct,
+                        directional_accuracy_score, trade_taken, est_entry_premium, est_exit_premium,
+                        spread_haircut_pct, gross_pnl_pct, net_pnl_pct, is_trade_win
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """)
+
     # One connection reused for the whole batch (Phase-1 audit finding #15) — this used to
     # open/close a fresh connection per row inside the loop.
     with get_db_connection() as conn:
@@ -606,14 +904,7 @@ def evaluate_pending_signals() -> Dict[str, Any]:
 
                 # Reuses the batch-level connection opened above (Phase-1 audit finding #15) —
                 # this used to open a brand new connection here, per row, inside the loop.
-                cursor.execute("""
-                    INSERT OR REPLACE INTO signal_evaluations (
-                        signal_id, eval_date, eval_timestamp, next_open_915, next_high, next_low,
-                        next_close_930, actual_gap_pct, is_direction_correct, variance_error_pct,
-                        directional_accuracy_score, trade_taken, est_entry_premium, est_exit_premium,
-                        spread_haircut_pct, gross_pnl_pct, net_pnl_pct, is_trade_win
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (
+                cursor.execute(upsert_signal_eval_sql, (
                         sig["id"],
                         today_date_str,
                         time.strftime("%Y-%m-%d %H:%M:%S IST"),

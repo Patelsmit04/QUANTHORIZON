@@ -28,6 +28,7 @@ from typing import Dict, Any, List, Optional
 
 from json_utils import atomic_write_json, read_json, json_file_lock
 from env_utils import DATA_DIR
+from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json, pg_key_lock
 
 logger = logging.getLogger("ExecutionProvider")
 
@@ -68,12 +69,21 @@ def _ensure_data_dir():
 
 
 def _load_trades() -> List[Dict[str, Any]]:
+    if USE_POSTGRES:
+        return pg_read_json("paper_trades", default=[])
     return read_json(PAPER_TRADES_FILE, default=[])
 
 
 def _save_trades(trades: List[Dict[str, Any]]):
+    if USE_POSTGRES:
+        pg_write_json("paper_trades", trades)
+        return
     _ensure_data_dir()
     atomic_write_json(PAPER_TRADES_FILE, trades)
+
+
+def _state_lock():
+    return pg_key_lock("paper_trades") if USE_POSTGRES else json_file_lock(PAPER_TRADES_FILE)
 
 
 def execute_signal(
@@ -118,7 +128,7 @@ def execute_signal(
     # M8 audit fix: the 3:40 PM auto-lock thread and a manual POST /api/strategies/{id}/execute
     # can both reach this at once — without a lock around the whole load-append-save cycle,
     # whichever writes last would silently discard the other's trade record.
-    with json_file_lock(PAPER_TRADES_FILE):
+    with _state_lock():
         trades = _load_trades()
         trades.append(trade_record)
         trades = trades[-2000:]  # bounded history

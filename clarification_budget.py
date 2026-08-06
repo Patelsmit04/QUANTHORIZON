@@ -17,6 +17,7 @@ from typing import Dict, Any
 
 from json_utils import atomic_write_json, read_json, json_file_lock
 from env_utils import DATA_DIR
+from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json, pg_key_lock
 
 logger = logging.getLogger("ClarificationBudget")
 
@@ -37,12 +38,21 @@ def _ensure_data_dir():
 
 
 def _load() -> Dict[str, Any]:
+    if USE_POSTGRES:
+        return pg_read_json("clarification_budget", default={})
     return read_json(BUDGET_FILE, default={})
 
 
 def _save(data: Dict[str, Any]):
+    if USE_POSTGRES:
+        pg_write_json("clarification_budget", data)
+        return
     _ensure_data_dir()
     atomic_write_json(BUDGET_FILE, data)
+
+
+def _state_lock():
+    return pg_key_lock("clarification_budget") if USE_POSTGRES else json_file_lock(BUDGET_FILE)
 
 
 def check_and_increment_budget() -> None:
@@ -56,7 +66,7 @@ def check_and_increment_budget() -> None:
     fire a real billed call, with the loser's increment overwriting the winner's. The whole
     read-check-write cycle is now serialized per-process via json_file_lock."""
     today_str = date.today().isoformat()
-    with json_file_lock(BUDGET_FILE):
+    with _state_lock():
         data = _load()
 
         count = data.get("count", 0) if data.get("date") == today_str else 0

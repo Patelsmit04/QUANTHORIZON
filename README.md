@@ -59,7 +59,8 @@ fundamental and news quality gates, and grading its own predictions every tradin
 ## Tech stack
 
 - **Backend**: Python, FastAPI, yfinance (price data), jugaad-data (NSE delivery %),
-  SQLite (signal journal), CurrentsAPI (news)
+  SQLite (signal journal), CurrentsAPI (news), optionally Postgres (see "Shared Postgres
+  backend" below) if the scanner and dashboard run on separate hosts
 - **Frontend**: static HTML/CSS/JS — no build step, no framework
 
 ## Prerequisites
@@ -105,11 +106,37 @@ scan, lock, and grade picks on schedule.
 > as a serverless function; serverless instances have no process that persists between
 > requests, so the 3:14–3:40 PM closing sequence, the 5-min/1-min scan loop, and every
 > "survives restarts" guarantee described above **do not run** under that deployment as
-> currently configured. If you deploy to Vercel (or any other serverless platform), the
-> dashboard/API will serve whatever was last written to disk, but nothing will actually
-> scan, lock, or evaluate on schedule — run it on a persistent host instead, or adapt the
-> scheduler to externally-triggered endpoints (e.g. platform cron hitting a tick endpoint)
-> before relying on serverless for the autonomous behavior.
+> currently configured. `GET /api/scan` and `GET /api/indices` know this and never attempt
+> a live scan inline there (it would just time out) — see "Shared Postgres backend" below
+> for actually serving real data from a serverless deployment instead of an empty response.
+
+## Shared Postgres backend (optional — running the scanner and the dashboard on separate hosts)
+
+If you want the actual autonomous scanner running on one machine (your own always-on host,
+`python app.py`) and a separate stateless deployment (e.g. Vercel) serving the dashboard/API off
+the SAME live data, set `DATABASE_URL` (a Postgres connection string — Neon and Vercel Postgres
+both work, use their **pooled** connection string) in **both** places:
+
+1. Create a Postgres database (e.g. a free [Neon](https://neon.tech) project, or Vercel's own
+   Postgres add-on).
+2. Set `DATABASE_URL` in your local `.env` (the persistent host) and in the Vercel project's
+   Environment Variables — same value in both.
+3. If you have existing local history you don't want to lose, run the one-time migration
+   **before** your first Postgres-backed run: `python scripts/migrate_to_postgres.py` (reads
+   `DATABASE_URL` from the environment; safe to re-run, it only upserts).
+4. Restart the local host and redeploy Vercel. Both now read/write the same `strategies.json`,
+   `trade_history.json`, `paper_trades.json`, `active_pillar_weights.json`,
+   `pillar_weights_history.json`, `last_market_scan.json`, `index_btst_verdicts.json`,
+   `clarification_budget.json`, `stock_news_cache.json` (all via one generic `app_state` table),
+   plus the full SQLite signal journal (`signal_journal`, `signal_evaluations`,
+   `index_verdict_journal`, `index_verdict_evaluations`, `notifications`) as real Postgres
+   tables.
+
+Leave `DATABASE_URL` unset (the default) to keep everything on local files/SQLite exactly as
+before — nothing above is required for a normal single-host run, and every module falls back to
+its pre-existing local behavior automatically. Provider-internal caches that the scanner alone
+ever reads (fundamentals, OI/delivery history, the daily refresh-job lock files) intentionally
+stay local-only either way — a serverless reader never touches them.
 
 On first run, `data/` is created automatically to hold:
 - `trade_history.json`, `signal_journal.db` — locked picks and graded outcomes (journal now
@@ -182,8 +209,11 @@ walk_forward_validator.py     Out-of-sample validation + auto-improving pillar w
 signal_journal.py             SQLite journal of signals + graded outcomes, per strategy + index
 vix_provider.py               India VIX regime classifier
 json_utils.py                 Atomic JSON read/write (concurrency-safe)
+pg_utils.py                   Optional shared Postgres backend (see "Shared Postgres backend")
+scripts/migrate_to_postgres.py  One-time local-data -> Postgres migration
 scanner.py                    Standalone CLI scan script (no server)
 static/                       Dashboard (HTML/CSS/JS)
+tests/                        pytest suite — `pytest tests/`
 ```
 
 ## Key API endpoints
