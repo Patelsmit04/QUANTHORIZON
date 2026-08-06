@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-from env_utils import load_env_with_fallback, DATA_DIR
+from env_utils import load_env_with_fallback, DATA_DIR, shutdown_event
 load_env_with_fallback(BASE_DIR)
 
 from net_utils import call_with_retry
@@ -133,9 +133,26 @@ app.add_middleware(
 # actual shape: a personal/small-scale dashboard with no existing login concept, not a
 # multi-tenant service. GET endpoints stay fully open exactly as documented above — this only
 # gates state-changing routes.
-def require_api_key():
-    """No-op auth dependency — app runs open for local user without API keys."""
-    return
+API_KEY_HEADER_NAME = "X-API-Key"
+QUANTHORIZON_API_KEY = os.environ.get("QUANTHORIZON_API_KEY", "").strip()
+
+if not QUANTHORIZON_API_KEY:
+    logging.getLogger("Auth").warning(
+        "QUANTHORIZON_API_KEY is not set — mutating endpoints (strategy CRUD, lock/evaluate "
+        "picks, execute, notifications, index intelligence run) are running WITHOUT "
+        "authentication. Set QUANTHORIZON_API_KEY in .env to require it."
+    )
+
+
+def require_api_key(x_api_key: Optional[str] = Header(default=None, alias=API_KEY_HEADER_NAME)):
+    """FastAPI dependency for mutating routes. No-op (open) if QUANTHORIZON_API_KEY isn't
+    configured — see the startup warning above; this preserves today's fully-open behavior for
+    anyone who hasn't opted in, rather than breaking existing deployments outright the moment
+    this ships. Uses a constant-time comparison to avoid leaking the key via response-timing."""
+    if not QUANTHORIZON_API_KEY:
+        return
+    if not x_api_key or not secrets.compare_digest(x_api_key, QUANTHORIZON_API_KEY):
+        raise HTTPException(status_code=401, detail="Missing or invalid API key.")
 
 
 @app.middleware("http")
