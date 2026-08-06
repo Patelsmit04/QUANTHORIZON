@@ -46,6 +46,8 @@ from index_scoring import evaluate_index_signal, fetch_global_cues, classify_glo
 from options_chain_provider import fetch_index_option_chain, get_nearest_expiry_chain, OPTION_CHAIN_INDICES
 from index_depth_analysis import build_index_btst_verdicts
 import strategy_manager as sm
+from clarification_service import ClarificationUnavailableError
+from clarification_budget import get_budget_status
 from strategy_manager import DEFAULT_STRATEGY_ID, get_strategy, list_strategies, compute_effective_pillar_multipliers
 from execution_provider import execute_signal, get_paper_trades, get_paper_performance
 
@@ -81,6 +83,10 @@ class StrategyUpdateRequest(BaseModel):
     news_gate_enabled: Optional[bool] = None
     auto_paper_trade: Optional[bool] = None
     is_active: Optional[bool] = None
+
+
+class ResubmitClarificationRequest(BaseModel):
+    correction_note: str
 
 # CORS Middleware — allow_origins=["*"] + allow_credentials=True is an invalid combination
 # per the Fetch/CORS spec (browsers refuse to expose the response to credentialed requests
@@ -1272,6 +1278,15 @@ def api_list_strategies(active_only: bool = Query(False)):
     return sanitize_json_data({"strategies": list_strategies(active_only=active_only)})
 
 
+@app.get("/api/strategies/clarification_budget")
+def api_clarification_budget_status():
+    """Today's remaining Claude clarification-call budget. MUST stay registered before
+    GET /api/strategies/{strategy_id} — FastAPI matches routes in registration order, so a
+    literal path segment here would otherwise be swallowed by the {strategy_id} path
+    parameter route matching "clarification_budget" as if it were an id."""
+    return sanitize_json_data(get_budget_status())
+
+
 @app.get("/api/strategies/{strategy_id}")
 def api_get_strategy(strategy_id: str):
     strategy = get_strategy(strategy_id)
@@ -1282,8 +1297,36 @@ def api_get_strategy(strategy_id: str):
 
 @app.post("/api/strategies")
 def api_create_strategy(payload: StrategyCreateRequest):
+    """Creates an unconfirmed draft — the AI clarification of what this exact configuration
+    does is generated here and returned for the user to review. The strategy stays inactive
+    (is_active=False) until POST /api/strategies/{id}/confirm."""
     try:
-        strategy = sm.create_strategy(**payload.model_dump())
+        strategy = sm.create_strategy_draft(**payload.model_dump())
+    except (ValueError, ClarificationUnavailableError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return sanitize_json_data(strategy)
+
+
+@app.post("/api/strategies/{strategy_id}/resubmit_clarification")
+def api_resubmit_clarification(strategy_id: str, payload: ResubmitClarificationRequest):
+    """Edit-and-resend loop: the user said the clarification was wrong — re-sends the
+    original config plus their correction to Claude for a revised summary."""
+    try:
+        strategy = sm.resubmit_clarification(strategy_id, payload.correction_note)
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except (ValueError, ClarificationUnavailableError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return sanitize_json_data(strategy)
+
+
+@app.post("/api/strategies/{strategy_id}/confirm")
+def api_confirm_strategy(strategy_id: str):
+    """User confirmed the clarification matches what they meant — activates the strategy."""
+    try:
+        strategy = sm.confirm_strategy(strategy_id)
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return sanitize_json_data(strategy)
@@ -1291,12 +1334,16 @@ def api_create_strategy(payload: StrategyCreateRequest):
 
 @app.put("/api/strategies/{strategy_id}")
 def api_update_strategy(strategy_id: str, payload: StrategyUpdateRequest):
+    """A real change to scope/pillars/weight-bar/gates resets confirmation and re-clarifies
+    automatically (see strategy_manager.update_strategy) — the response's `clarification` field
+    tells the caller whether that happened. Setting is_active=True is only honored if the
+    strategy is (still) confirmed after any such change."""
     fields = {k: v for k, v in payload.model_dump().items() if v is not None}
     try:
         strategy = sm.update_strategy(strategy_id, **fields)
     except KeyError as e:
         raise HTTPException(status_code=404, detail=str(e))
-    except ValueError as e:
+    except (ValueError, ClarificationUnavailableError) as e:
         raise HTTPException(status_code=400, detail=str(e))
     return sanitize_json_data(strategy)
 
