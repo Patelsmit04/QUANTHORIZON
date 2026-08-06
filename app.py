@@ -1110,6 +1110,21 @@ def evaluation_scheduler_worker():
 
 @app.on_event("startup")
 def start_background_scheduler():
+    # M12 audit fix: this handler used to start the scheduler threads unconditionally. On
+    # Vercel, FastAPI's startup event still fires on every cold start — nothing about
+    # serverless skips it — so every new instance was spawning background_scheduler_worker(),
+    # which immediately tries to run a real ~209-stock live scan via yfinance in the
+    # background regardless of whether any request had asked for one. That's real, uncapped
+    # background work competing with the request that triggered the cold start for the same
+    # instance's CPU/network — the actual cause of /api/scan hanging past its timeout, not
+    # just the request-handler-level fallback _can_run_live_scan_inline() gates elsewhere.
+    # These threads would never persist anyway (the instance can be frozen/killed between
+    # invocations), so there's nothing to gain from starting them here — see the README's
+    # "Deployment note" for why the scheduler needs a persistent host regardless.
+    if os.environ.get("VERCEL"):
+        logger.info("Running on Vercel — skipping background scheduler thread startup (see README).")
+        return
+
     # Captures a reference to the currently-running event loop so the (thread-based, not
     # asyncio) scheduler threads started below can bridge into it via
     # ws_broadcast.broadcast_sync() — see that module's docstring for why this bridge is
