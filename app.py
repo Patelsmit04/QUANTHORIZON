@@ -1530,7 +1530,7 @@ def get_stock_detail(symbol: str):
 
         data = data.dropna()
         nifty_df = cache_store.get("nifty_df", None)
-        
+
         processed = evaluate_5_pillar_matrix(
             symbol=formatted_ticker,
             df_stock=data,
@@ -1540,21 +1540,37 @@ def get_stock_detail(symbol: str):
             fundamental_data=get_fundamental_data(formatted_ticker),
             pillar_weight_multipliers=get_active_pillar_weights()
         )
-        
-        recent_df = data.tail(10).copy()
-        recent_df.reset_index(inplace=True)
-        
+
+        # Fetched SEPARATELY from the 1-day frame just scored above (M6) — evaluate_5_pillar_matrix's
+        # range_position_pct/volume_spike are computed relative to TODAY's session only, so
+        # widening the period on that same frame would silently change what it scores against.
+        # This second fetch exists purely to give the chart real multi-day history to show.
+        chart_data = call_with_retry(
+            lambda: yf.download(formatted_ticker, period="5d", interval="5m", progress=False),
+            label=f"get_stock_detail chart history [{formatted_ticker}]",
+        )
+        if chart_data is None or chart_data.empty:
+            chart_data = data  # fall back to the 1-day frame rather than an empty chart
+        if isinstance(chart_data.columns, pd.MultiIndex):
+            chart_data.columns = chart_data.columns.get_level_values(0)
+        chart_data = chart_data.dropna()
+
+        recent_df = chart_data.reset_index()
+
         candles = []
         for _, row in recent_df.iterrows():
             # Use strftime on the actual timestamp rather than slicing its string form — the
             # index is timezone-aware (+05:30 IST suffix), which made string-slicing grab the
             # offset instead of the time (e.g. "00+05" instead of "15:25").
-            ts = row['Datetime'] if 'Datetime' in row else row.name
+            row_ts = row['Datetime'] if 'Datetime' in row else row.name
             try:
-                time_str = ts.strftime("%H:%M")
+                time_str = row_ts.strftime("%H:%M")
+                unix_ts = int(row_ts.timestamp())
             except AttributeError:
-                time_str = str(ts)[-8:-3] if len(str(ts)) >= 8 else str(ts)
+                time_str = str(row_ts)[-8:-3] if len(str(row_ts)) >= 8 else str(row_ts)
+                unix_ts = None
             candles.append({
+                "ts": unix_ts,
                 "time": time_str,
                 "open": round(float(row['Open']), 2),
                 "high": round(float(row['High']), 2),

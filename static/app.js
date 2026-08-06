@@ -737,26 +737,74 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
             }
 
-            const candlesBody = document.getElementById("modalCandlesBody");
-            if (candlesBody) {
-                candlesBody.innerHTML = "";
-                (data.recent_candles || []).reverse().forEach(c => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${c.time}</td>
-                        <td>₹${c.open}</td>
-                        <td>₹${c.high}</td>
-                        <td>₹${c.low}</td>
-                        <td class="${c.close >= c.open ? 'text-bullish' : 'text-bearish'}">₹${c.close}</td>
-                        <td>${c.volume.toLocaleString('en-IN')}</td>
-                    `;
-                    candlesBody.appendChild(tr);
-                });
-            }
+            renderModalCandleChart(data.recent_candles || [], summary.vwap);
 
         } catch (error) {
             console.error("Modal fetch error:", error);
         }
+    }
+
+    // -------------------------------------------------------------
+    // Stock detail candle chart (M6) — TradingView lightweight-charts, replacing the old
+    // plain HTML candle table (Phase-1 audit finding #25: no charting library existed
+    // anywhere in this codebase). Created once and reused across modal opens (setData() on
+    // each open) rather than torn down/recreated, since lightweight-charts' own canvas setup
+    // is the expensive part, not swapping the data.
+    // -------------------------------------------------------------
+    let modalChart = null;
+    let modalCandleSeries = null;
+    let modalVwapSeries = null;
+
+    function ensureModalChart() {
+        if (modalChart) return;
+        const container = document.getElementById("modalChartContainer");
+        if (!container || typeof LightweightCharts === "undefined") return;
+
+        modalChart = LightweightCharts.createChart(container, {
+            layout: { background: { color: "transparent" }, textColor: "#52514e" },
+            grid: {
+                vertLines: { color: "rgba(11,11,11,0.06)" },
+                horzLines: { color: "rgba(11,11,11,0.06)" },
+            },
+            timeScale: { timeVisible: true, secondsVisible: false, borderColor: "rgba(11,11,11,0.08)" },
+            rightPriceScale: { borderColor: "rgba(11,11,11,0.08)" },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+        });
+        modalCandleSeries = modalChart.addCandlestickSeries({
+            upColor: "#0ca30c", downColor: "#d03b3b", borderVisible: false,
+            wickUpColor: "#0ca30c", wickDownColor: "#d03b3b",
+        });
+        modalVwapSeries = modalChart.addLineSeries({
+            color: "#a97a1c", lineWidth: 2, lastValueVisible: false, priceLineVisible: false,
+        });
+
+        new ResizeObserver(() => {
+            modalChart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
+        }).observe(container);
+    }
+
+    function renderModalCandleChart(candles, vwap) {
+        ensureModalChart();
+        if (!modalChart) return; // library failed to load — chart section just stays empty
+
+        const withTs = candles.filter((c) => c.ts !== null && c.ts !== undefined);
+        const candleData = withTs.map((c) => ({ time: c.ts, open: c.open, high: c.high, low: c.low, close: c.close }));
+        modalCandleSeries.setData(candleData);
+
+        // A flat reference line at the current VWAP — the actual pillar check (from the
+        // checklist above) is "trading above/below VWAP right now", not a historical VWAP
+        // curve, so a flat line at today's value is the accurate representation, not a
+        // fabricated bar-by-bar VWAP series this endpoint doesn't compute.
+        if (vwap && candleData.length > 0) {
+            modalVwapSeries.setData([
+                { time: candleData[0].time, value: vwap },
+                { time: candleData[candleData.length - 1].time, value: vwap },
+            ]);
+        } else {
+            modalVwapSeries.setData([]);
+        }
+
+        modalChart.timeScale().fitContent();
     }
 
     function hideModal() {
