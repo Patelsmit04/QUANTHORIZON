@@ -28,106 +28,114 @@
     <!-- Top Navigation & Header -->
     <header class="app-header">
         <div class="header-container">
-            <div class="brand-section">
-                <div class="app-logo-frame">
-                    <img src="/static/logo.png" alt="QuantHorizon Logo">
-                </div>
-                <div>
-                    <h1 class="brand-title">Quant<span>Horizon</span></h1>
-                    <p class="brand-subtitle">High-Conviction Priority Engine & Gap Predictor</p>
-                </div>
-            </div>
-
-            <!-- Section Nav -->
-            <nav class="main-nav-tabs" id="mainNavTabs">
-                <button class="main-nav-tab active" data-section="scanner">
-                    <i class="fa-solid fa-radar"></i> SCANNER
-                </button>
-                <button class="main-nav-tab" data-section="indices">
-                    <i class="fa-solid fa-chart-column"></i> INDICES
-                </button>
-                <button class="main-nav-tab" data-section="strategies">
-                    <i class="fa-solid fa-sliders"></i> STRATEGIES
-                    <span class="nav-badge" id="strategiesNavBadge">--</span>
-                </button>
-                <button class="main-nav-tab" data-section="history">
-                    <i class="fa-solid fa-clock-rotate-left"></i> HISTORY
-                    <span class="nav-badge" id="historyNavBadge">LIVE</span>
-                </button>
-                <button class="main-nav-tab" data-section="news">
-                    <i class="fa-solid fa-newspaper"></i> NEWS
-                    <span class="nav-badge" id="newsNavBadge">--</span>
-                </button>
-            </nav>
-
-            <!-- Market Status Pill -->
-            <div class="market-status-box">
-                <div class="status-indicator live-pulse" id="statusDot"></div>
-                <div class="status-text">
-                    <span class="status-label">MARKET STATUS</span>
-                    <span id="marketStatusText" class="status-value">OPEN</span>
-                </div>
-                <div class="timer-box">
-                    <span class="timer-label" id="scanModeLabel">MODE:</span>
-                    <span id="marketTimer" class="timer-value">OFF-MARKET SNAPSHOT (3:30 PM Scan Locked)</span>
-                </div>
-            </div>
-
-            <!-- Header Action Controls -->
-            <div class="header-actions">
-                <!-- Priority Only Quick Toggle -->
-                <div class="priority-toggle-box">
-                    <i class="fa-solid fa-fire text-gold"></i>
-                    <span>PRIORITY ONLY</span>
-                    <label class="switch">
-                        <input type="checkbox" id="priorityOnlyToggle" aria-label="Show priority picks only">
-                        <span class="slider round"></span>
-                    </label>
+            <div class="header-top-row">
+                <div class="brand-section">
+                    <div class="app-logo-frame">
+                        <img src="/static/logo.png" alt="QuantHorizon Logo">
+                    </div>
+                    <div>
+                        <h1 class="brand-title">Quant<span>Horizon</span></h1>
+                        <p class="brand-subtitle">High-Conviction Priority Engine & Gap Predictor</p>
+                    </div>
                 </div>
 
-                <div class="auto-refresh-toggle">
-                    <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
-                    <span>AUTO</span>
-                    <label class="switch">
-                        <input type="checkbox" id="autoRefreshToggle" checked aria-label="Toggle auto refresh">
-                        <span class="slider round"></span>
-                    </label>
+                <!-- Market Status Pill -->
+                <div class="market-status-box">
+                    <div class="status-indicator live-pulse" id="statusDot"></div>
+                    <div class="status-text">
+                        <span class="status-label">MARKET STATUS</span>
+                        <span id="marketStatusText" class="status-value">OPEN</span>
+                    </div>
+                    <div class="timer-box">
+                        <span class="timer-label" id="scanModeLabel">MODE:</span>
+                        <span id="marketTimer" class="timer-value">OFF-MARKET SNAPSHOT (3:30 PM Scan Locked)</span>
+                    </div>
                 </div>
 
-                <button id="winRateBtn" class="btn btn-pill btn-secondary" title="View BTST Win Rate Analytics">
-                    <i class="fa-solid fa-trophy text-gold"></i>
-                    <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
-                </button>
+                <!-- Header Action Controls -->
+                <div class="header-actions">
+                    <!-- Priority Only Quick Toggle -->
+                    <div class="priority-toggle-box">
+                        <i class="fa-solid fa-fire text-gold"></i>
+                        <span>PRIORITY ONLY</span>
+                        <label class="switch">
+                            <input type="checkbox" id="priorityOnlyToggle" aria-label="Show priority picks only">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
 
-                <button id="guideBtn" class="btn btn-pill btn-secondary" title="Learn How Priority Ranking Works">
-                    <i class="fa-solid fa-circle-question"></i>
-                    <span>GUIDE</span>
-                </button>
+                    <div class="auto-refresh-toggle">
+                        <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
+                        <span>AUTO</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoRefreshToggle" checked aria-label="Toggle auto refresh">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
 
-                <button id="scanBtn" class="btn btn-pill btn-primary">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>SCAN NOW</span>
-                </button>
-
-                <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
-                    <i class="fa-solid fa-file-csv"></i>
-                    <span>CSV</span>
-                </button>
-
-
-                <!-- Notifications Bell — closing-sequence lock events + index verdicts, pushed live over /ws/live -->
-                <div class="notif-bell-wrap">
-                    <button id="notifBell" class="btn-icon" title="Notifications" aria-label="Notifications">
-                        <i class="fa-solid fa-bell"></i>
-                        <span class="notif-badge hidden" id="notifBadge">0</span>
+                    <button id="winRateBtn" class="btn btn-pill btn-secondary" title="View BTST Win Rate Analytics">
+                        <i class="fa-solid fa-trophy text-gold"></i>
+                        <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
                     </button>
+
+                    <button id="guideBtn" class="btn btn-pill btn-secondary" title="Learn How Priority Ranking Works">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span>GUIDE</span>
+                    </button>
+
+                    <button id="scanBtn" class="btn btn-pill btn-primary">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>SCAN NOW</span>
+                    </button>
+
+                    <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>CSV</span>
+                    </button>
+
+                    <!-- Notifications Bell — closing-sequence lock events + index verdicts, pushed live over /ws/live -->
+                    <div class="notif-bell-wrap">
+                        <button id="notifBell" class="btn-icon" title="Notifications" aria-label="Notifications">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="notif-badge hidden" id="notifBadge">0</span>
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
             </div>
 
-            <!-- Mobile Menu Toggle -->
-            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+            <!-- Sub-Header Section Navigation Row (Placed Just Below Logo and Name) -->
+            <div class="header-nav-row">
+                <nav class="main-nav-tabs" id="mainNavTabs">
+                    <button class="main-nav-tab active" data-section="scanner">
+                        <i class="fa-solid fa-radar"></i>
+                        <span>SCANNER</span>
+                    </button>
+                    <button class="main-nav-tab" data-section="indices">
+                        <i class="fa-solid fa-chart-column"></i>
+                        <span>INDICES</span>
+                    </button>
+                    <button class="main-nav-tab" data-section="strategies">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>STRATEGIES</span>
+                        <span class="nav-badge" id="strategiesNavBadge">--</span>
+                    </button>
+                    <button class="main-nav-tab" data-section="history">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>HISTORY</span>
+                        <span class="nav-badge" id="historyNavBadge">LIVE</span>
+                    </button>
+                    <button class="main-nav-tab" data-section="news">
+                        <i class="fa-solid fa-newspaper"></i>
+                        <span>NEWS</span>
+                        <span class="nav-badge" id="newsNavBadge">--</span>
+                    </button>
+                </nav>
+            </div>
         </div>
 
         <!-- Notification panel (M9 audit fix): a fixed-position overlay, NOT nested inside

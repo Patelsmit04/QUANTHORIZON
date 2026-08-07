@@ -123,17 +123,32 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     position: sticky;
     top: 0;
     z-index: 100;
-    padding: 14px 28px;
+    padding: 12px 24px;
 }
 
 .header-container {
     max-width: 1680px;
     margin: 0 auto;
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.header-top-row {
+    display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 20px;
     flex-wrap: wrap;
+    width: 100%;
+}
+
+.header-nav-row {
+    width: 100%;
+    border-top: 1px solid rgba(226, 232, 240, 0.7);
+    padding-top: 8px;
+    display: flex;
+    justify-content: center;
 }
 
 .brand-section { 
@@ -341,48 +356,80 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     justify-content: center;
 }
 
-/* Nav tabs (Scanner / News) */
+/* Nav tabs (Scanner / Indices / Strategies / History / News) - Vertical Icon-above-Text Row */
 .main-nav-tabs {
     display: flex;
-    gap: 4px;
-    background: var(--glass-bg-soft);
-    border: 1px solid var(--glass-border);
-    padding: 4px;
-    border-radius: var(--radius-pill);
+    align-items: center;
+    justify-content: space-around;
+    gap: 36px;
+    background: transparent;
+    border: none;
+    padding: 2px 12px;
+    width: 100%;
+    max-width: 900px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .main-nav-tab {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 8px 18px;
-    border-radius: var(--radius-pill);
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 16px 8px;
+    border-radius: 6px;
     font-family: var(--font-heading);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.3px;
-    color: var(--ink-secondary);
+    letter-spacing: 0.5px;
+    color: #5b6b7c;
     background: transparent;
     border: none;
+    border-bottom: 3px solid transparent;
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
+    white-space: nowrap;
 }
 
-.main-nav-tab:hover { color: var(--ink-primary); }
+.main-nav-tab i {
+    font-size: 18px;
+    color: #5b6b7c;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.main-nav-tab:hover {
+    color: var(--ink-primary);
+}
+
+.main-nav-tab:hover i {
+    color: var(--ink-primary);
+    transform: translateY(-1px);
+}
 
 .main-nav-tab.active {
-    background: var(--glass-bg-strong);
-    color: var(--ink-primary);
-    box-shadow: 0 2px 10px rgba(31, 41, 74, 0.10);
+    color: var(--gold-bright, #c99433);
+    font-weight: 800;
+    border-bottom: 3px solid var(--gold-bright, #c99433);
+    background: transparent;
+    box-shadow: none;
+}
+
+.main-nav-tab.active i {
+    color: var(--gold-bright, #c99433);
 }
 
 .nav-badge {
+    position: absolute;
+    top: -2px;
+    right: 2px;
     background: var(--gold-bg);
     color: var(--gold);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 800;
-    padding: 2px 7px;
-    border-radius: var(--radius-pill);
+    padding: 1px 5px;
+    border-radius: 10px;
 }
 
 /* Market Status Pill */
