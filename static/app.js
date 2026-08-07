@@ -1404,11 +1404,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return "avoid";
     }
 
-    function buildIndexVerdictCard(v) {
+    function buildIndexVerdictCard(v = {}) {
+        if (!v) return document.createElement("div");
         const card = document.createElement("div");
         card.className = `index-verdict-card ${v.price_verified ? "" : "unverified"}`;
 
-        const badgeClass = verdictBadgeClass(v.verdict);
+        const badgeClass = verdictBadgeClass(v.verdict || "Avoid");
         const priceText = v.price !== null && v.price !== undefined ? "₹" + v.price.toLocaleString("en-IN") : "--";
         const unverifiedTag = v.price_verified ? `<span class="verified-tag"><i class="fa-solid fa-circle-check"></i> VERIFIED CLOSE</span>` : `<span class="unverified-tag">UNVERIFIED</span>`;
 
@@ -1417,17 +1418,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (eo.formatted) {
             expectedOpenText = escapeHtml(eo.formatted);
         } else if (eo.direction) {
-            expectedOpenText = `${escapeHtml(eo.direction)} (±${eo.points} pts)`;
+            expectedOpenText = `${escapeHtml(eo.direction)} (±${eo.points || 0} pts)`;
         }
         const gapColorClass = eo.direction === "Gap Up" ? "text-green" : (eo.direction === "Gap Down" ? "text-red" : "text-gold");
 
-        const catalysts = v.key_overnight_catalysts || [];
+        const catalysts = Array.isArray(v.key_overnight_catalysts) ? v.key_overnight_catalysts : [];
         const catalystsHtml = catalysts.map(c => `<div class="verdict-catalyst-item">${escapeHtml(c)}</div>`).join("");
 
         const trade = v.highest_probability_btst_trade || {};
 
-        const detailId = `verdict-detail-${v.index_name}`;
-        const detailHtml = buildPillarDetailHtml(v.pillar_breakdown);
+        const detailId = `verdict-detail-${v.index_name || 'idx'}`;
+        const detailHtml = buildPillarDetailHtml(v.pillar_breakdown || {});
 
         card.innerHTML = `
             <div class="index-verdict-card-header">
