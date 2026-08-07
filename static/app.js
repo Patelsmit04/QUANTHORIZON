@@ -1482,9 +1482,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const cues = (breakdown.global_cues && breakdown.global_cues.detail) || {};
         const cueLabels = { DOW: "Dow", NASDAQ: "Nasdaq", NIKKEI: "Nikkei", HANGSENG: "Hang Seng", CRUDE: "Crude", USDINR: "USD/INR" };
-        const cueRows = Object.entries(cues).map(([k, val]) =>
-            `<div class="detail-row"><span>${cueLabels[k] || k}</span><span>${val >= 0 ? "+" : ""}${val}%</span></div>`
-        ).join("") || `<div class="detail-row"><span>No cue data</span><span>--</span></div>`;
+        const cueRows = Object.entries(cues).map(([k, val]) => {
+            const displayVal = (val !== null && val !== undefined) ? `${val >= 0 ? "+" : ""}${val}%` : "--";
+            return `<div class="detail-row"><span>${cueLabels[k] || k}</span><span>${displayVal}</span></div>`;
+        }).join("") || `<div class="detail-row"><span>No cue data</span><span>--</span></div>`;
 
         const deriv = breakdown.derivatives || {};
         const derivRows = deriv.verified ? `
@@ -1560,16 +1561,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const cues = (idx.global_cues && (idx.global_cues.detail || idx.global_cues.cues)) || {};
         const cueLabels = { DOW: "Dow", NASDAQ: "Nasdaq", NIKKEI: "Nikkei", HANGSENG: "Hang Seng", CRUDE: "Crude", USDINR: "USD/INR" };
         const cuesHtml = Object.entries(cues).map(([k, v]) => {
+            if (v === null || v === undefined) return `<span class="cue-chip">${cueLabels[k] || k} --</span>`;
             const cls = v > 0 ? "cue-up" : (v < 0 ? "cue-down" : "");
             return `<span class="cue-chip ${cls}">${cueLabels[k] || k} ${v >= 0 ? "+" : ""}${v}%</span>`;
         }).join("");
 
-        const changePts = idx.change_pts !== undefined ? idx.change_pts : 0;
-        const pctChange = idx.pct_change !== undefined ? idx.pct_change : 0;
-        const changeClass = changePts >= 0 ? "text-bullish" : "text-bearish";
-        const changeSign = changePts >= 0 ? "+" : "";
-        const changeHtml = idx.change_pts !== undefined
-            ? `<div class="index-card-change ${changeClass}">${changeSign}${changePts.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${changeSign}${pctChange.toFixed(2)}%)</div>`
+        const changePts = (idx.change_pts !== undefined && idx.change_pts !== null) ? idx.change_pts : null;
+        const pctChange = (idx.pct_change !== undefined && idx.pct_change !== null) ? idx.pct_change : null;
+        const changeClass = (changePts !== null && changePts >= 0) ? "text-bullish" : "text-bearish";
+        const changeSign = (changePts !== null && changePts >= 0) ? "+" : "";
+        const formattedPts = changePts !== null ? changePts.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "--";
+        const formattedPct = pctChange !== null ? (typeof pctChange === "number" ? pctChange.toFixed(2) : pctChange) : "--";
+        const changeHtml = changePts !== null
+            ? `<div class="index-card-change ${changeClass}">${changeSign}${formattedPts} (${changeSign}${formattedPct}%)</div>`
             : "";
 
         card.innerHTML = `
@@ -2257,15 +2261,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const stratFilter = historyStrategyFilter ? historyStrategyFilter.value : "ALL";
         const outcomeFilter = historyOutcomeFilter ? historyOutcomeFilter.value : "ALL";
 
-        let filtered = allHistoryRows;
+        let filtered = Array.isArray(allHistoryRows) ? allHistoryRows : [];
         if (search) {
-            filtered = filtered.filter(r => (r.instrument && r.instrument.toUpperCase().includes(search)) || (r.raw_ticker && r.raw_ticker.toUpperCase().includes(search)));
+            filtered = filtered.filter(r => (r && r.instrument && r.instrument.toUpperCase().includes(search)) || (r && r.raw_ticker && r.raw_ticker.toUpperCase().includes(search)));
         }
         if (stratFilter !== "ALL") {
-            filtered = filtered.filter(r => r.strategy_id === stratFilter);
+            filtered = filtered.filter(r => r && r.strategy_id === stratFilter);
         }
         if (outcomeFilter !== "ALL") {
-            filtered = filtered.filter(r => r.status === outcomeFilter);
+            filtered = filtered.filter(r => r && r.status === outcomeFilter);
         }
 
         if (filtered.length === 0) {
