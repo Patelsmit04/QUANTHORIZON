@@ -2664,6 +2664,8 @@ button, input, select, textarea, .tab-btn, .main-nav-tab, .switch, .scanner-row 
 
     .brand-section {
         gap: 8px !important;
+        margin-right: auto !important;
+        flex: 0 1 auto !important;
     }
 
     .app-logo-frame {
@@ -2692,9 +2694,9 @@ button, input, select, textarea, .tab-btn, .main-nav-tab, .switch, .scanner-row 
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        margin-left: auto !important;
+        margin-left: 12px !important;
         flex-shrink: 0 !important;
-        z-index: 100 !important;
+        z-index: 1000 !important;
     }
 
     .btn-icon#notifBellMobileTop {
