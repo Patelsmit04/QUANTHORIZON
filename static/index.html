@@ -244,8 +244,38 @@
     <!-- ============================== SCANNER SECTION ============================== -->
     <div id="scannerSection">
 
+        <!-- Scanner Direct Quick Actions Toolbar (Pic 2 Controls Available Directly on Scanner Page) -->
+        <div class="scanner-quick-actions-bar">
+            <button id="scanBtnQuick" class="btn btn-pill btn-primary">
+                <i class="fa-solid fa-bolt"></i> <span>SCAN NOW</span>
+            </button>
+            <div class="priority-toggle-box">
+                <i class="fa-solid fa-fire text-gold"></i> <span>PRIORITY</span>
+                <label class="switch">
+                    <input type="checkbox" id="priorityOnlyToggleQuick" aria-label="Show priority picks only">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <button id="winRateBtnQuick" class="btn btn-pill btn-secondary">
+                <i class="fa-solid fa-trophy text-gold"></i> <span>WIN RATE: <strong id="quickWinRateText">--%</strong></span>
+            </button>
+            <button id="guideBtnQuick" class="btn btn-pill btn-secondary">
+                <i class="fa-solid fa-circle-question"></i> <span>GUIDE</span>
+            </button>
+            <button id="exportCsvBtnQuick" class="btn btn-pill btn-secondary">
+                <i class="fa-solid fa-file-csv"></i> <span>CSV</span>
+            </button>
+            <div class="auto-refresh-toggle">
+                <i class="fa-solid fa-rotate-right"></i> <span>AUTO</span>
+                <label class="switch">
+                    <input type="checkbox" id="autoRefreshToggleQuick" checked aria-label="Toggle auto refresh">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+
         <!-- Split Live-Updating Accuracy Dashboard (4 Independent Horizon & Scope Categories) -->
-        <section class="split-accuracy-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px;margin-bottom:16px;">
+        <section class="split-accuracy-grid">
             <div class="metric-card" style="border-top:3px solid var(--gold);">
                 <div class="metric-header">
                     <span class="metric-title"><i class="fa-solid fa-bolt text-gold"></i> BTST — STOCKS</span>

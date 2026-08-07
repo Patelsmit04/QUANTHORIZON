@@ -43,6 +43,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const priorityOnlyToggleMobile = document.getElementById("priorityOnlyToggleMobile");
     const autoRefreshToggleMobile = document.getElementById("autoRefreshToggleMobile");
 
+    // Mobile & Quick Action DOM
+    const scanBtnQuick = document.getElementById("scanBtnQuick");
+    const guideBtnQuick = document.getElementById("guideBtnQuick");
+    const winRateBtnQuick = document.getElementById("winRateBtnQuick");
+    const exportCsvBtnQuick = document.getElementById("exportCsvBtnQuick");
+    const priorityOnlyToggleQuick = document.getElementById("priorityOnlyToggleQuick");
+    const autoRefreshToggleQuick = document.getElementById("autoRefreshToggleQuick");
+    const quickWinRateText = document.getElementById("quickWinRateText");
+
     // DOM Elements
     const scanBtn = document.getElementById("scanBtn");
     const guideBtn = document.getElementById("guideBtn");
@@ -279,31 +288,34 @@ document.addEventListener("DOMContentLoaded", () => {
         exportWatchlistCsv();
     });
 
-    // Sync Priority & AutoRefresh toggles between Desktop and Mobile
-    if (priorityOnlyToggleMobile) {
-        priorityOnlyToggleMobile.addEventListener("change", (e) => {
-            if (priorityOnlyToggle) priorityOnlyToggle.checked = e.target.checked;
-            filterAndRenderTable();
-        });
+    // Quick Action Toolbar Buttons (Scanner Page Direct Controls)
+    if (scanBtnQuick) scanBtnQuick.addEventListener("click", () => fetchScanResults(true));
+    if (guideBtnQuick) guideBtnQuick.addEventListener("click", () => guideModal.classList.remove("hidden"));
+    if (winRateBtnQuick) winRateBtnQuick.addEventListener("click", openWinRateModal);
+    if (exportCsvBtnQuick) exportCsvBtnQuick.addEventListener("click", exportWatchlistCsv);
+
+    // Sync Priority & AutoRefresh toggles across Desktop, Mobile Drawer, and Quick Toolbar
+    function syncPriorityToggle(checked) {
+        if (priorityOnlyToggle) priorityOnlyToggle.checked = checked;
+        if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.checked = checked;
+        if (priorityOnlyToggleQuick) priorityOnlyToggleQuick.checked = checked;
+        filterAndRenderTable();
     }
-    if (autoRefreshToggleMobile) {
-        autoRefreshToggleMobile.addEventListener("change", (e) => {
-            if (autoRefreshToggle) autoRefreshToggle.checked = e.target.checked;
-            setupAutoRefresh();
-        });
+
+    function syncAutoRefreshToggle(checked) {
+        if (autoRefreshToggle) autoRefreshToggle.checked = checked;
+        if (autoRefreshToggleMobile) autoRefreshToggleMobile.checked = checked;
+        if (autoRefreshToggleQuick) autoRefreshToggleQuick.checked = checked;
+        setupAutoRefresh();
     }
-    if (priorityOnlyToggle) {
-        priorityOnlyToggle.addEventListener("change", (e) => {
-            if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.checked = e.target.checked;
-            filterAndRenderTable();
-        });
-    }
-    if (autoRefreshToggle) {
-        autoRefreshToggle.addEventListener("change", (e) => {
-            if (autoRefreshToggleMobile) autoRefreshToggleMobile.checked = e.target.checked;
-            setupAutoRefresh();
-        });
-    }
+
+    if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
+    if (priorityOnlyToggle) priorityOnlyToggle.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
+    if (priorityOnlyToggleQuick) priorityOnlyToggleQuick.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
+
+    if (autoRefreshToggleMobile) autoRefreshToggleMobile.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
+    if (autoRefreshToggle) autoRefreshToggle.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
+    if (autoRefreshToggleQuick) autoRefreshToggleQuick.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
 
     if (scanBtn) scanBtn.addEventListener("click", () => fetchScanResults(true));
     if (guideBtn) guideBtn.addEventListener("click", () => guideModal.classList.remove("hidden"));
@@ -489,6 +501,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const winRate = (data.win_rate_pct !== undefined && data.win_rate_pct !== null && data.win_rate_pct !== 0) ? data.win_rate_pct : 75.0;
         if (headerWinRateText) headerWinRateText.textContent = `${winRate}%`;
+        if (quickWinRateText) quickWinRateText.textContent = `${winRate}%`;
         if (cardWinRatePct) cardWinRatePct.textContent = `${winRate}%`;
         if (cardTrackedTradesCount) cardTrackedTradesCount.textContent = data.total_tracked_trades || 0;
     }
@@ -506,6 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const accuracy = data.prediction_accuracy_pct || 92.5;
 
             if (headerWinRateText) headerWinRateText.textContent = `${winRate}%`;
+            if (quickWinRateText) quickWinRateText.textContent = `${winRate}%`;
             if (cardWinRatePct) cardWinRatePct.textContent = `${winRate}%`;
             if (cardTrackedTradesCount) cardTrackedTradesCount.textContent = data.total_trades || 0;
 

@@ -677,6 +677,32 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 .main-content { max-width: 1680px; margin: 24px auto 0; padding: 0 24px; }
 
+/* Scanner Quick Actions Toolbar */
+.scanner-quick-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding: 4px 2px 8px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.scanner-quick-actions-bar .btn,
+.scanner-quick-actions-bar .priority-toggle-box,
+.scanner-quick-actions-bar .auto-refresh-toggle {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* Split Accuracy Grid (Strict 4 columns on Desktop, Strict 2x2 grid on Mobile) */
+.split-accuracy-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
