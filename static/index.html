@@ -92,14 +92,14 @@
                         <i class="fa-solid fa-file-csv"></i>
                         <span>CSV</span>
                     </button>
+                </div>
 
-                    <!-- Notifications Bell — closing-sequence lock events + index verdicts, pushed live over /ws/live -->
-                    <div class="notif-bell-wrap">
-                        <button id="notifBell" class="btn-icon" title="Notifications" aria-label="Notifications">
-                            <i class="fa-solid fa-bell"></i>
-                            <span class="notif-badge hidden" id="notifBadge">0</span>
-                        </button>
-                    </div>
+                <!-- Notifications Bell — closing-sequence lock events + index verdicts, pushed live over /ws/live -->
+                <div class="notif-bell-wrap">
+                    <button id="notifBell" class="btn-icon" title="Notifications" aria-label="Notifications">
+                        <i class="fa-solid fa-bell"></i>
+                        <span class="notif-badge hidden" id="notifBadge">0</span>
+                    </button>
                 </div>
 
                 <!-- Mobile Menu Toggle -->
@@ -244,33 +244,37 @@
     <!-- ============================== SCANNER SECTION ============================== -->
     <div id="scannerSection">
 
-        <!-- Scanner Direct Quick Actions Toolbar (Pic 2 Controls Available Directly on Scanner Page) -->
+        <!-- Scanner Quick Actions Toolbar (Matching User Reference Pic 1 Layout) -->
         <div class="scanner-quick-actions-bar">
-            <button id="scanBtnQuick" class="btn btn-pill btn-primary">
-                <i class="fa-solid fa-bolt"></i> <span>SCAN NOW</span>
-            </button>
-            <div class="priority-toggle-box">
-                <i class="fa-solid fa-fire text-gold"></i> <span>PRIORITY</span>
-                <label class="switch">
-                    <input type="checkbox" id="priorityOnlyToggleQuick" aria-label="Show priority picks only">
-                    <span class="slider round"></span>
-                </label>
+            <!-- Row 1: Priority Toggle + Guide + CSV -->
+            <div class="actions-row actions-row-1">
+                <div class="priority-toggle-box">
+                    <i class="fa-solid fa-fire text-gold"></i> <span>PRIORITY ONLY</span>
+                    <label class="switch">
+                        <input type="checkbox" id="priorityOnlyToggleQuick" aria-label="Show priority picks only">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <button id="guideBtnQuick" class="btn btn-pill btn-secondary">
+                    <i class="fa-solid fa-circle-question"></i> <span>GUIDE</span>
+                </button>
+                <button id="exportCsvBtnQuick" class="btn btn-pill btn-secondary">
+                    <i class="fa-solid fa-file-csv"></i> <span>CSV</span>
+                </button>
             </div>
-            <button id="winRateBtnQuick" class="btn btn-pill btn-secondary">
-                <i class="fa-solid fa-trophy text-gold"></i> <span>WIN RATE: <strong id="quickWinRateText">--%</strong></span>
-            </button>
-            <button id="guideBtnQuick" class="btn btn-pill btn-secondary">
-                <i class="fa-solid fa-circle-question"></i> <span>GUIDE</span>
-            </button>
-            <button id="exportCsvBtnQuick" class="btn btn-pill btn-secondary">
-                <i class="fa-solid fa-file-csv"></i> <span>CSV</span>
-            </button>
-            <div class="auto-refresh-toggle">
-                <i class="fa-solid fa-rotate-right"></i> <span>AUTO</span>
-                <label class="switch">
-                    <input type="checkbox" id="autoRefreshToggleQuick" checked aria-label="Toggle auto refresh">
-                    <span class="slider round"></span>
-                </label>
+
+            <!-- Row 2: Prominent Scan Now Button + Auto Refresh Toggle -->
+            <div class="actions-row actions-row-2">
+                <button id="scanBtnQuick" class="btn btn-pill btn-primary btn-scan-prominent">
+                    <i class="fa-solid fa-bolt"></i> <span>SCAN NOW</span>
+                </button>
+                <div class="auto-refresh-toggle">
+                    <i class="fa-solid fa-rotate-right"></i> <span>AUTO</span>
+                    <label class="switch">
+                        <input type="checkbox" id="autoRefreshToggleQuick" checked aria-label="Toggle auto refresh">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
         </div>
 
