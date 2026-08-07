@@ -519,9 +519,10 @@ def save_last_market_scan(scan_response: Dict[str, Any]):
 
 def load_last_market_scan() -> Optional[Dict[str, Any]]:
     """Load persistent 3:30 PM market scan analysis."""
-    if USE_POSTGRES:
-        return pg_read_json("last_market_scan", default=None)
-    return read_json(LAST_MARKET_SCAN_FILE, default=None)
+    scan = pg_read_json("last_market_scan", default=None) if USE_POSTGRES else read_json(LAST_MARKET_SCAN_FILE, default=None)
+    if scan is not None and scan.get("total_scanned", 0) > 0 and len(scan.get("stocks", [])) > 0:
+        return scan
+    return None
 
 
 def fetch_index_ohlc_dict() -> Dict[str, Optional[pd.DataFrame]]:
