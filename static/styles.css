@@ -2785,10 +2785,16 @@ button, input, select, textarea, .tab-btn, .main-nav-tab, .switch, .scanner-row 
 
     .split-accuracy-grid {
         display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-rows: auto auto !important;
         gap: 10px !important;
         width: 100% !important;
     }
+
+    .split-accuracy-grid > div:nth-child(1) { grid-column: 1 / 2 !important; grid-row: 1 !important; width: 100% !important; }
+    .split-accuracy-grid > div:nth-child(2) { grid-column: 2 / 3 !important; grid-row: 1 !important; width: 100% !important; }
+    .split-accuracy-grid > div:nth-child(3) { grid-column: 1 / 2 !important; grid-row: 2 !important; width: 100% !important; }
+    .split-accuracy-grid > div:nth-child(4) { grid-column: 2 / 3 !important; grid-row: 2 !important; width: 100% !important; }
 
     .split-accuracy-grid .metric-card {
         min-width: 0 !important;
