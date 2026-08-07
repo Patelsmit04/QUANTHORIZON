@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const mobileMenuToggle = document.getElementById("mobileMenuToggle");
     const mobileMenuDrawer = document.getElementById("mobileMenuDrawer");
     const mobileNavTabs = document.getElementById("mobileNavTabs");
+    const mobileBottomNav = document.getElementById("mobileBottomNav");
     const scanBtnMobile = document.getElementById("scanBtnMobile");
     const guideBtnMobile = document.getElementById("guideBtnMobile");
     const winRateBtnMobile = document.getElementById("winRateBtnMobile");
@@ -174,38 +175,60 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Mobile Navigation
+    // Unified Section Switcher
+    function switchSection(section) {
+        if (!section) return;
+        if (mainNavTabs) {
+            mainNavTabs.querySelectorAll(".main-nav-tab").forEach(b => {
+                b.classList.toggle("active", b.dataset.section === section);
+            });
+        }
+        if (mobileNavTabs) {
+            mobileNavTabs.querySelectorAll(".mobile-nav-tab").forEach(b => {
+                b.classList.toggle("active", b.dataset.section === section);
+            });
+        }
+        if (mobileBottomNav) {
+            mobileBottomNav.querySelectorAll(".mobile-bottom-tab").forEach(b => {
+                b.classList.toggle("active", b.dataset.section === section);
+            });
+        }
+
+        const sections = {
+            scanner: scannerSection,
+            news: newsSection,
+            indices: indicesSection,
+            strategies: strategiesSection,
+            history: historySection
+        };
+        Object.entries(sections).forEach(([key, el]) => {
+            if (!el) return;
+            if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
+        });
+
+        if (section === "news" && !newsLoaded) fetchNewsSection();
+        if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
+        if (section === "strategies") fetchStrategies();
+        if (section === "history") fetchHistorySection();
+    }
+
+    // Mobile Navigation Drawer
     if (mobileNavTabs) {
         mobileNavTabs.addEventListener("click", (e) => {
             const btn = e.target.closest(".mobile-nav-tab");
             if (!btn) return;
-
-            mobileNavTabs.querySelectorAll(".mobile-nav-tab").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            const section = btn.dataset.section;
-            
-            // Sync with desktop mainNavTabs if present
-            if (mainNavTabs) {
-                mainNavTabs.querySelectorAll(".main-nav-tab").forEach(b => {
-                    if (b.dataset.section === section) b.classList.add("active");
-                    else b.classList.remove("active");
-                });
-            }
-
-            const sections = { scanner: scannerSection, news: newsSection, indices: indicesSection, strategies: strategiesSection };
-            Object.entries(sections).forEach(([key, el]) => {
-                if (!el) return;
-                if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
-            });
-
-            // Close mobile menu after selection
+            switchSection(btn.dataset.section);
             if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
             if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        });
+    }
 
-            if (section === "news" && !newsLoaded) fetchNewsSection();
-            if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
-            if (section === "strategies") fetchStrategies();
+    // Mobile Navigation Dock (Bottom Dock)
+    if (mobileBottomNav) {
+        mobileBottomNav.addEventListener("click", (e) => {
+            const btn = e.target.closest(".mobile-bottom-tab");
+            if (!btn) return;
+            switchSection(btn.dataset.section);
         });
     }
 
@@ -307,26 +330,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Section Nav: Scanner <-> News
+    // Section Nav: Scanner <-> News <-> Indices <-> Strategies <-> History
     if (mainNavTabs) {
         mainNavTabs.addEventListener("click", (e) => {
             const btn = e.target.closest(".main-nav-tab");
             if (!btn) return;
-
-            mainNavTabs.querySelectorAll(".main-nav-tab").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            const section = btn.dataset.section;
-            const sections = { scanner: scannerSection, news: newsSection, indices: indicesSection, strategies: strategiesSection, history: historySection };
-            Object.entries(sections).forEach(([key, el]) => {
-                if (!el) return;
-                if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
-            });
-
-            if (section === "news" && !newsLoaded) fetchNewsSection();
-            if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
-            if (section === "strategies") fetchStrategies();
-            if (section === "history") fetchHistorySection();
+            switchSection(btn.dataset.section);
         });
     }
 
