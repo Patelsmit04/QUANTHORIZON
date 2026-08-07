@@ -1377,7 +1377,7 @@ def get_scan_results(
             # by a concurrent scan.
             scan_response = copy.deepcopy(cached) if cached is not None else None
 
-        if scan_response is not None:
+        if scan_response is not None and len(scan_response.get("stocks", [])) > 0:
             scan_response["cache_hit"] = True
         elif _can_run_live_scan_inline():
             scan_response = run_full_scan_pipeline()
