@@ -32,6 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Mobile Menu DOM
     const mobileMenuToggle = document.getElementById("mobileMenuToggle");
     const mobileMenuDrawer = document.getElementById("mobileMenuDrawer");
+    const mobileDrawerOverlay = document.getElementById("mobileDrawerOverlay");
+    const drawerCloseBtn = document.getElementById("drawerCloseBtn");
     const mobileNavTabs = document.getElementById("mobileNavTabs");
     const mobileBottomNav = document.getElementById("mobileBottomNav");
     const scanBtnMobile = document.getElementById("scanBtnMobile");
@@ -167,13 +169,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Event Listeners
     
-    // Mobile Menu Toggle
-    if (mobileMenuToggle && mobileMenuDrawer) {
+    // Mobile Navigation Drawer Open/Close Helpers
+    function openMobileDrawer() {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.add("active");
+        if (mobileDrawerOverlay) mobileDrawerOverlay.classList.remove("hidden");
+        if (mobileMenuToggle) {
+            mobileMenuToggle.classList.add("active");
+            const icon = mobileMenuToggle.querySelector("i");
+            if (icon) icon.className = "fa-solid fa-xmark";
+        }
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeMobileDrawer() {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+        if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add("hidden");
+        if (mobileMenuToggle) {
+            mobileMenuToggle.classList.remove("active");
+            const icon = mobileMenuToggle.querySelector("i");
+            if (icon) icon.className = "fa-solid fa-bars";
+        }
+        document.body.style.overflow = "";
+    }
+
+    if (mobileMenuToggle) {
         mobileMenuToggle.addEventListener("click", () => {
-            mobileMenuDrawer.classList.toggle("active");
-            mobileMenuToggle.classList.toggle("active");
+            if (mobileMenuDrawer && mobileMenuDrawer.classList.contains("active")) {
+                closeMobileDrawer();
+            } else {
+                openMobileDrawer();
+            }
         });
     }
+
+    if (drawerCloseBtn) drawerCloseBtn.addEventListener("click", closeMobileDrawer);
+    if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener("click", closeMobileDrawer);
 
     // Unified Section Switcher
     function switchSection(section) {
@@ -212,14 +242,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (section === "history") fetchHistorySection();
     }
 
-    // Mobile Navigation Drawer
+    // Mobile Navigation Drawer Tabs
     if (mobileNavTabs) {
         mobileNavTabs.addEventListener("click", (e) => {
             const btn = e.target.closest(".mobile-nav-tab");
             if (!btn) return;
             switchSection(btn.dataset.section);
-            if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-            if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+            closeMobileDrawer();
         });
     }
 
@@ -234,23 +263,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Mobile Action Buttons
     if (scanBtnMobile) scanBtnMobile.addEventListener("click", () => {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        closeMobileDrawer();
         fetchScanResults(true);
     });
     if (guideBtnMobile) guideBtnMobile.addEventListener("click", () => {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        closeMobileDrawer();
         guideModal.classList.remove("hidden");
     });
     if (winRateBtnMobile) winRateBtnMobile.addEventListener("click", () => {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        closeMobileDrawer();
         openWinRateModal();
     });
     if (exportCsvBtnMobile) exportCsvBtnMobile.addEventListener("click", () => {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        closeMobileDrawer();
         exportWatchlistCsv();
     });
 

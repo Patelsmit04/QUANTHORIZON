@@ -152,66 +152,84 @@
             <div id="notifList"><div class="notif-empty">No notifications yet.</div></div>
         </div>
 
+        <!-- Mobile Drawer Backdrop Overlay -->
+        <div class="mobile-drawer-overlay hidden" id="mobileDrawerOverlay"></div>
+
         <!-- Mobile Menu Drawer -->
         <div class="mobile-menu-drawer" id="mobileMenuDrawer">
             <div class="mobile-menu-content">
-                <div class="mobile-menu-header" style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-                    <div class="app-logo-frame md">
-                        <img src="/static/logo.png" alt="QuantHorizon Logo">
+                <div class="mobile-menu-header">
+                    <div class="mobile-brand-wrap">
+                        <div class="app-logo-frame md">
+                            <img src="/static/logo.png" alt="QuantHorizon Logo">
+                        </div>
+                        <div>
+                            <div class="drawer-title">Quant<span>Horizon</span></div>
+                            <div class="drawer-subtitle">Institutional BTST Engine & Gap Predictor</div>
+                        </div>
                     </div>
-                    <div>
-                        <div style="font-family: var(--font-heading); font-weight: 800; font-size: 16px; color: var(--ink-primary);">Quant<span style="color: var(--gold);">Horizon</span></div>
-                        <div style="font-size: 10px; color: var(--ink-secondary);">Institutional BTST Engine & Gap Predictor</div>
-                    </div>
+                    <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
+
+                <div class="drawer-section-label"><i class="fa-solid fa-compass"></i> NAVIGATION SECTIONS</div>
                 <nav class="mobile-nav-tabs" id="mobileNavTabs">
                     <button class="mobile-nav-tab active" data-section="scanner">
-                        <i class="fa-solid fa-radar"></i> SCANNER
+                        <i class="fa-solid fa-radar"></i>
+                        <span>SCANNER</span>
                     </button>
                     <button class="mobile-nav-tab" data-section="indices">
-                        <i class="fa-solid fa-chart-column"></i> INDICES
+                        <i class="fa-solid fa-chart-column"></i>
+                        <span>INDICES</span>
                     </button>
                     <button class="mobile-nav-tab" data-section="strategies">
-                        <i class="fa-solid fa-sliders"></i> STRATEGIES
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>STRATEGIES</span>
                     </button>
                     <button class="mobile-nav-tab" data-section="history">
-                        <i class="fa-solid fa-clock-rotate-left"></i> HISTORY
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>HISTORY</span>
                     </button>
                     <button class="mobile-nav-tab" data-section="news">
-                        <i class="fa-solid fa-newspaper"></i> NEWS
+                        <i class="fa-solid fa-newspaper"></i>
+                        <span>NEWS</span>
                     </button>
                 </nav>
-                <div class="mobile-menu-divider"></div>
-                <div class="mobile-menu-controls">
-                    <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px;">
-                        <div class="priority-toggle-box" style="flex: 1; justify-content: space-between;">
-                            <span><i class="fa-solid fa-fire text-gold"></i> PRIORITY</span>
-                            <label class="switch">
-                                <input type="checkbox" id="priorityOnlyToggleMobile" aria-label="Show priority picks only">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                        <div class="auto-refresh-toggle" style="flex: 1; justify-content: space-between;">
-                            <span><i class="fa-solid fa-rotate-right"></i> AUTO</span>
-                            <label class="switch">
-                                <input type="checkbox" id="autoRefreshToggleMobile" checked aria-label="Toggle auto refresh">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
+
+                <div class="drawer-section-label"><i class="fa-solid fa-sliders"></i> QUICK CONTROLS</div>
+                <div class="mobile-toggles-row">
+                    <div class="mobile-toggle-card">
+                        <span><i class="fa-solid fa-fire text-gold"></i> PRIORITY ONLY</span>
+                        <label class="switch">
+                            <input type="checkbox" id="priorityOnlyToggleMobile" aria-label="Show priority picks only">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
-                    <button id="scanBtnMobile" class="btn btn-pill btn-primary btn-full-width">
+                    <div class="mobile-toggle-card">
+                        <span><i class="fa-solid fa-rotate-right"></i> AUTO REFRESH</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoRefreshToggleMobile" checked aria-label="Toggle auto refresh">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="drawer-section-label"><i class="fa-solid fa-layer-group"></i> ACTIONS & ANALYTICS</div>
+                <div class="mobile-menu-controls">
+                    <button id="scanBtnMobile" class="btn btn-pill btn-primary drawer-btn">
                         <i class="fa-solid fa-bolt"></i> SCAN NOW
                     </button>
-                    <button id="winRateBtnMobile" class="btn btn-pill btn-secondary btn-full-width">
+                    <button id="winRateBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
                         <i class="fa-solid fa-trophy text-gold"></i> WIN RATE ANALYTICS
                     </button>
-                    <button id="guideBtnMobile" class="btn btn-pill btn-secondary btn-full-width">
+                    <button id="guideBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
                         <i class="fa-solid fa-circle-question"></i> USER GUIDE
                     </button>
-                    <button id="exportCsvBtnMobile" class="btn btn-pill btn-secondary btn-full-width">
+                    <button id="exportCsvBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
                         <i class="fa-solid fa-file-csv"></i> EXPORT CSV
                     </button>
-                    <button id="notifBellMobile" class="btn btn-pill btn-secondary btn-full-width">
+                    <button id="notifBellMobile" class="btn btn-pill btn-secondary drawer-btn">
                         <i class="fa-solid fa-bell"></i> NOTIFICATIONS
                         <span class="notif-badge hidden" id="notifBadgeMobile">0</span>
                     </button>
