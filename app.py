@@ -836,9 +836,6 @@ def _run_full_scan_pipeline_impl() -> Dict[str, Any]:
             "last known-good cached scan instead of overwriting it with an empty result."
         )
         return existing_summary
-    elif not stocks:
-        logger.warning("Full scan pipeline returned 0 stocks — populating seed institutional evaluations for initial deployment.")
-        stocks = generate_seed_stock_evaluations()
 
     annotate_bestest_5(stocks)
     annotate_depth_analysis(stocks)
@@ -916,63 +913,7 @@ def _run_full_scan_pipeline_impl() -> Dict[str, Any]:
     return scan_response
 
 
-def generate_seed_stock_evaluations() -> List[Dict[str, Any]]:
-    """Generates high-conviction seed stock evaluations for initial server boot or network fallback."""
-    seed_data = [
-        {"symbol": "RELIANCE", "ticker": "RELIANCE.NS", "name": "Reliance Industries Ltd", "price": 2985.40, "sig": "BTST BUY (P1)", "p_level": "P1_HIGH", "conf": 88, "gap": 1.4, "vol": 3.2, "rsi": 64.2, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "HDFCBANK", "ticker": "HDFCBANK.NS", "name": "HDFC Bank Ltd", "price": 1642.10, "sig": "BTST BUY (P1)", "p_level": "P1_HIGH", "conf": 86, "gap": 1.2, "vol": 2.8, "rsi": 61.5, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "ICICIBANK", "ticker": "ICICIBANK.NS", "name": "ICICI Bank Ltd", "price": 1180.50, "sig": "BTST BUY (P1)", "p_level": "P1_HIGH", "conf": 85, "gap": 1.3, "vol": 2.6, "rsi": 63.0, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "TCS", "ticker": "TCS.NS", "name": "Tata Consultancy Services", "price": 4120.30, "sig": "BTST BUY (P1)", "p_level": "P1_HIGH", "conf": 84, "gap": 1.1, "vol": 2.4, "rsi": 59.8, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "INFY", "ticker": "INFY.NS", "name": "Infosys Ltd", "price": 1785.60, "sig": "BTST BUY (P1)", "p_level": "P1_HIGH", "conf": 82, "gap": 1.0, "vol": 2.2, "rsi": 58.4, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "TATAMOTORS", "ticker": "TATAMOTORS.NS", "name": "Tata Motors Ltd", "price": 985.00, "sig": "STBT SELL (P2)", "p_level": "P2_MEDIUM", "conf": 76, "gap": -1.1, "vol": 2.1, "rsi": 42.1, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "SBIN", "ticker": "SBIN.NS", "name": "State Bank of India", "price": 845.20, "sig": "BTST BUY (P1)", "p_level": "P1_HIGH", "conf": 83, "gap": 1.2, "vol": 2.5, "rsi": 62.1, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "AXISBANK", "ticker": "AXISBANK.NS", "name": "Axis Bank Ltd", "price": 1240.00, "sig": "BTST BUY (P2)", "p_level": "P2_MEDIUM", "conf": 78, "gap": 0.9, "vol": 1.9, "rsi": 57.2, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "BHARTIARTL", "ticker": "BHARTIARTL.NS", "name": "Bharti Airtel Ltd", "price": 1420.00, "sig": "BTST BUY (P1)", "p_level": "P1_HIGH", "conf": 85, "gap": 1.3, "vol": 2.7, "rsi": 65.0, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "MARUTI", "ticker": "MARUTI.NS", "name": "Maruti Suzuki India Ltd", "price": 12450.00, "sig": "BTST BUY (P2)", "p_level": "P2_MEDIUM", "conf": 77, "gap": 0.8, "vol": 1.8, "rsi": 56.1, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "KOTAKBANK", "ticker": "KOTAKBANK.NS", "name": "Kotak Mahindra Bank Ltd", "price": 1790.00, "sig": "BTST BUY (P2)", "p_level": "P2_MEDIUM", "conf": 75, "gap": 0.7, "vol": 1.7, "rsi": 55.4, "tier": "Tier 1 (High Liquidity)"},
-        {"symbol": "LT", "ticker": "LT.NS", "name": "Larsen & Toubro Ltd", "price": 3620.00, "sig": "BTST BUY (P1)", "p_level": "P1_HIGH", "conf": 81, "gap": 1.1, "vol": 2.3, "rsi": 60.2, "tier": "Tier 1 (High Liquidity)"},
-    ]
 
-    results = []
-    for idx, s in enumerate(seed_data, start=1):
-        price = s["price"]
-        is_btst = "BTST" in s["sig"]
-        tp = round(price * 1.015, 2) if is_btst else round(price * 0.985, 2)
-        sl = round(price * 0.992, 2) if is_btst else round(price * 1.008, 2)
-
-        results.append({
-            "symbol": s["symbol"],
-            "company_name": s["name"],
-            "raw_ticker": s["ticker"],
-            "close_price_325": price,
-            "ltp": price,
-            "signal": s["sig"],
-            "priority_level": s["p_level"],
-            "confidence_score": s["conf"],
-            "predicted_gap_pct": s["gap"],
-            "volume_spike": s["vol"],
-            "rsi": s["rsi"],
-            "liquidity_tier": s["tier"],
-            "target_profit_price": tp,
-            "stop_loss_price": sl,
-            "risk_reward_ratio": "1 : 1.88",
-            "rank_position": idx,
-            "pillar_weights": {
-                "Pillar 1: Futures OI": 1.5,
-                "Pillar 2: Vol Persistence": 1.2,
-                "Pillar 3: Relative Strength": 1.0,
-                "Pillar 4: Volume Spike": 1.4,
-                "Pillar 5: Marubozu Close": 1.1
-            },
-            "confirmed_pillars": [
-                "Pillar 1: Futures OI (Long Buildup)",
-                "Pillar 3: Relative Strength (> Sector Index)",
-                "Pillar 4: Volume Spike (> 2.0x 20-period SMA)"
-            ],
-            "total_pillar_weight": 6.2,
-            "required_weight": 3.0
-        })
-    return results
 
 
 def _log_and_maybe_paper_trade(signal: Dict[str, Any], strategy_id: str, vix_val: float, vix_regime: str, auto_paper_trade: bool):
