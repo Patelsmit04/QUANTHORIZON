@@ -677,9 +677,9 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 .main-content { max-width: 1680px; margin: 24px auto 0; padding: 0 24px; }
 
-/* Scanner Quick Actions Toolbar (User Pic 1 Reference Layout) */
+/* Scanner Quick Actions Toolbar (Mobile-Only - Hidden on PC/Desktop to prevent button duplication) */
 .scanner-quick-actions-bar {
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 12px;
     margin-bottom: 20px;
@@ -2701,35 +2701,59 @@ button, input, select, textarea, .tab-btn, .main-nav-tab, .switch, .scanner-row 
     }
 
     .scanner-quick-actions-bar {
-        padding: 14px 14px !important;
+        display: flex !important;
+        padding: 12px 14px !important;
         border-radius: 18px !important;
         gap: 10px !important;
     }
 
     .actions-row-1 {
-        grid-template-columns: 1.3fr 1fr 1fr !important;
-        gap: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        width: 100% !important;
     }
 
-    .actions-row-2 {
-        grid-template-columns: 1.5fr 1fr !important;
-        gap: 10px !important;
-    }
-
-    .actions-row-1 .priority-toggle-box,
-    .actions-row-2 .auto-refresh-toggle {
+    .actions-row-1 .priority-toggle-box {
+        flex: 1.6 !important;
+        min-width: 0 !important;
         font-size: 10px !important;
-        padding: 8px 10px !important;
+        padding: 7px 10px !important;
+        gap: 4px !important;
+        white-space: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+
+    .actions-row-1 .priority-toggle-box span {
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .actions-row-1 .btn {
+        flex: 1 !important;
         font-size: 10px !important;
-        padding: 8px 6px !important;
+        padding: 8px 4px !important;
+        white-space: nowrap !important;
+    }
+
+    .actions-row-2 {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
     }
 
     .btn-scan-prominent {
+        flex: 1.5 !important;
         font-size: 13px !important;
-        padding: 10px 18px !important;
+        padding: 10px 16px !important;
+    }
+
+    .actions-row-2 .auto-refresh-toggle {
+        flex: 1 !important;
+        font-size: 10px !important;
+        padding: 7px 10px !important;
     }
 
     .scanner-table th:first-child,
@@ -2745,13 +2769,61 @@ button, input, select, textarea, .tab-btn, .main-nav-tab, .switch, .scanner-row 
         z-index: 20;
     }
 
-    .split-accuracy-grid,
+    .split-accuracy-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .split-accuracy-grid .metric-card {
+        min-width: 0 !important;
+        padding: 10px 10px !important;
+        border-radius: 14px !important;
+        box-sizing: border-box !important;
+    }
+
+    .split-accuracy-grid .metric-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 4px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .split-accuracy-grid .metric-title {
+        font-size: 10px !important;
+        font-weight: 800 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 100% !important;
+    }
+
+    .split-accuracy-grid .badge {
+        font-size: 9px !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+    }
+
+    .split-accuracy-grid .metric-body {
+        margin-top: 2px !important;
+    }
+
+    .split-accuracy-grid .metric-body div {
+        font-size: 17px !important;
+    }
+
+    .split-accuracy-grid .metric-subtext {
+        font-size: 9px !important;
+    }
+
     .metrics-grid {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 10px !important;
     }
 
-    .metric-card {
+    .metrics-grid .metric-card {
         padding: 12px 14px !important;
         border-radius: 14px !important;
     }
