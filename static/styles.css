@@ -2563,6 +2563,55 @@ button, input, select, textarea, .tab-btn, .main-nav-tab, .switch, .scanner-row 
 }
 
 @media (max-width: 768px) {
+    .app-header {
+        padding: 10px 16px !important;
+    }
+
+    .header-container {
+        gap: 0 !important;
+    }
+
+    .header-top-row {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        width: 100% !important;
+    }
+
+    .brand-section {
+        gap: 8px !important;
+    }
+
+    .app-logo-frame {
+        width: 36px !important;
+        height: 36px !important;
+    }
+
+    .brand-title {
+        font-size: 18px !important;
+    }
+
+    .brand-subtitle {
+        display: none !important;
+    }
+
+    .market-status-box,
+    .header-actions {
+        display: none !important;
+    }
+
+    .header-nav-row {
+        display: none !important;
+    }
+
+    .mobile-menu-toggle {
+        display: flex !important;
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 16px !important;
+    }
+
     .scanner-table th:first-child,
     .scanner-table td:first-child {
         position: sticky;
@@ -2576,26 +2625,35 @@ button, input, select, textarea, .tab-btn, .main-nav-tab, .switch, .scanner-row 
         z-index: 20;
     }
 
-    .main-nav-tabs {
-        padding: 4px 8px;
-        gap: 6px;
-    }
-
-    .main-nav-tab {
-        min-height: 40px;
-        font-size: 11px;
-        padding: 8px 14px;
-    }
-
-    .split-accuracy-grid {
+    .split-accuracy-grid,
+    .metrics-grid {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 10px !important;
+    }
+
+    .metric-card {
+        padding: 12px 14px !important;
+        border-radius: 14px !important;
+    }
+
+    .metric-value {
+        font-size: 20px !important;
+    }
+
+    .metric-title {
+        font-size: 10px !important;
+    }
+
+    .metric-subtext {
+        font-size: 10px !important;
     }
 }
 
 @media (max-width: 640px) {
-    .split-accuracy-grid {
-        grid-template-columns: 1fr !important;
+    .split-accuracy-grid,
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
     }
 
     /* Mobile Bottom Sheet for Modals */
