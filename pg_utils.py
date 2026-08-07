@@ -29,7 +29,10 @@ import threading
 from contextlib import contextmanager
 from typing import Any, Iterator, Optional
 
-from psycopg.types.json import Jsonb
+try:
+    from psycopg.types.json import Jsonb
+except ImportError:
+    Jsonb = None
 
 USE_POSTGRES = False
 
