@@ -741,12 +741,24 @@ input:checked + .slider:before { transform: translateX(16px); }
     box-shadow: 0 8px 24px rgba(184, 134, 11, 0.45) !important;
 }
 
-/* Split Accuracy Grid (Strict 4 columns on Desktop, Strict 2x2 grid on Mobile) */
+/* Split Accuracy Grid (Strict 2x2 grid on Laptop/Tablet/Mobile, 4 columns on Ultra-Wide Desktop) */
 .split-accuracy-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    margin-bottom: 20px !important;
+    width: 100% !important;
+}
+
+.split-accuracy-grid .metric-card {
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+@media (min-width: 1200px) {
+    .split-accuracy-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
 }
 
 .metrics-grid {
