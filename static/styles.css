@@ -741,10 +741,11 @@ input:checked + .slider:before { transform: translateX(16px); }
     box-shadow: 0 8px 24px rgba(184, 134, 11, 0.45) !important;
 }
 
-/* Split Accuracy Grid (Strict 2x2 grid on Laptop/Tablet/Mobile, 4 columns on Ultra-Wide Desktop) */
+/* Split Accuracy Grid (Strict 2x2 matrix on Laptop/Tablet/Mobile, 4 columns on Ultra-Wide Desktop) */
 .split-accuracy-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto !important;
     gap: 14px !important;
     margin-bottom: 20px !important;
     width: 100% !important;
@@ -752,12 +753,26 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 .split-accuracy-grid .metric-card {
     min-width: 0 !important;
+    width: 100% !important;
     box-sizing: border-box !important;
 }
+
+.split-accuracy-grid > div:nth-child(1) { grid-column: 1 / 2 !important; grid-row: 1 !important; }
+.split-accuracy-grid > div:nth-child(2) { grid-column: 2 / 3 !important; grid-row: 1 !important; }
+.split-accuracy-grid > div:nth-child(3) { grid-column: 1 / 2 !important; grid-row: 2 !important; }
+.split-accuracy-grid > div:nth-child(4) { grid-column: 2 / 3 !important; grid-row: 2 !important; }
 
 @media (min-width: 1200px) {
     .split-accuracy-grid {
         grid-template-columns: repeat(4, 1fr) !important;
+        grid-template-rows: auto !important;
+    }
+    .split-accuracy-grid > div:nth-child(1),
+    .split-accuracy-grid > div:nth-child(2),
+    .split-accuracy-grid > div:nth-child(3),
+    .split-accuracy-grid > div:nth-child(4) {
+        grid-column: auto !important;
+        grid-row: auto !important;
     }
 }
 
@@ -2689,12 +2704,13 @@ button, input, select, textarea, .tab-btn, .main-nav-tab, .switch, .scanner-row 
         display: none !important;
     }
 
-    .notif-bell-wrap {
+    .notif-bell-wrap-mobile {
         display: flex !important;
         align-items: center !important;
+        margin-left: auto !important;
     }
 
-    .btn-icon#notifBell {
+    .btn-icon#notifBellMobileTop {
         width: 38px !important;
         height: 38px !important;
         border-radius: 50% !important;
@@ -2706,6 +2722,9 @@ button, input, select, textarea, .tab-btn, .main-nav-tab, .switch, .scanner-row 
         align-items: center !important;
         justify-content: center !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        cursor: pointer !important;
+        position: relative !important;
+    }
     }
 
     .mobile-menu-toggle {

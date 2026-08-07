@@ -150,8 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Notifications DOM (M5) — bell/badge/panel + toast, fed live over /ws/live
     const notifBell = document.getElementById("notifBell");
-    const notifBellMobile = document.getElementById("notifBellMobile");
     const notifBadge = document.getElementById("notifBadge");
+    const notifBellMobileTop = document.getElementById("notifBellMobileTop");
+    const notifBadgeMobileTop = document.getElementById("notifBadgeMobileTop");
     const notifBadgeMobile = document.getElementById("notifBadgeMobile");
     const notifPanel = document.getElementById("notifPanel");
     const notifList = document.getElementById("notifList");
@@ -2070,6 +2071,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const text = notifUnreadCount > 99 ? "99+" : String(notifUnreadCount);
         if (notifBadge) { notifBadge.textContent = text; notifBadge.classList.toggle("hidden", !show); }
         if (notifBadgeMobile) { notifBadgeMobile.textContent = text; notifBadgeMobile.classList.toggle("hidden", !show); }
+        if (notifBadgeMobileTop) { notifBadgeMobileTop.textContent = text; notifBadgeMobileTop.classList.toggle("hidden", !show); }
     }
 
     function renderNotifList(notifications) {
@@ -2148,9 +2150,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         renderNotifBadge();
                         if (notifPanel && !notifPanel.classList.contains("hidden")) onNotifPanelOpened();
                     }
-                    // scan_update / closing_sequence_progress are lightweight status pings —
-                    // deliberately not surfaced as bell notifications (would be noisy at
-                    // several-per-minute during market hours); ignored here by design.
                 } catch (e) { console.error("Bad /ws/live message:", e); }
             };
         }
@@ -2159,6 +2158,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function initNotifications() {
         if (notifBell) notifBell.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
+        if (notifBellMobileTop) notifBellMobileTop.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
         if (notifBellMobile) notifBellMobile.addEventListener("click", () => {
             if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
             if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
@@ -2173,12 +2173,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         document.addEventListener("click", (e) => {
             if (!notifPanel || notifPanel.classList.contains("hidden")) return;
-            // M9 audit fix: notifBellMobile wasn't in this exception list, so opening the panel
-            // from the mobile bell triggered this SAME click's document-level listener right
-            // after (clicks bubble from the button up to document), instantly re-hiding it —
-            // the panel would flash open and close within one tap, even once it was made
-            // structurally reachable on mobile.
-            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target)) || (notifBellMobile && notifBellMobile.contains(e.target))) return;
+            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target)) || (notifBellMobile && notifBellMobile.contains(e.target)) || (notifBellMobileTop && notifBellMobileTop.contains(e.target))) return;
             notifPanel.classList.add("hidden");
         });
 
