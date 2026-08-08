@@ -63,7 +63,7 @@
                 </button>
                 <button class="sidebar-nav-item" data-section="globalNews" title="Global & Macro News">
                     <i class="fa-solid fa-globe"></i>
-                    <span class="nav-label">Global & Macro News</span>
+                    <span class="nav-label">Global &amp; Macro News</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="institutionalFlow" title="Institutional Flow">
                     <i class="fa-solid fa-building-columns"></i>
@@ -76,7 +76,7 @@
                 </button>
                 <button class="sidebar-nav-item" data-section="history" title="History & Calibration">
                     <i class="fa-solid fa-clock-rotate-left"></i>
-                    <span class="nav-label">History & Calibration</span>
+                    <span class="nav-label">History &amp; Calibration</span>
                     <span class="nav-badge" id="historyNavBadge">LIVE</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="strategies" title="Strategies">
@@ -116,7 +116,7 @@
                     </div>
                 </div>
 
-                <div class="drawer-section-label"><i class="fa-solid fa-layer-group"></i> ACTIONS & ANALYTICS</div>
+                <div class="drawer-section-label"><i class="fa-solid fa-layer-group"></i> ACTIONS &amp; ANALYTICS</div>
                 <div class="mobile-menu-controls">
                     <button id="scanBtnMobile" class="btn btn-pill btn-primary drawer-btn">
                         <i class="fa-solid fa-bolt"></i> SCAN NOW
@@ -144,15 +144,18 @@
         <div class="mobile-drawer-overlay hidden" id="mobileDrawerOverlay"></div>
 
         <div class="app-main">
+
             <header class="content-topbar">
                 <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
                     <i class="fa-solid fa-bars"></i>
                 </button>
+
                 <div class="topbar-brand-mini">
                     <div class="app-logo-frame sm">
                         <img src="/static/logo.png" alt="QuantHorizon Logo">
                     </div>
                 </div>
+
                 <div class="market-status-box">
                     <div class="status-indicator live-pulse" id="statusDot"></div>
                     <div class="status-text">
@@ -164,7 +167,9 @@
                         <span id="marketTimer" class="timer-value">OFF-MARKET SNAPSHOT (3:30 PM Scan Locked)</span>
                     </div>
                 </div>
+
                 <div class="topbar-spacer"></div>
+
                 <div class="header-actions">
                     <div class="priority-toggle-box">
                         <i class="fa-solid fa-fire text-gold"></i>
@@ -174,6 +179,7 @@
                             <span class="slider round"></span>
                         </label>
                     </div>
+
                     <div class="auto-refresh-toggle">
                         <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
                         <span>AUTO</span>
@@ -182,22 +188,27 @@
                             <span class="slider round"></span>
                         </label>
                     </div>
+
                     <button id="winRateBtn" class="btn btn-pill btn-secondary" title="View BTST Win Rate Analytics">
                         <i class="fa-solid fa-trophy text-gold"></i>
                         <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
                     </button>
+
                     <button id="guideBtn" class="btn btn-pill btn-secondary" title="Priority Ranking & Gap Prediction Rules">
                         <i class="fa-solid fa-circle-question"></i>
                         <span>GUIDE</span>
                     </button>
+
                     <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
                         <i class="fa-solid fa-file-csv"></i>
                         <span>CSV</span>
                     </button>
+
                     <button id="scanBtn" class="btn btn-pill btn-primary">
                         <i class="fa-solid fa-bolt"></i>
                         <span>SCAN NOW</span>
                     </button>
+
                     <div class="notif-bell-wrap">
                         <button id="notifBell" class="btn-icon" title="Notifications" aria-label="Notifications">
                             <i class="fa-solid fa-bell"></i>
@@ -216,11 +227,23 @@
             </div>
 
             <main class="main-content">
-            <!-- FULL BODY CONTINUES - this push may still be incomplete if truncated by size limits -->
-            <div id="dashboardSection"><p>Loading full restore...</p></div>
+
+            <div id="dashboardSection">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-gauge-high text-gold"></i> DASHBOARD
+                        <span class="section-page-subtitle">Live Accuracy, Priority Mix &amp; Today's Snapshot</span>
+                    </h2>
+                </div>
+                <p style="color:#888;padding:40px;text-align:center;">
+                    Full HTML restore required. Please paste your complete index.html file via GitHub web editor.
+                    See chat instructions. mobile-audit.css is already on the repo.
+                </p>
+            </div>
+
             </main>
         </div>
     </div>
+
     <script src="/static/app.js?v=6.1.0"></script>
 </body>
 </html>
