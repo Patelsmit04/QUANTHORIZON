@@ -49,3 +49,20 @@ def interruptible_sleep(seconds: float) -> bool:
     Returns False if the timeout elapsed normally without interruption.
     """
     return shutdown_event.wait(timeout=seconds)
+
+
+import zoneinfo
+from datetime import datetime
+
+IST = zoneinfo.ZoneInfo("Asia/Kolkata")
+
+
+def get_ist_now() -> datetime:
+    """Returns current datetime explicitly in Asia/Kolkata (IST) timezone."""
+    return datetime.now(IST)
+
+
+def get_ist_today_str() -> str:
+    """Returns current date string (YYYY-MM-DD) explicitly in Asia/Kolkata (IST) timezone."""
+    return get_ist_now().strftime("%Y-%m-%d")
+

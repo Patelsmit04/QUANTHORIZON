@@ -184,6 +184,10 @@ def evaluate_5_pillar_matrix(
             "confirmed_pillars_count": 0,
             "confirmed_pillars_weight": 0.0,
             "signal": "NEUTRAL",
+            "option_type": "NONE",
+            "conviction_level": "WATCHLIST",
+            "priority_level": "P3_LOW",
+            "confidence_score": 40,
             "reason": "Insufficient intraday data"
         }
 

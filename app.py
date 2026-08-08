@@ -551,17 +551,16 @@ def fetch_raw_stock_universe() -> Dict[str, Any]:
     """
     The expensive part (one batch yfinance download + per-stock OI/delivery/fundamentals
     reads) — done ONCE per scan tick and reused by every strategy that scores the stock
-    universe, so running N strategies doesn't multiply network calls by N. That's what
-    caused real rate-limiting earlier; this split is what prevents a repeat now that
-    multiple strategies can all target STOCKS.
+    universe. Uses period="5d" and chunked retries to guarantee all 209 canonical NSE F&O tickers
+    are fetched consistently across both Localhost and Production.
     """
     logger.info(f"Downloading 5-Pillar intraday data for {len(FO_STOCKS)} F&O stocks + Nifty 50...")
-    tickers_to_download = FO_STOCKS + ["^NSEI"]
+    tickers_to_download = list(FO_STOCKS) + ["^NSEI"]
 
     download_df = call_with_retry(
         lambda: yf.download(
             tickers=tickers_to_download,
-            period="1d",
+            period="5d",
             interval="5m",
             group_by="ticker",
             progress=False,
@@ -570,6 +569,32 @@ def fetch_raw_stock_universe() -> Dict[str, Any]:
         label="stock universe batch download",
         timeout=45.0,  # a ~210-ticker batch download legitimately takes longer than a single fetch
     )
+
+    downloaded_set = set()
+    if download_df is not None and isinstance(download_df.columns, pd.MultiIndex):
+        downloaded_set = set(download_df.columns.levels[0])
+
+    missing_tickers = [t for t in FO_STOCKS if t not in downloaded_set]
+    if missing_tickers:
+        logger.info(f"Retrying batch download for {len(missing_tickers)} missing F&O tickers in chunked passes...")
+        chunk_size = 25
+        for i in range(0, len(missing_tickers), chunk_size):
+            chunk = missing_tickers[i:i + chunk_size]
+            try:
+                chunk_df = yf.download(
+                    tickers=chunk,
+                    period="5d",
+                    interval="5m",
+                    group_by="ticker",
+                    progress=False,
+                    threads=True,
+                )
+                if chunk_df is not None and isinstance(chunk_df.columns, pd.MultiIndex):
+                    for ticker in chunk_df.columns.levels[0]:
+                        if ticker in chunk and download_df is not None:
+                            download_df[ticker] = chunk_df[ticker]
+            except Exception as e:
+                logger.warning(f"Chunk download retry failed for {chunk}: {e}")
 
     nifty_df = None
     if download_df is not None and isinstance(download_df.columns, pd.MultiIndex) and "^NSEI" in download_df.columns.levels[0]:
@@ -581,6 +606,25 @@ def fetch_raw_stock_universe() -> Dict[str, Any]:
         "fundamentals_cache": load_all_fundamentals(),
         "dynamic_pillar_weights": get_active_pillar_weights(),
     }
+
+
+def extract_single_stock_df(download_df: pd.DataFrame, ticker: str) -> Optional[pd.DataFrame]:
+    """Safely extract per-ticker DataFrame from yfinance MultiIndex download_df, searching all index levels."""
+    if download_df is None or download_df.empty:
+        return None
+    if not isinstance(download_df.columns, pd.MultiIndex):
+        return download_df
+    if ticker in download_df.columns.levels[0]:
+        try:
+            return download_df[ticker]
+        except Exception:
+            pass
+    if len(download_df.columns.levels) > 1 and ticker in download_df.columns.levels[1]:
+        try:
+            return download_df.xs(ticker, axis=1, level=1)
+        except Exception:
+            pass
+    return None
 
 
 def score_stock_universe(raw: Dict[str, Any], strategy: Dict[str, Any], oi_mult: float = 1.5) -> List[Dict[str, Any]]:
@@ -595,14 +639,7 @@ def score_stock_universe(raw: Dict[str, Any], strategy: Dict[str, Any], oi_mult:
     results = []
     for ticker in FO_STOCKS:
         try:
-            if isinstance(download_df.columns, pd.MultiIndex):
-                if ticker in download_df.columns.levels[0]:
-                    stock_df = download_df[ticker]
-                else:
-                    continue
-            else:
-                stock_df = download_df
-
+            stock_df = extract_single_stock_df(download_df, ticker)
             clean_sym = ticker.replace(".NS", "")
             oi = get_per_stock_oi_data(clean_sym)
             delivery = get_per_stock_delivery_data(clean_sym)

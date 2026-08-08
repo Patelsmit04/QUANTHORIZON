@@ -244,7 +244,7 @@ def get_per_stock_oi_data(symbol: str, fetch_online: bool = False) -> Optional[D
         return None
 
     # Compute volume-based OI proxy
-    volumes = [r["volume"] for r in records if r["volume"] > 0]
+    volumes = [r.get("volume", r.get("v", 0)) for r in records if r.get("volume", r.get("v", 0)) > 0]
     if len(volumes) < 3:
         return None
 

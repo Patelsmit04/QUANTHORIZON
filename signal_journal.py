@@ -27,7 +27,7 @@ from strategy_manager import DEFAULT_STRATEGY_ID
 from index_scoring import INDEX_TICKERS
 from net_utils import call_with_retry
 from candle_utils import fetch_post_lock_candles
-from env_utils import DATA_DIR
+from env_utils import DATA_DIR, get_ist_today_str, get_ist_now, IST
 from pg_utils import USE_POSTGRES, get_pg_connection
 
 logger = logging.getLogger("SignalJournal")
@@ -467,7 +467,7 @@ def log_signal_entry(
     symbol on the same day would collide on the same primary key and INSERT OR IGNORE would
     silently drop the second one.
     """
-    today_date = datetime.now().strftime("%Y-%m-%d")
+    today_date = get_ist_today_str()
     symbol = stock.get("symbol") or stock.get("index_name")
     if not symbol:
         logger.warning("log_signal_entry: no symbol/index_name on result — skipping.")
@@ -577,7 +577,7 @@ def log_index_verdict(verdict: Dict[str, Any], raw_index_result: Dict[str, Any])
     not a per-strategy signal; it runs once per index per day regardless of how many strategies
     are configured.
     """
-    verdict_date = datetime.now().strftime("%Y-%m-%d")
+    verdict_date = get_ist_today_str()
     index_name = verdict.get("index_name")
     if not index_name:
         logger.warning("log_index_verdict: no index_name on verdict — skipping.")
@@ -668,7 +668,7 @@ def evaluate_pending_index_verdicts() -> Dict[str, Any]:
         return {"evaluated_count": 0, "message": "No pending index verdicts to evaluate."}
 
     evaluated_count = 0
-    today_date_str = datetime.now().strftime("%Y-%m-%d")
+    today_date_str = get_ist_today_str()
 
     upsert_index_eval_sql = ("""
                 INSERT INTO index_verdict_evaluations (
@@ -844,7 +844,7 @@ def evaluate_pending_signals() -> Dict[str, Any]:
         return {"evaluated_count": 0, "message": "No pending signals to evaluate."}
 
     evaluated_count = 0
-    today_date_str = datetime.now().strftime("%Y-%m-%d")
+    today_date_str = get_ist_today_str()
 
     upsert_signal_eval_sql = ("""
                     INSERT INTO signal_evaluations (
