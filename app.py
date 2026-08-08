@@ -1477,6 +1477,39 @@ def get_news_section(
     })
 
 
+@app.get("/api/institutional_flow")
+def get_institutional_flow(min_value_cr: float = Query(25.0, description="Minimum deal value in ₹ Crore (SEBI floor ₹25 Cr)")):
+    """
+    NSE Block & Bulk Deals API (≥ ₹25 Crore Minimum SEBI Threshold).
+    Exposes institutional buying & selling flow data for BTST conviction scoring.
+    """
+    from block_deal_provider import fetch_live_large_deals
+    deals = fetch_live_large_deals(min_value_cr=min_value_cr)
+    buy_deals = [d for d in deals if d.get("side") == "BUY"]
+    sell_deals = [d for d in deals if d.get("side") == "SELL"]
+    total_buy_cr = round(sum(d.get("value_cr", 0) for d in buy_deals), 2)
+    total_sell_cr = round(sum(d.get("value_cr", 0) for d in sell_deals), 2)
+    
+    return sanitize_json_data({
+        "min_value_cr": min_value_cr,
+        "total_deals": len(deals),
+        "total_buy_value_cr": total_buy_cr,
+        "total_sell_value_cr": total_sell_cr,
+        "net_institutional_flow_cr": round(total_buy_cr - total_sell_cr, 2),
+        "deals": deals
+    })
+
+
+@app.get("/api/institutional_flow/{symbol}")
+def get_stock_institutional_flow(symbol: str):
+    """
+    Per-stock Institutional Flow Analysis & Conviction Verdict (≥ ₹25 Cr deals).
+    """
+    from block_deal_provider import compute_stock_institutional_flow
+    res = compute_stock_institutional_flow(symbol)
+    return sanitize_json_data(res)
+
+
 @app.get("/api/news/{symbol}")
 def get_stock_news_detail(symbol: str):
     """Cached news for a single stock — same no-live-API-call guarantee as /api/news."""
