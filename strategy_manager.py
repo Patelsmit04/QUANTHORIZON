@@ -45,6 +45,7 @@ STOCK_PILLAR_NAMES = [
     "Pillar 3: Relative Strength",
     "Pillar 4: Volume Spike",
     "Pillar 5: Marubozu Close",
+    "Pillar 6: Institutional Flow",
 ]
 
 INDEX_PILLAR_NAMES = [

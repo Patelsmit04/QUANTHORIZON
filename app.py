@@ -30,6 +30,10 @@ from nse_data_provider import (
     fetch_all_nse_data, get_per_stock_oi_data, get_per_stock_delivery_data,
     was_nse_refresh_completed_today, refresh_nse_data_cache,
 )
+from block_deal_provider import (
+    get_institutional_flow_data, maybe_run_institutional_flow_checkpoints,
+    SHADOW_MODE as INSTITUTIONAL_FLOW_SHADOW_MODE,
+)
 from fo_universe import get_canonical_fo_tickers, NSE_FO_STOCKS, is_valid_fo_stock
 from vix_provider import fetch_india_vix
 from signal_journal import (
@@ -597,6 +601,7 @@ def score_stock_universe(raw: Dict[str, Any], strategy: Dict[str, Any], oi_mult:
             oi = get_per_stock_oi_data(clean_sym)
             delivery = get_per_stock_delivery_data(clean_sym)
             fundamentals = get_fundamental_data(ticker, cache=fundamentals_cache) if use_fundamentals_gate else None
+            institutional_flow = get_institutional_flow_data(clean_sym)
 
             processed = evaluate_5_pillar_matrix(
                 symbol=ticker,
@@ -608,7 +613,9 @@ def score_stock_universe(raw: Dict[str, Any], strategy: Dict[str, Any], oi_mult:
                 eval_date=get_ist_now(),
                 fundamental_data=fundamentals,
                 pillar_weight_multipliers=effective_multipliers,
-                required_weight_override=required_override
+                required_weight_override=required_override,
+                institutional_flow_data=institutional_flow,
+                institutional_flow_shadow_mode=INSTITUTIONAL_FLOW_SHADOW_MODE
             )
             if processed and "confidence_score" in processed:
                 processed["strategy_id"] = strategy["id"]
@@ -996,6 +1003,13 @@ def background_scheduler_worker():
             # when should_refresh_universe_news() says a pass is due — see news_provider.py).
             # Runs regardless of open/closed so its up-to-3 daily passes spread across the day.
             maybe_refresh_universe_news()
+
+            # Institutional Flow (bulk/block deal) checkpoints — same "call every tick, no-op
+            # outside its own trigger windows" idiom as the news refresh above. Runs regardless
+            # of open/closed because its "live_trigger"/"final_check" windows (~2:30/3:15 PM
+            # IST) fall DURING market hours (the is_open branch below), while "eod_archive"
+            # (~7:30 PM) falls after close — see block_deal_provider.py.
+            maybe_run_institutional_flow_checkpoints()
 
             # Market Schedule Scanning Engine. Regular scanning runs through 3:14 PM; from
             # 3:14 PM the closing_sequence module's own snapshot -> CAS close -> scoring ->
@@ -1882,7 +1896,9 @@ def get_stock_detail(symbol: str):
             oi_magnitude_mult=1.5,
             eval_date=get_ist_now(),
             fundamental_data=get_fundamental_data(formatted_ticker),
-            pillar_weight_multipliers=get_active_pillar_weights()
+            pillar_weight_multipliers=get_active_pillar_weights(),
+            institutional_flow_data=get_institutional_flow_data(formatted_ticker.replace(".NS", "")),
+            institutional_flow_shadow_mode=INSTITUTIONAL_FLOW_SHADOW_MODE
         )
 
         # Fetched SEPARATELY from the 1-day frame just scored above (M6) — evaluate_5_pillar_matrix's

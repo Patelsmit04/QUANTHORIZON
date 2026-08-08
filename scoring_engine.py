@@ -17,6 +17,15 @@ BTST 5-PILLAR CONFIRMATION SCORING ENGINE (AUDITED & REFACTORED V2)
 5. Marubozu-Style Price Close: Normalized Intraday Range Position (0% = Low, 100% = High).
    - Bullish Marubozu Close: Range Position >= 98.0%
    - Bearish Marubozu Close: Range Position <= 2.0%
+6. Institutional Flow (Bulk/Block Deals): Tiered by aggregated same-day net institutional value
+   per symbol (see block_deal_provider.py) — WEAK (Rs25-50cr, weight 0.5), MODERATE (Rs50-150cr,
+   weight 1.0), STRONG (Rs150cr+, weight 1.5). Direction-gated like Pillar 3 (only confirms when
+   it agrees with the tentative VWAP/RSI bias); sell-side confirmation is dampened 0.7x relative
+   to buy-side, since institutional selling is more often rebalancing/liquidity-driven than a
+   conviction call. Governed by a shadow-mode flag (institutional_flow_shadow_mode) — while on,
+   the pillar is fully computed and returned for transparency but excluded from
+   confirmed_pillars_weight, so it cannot move the live verdict until reconciliation between the
+   live NSE snapshot and the official EOD archive has been validated (see block_deal_provider.py).
 
 Liquidity Tiering (enforced as the actual signal-validity gate, not just informational):
 - TIER 1 (Nifty 50 / Top 30 Liquid F&O): Required Confirmation Weight >= 3.0
@@ -118,10 +127,13 @@ def evaluate_5_pillar_matrix(
     eval_date: Optional[datetime] = None,
     fundamental_data: Optional[Dict[str, Any]] = None,
     pillar_weight_multipliers: Optional[Dict[str, float]] = None,
-    required_weight_override: Optional[float] = None
+    required_weight_override: Optional[float] = None,
+    institutional_flow_data: Optional[Dict[str, Any]] = None,
+    institutional_flow_shadow_mode: bool = True
 ) -> Dict[str, Any]:
     """
-    Evaluates stock against the Refactored 5-Pillar Matrix.
+    Evaluates stock against the Refactored 5-Pillar Matrix (now 6, with Institutional Flow —
+    the name is kept for backward compatibility with existing call sites/journal columns).
 
     fundamental_data (optional): output of fundamental_provider.get_fundamental_data(). This is
     a QUALITY GATE, not a technical pillar — it doesn't add pillar weight (fundamentals move on
@@ -139,6 +151,17 @@ def evaluate_5_pillar_matrix(
     required_weight_override (optional): replaces the tier-based required_pillars threshold
     (3 for TIER_1, 4 for TIER_2) with a caller-supplied value — used by strategy_manager to
     let a strategy define its own confirmation bar. None (default) keeps the tier-based rule.
+
+    institutional_flow_data (optional): output of
+    block_deal_provider.get_institutional_flow_data() — same-day aggregated net bulk/block deal
+    value for this symbol. None (default, FAIL LOUD) excludes Pillar 6 from scoring entirely,
+    same convention as oi_data/delivery_data above.
+
+    institutional_flow_shadow_mode (default True): while True, Pillar 6 is still fully computed
+    and returned in the response (institutional_flow block) but its weight is excluded from
+    confirmed_pillars/pillar_weights, so it cannot affect total_confirmed_weight or the signal
+    derived from it — see block_deal_provider.py's module docstring for why (unreconciled live
+    NSE data). Flip to False only after that reconciliation has run clean for a couple of weeks.
     """
     weight_mult = pillar_weight_multipliers or {}
 
@@ -371,6 +394,43 @@ def evaluate_5_pillar_matrix(
 
     pillar_weights["Pillar 5: Marubozu Close"] = p5_weight
 
+    # =========================================================================
+    # PILLAR 6: Institutional Flow (Bulk/Block Deals) — see block_deal_provider.py.
+    # FAIL LOUD: if institutional_flow_data is None, DATA_UNAVAILABLE — excluded entirely.
+    # =========================================================================
+    SELL_SIDE_DAMPENING = 0.7  # institutional selling is weaker conviction signal than buying
+    TIER_WEIGHTS = {"WEAK": 0.5, "MODERATE": 1.0, "STRONG": 1.5}
+
+    p6_data_status = "DATA_UNAVAILABLE"
+    p6_tier = None
+    p6_dominant_side = None
+    p6_net_value_cr = 0.0
+    p6_would_confirm = False
+    p6_would_weight = 0.0
+
+    if institutional_flow_data is not None:
+        p6_data_status = institutional_flow_data.get("source", "PROVIDED")
+        p6_tier = institutional_flow_data.get("tier", "BELOW_THRESHOLD")
+        p6_dominant_side = institutional_flow_data.get("dominant_side", "NONE")
+        p6_net_value_cr = float(institutional_flow_data.get("net_value_cr", 0.0))
+        tier_weight = TIER_WEIGHTS.get(p6_tier, 0.0)
+
+        if tier_weight > 0 and bullish_bias and p6_dominant_side == "BUY":
+            p6_would_confirm = True
+            p6_would_weight = round(tier_weight * _mult("Pillar 6: Institutional Flow"), 4)
+        elif tier_weight > 0 and bearish_bias and p6_dominant_side == "SELL":
+            p6_would_confirm = True
+            p6_would_weight = round(tier_weight * SELL_SIDE_DAMPENING * _mult("Pillar 6: Institutional Flow"), 4)
+    else:
+        logger.warning(f"[{clean_sym}] Pillar 6 Institutional Flow: DATA_UNAVAILABLE — excluded from pillar count")
+
+    p6_confirmed = p6_would_confirm and not institutional_flow_shadow_mode
+    p6_weight = p6_would_weight if p6_confirmed else 0.0
+    if p6_confirmed:
+        confirmed_pillars.append(f"Pillar 6: Institutional Flow ({p6_tier}, {p6_dominant_side} Rs{abs(p6_net_value_cr):.1f}cr)")
+
+    pillar_weights["Pillar 6: Institutional Flow"] = p6_weight
+
     # Total confirmed count & weighted score
     total_confirmed_count = len(confirmed_pillars)
     total_confirmed_weight = sum(pillar_weights.values())
@@ -466,6 +526,19 @@ def evaluate_5_pillar_matrix(
             "avg_10d_delivery_pct": avg_10d_delivery,
             "delivery_t1_confirmed": delivery_t1_confirmed,
             "data_status": delivery_data_status
+        },
+        "institutional_flow": {
+            "tier": p6_tier,
+            "dominant_side": p6_dominant_side,
+            "net_value_cr": p6_net_value_cr,
+            "buy_value_cr": institutional_flow_data.get("buy_value_cr") if institutional_flow_data else None,
+            "sell_value_cr": institutional_flow_data.get("sell_value_cr") if institutional_flow_data else None,
+            "deal_types": institutional_flow_data.get("deal_types") if institutional_flow_data else None,
+            "as_of": institutional_flow_data.get("as_of") if institutional_flow_data else None,
+            "shadow_mode": institutional_flow_shadow_mode,
+            "would_confirm": p6_would_confirm,
+            "would_weight": round(p6_would_weight, 2),
+            "data_status": p6_data_status
         },
         "fundamental_quality": {
             "verdict": fundamental_verdict,

@@ -3,8 +3,9 @@ WALK-FORWARD VALIDATOR & DYNAMIC PILLAR WEIGHTING ENGINE
 =========================================================
 1. Walk-Forward Validation: Rolling Out-of-Sample backtest validator.
 2. Lookahead Bias Audit: Verifies 3:30 PM signal generation strictly uses <= 3:30 PM data.
-3. Dynamic Pillar Weighting: Re-weights 5 pillars based on standalone hit rates, AUTO-APPLIED
-   to live scoring once per day — with safety limits: the N>=30 sample guardrail below, and a
+3. Dynamic Pillar Weighting: Re-weights 6 pillars (incl. Pillar 6: Institutional Flow) based on
+   standalone hit rates, AUTO-APPLIED to live scoring once per day — with safety limits: the
+   N>=30 sample guardrail below, and a
    cap on how much any single day's data can move a weight (MAX_DAILY_CHANGE_PCT), so one lucky
    or unlucky streak right at the sample threshold can't whipsaw live scoring. This is
    auto-improvement, not unsupervised drift — every change is capped, logged, and auditable via
@@ -32,6 +33,7 @@ DEFAULT_PILLAR_WEIGHTS = {
     "Pillar 3: Relative Strength": 1.0,
     "Pillar 4: Volume Spike": 1.0,
     "Pillar 5: Marubozu Close": 1.0,
+    "Pillar 6: Institutional Flow": 1.0,
 }
 
 MAX_DAILY_CHANGE_PCT = 0.15  # a weight can move at most +/-15% from its current value in one day
@@ -135,7 +137,7 @@ def compute_dynamic_pillar_weights() -> Dict[str, Any]:
         cursor = conn.cursor()
         cursor.execute("""
             SELECT j.pillar_1_confirmed, j.pillar_2_confirmed, j.pillar_3_confirmed,
-                   j.pillar_4_confirmed, j.pillar_5_confirmed, e.is_direction_correct
+                   j.pillar_4_confirmed, j.pillar_5_confirmed, j.pillar_6_confirmed, e.is_direction_correct
             FROM signal_journal j
             INNER JOIN signal_evaluations e ON j.id = e.signal_id
         """)
@@ -150,12 +152,13 @@ def compute_dynamic_pillar_weights() -> Dict[str, Any]:
                 "Pillar 2: Vol Persistence": 1.0,
                 "Pillar 3: Relative Strength": 1.0,
                 "Pillar 4: Volume Spike": 1.0,
-                "Pillar 5: Marubozu Close": 1.0
+                "Pillar 5: Marubozu Close": 1.0,
+                "Pillar 6: Institutional Flow": 1.0
             }
         }
 
     pillar_hit_rates = {}
-    for p in range(1, 6):
+    for p in range(1, 7):
         col_name = f"pillar_{p}_confirmed"
         active_rows = [r for r in rows if r[col_name] == 1]
         if active_rows:
@@ -166,14 +169,15 @@ def compute_dynamic_pillar_weights() -> Dict[str, Any]:
         pillar_hit_rates[f"Pillar {p}"] = hit_rate
 
     # Calculate normalized dynamic weights (baseline average = 1.0)
-    avg_rate = sum(pillar_hit_rates.values()) / 5.0
+    avg_rate = sum(pillar_hit_rates.values()) / len(pillar_hit_rates)
     rec_weights = {}
     name_map = {
         "Pillar 1": "Pillar 1: Futures OI",
         "Pillar 2": "Pillar 2: Vol Persistence",
         "Pillar 3": "Pillar 3: Relative Strength",
         "Pillar 4": "Pillar 4: Volume Spike",
-        "Pillar 5": "Pillar 5: Marubozu Close"
+        "Pillar 5": "Pillar 5: Marubozu Close",
+        "Pillar 6": "Pillar 6: Institutional Flow"
     }
 
     for p, rate in pillar_hit_rates.items():

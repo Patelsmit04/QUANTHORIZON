@@ -1,7 +1,7 @@
 # QUANTHORIZON — BTST/STBT Scanner
 
 A quantitative scanner for NSE F&O stocks that ranks BTST (Buy Today Sell Tomorrow) and
-STBT (Sell Today Buy Tomorrow) overnight setups, combining a technical 5-pillar matrix with
+STBT (Sell Today Buy Tomorrow) overnight setups, combining a technical 6-pillar matrix with
 fundamental and news quality gates, and grading its own predictions every trading day.
 
 > **Not investment advice.** This tool produces probability-ranked, backtested-style signals
@@ -11,9 +11,14 @@ fundamental and news quality gates, and grading its own predictions every tradin
 
 ## What it does
 
-- **5-Pillar technical matrix**: futures OI proxy, same-day volume persistence + T+1 delivery
-  validation, relative strength vs Nifty 50, volume spike, and Marubozu-style close position.
-  Liquidity-tiered thresholds (TIER_1 blue-chips need less confirmation than TIER_2).
+- **6-Pillar technical matrix**: futures OI proxy, same-day volume persistence + T+1 delivery
+  validation, relative strength vs Nifty 50, volume spike, Marubozu-style close position, and
+  institutional flow (NSE bulk/block deals — tiered by same-day net value, direction-gated,
+  buy-side weighted higher than sell-side; see `block_deal_provider.py`). Institutional Flow
+  ships in **shadow mode** by default (computed and visible, excluded from the live verdict)
+  until its live-snapshot-vs-official-archive reconciliation has run clean for a couple of
+  weeks — see `INSTITUTIONAL_FLOW_SHADOW_MODE` in `.env.example`. Liquidity-tiered thresholds
+  (TIER_1 blue-chips need less confirmation than TIER_2).
 - **Fundamental quality gate**: P/E, ROE, debt/equity, earnings growth — caps conviction on
   structurally weak businesses, never manufactures it on strong technicals alone.
 - **News quality gate**: transparent, keyword-based read of recent headlines per stock (via
@@ -151,6 +156,9 @@ On first run, `data/` is created automatically to hold:
 - `last_market_scan.json` — the persisted snapshot served off-market
 - `index_btst_verdicts.json` — the latest post-close Index BTST Intelligence verdict (Nifty
   50 / Bank Nifty / Sensex), regenerated once daily
+- `institutional_flow_daily.json` — today's captured bulk/block deal checkpoints (live_trigger
+  / final_check / eod_archive), per-symbol aggregated net value; `institutional_flow_
+  reconciliation.json` — live-vs-official-archive diff history (see `block_deal_provider.py`)
 
 This directory is gitignored — it's runtime state, not source.
 
@@ -161,7 +169,7 @@ does not reimplement scoring, it controls what that scoring uses:
 
 - **target_scope**: which universe(s) it scans — `STOCKS`, `NIFTY50`, `BANKNIFTY`, `SENSEX`,
   any combination
-- **active_pillars**: which of the 5 stock pillars / 4 index pillars count toward its score —
+- **active_pillars**: which of the 6 stock pillars / 6 index pillars count toward its score —
   a disabled pillar contributes zero weight, it isn't removed from the engine
 - **required_weight_override**: a custom confirmation bar, or `None` to use the engine's own
   tier-based (stocks) / fixed (indices) default

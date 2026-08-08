@@ -193,5 +193,11 @@ def test_init_journal_db_uses_postgres_schema_when_enabled(monkeypatch):
     all_sql = " ".join(call.args[0] for call in cursor.execute.call_args_list)
     assert "DOUBLE PRECISION" in all_sql
     assert "strategy_id TEXT NOT NULL DEFAULT 'default-5-pillar'" in all_sql
-    # SQLite's ALTER TABLE...ADD COLUMN migration path must not run for a fresh Postgres schema.
-    assert "ALTER TABLE" not in all_sql
+    assert "pillar_6_confirmed" in all_sql
+    # Postgres's own migrations (pillar_6, added after strategy_id) must use the natively
+    # idempotent ADD COLUMN IF NOT EXISTS form — SQLite's bare ALTER TABLE ADD COLUMN
+    # (guarded by a try/except instead, since SQLite has no IF NOT EXISTS) must never leak
+    # into this path, since it isn't idempotent and would error on a second run.
+    alter_statements = [s for s in all_sql.split(";") if "ALTER TABLE" in s]
+    assert alter_statements, "expected the pillar_6 Postgres migration to run"
+    assert all("IF NOT EXISTS" in s for s in alter_statements)

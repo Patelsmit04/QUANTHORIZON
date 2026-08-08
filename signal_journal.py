@@ -180,6 +180,8 @@ def _init_journal_db_postgres():
             pillar_4_weight DOUBLE PRECISION NOT NULL,
             pillar_5_confirmed INTEGER NOT NULL,
             pillar_5_weight DOUBLE PRECISION NOT NULL,
+            pillar_6_confirmed INTEGER NOT NULL DEFAULT 0,
+            pillar_6_weight DOUBLE PRECISION NOT NULL DEFAULT 0.0,
             total_pillar_weight DOUBLE PRECISION NOT NULL,
             expiry_discount_applied INTEGER NOT NULL,
             vix_regime TEXT NOT NULL,
@@ -187,6 +189,12 @@ def _init_journal_db_postgres():
             strategy_id TEXT NOT NULL DEFAULT 'default-5-pillar'
         );
         """)
+
+        # Migration: pillar_6 (Institutional Flow) postdates every pre-existing Postgres
+        # database's CREATE TABLE — add idempotently so old deployments don't need a manual
+        # migration step. Unlike the SQLite path below, Postgres supports IF NOT EXISTS natively.
+        cursor.execute("ALTER TABLE signal_journal ADD COLUMN IF NOT EXISTS pillar_6_confirmed INTEGER NOT NULL DEFAULT 0;")
+        cursor.execute("ALTER TABLE signal_journal ADD COLUMN IF NOT EXISTS pillar_6_weight DOUBLE PRECISION NOT NULL DEFAULT 0.0;")
 
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS signal_evaluations (
@@ -323,6 +331,18 @@ def init_journal_db():
         # rows backfill to the Default 5-Pillar strategy rather than breaking per-strategy filters.
         try:
             cursor.execute(f"ALTER TABLE signal_journal ADD COLUMN strategy_id TEXT NOT NULL DEFAULT '{DEFAULT_STRATEGY_ID}'")
+        except sqlite3.OperationalError:
+            pass
+
+        # Migration: pillar_6 (Institutional Flow) postdates the 5-pillar schema on any existing
+        # DB — same idempotent ALTER TABLE pattern as strategy_id above (SQLite has no
+        # ADD COLUMN IF NOT EXISTS, unlike the Postgres path).
+        try:
+            cursor.execute("ALTER TABLE signal_journal ADD COLUMN pillar_6_confirmed INTEGER NOT NULL DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            cursor.execute("ALTER TABLE signal_journal ADD COLUMN pillar_6_weight REAL NOT NULL DEFAULT 0.0")
         except sqlite3.OperationalError:
             pass
 
@@ -490,6 +510,7 @@ def log_signal_entry(
     p3_w = float(pw.get("Pillar 3: Relative Strength", 0.0))
     p4_w = float(pw.get("Pillar 4: Volume Spike", 0.0))
     p5_w = float(pw.get("Pillar 5: Marubozu Close", 0.0))
+    p6_w = float(pw.get("Pillar 6: Institutional Flow", 0.0))
 
     # M11: same column/value list either dialect — _PgCursorCompat.execute() (see
     # get_db_connection) translates `?` to `%s` transparently, so only the conflict-handling
@@ -503,9 +524,9 @@ def log_signal_entry(
                 vwap, volume_spike, rsi, range_position_pct,
                 pillar_1_confirmed, pillar_1_weight, pillar_2_confirmed, pillar_2_weight,
                 pillar_3_confirmed, pillar_3_weight, pillar_4_confirmed, pillar_4_weight,
-                pillar_5_confirmed, pillar_5_weight, total_pillar_weight,
+                pillar_5_confirmed, pillar_5_weight, pillar_6_confirmed, pillar_6_weight, total_pillar_weight,
                 expiry_discount_applied, vix_regime, vix_value, strategy_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (id) DO NOTHING
             """ if USE_POSTGRES else """
             INSERT OR IGNORE INTO signal_journal (
@@ -515,9 +536,9 @@ def log_signal_entry(
                 vwap, volume_spike, rsi, range_position_pct,
                 pillar_1_confirmed, pillar_1_weight, pillar_2_confirmed, pillar_2_weight,
                 pillar_3_confirmed, pillar_3_weight, pillar_4_confirmed, pillar_4_weight,
-                pillar_5_confirmed, pillar_5_weight, total_pillar_weight,
+                pillar_5_confirmed, pillar_5_weight, pillar_6_confirmed, pillar_6_weight, total_pillar_weight,
                 expiry_discount_applied, vix_regime, vix_value, strategy_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """)
 
     try:
@@ -547,6 +568,7 @@ def log_signal_entry(
                 1 if p3_w > 0 else 0, p3_w,
                 1 if p4_w > 0 else 0, p4_w,
                 1 if p5_w > 0 else 0, p5_w,
+                1 if p6_w > 0 else 0, p6_w,
                 float(stock.get("confirmed_pillars_weight", 0.0)),
                 1 if stock.get("expiry_discount_applied", False) else 0,
                 vix_regime,
