@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>QuantHorizon — High-Conviction Institutional Engine & Gap Predictor</title>
     <link rel="icon" type="image/png" href="/static/logo.png">
 
@@ -18,28 +18,150 @@
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=5.5.0">
+    <link rel="stylesheet" href="/static/styles.css?v=6.0.0">
 </head>
 <body>
 
     <!-- Live notification toasts (see /ws/live, wired in app.js) -->
     <div id="toastContainer"></div>
 
-    <!-- Top Navigation & Header -->
-    <header class="app-header">
-        <div class="header-container">
-            <div class="header-top-row">
-                <div class="brand-section">
-                    <div class="app-logo-frame">
-                        <img src="/static/logo.png" alt="QuantHorizon Logo">
+    <div class="app-shell">
+
+        <!-- ============================== LEFT SIDEBAR (desktop persistent / mobile drawer) ============================== -->
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <div class="app-logo-frame">
+                    <img src="/static/logo.png" alt="QuantHorizon Logo">
+                </div>
+                <div class="sidebar-brand-text">
+                    <div class="drawer-title">Quant<span>Horizon</span></div>
+                    <div class="drawer-subtitle">Institutional BTST Engine</div>
+                </div>
+                <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar" aria-label="Collapse sidebar">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav" id="sidebarNav">
+                <button class="sidebar-nav-item active" data-section="dashboard" title="Dashboard">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span class="nav-label">Dashboard</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="scanner" title="Signals Engine">
+                    <i class="fa-solid fa-crosshairs"></i>
+                    <span class="nav-label">Signals Engine</span>
+                    <span class="nav-badge" id="signalsNavBadge">0</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="stocksNews" title="Stocks News">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                    <span class="nav-label">Stocks News</span>
+                    <span class="nav-badge" id="stocksNewsNavBadge">--</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="globalNews" title="Global & Macro News">
+                    <i class="fa-solid fa-globe"></i>
+                    <span class="nav-label">Global &amp; Macro News</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="institutionalFlow" title="Institutional Flow">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <span class="nav-label">Institutional Flow</span>
+                    <span class="nav-badge" id="institutionalFlowNavBadge">--</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="indices" title="Index Intelligence">
+                    <i class="fa-solid fa-chart-column"></i>
+                    <span class="nav-label">Index Intelligence</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="history" title="History & Calibration">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span class="nav-label">History &amp; Calibration</span>
+                    <span class="nav-badge" id="historyNavBadge">LIVE</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="strategies" title="Strategies">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span class="nav-label">Strategies</span>
+                    <span class="nav-badge" id="strategiesNavBadge">--</span>
+                </button>
+
+                <div class="sidebar-nav-divider"></div>
+
+                <button class="sidebar-nav-item" data-section="guide" title="Guide / Export / Settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span class="nav-label">Guide / Export / Settings</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="rules" title="Rules">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span class="nav-label">Rules</span>
+                </button>
+            </nav>
+
+            <!-- Mobile-only quick controls: identical toggles/actions to the desktop sticky top bar,
+                 surfaced here too since the top bar's secondary controls collapse on small screens
+                 and the drawer is the one place on mobile guaranteed to have room for all of them. -->
+            <div class="sidebar-mobile-controls">
+                <div class="drawer-section-label"><i class="fa-solid fa-sliders"></i> QUICK CONTROLS</div>
+                <div class="mobile-toggles-row">
+                    <div class="mobile-toggle-card">
+                        <span><i class="fa-solid fa-fire text-gold"></i> PRIORITY ONLY</span>
+                        <label class="switch">
+                            <input type="checkbox" id="priorityOnlyToggleMobile" aria-label="Show priority picks only">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
-                    <div>
-                        <h1 class="brand-title">Quant<span>Horizon</span></h1>
-                        <p class="brand-subtitle">High-Conviction Priority Engine & Gap Predictor</p>
+                    <div class="mobile-toggle-card">
+                        <span><i class="fa-solid fa-rotate-right"></i> AUTO REFRESH</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoRefreshToggleMobile" checked aria-label="Toggle auto refresh">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                 </div>
 
-                <!-- Market Status Pill -->
+                <div class="drawer-section-label"><i class="fa-solid fa-layer-group"></i> ACTIONS &amp; ANALYTICS</div>
+                <div class="mobile-menu-controls">
+                    <button id="scanBtnMobile" class="btn btn-pill btn-primary drawer-btn">
+                        <i class="fa-solid fa-bolt"></i> SCAN NOW
+                    </button>
+                    <button id="winRateBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
+                        <i class="fa-solid fa-trophy text-gold"></i> WIN RATE ANALYTICS
+                    </button>
+                    <button id="exportCsvBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
+                        <i class="fa-solid fa-file-csv"></i> EXPORT CSV
+                    </button>
+                    <button id="notifBellMobile" class="btn btn-pill btn-secondary drawer-btn">
+                        <i class="fa-solid fa-bell"></i> NOTIFICATIONS
+                        <span class="notif-badge hidden" id="notifBadgeMobile">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="paper-trade-badge">
+                    <i class="fa-solid fa-circle-info"></i> PAPER / SIMULATED ONLY — no real money moves through this system.
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Drawer Backdrop Overlay -->
+        <div class="mobile-drawer-overlay hidden" id="mobileDrawerOverlay"></div>
+
+        <!-- ============================== MAIN CONTENT AREA ============================== -->
+        <div class="app-main">
+
+            <!-- Sticky Content Top Bar -->
+            <header class="content-topbar">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <div class="topbar-brand-mini">
+                    <div class="app-logo-frame sm">
+                        <img src="/static/logo.png" alt="QuantHorizon Logo">
+                    </div>
+                </div>
+
+                <!-- Market Status Pill (mode/timer sub-label hides under 768px via CSS) -->
                 <div class="market-status-box">
                     <div class="status-indicator live-pulse" id="statusDot"></div>
                     <div class="status-text">
@@ -52,9 +174,10 @@
                     </div>
                 </div>
 
-                <!-- Header Action Controls -->
+                <div class="topbar-spacer"></div>
+
+                <!-- Top Bar Action Controls -->
                 <div class="header-actions">
-                    <!-- Priority Only Quick Toggle -->
                     <div class="priority-toggle-box">
                         <i class="fa-solid fa-fire text-gold"></i>
                         <span>PRIORITY ONLY</span>
@@ -78,14 +201,9 @@
                         <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
                     </button>
 
-                    <button id="guideBtn" class="btn btn-pill btn-secondary" title="Learn How Priority Ranking Works">
+                    <button id="guideBtn" class="btn btn-pill btn-secondary" title="Priority Ranking & Gap Prediction Rules">
                         <i class="fa-solid fa-circle-question"></i>
                         <span>GUIDE</span>
-                    </button>
-
-                    <button id="scanBtn" class="btn btn-pill btn-primary">
-                        <i class="fa-solid fa-bolt"></i>
-                        <span>SCAN NOW</span>
                     </button>
 
                     <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
@@ -93,7 +211,11 @@
                         <span>CSV</span>
                     </button>
 
-                    <!-- Desktop Notifications Bell -->
+                    <button id="scanBtn" class="btn btn-pill btn-primary">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>SCAN NOW</span>
+                    </button>
+
                     <div class="notif-bell-wrap">
                         <button id="notifBell" class="btn-icon" title="Notifications" aria-label="Notifications">
                             <i class="fa-solid fa-bell"></i>
@@ -101,666 +223,626 @@
                         </button>
                     </div>
                 </div>
+            </header>
 
-                <!-- Mobile Top Bar Notification Bell -->
-                <div class="notif-bell-wrap-mobile">
-                    <button id="notifBellMobileTop" class="btn-icon" title="Notifications" aria-label="Notifications">
-                        <i class="fa-solid fa-bell"></i>
-                        <span class="notif-badge hidden" id="notifBadgeMobileTop">0</span>
-                    </button>
+            <!-- Notification panel — fixed-position overlay so it's reachable from either bell
+                 regardless of which controls the current breakpoint has collapsed. -->
+            <div class="notif-panel hidden" id="notifPanel">
+                <div class="notif-panel-header">
+                    <span>NOTIFICATIONS</span>
+                    <button class="notif-mark-all-btn" id="notifMarkAllBtn">Mark all read</button>
+                </div>
+                <div id="notifList"><div class="notif-empty">No notifications yet.</div></div>
+            </div>
+
+            <!-- Main Routed Content -->
+            <main class="main-content">
+
+            <!-- ============================== DASHBOARD SECTION ============================== -->
+            <div id="dashboardSection">
+
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-gauge-high text-gold"></i> DASHBOARD
+                        <span class="section-page-subtitle">Live Accuracy, Priority Mix &amp; Today's Snapshot</span>
+                    </h2>
                 </div>
 
-                <!-- Mobile Menu Toggle -->
-                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-
-            <!-- Sub-Header Section Navigation Row (Placed Just Below Logo and Name) -->
-            <div class="header-nav-row">
-                <nav class="main-nav-tabs" id="mainNavTabs">
-                    <button class="main-nav-tab active" data-section="scanner">
-                        <i class="fa-solid fa-crosshairs"></i>
-                        <span>SCANNER</span>
-                    </button>
-                    <button class="main-nav-tab" data-section="indices">
-                        <i class="fa-solid fa-chart-column"></i>
-                        <span>INDICES</span>
-                    </button>
-                    <button class="main-nav-tab" data-section="strategies">
-                        <i class="fa-solid fa-sliders"></i>
-                        <span>STRATEGIES</span>
-                        <span class="nav-badge" id="strategiesNavBadge">--</span>
-                    </button>
-                    <button class="main-nav-tab" data-section="history">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                        <span>HISTORY</span>
-                        <span class="nav-badge" id="historyNavBadge">LIVE</span>
-                    </button>
-                    <button class="main-nav-tab" data-section="news">
-                        <i class="fa-solid fa-newspaper"></i>
-                        <span>NEWS</span>
-                        <span class="nav-badge" id="newsNavBadge">--</span>
-                    </button>
-                    <button class="main-nav-tab" data-section="institutionalFlow">
-                        <i class="fa-solid fa-building-columns"></i>
-                        <span>FLOW</span>
-                        <span class="nav-badge" id="institutionalFlowNavBadge">--</span>
-                    </button>
-                </nav>
-            </div>
-        </div>
-
-        <!-- Notification panel (M9 audit fix): a fixed-position overlay, NOT nested inside
-             .header-actions/.notif-bell-wrap — that subtree is display:none below 900px, which
-             made this panel structurally unreachable from the mobile bell (#notifBellMobile)
-             even though its click handler removed the "hidden" class and marked everything
-             read server-side. Both the desktop bell and the mobile drawer bell now open this
-             SAME element, positioned relative to the viewport instead of a hidden ancestor. -->
-        <div class="notif-panel hidden" id="notifPanel">
-            <div class="notif-panel-header">
-                <span>NOTIFICATIONS</span>
-                <button class="notif-mark-all-btn" id="notifMarkAllBtn">Mark all read</button>
-            </div>
-            <div id="notifList"><div class="notif-empty">No notifications yet.</div></div>
-        </div>
-
-        <!-- Mobile Drawer Backdrop Overlay -->
-        <div class="mobile-drawer-overlay hidden" id="mobileDrawerOverlay"></div>
-
-        <!-- Mobile Menu Drawer -->
-        <div class="mobile-menu-drawer" id="mobileMenuDrawer">
-            <div class="mobile-menu-content">
-                <div class="mobile-menu-header">
-                    <div class="mobile-brand-wrap">
-                        <div class="app-logo-frame md">
-                            <img src="/static/logo.png" alt="QuantHorizon Logo">
+                <!-- Split Live-Updating Accuracy Dashboard (4 Independent Horizon & Scope Categories) -->
+                <section class="split-accuracy-grid">
+                    <div class="metric-card" style="border-top:3px solid var(--gold);">
+                        <div class="metric-header">
+                            <span class="metric-title"><i class="fa-solid fa-bolt text-gold"></i> BTST — STOCKS</span>
+                            <span class="badge badge-gold" id="splitBtstStocksBadge">78.5% ACC</span>
                         </div>
-                        <div>
-                            <div class="drawer-title">Quant<span>Horizon</span></div>
-                            <div class="drawer-subtitle">Institutional BTST Engine & Gap Predictor</div>
+                        <div class="metric-body" style="margin-top:6px;">
+                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitBtstStocksVal">75.0% Win Rate</div>
+                            <span class="metric-subtext" id="splitBtstStocksSub">N=0 evaluated picks</span>
                         </div>
                     </div>
-                    <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">
-                        <i class="fa-solid fa-xmark"></i>
+                    <div class="metric-card" style="border-top:3px solid #3b82f6;">
+                        <div class="metric-header">
+                            <span class="metric-title"><i class="fa-solid fa-chart-column text-cyan"></i> BTST — INDICES</span>
+                            <span class="badge badge-cyan" id="splitBtstIndicesBadge">78.5% ACC</span>
+                        </div>
+                        <div class="metric-body" style="margin-top:6px;">
+                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitBtstIndicesVal">75.0% Win Rate</div>
+                            <span class="metric-subtext" id="splitBtstIndicesSub">N=0 index verdicts</span>
+                        </div>
+                    </div>
+                    <div class="metric-card" style="border-top:3px solid #10b981;">
+                        <div class="metric-header">
+                            <span class="metric-title"><i class="fa-solid fa-microchip text-bullish"></i> INTRADAY — STOCKS</span>
+                            <span class="badge badge-bullish" id="splitIntraStocksBadge">82.0% ACC</span>
+                        </div>
+                        <div class="metric-body" style="margin-top:6px;">
+                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitIntraStocksVal">76.5% Win Rate</div>
+                            <span class="metric-subtext" id="splitIntraStocksSub">SMC &amp; Algo Setups</span>
+                        </div>
+                    </div>
+                    <div class="metric-card" style="border-top:3px solid #8b5cf6;">
+                        <div class="metric-header">
+                            <span class="metric-title"><i class="fa-solid fa-sliders text-amber"></i> INTRADAY — INDICES</span>
+                            <span class="badge badge-amber" id="splitIntraIndicesBadge">80.5% ACC</span>
+                        </div>
+                        <div class="metric-body" style="margin-top:6px;">
+                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitIntraIndicesVal">75.5% Win Rate</div>
+                            <span class="metric-subtext" id="splitIntraIndicesSub">Nifty/Bank Nifty Scalps</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Metrics Overview Section -->
+                <section class="metrics-grid">
+
+                    <!-- Card 1: Total Scanned -->
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-title">TOTAL SCANNED</span>
+                            <div class="card-icon-bubble"><i class="fa-solid fa-database"></i></div>
+                        </div>
+                        <div class="metric-body">
+                            <span id="totalScanned" class="metric-value">--</span>
+                            <span class="metric-subtext">NSE F&amp;O Tickers</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Priority 1 High Conviction -->
+                    <div class="metric-card card-p1">
+                        <div class="metric-header">
+                            <span class="metric-title">🔥 PRIORITY 1 (TIER 1)</span>
+                            <div class="card-icon-bubble text-gold"><i class="fa-solid fa-crown"></i></div>
+                        </div>
+                        <div class="metric-body">
+                            <span id="priority1Count" class="metric-value text-gold">0</span>
+                            <span class="metric-subtext">High Conviction Picks</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: BTST Win Rate Score -->
+                    <div class="metric-card card-winrate">
+                        <div class="metric-header">
+                            <span class="metric-title">🏆 BTST WIN RATE</span>
+                            <div class="card-icon-bubble text-gold"><i class="fa-solid fa-trophy"></i></div>
+                        </div>
+                        <div class="metric-body">
+                            <span id="cardWinRatePct" class="metric-value text-gold">0.0%</span>
+                            <span class="metric-subtext"><span id="cardTrackedTradesCount">0</span> Overnight Trades Analyzed</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: BTST Calls -->
+                    <div class="metric-card card-bullish">
+                        <div class="metric-header">
+                            <span class="metric-title">BTST CALLS (CE)</span>
+                            <div class="card-icon-bubble text-bullish"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                        </div>
+                        <div class="metric-body">
+                            <span id="btstCount" class="metric-value text-bullish">0</span>
+                            <span class="metric-subtext">Overnight Call Signals</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: STBT Puts -->
+                    <div class="metric-card card-bearish">
+                        <div class="metric-header">
+                            <span class="metric-title">STBT PUTS (PE)</span>
+                            <div class="card-icon-bubble text-bearish"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                        </div>
+                        <div class="metric-body">
+                            <span id="stbtCount" class="metric-value text-bearish">0</span>
+                            <span class="metric-subtext">Overnight Put Signals</span>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- Clean Priority Ranking Legend Card (summary — full detail lives on the Rules page) -->
+                <section class="ranking-legend-card">
+                    <div class="legend-header">
+                        <div class="legend-title-wrap">
+                            <i class="fa-solid fa-layer-group text-gold"></i>
+                            <span class="legend-title">PRIORITY RANKING LEGEND</span>
+                        </div>
+                        <span class="legend-subtitle">How Stocks Are Filtered &amp; Ranked By Conviction</span>
+                    </div>
+                    <div class="legend-pills-row">
+                        <div class="legend-pill-card legend-p1-pill">
+                            <span class="badge badge-p1-high"><i class="fa-solid fa-fire"></i> PRIORITY 1</span>
+                            <div class="legend-text">
+                                <strong>High Conviction (85%–100% Score)</strong>: Price within 0.3% of High/Low + Vol Surge ≥ 3.0x + VWAP/RSI Confluence.
+                            </div>
+                        </div>
+                        <div class="legend-pill-card legend-p2-pill">
+                            <span class="badge badge-p2-medium"><i class="fa-solid fa-bolt"></i> PRIORITY 2</span>
+                            <div class="legend-text">
+                                <strong>Moderate Conviction (65%–84% Score)</strong>: Standard breakout within 0.5%–1.0% of High/Low + Vol Surge ≥ 1.8x.
+                            </div>
+                        </div>
+                        <div class="legend-pill-card legend-p3-pill">
+                            <span class="badge badge-p3-low"><i class="fa-solid fa-eye"></i> WATCHLIST</span>
+                            <div class="legend-text">
+                                <strong>Accumulation / Watchlist (&lt;65% Score)</strong>: Early volume surge without full price breakout.
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-pill btn-secondary legend-rules-link" data-section-link="rules">
+                        <i class="fa-solid fa-scale-balanced"></i> View Full Quantitative Rules
+                    </button>
+                </section>
+
+            </div>
+            <!-- ============================== END DASHBOARD SECTION ============================== -->
+
+            <!-- ============================== SCANNER / SIGNALS ENGINE SECTION ============================== -->
+            <div id="scannerSection" class="hidden">
+
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-crosshairs text-gold"></i> SIGNALS ENGINE
+                        <span class="section-page-subtitle">Live-Ranked BTST/STBT Setups Across the F&amp;O Universe</span>
+                    </h2>
+                </div>
+
+                <!-- Controls & Filter Toolbar -->
+                <section class="toolbar-container">
+                    <!-- Filter Tabs -->
+                    <div class="filter-tabs" id="filterTabs">
+                        <button class="tab-btn active" data-filter="ALL">
+                            <i class="fa-solid fa-border-all"></i> ALL STOCKS
+                        </button>
+                        <button class="tab-btn btn-tab-bullish" data-filter="BTST">
+                            <i class="fa-solid fa-circle-arrow-up"></i> BTST (CALL)
+                        </button>
+                        <button class="tab-btn btn-tab-bearish" data-filter="STBT">
+                            <i class="fa-solid fa-circle-arrow-down"></i> STBT (PUT)
+                        </button>
+                        <button class="tab-btn btn-tab-vol" data-filter="HIGH_VOL">
+                            <i class="fa-solid fa-fire-flame-curved"></i> VOL SURGE ≥ 2.0x
+                        </button>
+                        <button class="tab-btn btn-tab-watch" data-filter="WATCHLIST">
+                            <i class="fa-solid fa-eye"></i> WATCHLIST
+                        </button>
+                    </div>
+
+                    <!-- Toolbar Actions (Search & Sort) -->
+                    <div class="toolbar-actions">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="searchInput" placeholder="Search Ticker (e.g. RELIANCE)...">
+                        </div>
+
+                        <div class="sort-box">
+                            <i class="fa-solid fa-sort"></i>
+                            <select id="sortSelect" aria-label="Sort stocks">
+                                <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
+                                <option value="SCORE_DESC">Sort: Highest Confidence %</option>
+                                <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
+                                <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
+                                <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Dynamic Stocks Data Table -->
+                <section class="table-container">
+                    <div class="table-scroll">
+                        <table class="data-table" id="scannerDataTable">
+                            <thead>
+                                <tr>
+                                    <th>RANK</th>
+                                    <th>TICKER</th>
+                                    <th>SIGNAL</th>
+                                    <th>OPTION TYPE</th>
+                                    <th>PRIORITY LEVEL</th>
+                                    <th>CONFIDENCE SCORE</th>
+                                    <th>EST. OVERNIGHT GAP</th>
+                                    <th>LTP</th>
+                                    <th>VOL SURGE</th>
+                                    <th>RSI</th>
+                                    <th>5-PILLAR WEIGHT</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stocksTableBody">
+                                <!-- Dynamic Rows Injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Scan Progress Bar -->
+                    <div id="scanProgressBar" class="progress-bar-container hidden">
+                        <div class="progress-bar"></div>
+                    </div>
+
+                    <!-- Empty State Display -->
+                    <div id="emptyState" class="empty-state hidden">
+                        <i class="fa-solid fa-radar fa-3x"></i>
+                        <h3>No Priority Signals Found</h3>
+                        <p>Try unchecking "Tier 1 Only" or clicking "SCAN NOW" to fetch fresh market data.</p>
+                    </div>
+                </section>
+
+            </div>
+            <!-- ============================== END SCANNER / SIGNALS ENGINE SECTION ============================== -->
+
+            <!-- ============================== STOCKS NEWS SECTION ============================== -->
+            <div id="stocksNewsSection" class="hidden">
+
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-arrow-trend-up text-cyan"></i> STOCKS NEWS
+                        <span class="section-page-subtitle">Individual Indian F&amp;O Stock Impact Analysis</span>
+                    </h2>
+                </div>
+
+                <section class="news-toolbar sticky-filter-row">
+                    <div class="news-status-bar" id="newsStatusBar">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>Loading news coverage...</span>
+                    </div>
+
+                    <div class="toolbar-actions">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="newsSearchInput" placeholder="Search stock or company name...">
+                        </div>
+                    </div>
+
+                    <div class="news-verdict-filters" id="newsVerdictFilters">
+                        <button class="tab-btn active" data-verdict="ALL"><i class="fa-solid fa-border-all"></i> ALL</button>
+                        <button class="tab-btn" data-verdict="NEGATIVE"><i class="fa-solid fa-triangle-exclamation"></i> NEGATIVE</button>
+                        <button class="tab-btn" data-verdict="CAUTION"><i class="fa-solid fa-flag"></i> CAUTION</button>
+                        <button class="tab-btn" data-verdict="POSITIVE"><i class="fa-solid fa-circle-check"></i> POSITIVE</button>
+                        <button class="tab-btn" data-verdict="NEUTRAL"><i class="fa-solid fa-minus"></i> NEUTRAL</button>
+                    </div>
+                </section>
+
+                <section id="newsGrid" class="news-grid">
+                    <!-- Dynamic Stock-Affected News Cards Injected by JS -->
+                </section>
+
+                <div id="newsEmptyState" class="empty-state hidden">
+                    <i class="fa-solid fa-newspaper fa-3x"></i>
+                    <h3>No News Cached Yet</h3>
+                    <p>The background job refreshes news for every F&amp;O stock up to 3x/day to stay within the API budget. Check back after the next scheduled pass.</p>
+                </div>
+
+            </div>
+            <!-- ============================== END STOCKS NEWS SECTION ============================== -->
+
+            <!-- ============================== GLOBAL & MACRO NEWS SECTION ============================== -->
+            <div id="globalNewsSection" class="hidden">
+
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-globe text-gold"></i> GLOBAL &amp; MACRO NEWS
+                        <span class="section-page-subtitle">S&amp;P 500, Commodities, Forex, Fed/RBI Policy + Indian Stock Impact Mapping</span>
+                    </h2>
+                </div>
+
+                <section class="news-toolbar sticky-filter-row">
+                    <div class="news-status-bar" id="globalNewsStatusBar">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>Loading global &amp; macro news...</span>
+                    </div>
+
+                    <div class="news-verdict-filters" id="globalNewsVerdictFilters">
+                        <button class="tab-btn active" data-verdict="ALL"><i class="fa-solid fa-border-all"></i> ALL</button>
+                        <button class="tab-btn" data-verdict="NEGATIVE"><i class="fa-solid fa-triangle-exclamation"></i> NEGATIVE</button>
+                        <button class="tab-btn" data-verdict="CAUTION"><i class="fa-solid fa-flag"></i> CAUTION</button>
+                        <button class="tab-btn" data-verdict="POSITIVE"><i class="fa-solid fa-circle-check"></i> POSITIVE</button>
+                        <button class="tab-btn" data-verdict="NEUTRAL"><i class="fa-solid fa-minus"></i> NEUTRAL</button>
+                    </div>
+                </section>
+
+                <section id="globalNewsGrid" class="news-grid">
+                    <!-- Dynamic Global Macro News Cards with Stock Mapping Injected by JS -->
+                </section>
+
+                <div id="globalNewsEmptyState" class="empty-state hidden">
+                    <i class="fa-solid fa-globe fa-3x"></i>
+                    <h3>No Global News Cached Yet</h3>
+                    <p>The background job refreshes global &amp; macro coverage on the same budget-aware schedule as Stocks News. Check back after the next scheduled pass.</p>
+                </div>
+
+            </div>
+            <!-- ============================== END GLOBAL & MACRO NEWS SECTION ============================== -->
+
+            <!-- ============================== INSTITUTIONAL FLOW SECTION ============================== -->
+            <div id="institutionalFlowSection" class="hidden">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-building-columns text-gold"></i> INSTITUTIONAL FLOW
+                        <span class="section-page-subtitle">Today's NSE Bulk &amp; Block Deals, &ge; Regulatory Floor</span>
+                    </h2>
+                    <button id="btnRefreshInstitutionalFlow" class="btn btn-pill btn-secondary">
+                        <i class="fa-solid fa-rotate-right"></i> REFRESH
                     </button>
                 </div>
 
-                <div class="drawer-section-label"><i class="fa-solid fa-compass"></i> NAVIGATION SECTIONS</div>
-                <nav class="mobile-nav-tabs" id="mobileNavTabs">
-                    <button class="mobile-nav-tab active" data-section="scanner">
-                        <i class="fa-solid fa-crosshairs"></i>
-                        <span>SCANNER</span>
-                    </button>
-                    <button class="mobile-nav-tab" data-section="indices">
-                        <i class="fa-solid fa-chart-column"></i>
-                        <span>INDICES</span>
-                    </button>
-                    <button class="mobile-nav-tab" data-section="strategies">
-                        <i class="fa-solid fa-sliders"></i>
-                        <span>STRATEGIES</span>
-                    </button>
-                    <button class="mobile-nav-tab" data-section="history">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                        <span>HISTORY</span>
-                    </button>
-                    <button class="mobile-nav-tab" data-section="news">
-                        <i class="fa-solid fa-newspaper"></i>
-                        <span>NEWS</span>
-                    </button>
-                    <button class="mobile-nav-tab" data-section="institutionalFlow">
-                        <i class="fa-solid fa-building-columns"></i>
-                        <span>FLOW</span>
-                    </button>
-                </nav>
+                <div class="news-status-bar" id="institutionalFlowStatusBar">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Loading...</span>
+                </div>
 
-                <div class="drawer-section-label"><i class="fa-solid fa-sliders"></i> QUICK CONTROLS</div>
-                <div class="mobile-toggles-row">
-                    <div class="mobile-toggle-card">
-                        <span><i class="fa-solid fa-fire text-gold"></i> PRIORITY ONLY</span>
-                        <label class="switch">
-                            <input type="checkbox" id="priorityOnlyToggleMobile" aria-label="Show priority picks only">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="mobile-toggle-card">
-                        <span><i class="fa-solid fa-rotate-right"></i> AUTO REFRESH</span>
-                        <label class="switch">
-                            <input type="checkbox" id="autoRefreshToggleMobile" checked aria-label="Toggle auto refresh">
-                            <span class="slider round"></span>
-                        </label>
+                <div class="toolbar-container" style="margin-bottom:16px;margin-top:12px;">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="institutionalFlowSearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
                     </div>
                 </div>
 
-                <div class="drawer-section-label"><i class="fa-solid fa-layer-group"></i> ACTIONS & ANALYTICS</div>
-                <div class="mobile-menu-controls">
-                    <button id="scanBtnMobile" class="btn btn-pill btn-primary drawer-btn">
-                        <i class="fa-solid fa-bolt"></i> SCAN NOW
-                    </button>
-                    <button id="winRateBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
-                        <i class="fa-solid fa-trophy text-gold"></i> WIN RATE ANALYTICS
-                    </button>
-                    <button id="guideBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
-                        <i class="fa-solid fa-circle-question"></i> USER GUIDE
-                    </button>
-                    <button id="exportCsvBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
-                        <i class="fa-solid fa-file-csv"></i> EXPORT CSV
-                    </button>
-                    <button id="notifBellMobile" class="btn btn-pill btn-secondary drawer-btn">
-                        <i class="fa-solid fa-bell"></i> NOTIFICATIONS
-                        <span class="notif-badge hidden" id="notifBadgeMobile">0</span>
-                    </button>
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table class="data-table" id="institutionalFlowDataTable">
+                            <thead>
+                                <tr>
+                                    <th>SYMBOL</th>
+                                    <th>SIDE</th>
+                                    <th>DEAL TYPE</th>
+                                    <th>VALUE (&#8377;CR)</th>
+                                    <th>DATE</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="institutionalFlowTableBody">
+                                <!-- Dynamic deal rows injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="institutionalFlowEmptyState" class="empty-state hidden">
+                    <i class="fa-solid fa-building-columns fa-3x"></i>
+                    <h3>No Qualifying Deals Yet Today</h3>
+                    <p>The live snapshot is checked shortly after the confirmed 2:20 PM afternoon block-deal window closes, with a final check before the 3:30 PM lock. Check back after those windows, or after market hours for the reconciled end-of-day figures.</p>
                 </div>
             </div>
-        </div>
-    </header>
+            <!-- ============================== END INSTITUTIONAL FLOW SECTION ============================== -->
 
-    <!-- Main Container -->
-    <main class="main-content">
+            <!-- ============================== INDICES SECTION ============================== -->
+            <div id="indicesSection" class="hidden">
 
-    <!-- ============================== SCANNER SECTION ============================== -->
-    <div id="scannerSection">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-chart-column text-gold"></i> INDEX INTELLIGENCE
+                        <span class="section-page-subtitle">Post-Close Verdict &amp; Live Index Signals</span>
+                    </h2>
+                </div>
 
-        <!-- Scanner Quick Actions Toolbar (Matching User Reference Pic 1 Layout) -->
-        <div class="scanner-quick-actions-bar">
-            <!-- Row 1: Priority Toggle + CSV -->
-            <div class="actions-row actions-row-1">
-                <div class="priority-toggle-box">
-                    <i class="fa-solid fa-fire text-gold"></i> <span>PRIORITY ONLY</span>
-                    <label class="switch">
-                        <input type="checkbox" id="priorityOnlyToggleQuick" aria-label="Show priority picks only">
-                        <span class="slider round"></span>
+                <div class="index-verdict-heading-row">
+                    <h2 class="index-verdict-heading">Index BTST Intelligence <span class="index-verdict-heading-sub">Post-Close Verdict</span></h2>
+                    <div id="indexVerdictMeta" class="form-hint"></div>
+                </div>
+                <section class="index-verdict-grid" id="indexVerdictGrid">
+                    <!-- Dynamic structured verdict cards injected by JS -->
+                </section>
+                <div id="indexVerdictEmptyState" class="empty-state hidden">
+                    <i class="fa-solid fa-chart-line fa-3x"></i>
+                    <h3>Index BTST Intelligence Hasn't Run Yet Today</h3>
+                    <p>This deeper derivatives + Greeks + macro read runs once, shortly after market close — check back after 3:45 PM IST.</p>
+                </div>
+
+                <div class="index-verdict-heading-row" style="margin-top:28px;">
+                    <h2 class="index-verdict-heading">Live Index Signals</h2>
+                </div>
+                <section class="index-grid" id="indexGrid">
+                    <!-- Dynamic index cards injected by JS -->
+                </section>
+            </div>
+            <!-- ============================== END INDICES SECTION ============================== -->
+
+            <!-- ============================== STRATEGIES SECTION ============================== -->
+            <div id="strategiesSection" class="hidden">
+
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-sliders text-gold"></i> STRATEGIES
+                        <span class="section-page-subtitle">Default 5-Pillar Matrix + Your Custom Presets</span>
+                    </h2>
+                </div>
+
+                <section class="toolbar-container">
+                    <div class="legend-subtitle">Presets on top of the existing pillars/gates — add, edit, or remove any of your own; the built-in Default 5-Pillar strategy can be edited but not deleted.</div>
+                    <button id="addStrategyBtn" class="btn btn-pill btn-primary">
+                        <i class="fa-solid fa-plus"></i> ADD STRATEGY
+                    </button>
+                </section>
+
+                <div class="paper-trade-notice">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>All strategy execution is PAPER/SIMULATED only — no real broker is connected and no real money ever moves through this system.</span>
+                </div>
+
+                <section class="strategy-grid" id="strategyGrid">
+                    <!-- Dynamic strategy cards injected by JS -->
+                </section>
+            </div>
+            <!-- ============================== END STRATEGIES SECTION ============================== -->
+
+            <!-- ============================== HISTORY & CALIBRATION SECTION ============================== -->
+            <div id="historySection" class="hidden">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-clock-rotate-left text-gold"></i> HISTORY &amp; CALIBRATION
+                        <span class="section-page-subtitle">Realized Gap Buckets &amp; Walk-Forward Outcomes</span>
+                    </h2>
+                    <button id="btnRefreshHistory" class="btn btn-pill btn-secondary">
+                        <i class="fa-solid fa-rotate-right"></i> REFRESH HISTORY
+                    </button>
+                </div>
+
+                <!-- History Filters -->
+                <div class="toolbar-container" style="margin-bottom:16px;">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="historySearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
+                    </div>
+                    <div class="sort-box">
+                        <select id="historyStrategyFilter" class="form-select">
+                            <option value="ALL">All Strategies</option>
+                            <option value="default-5-pillar">5-Pillar Matrix</option>
+                            <option value="smc-institutional-v1">Smart Money Concepts (SMC)</option>
+                        </select>
+                    </div>
+                    <div class="sort-box">
+                        <select id="historyOutcomeFilter" class="form-select">
+                            <option value="ALL">All Statuses</option>
+                            <option value="CLOSED">Closed / Evaluated</option>
+                            <option value="OPEN">Open / Pending</option>
+                        </select>
+                    </div>
+                    <label class="checkbox-item" style="white-space:nowrap;" title="Only setups where Institutional Flow (Pillar 6) contributed to the score">
+                        <input type="checkbox" id="historyInstitutionalFlowFilter">
+                        <i class="fa-solid fa-building-columns"></i> Institutional Flow Only
                     </label>
                 </div>
-                <button id="exportCsvBtnQuick" class="btn btn-pill btn-secondary">
-                    <i class="fa-solid fa-file-csv"></i> <span>CSV</span>
-                </button>
-            </div>
 
-            <!-- Row 2: Prominent Scan Now Button + Auto Refresh Toggle -->
-            <div class="actions-row actions-row-2">
-                <button id="scanBtnQuick" class="btn btn-pill btn-primary btn-scan-prominent">
-                    <i class="fa-solid fa-bolt"></i> <span>SCAN NOW</span>
-                </button>
-                <div class="auto-refresh-toggle">
-                    <i class="fa-solid fa-rotate-right"></i> <span>AUTO</span>
-                    <label class="switch">
-                        <input type="checkbox" id="autoRefreshToggleQuick" checked aria-label="Toggle auto refresh">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Split Live-Updating Accuracy Dashboard (4 Independent Horizon & Scope Categories) -->
-        <section class="split-accuracy-grid">
-            <div class="metric-card" style="border-top:3px solid var(--gold);">
-                <div class="metric-header">
-                    <span class="metric-title"><i class="fa-solid fa-bolt text-gold"></i> BTST — STOCKS</span>
-                    <span class="badge badge-gold" id="splitBtstStocksBadge">78.5% ACC</span>
-                </div>
-                <div class="metric-body" style="margin-top:6px;">
-                    <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitBtstStocksVal">75.0% Win Rate</div>
-                    <span class="metric-subtext" id="splitBtstStocksSub">N=0 evaluated picks</span>
-                </div>
-            </div>
-            <div class="metric-card" style="border-top:3px solid #3b82f6;">
-                <div class="metric-header">
-                    <span class="metric-title"><i class="fa-solid fa-chart-column text-cyan"></i> BTST — INDICES</span>
-                    <span class="badge badge-cyan" id="splitBtstIndicesBadge">78.5% ACC</span>
-                </div>
-                <div class="metric-body" style="margin-top:6px;">
-                    <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitBtstIndicesVal">75.0% Win Rate</div>
-                    <span class="metric-subtext" id="splitBtstIndicesSub">N=0 index verdicts</span>
-                </div>
-            </div>
-            <div class="metric-card" style="border-top:3px solid #10b981;">
-                <div class="metric-header">
-                    <span class="metric-title"><i class="fa-solid fa-microchip text-bullish"></i> INTRADAY — STOCKS</span>
-                    <span class="badge badge-bullish" id="splitIntraStocksBadge">82.0% ACC</span>
-                </div>
-                <div class="metric-body" style="margin-top:6px;">
-                    <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitIntraStocksVal">76.5% Win Rate</div>
-                    <span class="metric-subtext" id="splitIntraStocksSub">SMC & Algo Setups</span>
-                </div>
-            </div>
-            <div class="metric-card" style="border-top:3px solid #8b5cf6;">
-                <div class="metric-header">
-                    <span class="metric-title"><i class="fa-solid fa-sliders text-amber"></i> INTRADAY — INDICES</span>
-                    <span class="badge badge-amber" id="splitIntraIndicesBadge">80.5% ACC</span>
-                </div>
-                <div class="metric-body" style="margin-top:6px;">
-                    <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitIntraIndicesVal">75.5% Win Rate</div>
-                    <span class="metric-subtext" id="splitIntraIndicesSub">Nifty/Bank Nifty Scalps</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Metrics Overview Section -->
-        <section class="metrics-grid">
-            
-            <!-- Card 1: Total Scanned -->
-            <div class="metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">TOTAL SCANNED</span>
-                    <div class="card-icon-bubble"><i class="fa-solid fa-database"></i></div>
-                </div>
-                <div class="metric-body">
-                    <span id="totalScanned" class="metric-value">--</span>
-                    <span class="metric-subtext">NSE F&O Tickers</span>
-                </div>
-            </div>
-
-            <!-- Card 2: Priority 1 High Conviction -->
-            <div class="metric-card card-p1">
-                <div class="metric-header">
-                    <span class="metric-title">🔥 PRIORITY 1 (TIER 1)</span>
-                    <div class="card-icon-bubble text-gold"><i class="fa-solid fa-crown"></i></div>
-                </div>
-                <div class="metric-body">
-                    <span id="priority1Count" class="metric-value text-gold">0</span>
-                    <span class="metric-subtext">High Conviction Picks</span>
-                </div>
-            </div>
-
-            <!-- Card 3: BTST Win Rate Score -->
-            <div class="metric-card card-winrate">
-                <div class="metric-header">
-                    <span class="metric-title">🏆 BTST WIN RATE</span>
-                    <div class="card-icon-bubble text-gold"><i class="fa-solid fa-trophy"></i></div>
-                </div>
-                <div class="metric-body">
-                    <span id="cardWinRatePct" class="metric-value text-gold">0.0%</span>
-                    <span class="metric-subtext"><span id="cardTrackedTradesCount">0</span> Overnight Trades Analyzed</span>
-                </div>
-            </div>
-
-            <!-- Card 4: BTST Calls -->
-            <div class="metric-card card-bullish">
-                <div class="metric-header">
-                    <span class="metric-title">BTST CALLS (CE)</span>
-                    <div class="card-icon-bubble text-bullish"><i class="fa-solid fa-arrow-trend-up"></i></div>
-                </div>
-                <div class="metric-body">
-                    <span id="btstCount" class="metric-value text-bullish">0</span>
-                    <span class="metric-subtext">Overnight Call Signals</span>
-                </div>
-            </div>
-
-            <!-- Card 5: STBT Puts -->
-            <div class="metric-card card-bearish">
-                <div class="metric-header">
-                    <span class="metric-title">STBT PUTS (PE)</span>
-                    <div class="card-icon-bubble text-bearish"><i class="fa-solid fa-arrow-trend-down"></i></div>
-                </div>
-                <div class="metric-body">
-                    <span id="stbtCount" class="metric-value text-bearish">0</span>
-                    <span class="metric-subtext">Overnight Put Signals</span>
-                </div>
-            </div>
-
-        </section>
-
-        <!-- Clean Priority Ranking Legend Card -->
-        <section class="ranking-legend-card">
-            <div class="legend-header">
-                <div class="legend-title-wrap">
-                    <i class="fa-solid fa-layer-group text-gold"></i>
-                    <span class="legend-title">PRIORITY RANKING LEGEND</span>
-                </div>
-                <span class="legend-subtitle">How Stocks Are Filtered & Ranked By Conviction</span>
-            </div>
-            <div class="legend-pills-row">
-                <div class="legend-pill-card legend-p1-pill">
-                    <span class="badge badge-p1-high"><i class="fa-solid fa-fire"></i> PRIORITY 1</span>
-                    <div class="legend-text">
-                        <strong>High Conviction (85%–100% Score)</strong>: Price within 0.3% of High/Low + Vol Surge ≥ 3.0x + VWAP/RSI Confluence.
+                <!-- History Table -->
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table class="data-table" id="historyDataTable">
+                            <thead>
+                                <tr>
+                                    <th>DATE / TIME</th>
+                                    <th>INSTRUMENT</th>
+                                    <th>STRATEGY</th>
+                                    <th>SIGNAL</th>
+                                    <th>ENTRY</th>
+                                    <th>TARGET (TP)</th>
+                                    <th>STOP LOSS (SL)</th>
+                                    <th>PREDICTED BUCKET</th>
+                                    <th>REALIZED GAP</th>
+                                    <th>OUTCOME RESULT</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <!-- Dynamic history rows injected by JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="legend-pill-card legend-p2-pill">
-                    <span class="badge badge-p2-medium"><i class="fa-solid fa-bolt"></i> PRIORITY 2</span>
-                    <div class="legend-text">
-                        <strong>Moderate Conviction (65%–84% Score)</strong>: Standard breakout within 0.5%–1.0% of High/Low + Vol Surge ≥ 1.8x.
+
+                <!-- Calibration Report Sub-Section -->
+                <div style="margin-top:32px;margin-bottom:16px;">
+                    <h3 style="font-size:16px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-bullseye text-cyan"></i> CONFIDENCE CALIBRATION &amp; BUCKET ACCURACY REPORT
+                    </h3>
+                </div>
+
+                <section id="calibrationCardGrid" class="calibration-card-grid">
+                    <!-- Dynamic calibration bar-cards injected by JS -->
+                </section>
+            </div>
+            <!-- ============================== END HISTORY & CALIBRATION SECTION ============================== -->
+
+            <!-- ============================== GUIDE / EXPORT / SETTINGS SECTION ============================== -->
+            <div id="guideSection" class="hidden">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-gear text-gold"></i> GUIDE / EXPORT / SETTINGS
+                        <span class="section-page-subtitle">Export Your Watchlist &amp; Review How QuantHorizon Works</span>
+                    </h2>
+                </div>
+
+                <section class="guide-settings-grid">
+                    <div class="guide-step-box">
+                        <h4><i class="fa-solid fa-file-csv text-gold"></i> Export Watchlist</h4>
+                        <p>Download the current filtered Signals Engine view as a CSV file — same data, same filters, same sort order you're looking at right now.</p>
+                        <button id="exportCsvBtnGuide" class="btn btn-pill btn-primary" style="margin-top:10px;">
+                            <i class="fa-solid fa-file-csv"></i> EXPORT CSV
+                        </button>
                     </div>
-                </div>
-                <div class="legend-pill-card legend-p3-pill">
-                    <span class="badge badge-p3-low"><i class="fa-solid fa-eye"></i> WATCHLIST</span>
-                    <div class="legend-text">
-                        <strong>Accumulation / Watchlist (&lt;65% Score)</strong>: Early volume surge without full price breakout.
+
+                    <div class="guide-step-box">
+                        <h4><i class="fa-solid fa-trophy text-gold"></i> Win Rate &amp; Gap Accuracy Analytics</h4>
+                        <p>Open the full historical trade log: predicted gap vs. actual gap, per-pick accuracy score, and overall BTST win rate.</p>
+                        <button id="winRateBtnGuide" class="btn btn-pill btn-secondary" style="margin-top:10px;">
+                            <i class="fa-solid fa-trophy text-gold"></i> OPEN WIN RATE ANALYTICS
+                        </button>
                     </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Controls & Filter Toolbar -->
-        <section class="toolbar-container">
-            <!-- Filter Tabs -->
-            <div class="filter-tabs" id="filterTabs">
-                <button class="tab-btn active" data-filter="ALL">
-                    <i class="fa-solid fa-border-all"></i> ALL STOCKS
-                </button>
-                <button class="tab-btn btn-tab-bullish" data-filter="BTST">
-                    <i class="fa-solid fa-circle-arrow-up"></i> BTST (CALL)
-                </button>
-                <button class="tab-btn btn-tab-bearish" data-filter="STBT">
-                    <i class="fa-solid fa-circle-arrow-down"></i> STBT (PUT)
-                </button>
-                <button class="tab-btn btn-tab-vol" data-filter="HIGH_VOL">
-                    <i class="fa-solid fa-fire-flame-curved"></i> VOL SURGE ≥ 2.0x
-                </button>
-                <button class="tab-btn btn-tab-watch" data-filter="WATCHLIST">
-                    <i class="fa-solid fa-eye"></i> WATCHLIST
-                </button>
-            </div>
+                    <div class="guide-step-box">
+                        <h4><i class="fa-solid fa-scale-balanced text-gold"></i> Quantitative Rules</h4>
+                        <p>Priority thresholds, the 5-Pillar matrix, scanning/locking schedule, and the fundamentals/news quality gates — all in one place, unchanged from the engine's actual scoring logic.</p>
+                        <button class="btn btn-pill btn-secondary sidebar-nav-jump" data-section-link="rules" style="margin-top:10px;">
+                            <i class="fa-solid fa-arrow-right"></i> VIEW RULES
+                        </button>
+                    </div>
 
-            <!-- Toolbar Actions (Search & Sort) -->
-            <div class="toolbar-actions">
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="searchInput" placeholder="Search Ticker (e.g. RELIANCE)...">
+                    <div class="guide-step-box">
+                        <h4><i class="fa-solid fa-circle-info text-gold"></i> About This Build</h4>
+                        <p>QuantHorizon is a paper/simulated research engine — no real broker is ever connected and no real money moves through this system. All quantitative rules, thresholds, and scoring logic are identical across desktop and mobile.</p>
+                    </div>
+                </section>
+            </div>
+            <!-- ============================== END GUIDE / EXPORT / SETTINGS SECTION ============================== -->
+
+            <!-- ============================== RULES SECTION ============================== -->
+            <div id="rulesSection" class="hidden">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-scale-balanced text-gold"></i> RULES
+                        <span class="section-page-subtitle">Priority Ranking &amp; Gap Prediction — Exactly How The Engine Scores</span>
+                    </h2>
                 </div>
 
-                <div class="sort-box">
-                    <i class="fa-solid fa-sort"></i>
-                    <select id="sortSelect" aria-label="Sort stocks">
-                        <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
-                        <option value="SCORE_DESC">Sort: Highest Confidence %</option>
-                        <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
-                        <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
-                        <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
-                    </select>
+                <p class="mb-3">Our quantitative engine predicts overnight gap movements and ranks Indian NSE F&amp;O stocks using 5 institutional pillars:</p>
+
+                <div class="guide-step-box">
+                    <h4>🟢 CALL (CE) vs 🔴 PUT (PE) Option Signals</h4>
+                    <p><strong>CALL (CE)</strong> represents overnight long breakout setups (BTST Buy). <strong>PUT (PE)</strong> represents overnight short distribution setups (STBT Sell).</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>📈 Autonomous Background Scanning Schedule &amp; Locking</h4>
+                    <p><strong>9:15 AM – 2:30 PM</strong>: 5-minute background scanning.<br>
+                    <strong>2:30 PM – 3:30 PM (Power Hour)</strong>: 1-minute high-frequency scanning.<br>
+                    <strong>3:30 PM Final Scan Cut-Off</strong>: Scanning finishes — no further scanning — and active BTST/STBT picks are automatically locked with a full written depth-analysis.<br>
+                    <strong>3:30 PM – 9:15 AM Next Day (Off-Market)</strong>: Live scanning freezes and serves the frozen 3:30 PM BTST pick snapshot.</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>🎯 9:15-9:17 AM Auto-Analyse &amp; Accuracy Auto-Upgrade Engine</h4>
+                    <p>Every morning in a tight 9:15-9:17 AM window, the system fetches the real opening prices, compares <strong>Predicted Gap % vs Actual Gap %</strong> for yesterday's locked picks, records variance error, and updates win rate / accuracy metrics — once a day, not repeatedly.</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>🧪 Fundamental &amp; News Quality Gates</h4>
+                    <p>Fundamentals (P/E, ROE, debt/equity, earnings growth) and stock-specific news are checked as quality gates on top of the technical setup — they can only <strong>cap</strong> conviction (e.g. P1 → P2) when the business or headlines look risky, never manufacture it. Both are shown in each pick's depth-analysis.</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>⚙️ Auto-Improving Pillar Weights</h4>
+                    <p>Once there are 30+ graded predictions, the system recomputes each of the 5 technical pillars' real hit rate and nudges its scoring weight toward that — capped at ±15%/day so one lucky or unlucky streak can't swing live scoring. Check <code>/api/validation</code> for the full history.</p>
+                </div>
+
+                <div class="guide-step-box">
+                    <h4>📰 News Coverage, Budget-Aware</h4>
+                    <p>Stocks News covers every F&amp;O stock (the full option-chain universe). A background job refreshes it up to 3x/day within CurrentsAPI's daily limit — your page views never call the API directly, so any number of people can browse News at zero extra cost.</p>
                 </div>
             </div>
-        </section>
+            <!-- ============================== END RULES SECTION ============================== -->
 
-        <!-- Dynamic Stocks Data Table -->
-        <section class="table-container">
-            <div class="table-scroll">
-                <table class="data-table" id="scannerDataTable">
-                    <thead>
-                        <tr>
-                            <th>RANK</th>
-                            <th>TICKER</th>
-                            <th>SIGNAL</th>
-                            <th>OPTION TYPE</th>
-                            <th>PRIORITY LEVEL</th>
-                            <th>CONFIDENCE SCORE</th>
-                            <th>EST. OVERNIGHT GAP</th>
-                            <th>LTP</th>
-                            <th>VOL SURGE</th>
-                            <th>RSI</th>
-                            <th>5-PILLAR WEIGHT</th>
-                            <th>ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stocksTableBody">
-                        <!-- Dynamic Rows Injected by JS -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Scan Progress Bar -->
-            <div id="scanProgressBar" class="progress-bar-container hidden">
-                <div class="progress-bar"></div>
-            </div>
-
-            <!-- Empty State Display -->
-            <div id="emptyState" class="empty-state hidden">
-                <i class="fa-solid fa-radar fa-3x"></i>
-                <h3>No Priority Signals Found</h3>
-                <p>Try unchecking "Tier 1 Only" or clicking "SCAN NOW" to fetch fresh market data.</p>
-            </div>
-        </section>
+            </main>
+        </div>
+        <!-- ============================== END MAIN CONTENT AREA ============================== -->
 
     </div>
-    <!-- ============================== END SCANNER SECTION ============================== -->
-
-    <!-- ============================== NEWS SECTION ============================== -->
-    <div id="newsSection" class="hidden">
-
-        <section class="news-toolbar">
-            <div class="news-status-bar" id="newsStatusBar">
-                <i class="fa-solid fa-circle-info"></i>
-                <span>Loading news coverage...</span>
-            </div>
-
-            <div class="toolbar-actions">
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="newsSearchInput" placeholder="Search stock or company name...">
-                </div>
-            </div>
-        </section>
-
-        <!-- Section I: Stocks Affected News -->
-        <div style="margin-top:20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
-            <h2 style="font-size:18px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
-                <i class="fa-solid fa-arrow-trend-up text-cyan"></i> I. STOCKS AFFECTED NEWS
-                <span style="font-size:12px;font-weight:500;color:var(--ink-muted);">(Individual Indian F&amp;O Stock Impact Analysis)</span>
-            </h2>
-            <div class="news-verdict-filters" id="newsVerdictFilters">
-                <button class="tab-btn active" data-verdict="ALL"><i class="fa-solid fa-border-all"></i> ALL</button>
-                <button class="tab-btn" data-verdict="NEGATIVE"><i class="fa-solid fa-triangle-exclamation"></i> NEGATIVE</button>
-                <button class="tab-btn" data-verdict="CAUTION"><i class="fa-solid fa-flag"></i> CAUTION</button>
-                <button class="tab-btn" data-verdict="POSITIVE"><i class="fa-solid fa-circle-check"></i> POSITIVE</button>
-                <button class="tab-btn" data-verdict="NEUTRAL"><i class="fa-solid fa-minus"></i> NEUTRAL</button>
-            </div>
-        </div>
-
-        <section id="newsGrid" class="news-grid">
-            <!-- Dynamic Stock-Affected News Cards Injected by JS -->
-        </section>
-
-        <!-- Section II: Global Market & Macro News -->
-        <div style="margin-top:36px;margin-bottom:12px;">
-            <h2 style="font-size:18px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
-                <i class="fa-solid fa-globe text-gold"></i> II. GLOBAL MARKET &amp; MACRO NEWS
-                <span style="font-size:12px;font-weight:500;color:var(--ink-muted);">(S&amp;P 500, Commodities, Forex, Fed/RBI Policy + Indian Stock Impact Mapping)</span>
-            </h2>
-        </div>
-
-        <section id="globalNewsGrid" class="news-grid">
-            <!-- Dynamic Global Macro News Cards with Stock Mapping Injected by JS -->
-        </section>
-
-        <div id="newsEmptyState" class="empty-state hidden">
-            <i class="fa-solid fa-newspaper fa-3x"></i>
-            <h3>No News Cached Yet</h3>
-            <p>The background job refreshes news for every F&amp;O stock up to 3x/day to stay within the API budget. Check back after the next scheduled pass.</p>
-        </div>
-
-    </div>
-    <!-- ============================== END NEWS SECTION ============================== -->
-
-    <!-- ============================== INSTITUTIONAL FLOW SECTION ============================== -->
-    <div id="institutionalFlowSection" class="hidden">
-        <div class="section-heading-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-            <h2 style="font-size:18px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
-                <i class="fa-solid fa-building-columns text-gold"></i> INSTITUTIONAL FLOW
-                <span style="font-size:12px;font-weight:500;color:var(--ink-muted);">(Today's NSE Bulk &amp; Block Deals, &ge; Regulatory Floor)</span>
-            </h2>
-            <button id="btnRefreshInstitutionalFlow" class="btn btn-pill btn-secondary">
-                <i class="fa-solid fa-rotate-right"></i> REFRESH
-            </button>
-        </div>
-
-        <div class="news-status-bar" id="institutionalFlowStatusBar">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>Loading...</span>
-        </div>
-
-        <div class="toolbar-container" style="margin-bottom:16px;margin-top:12px;">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="institutionalFlowSearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
-            </div>
-        </div>
-
-        <div class="table-card">
-            <div class="table-scroll">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>SYMBOL</th>
-                            <th>SIDE</th>
-                            <th>DEAL TYPE</th>
-                            <th>VALUE (&#8377;CR)</th>
-                            <th>DATE</th>
-                            <th>ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody id="institutionalFlowTableBody">
-                        <!-- Dynamic deal rows injected by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="institutionalFlowEmptyState" class="empty-state hidden">
-            <i class="fa-solid fa-building-columns fa-3x"></i>
-            <h3>No Qualifying Deals Yet Today</h3>
-            <p>The live snapshot is checked shortly after the confirmed 2:20 PM afternoon block-deal window closes, with a final check before the 3:30 PM lock. Check back after those windows, or after market hours for the reconciled end-of-day figures.</p>
-        </div>
-    </div>
-    <!-- ============================== END INSTITUTIONAL FLOW SECTION ============================== -->
-
-    <!-- ============================== INDICES SECTION ============================== -->
-    <div id="indicesSection" class="hidden">
-
-        <div class="index-verdict-heading-row">
-            <h2 class="index-verdict-heading">Index BTST Intelligence <span class="index-verdict-heading-sub">Post-Close Verdict</span></h2>
-            <div id="indexVerdictMeta" class="form-hint"></div>
-        </div>
-        <section class="index-verdict-grid" id="indexVerdictGrid">
-            <!-- Dynamic structured verdict cards injected by JS -->
-        </section>
-        <div id="indexVerdictEmptyState" class="empty-state hidden">
-            <i class="fa-solid fa-chart-line fa-3x"></i>
-            <h3>Index BTST Intelligence Hasn't Run Yet Today</h3>
-            <p>This deeper derivatives + Greeks + macro read runs once, shortly after market close — check back after 3:45 PM IST.</p>
-        </div>
-
-        <div class="index-verdict-heading-row" style="margin-top:28px;">
-            <h2 class="index-verdict-heading">Live Index Signals</h2>
-        </div>
-        <section class="index-grid" id="indexGrid">
-            <!-- Dynamic index cards injected by JS -->
-        </section>
-    </div>
-    <!-- ============================== END INDICES SECTION ============================== -->
-
-    <!-- ============================== STRATEGIES SECTION ============================== -->
-    <div id="strategiesSection" class="hidden">
-        <section class="toolbar-container">
-            <div class="legend-subtitle">Presets on top of the existing pillars/gates — add, edit, or remove any of your own; the built-in Default 5-Pillar strategy can be edited but not deleted.</div>
-            <button id="addStrategyBtn" class="btn btn-pill btn-primary">
-                <i class="fa-solid fa-plus"></i> ADD STRATEGY
-            </button>
-        </section>
-
-        <div class="paper-trade-notice">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>All strategy execution is PAPER/SIMULATED only — no real broker is connected and no real money ever moves through this system.</span>
-        </div>
-
-        <section class="strategy-grid" id="strategyGrid">
-            <!-- Dynamic strategy cards injected by JS -->
-        </section>
-    </div>
-    <!-- ============================== END STRATEGIES SECTION ============================== -->
-
-    <!-- ============================== HISTORY SECTION ============================== -->
-    <div id="historySection" class="hidden">
-        <div class="section-heading-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-            <h2 style="font-size:18px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
-                <i class="fa-solid fa-clock-rotate-left text-gold"></i> PREDICTION &amp; STRATEGY SETUP HISTORY
-                <span style="font-size:12px;font-weight:500;color:var(--ink-muted);">(Realized Gap Buckets &amp; Walk-Forward Outcomes)</span>
-            </h2>
-            <button id="btnRefreshHistory" class="btn btn-pill btn-secondary">
-                <i class="fa-solid fa-rotate-right"></i> REFRESH HISTORY
-            </button>
-        </div>
-
-        <!-- History Filters -->
-        <div class="toolbar-container" style="margin-bottom:16px;">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="historySearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
-            </div>
-            <div class="sort-box">
-                <select id="historyStrategyFilter" class="form-select">
-                    <option value="ALL">All Strategies</option>
-                    <option value="default-5-pillar">5-Pillar Matrix</option>
-                    <option value="smc-institutional-v1">Smart Money Concepts (SMC)</option>
-                </select>
-            </div>
-            <div class="sort-box">
-                <select id="historyOutcomeFilter" class="form-select">
-                    <option value="ALL">All Statuses</option>
-                    <option value="CLOSED">Closed / Evaluated</option>
-                    <option value="OPEN">Open / Pending</option>
-                </select>
-            </div>
-            <label class="checkbox-item" style="white-space:nowrap;" title="Only setups where Institutional Flow (Pillar 6) contributed to the score">
-                <input type="checkbox" id="historyInstitutionalFlowFilter">
-                <i class="fa-solid fa-building-columns"></i> Institutional Flow Only
-            </label>
-        </div>
-
-        <!-- History Table -->
-        <div class="table-card">
-            <div class="table-scroll">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>DATE / TIME</th>
-                            <th>INSTRUMENT</th>
-                            <th>STRATEGY</th>
-                            <th>SIGNAL</th>
-                            <th>ENTRY</th>
-                            <th>TARGET (TP)</th>
-                            <th>STOP LOSS (SL)</th>
-                            <th>PREDICTED BUCKET</th>
-                            <th>REALIZED GAP</th>
-                            <th>OUTCOME RESULT</th>
-                            <th>ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody id="historyTableBody">
-                        <!-- Dynamic history rows injected by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Calibration Report Sub-Section -->
-        <div style="margin-top:32px;margin-bottom:16px;">
-            <h3 style="font-size:16px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
-                <i class="fa-solid fa-bullseye text-cyan"></i> CONFIDENCE CALIBRATION &amp; BUCKET ACCURACY REPORT
-            </h3>
-        </div>
-
-        <div class="table-card" style="margin-bottom:24px;">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>CONFIDENCE BAND</th>
-                        <th>TOTAL SIGNALS</th>
-                        <th>SAMPLE STATUS</th>
-                        <th>DIRECTIONAL ACCURACY %</th>
-                        <th>WIN RATE %</th>
-                        <th>CALIBRATION VERDICT</th>
-                    </tr>
-                </thead>
-                <tbody id="calibrationTableBody">
-                    <!-- Dynamic calibration rows injected by JS -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <!-- ============================== END HISTORY SECTION ============================== -->
-
-    </main>
+    <!-- ============================== END APP SHELL ============================== -->
 
     <!-- Strategy Add/Edit Modal -->
     <div id="strategyFormModal" class="modal-overlay hidden">
@@ -961,57 +1043,6 @@
         </div>
     </div>
 
-    <!-- Ranking Guide Modal -->
-    <div id="guideModal" class="modal-overlay hidden">
-        <div class="modal-card">
-            <div class="modal-header">
-                <div class="modal-title-group" style="display: flex; align-items: center; gap: 10px;">
-                    <div class="app-logo-frame sm">
-                        <img src="/static/logo.png" alt="QuantHorizon">
-                    </div>
-                    <h2>Priority Ranking & Gap Prediction Guide</h2>
-                </div>
-                <button id="closeGuideBtn" class="modal-close-btn">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p class="mb-3">Our quantitative engine predicts overnight gap movements and ranks Indian NSE F&O stocks using 5 institutional pillars:</p>
-
-                <div class="guide-step-box">
-                    <h4>🟢 CALL (CE) vs 🔴 PUT (PE) Option Signals</h4>
-                    <p><strong>CALL (CE)</strong> represents overnight long breakout setups (BTST Buy). <strong>PUT (PE)</strong> represents overnight short distribution setups (STBT Sell).</p>
-                </div>
-
-                <div class="guide-step-box">
-                    <h4>📈 Autonomous Background Scanning Schedule & Locking</h4>
-                    <p><strong>9:15 AM – 2:30 PM</strong>: 5-minute background scanning.<br>
-                    <strong>2:30 PM – 3:30 PM (Power Hour)</strong>: 1-minute high-frequency scanning.<br>
-                    <strong>3:30 PM Final Scan Cut-Off</strong>: Scanning finishes — no further scanning — and active BTST/STBT picks are automatically locked with a full written depth-analysis.<br>
-                    <strong>3:30 PM – 9:15 AM Next Day (Off-Market)</strong>: Live scanning freezes and serves the frozen 3:30 PM BTST pick snapshot.</p>
-                </div>
-
-                <div class="guide-step-box">
-                    <h4>🎯 9:15-9:17 AM Auto-Analyse & Accuracy Auto-Upgrade Engine</h4>
-                    <p>Every morning in a tight 9:15-9:17 AM window, the system fetches the real opening prices, compares <strong>Predicted Gap % vs Actual Gap %</strong> for yesterday's locked picks, records variance error, and updates win rate / accuracy metrics — once a day, not repeatedly.</p>
-                </div>
-
-                <div class="guide-step-box">
-                    <h4>🧪 Fundamental &amp; News Quality Gates</h4>
-                    <p>Fundamentals (P/E, ROE, debt/equity, earnings growth) and stock-specific news are checked as quality gates on top of the technical setup — they can only <strong>cap</strong> conviction (e.g. P1 → P2) when the business or headlines look risky, never manufacture it. Both are shown in each pick's depth-analysis.</p>
-                </div>
-
-                <div class="guide-step-box">
-                    <h4>⚙️ Auto-Improving Pillar Weights</h4>
-                    <p>Once there are 30+ graded predictions, the system recomputes each of the 5 technical pillars' real hit rate and nudges its scoring weight toward that — capped at ±15%/day so one lucky or unlucky streak can't swing live scoring. Check <code>/api/validation</code> for the full history.</p>
-                </div>
-
-                <div class="guide-step-box">
-                    <h4>📰 News Coverage, Budget-Aware</h4>
-                    <p>The News tab covers every F&amp;O stock (the full option-chain universe). A background job refreshes it up to 3x/day within CurrentsAPI's daily limit — your page views never call the API directly, so any number of people can browse News at zero extra cost.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Stock Detail Drawer / Modal -->
     <div id="stockModal" class="modal-overlay hidden">
         <div class="modal-card">
@@ -1081,31 +1112,7 @@
         </div>
     </div>
 
-    <!-- Mobile Bottom Navigation Bar (iOS / Android Navigation Dock) -->
-    <nav class="mobile-bottom-nav" id="mobileBottomNav">
-        <button class="mobile-bottom-tab active" data-section="scanner">
-            <i class="fa-solid fa-crosshairs"></i>
-            <span>SCANNER</span>
-        </button>
-        <button class="mobile-bottom-tab" data-section="indices">
-            <i class="fa-solid fa-chart-column"></i>
-            <span>INDICES</span>
-        </button>
-        <button class="mobile-bottom-tab" data-section="strategies">
-            <i class="fa-solid fa-sliders"></i>
-            <span>STRATEGIES</span>
-        </button>
-        <button class="mobile-bottom-tab" data-section="history">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            <span>HISTORY</span>
-        </button>
-        <button class="mobile-bottom-tab" data-section="news">
-            <i class="fa-solid fa-newspaper"></i>
-            <span>NEWS</span>
-        </button>
-    </nav>
-
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=5.5.0"></script>
+    <script src="/static/app.js?v=6.0.0"></script>
 </body>
 </html>
