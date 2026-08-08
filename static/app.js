@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let allStocks = [];
     let currentFilter = "ALL";
     let autoRefreshInterval = null;
+    let newsRefreshInterval = null;
 
     // Mobile Menu DOM
     const mobileMenuToggle = document.getElementById("mobileMenuToggle");
@@ -106,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let allNewsStocks = [];
     let currentNewsVerdictFilter = "ALL";
-    let newsLoaded = false;
 
     // Indices & Strategies Section DOM
     const indicesSection = document.getElementById("indicesSection");
@@ -246,7 +246,19 @@ document.addEventListener("DOMContentLoaded", () => {
             if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
         });
 
-        if (section === "news" && !newsLoaded) fetchNewsSection();
+        if (section === "news") {
+            fetchNewsSection();
+            // Global/macro news auto-refreshes every 1 min while this tab is open — the
+            // per-stock side stays served from the once-daily background cache either way
+            // (see fetchNewsSection's own comment), and the global side is now backed by a
+            // 60s server-side cache (news_provider.fetch_market_news) so this poll interval
+            // can't multiply into repeated live CurrentsAPI calls.
+            if (newsRefreshInterval) clearInterval(newsRefreshInterval);
+            newsRefreshInterval = setInterval(fetchNewsSection, 60000);
+        } else if (newsRefreshInterval) {
+            clearInterval(newsRefreshInterval);
+            newsRefreshInterval = null;
+        }
         if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
         if (section === "strategies") fetchStrategies();
         if (section === "history") fetchHistorySection();
@@ -1115,9 +1127,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // -------------------------------------------------------------
-    // 9. NEWS SECTION — full F&O universe coverage, served entirely from cache.
-    // This never calls CurrentsAPI directly; /api/news reads a background-refreshed
-    // file so any number of page views costs zero extra API budget.
+    // 9. NEWS SECTION — full F&O universe coverage.
+    // Per-stock news is served entirely from a background-refreshed cache file (zero extra API
+    // budget no matter how many page views). Global/macro news is a live call on every
+    // /api/news hit (see news_provider.fetch_market_news) — it auto-refreshes here every 1 min
+    // while this tab is open, backed by a 60s server-side cache so that polling can't multiply
+    // into repeated live CurrentsAPI calls.
     // -------------------------------------------------------------
     let allGlobalNews = [];
 
@@ -1138,7 +1153,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             allNewsStocks = data.stocks || [];
             allGlobalNews = data.global_news || [];
-            newsLoaded = true;
             updateNewsStatusBar(data);
             renderNewsGrid();
             renderGlobalNewsGrid();

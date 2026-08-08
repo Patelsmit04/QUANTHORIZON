@@ -21,6 +21,8 @@ the company name together to cut down false matches; it's a heuristic, not a gua
 """
 
 import os
+import re
+import html
 import time
 import logging
 from pathlib import Path
@@ -135,6 +137,20 @@ def _filter_recent(headlines: List[Dict[str, Any]], hours: int = RECENCY_HOURS) 
 import xml.etree.ElementTree as ET
 
 
+def _clean_google_news_description(raw: str, fallback: str) -> str:
+    """Google News RSS wraps <description> in raw HTML — `<a href="...">Title</a>&nbsp;&nbsp;
+    <font color="...">Source</font>` — not plain text. The frontend correctly HTML-escapes
+    every field before display (XSS-safe), which means this markup was rendering as literal
+    visible text (`<a href=...>`) instead of being stripped, in every global-news card. Strip
+    tags and decode entities here so callers always get clean plain text."""
+    if not raw:
+        return fallback
+    no_tags = re.sub(r"<[^>]+>", " ", raw)
+    cleaned = html.unescape(no_tags)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned or fallback
+
+
 def fetch_google_news_rss(query: str, max_results: int = 6) -> Optional[List[Dict[str, Any]]]:
     """
     Fetch news from Google News RSS feed for Indian stock queries.
@@ -155,7 +171,7 @@ def fetch_google_news_rss(query: str, max_results: int = 6) -> Optional[List[Dic
             description = item.findtext("description", "")
             results.append({
                 "title": title,
-                "description": description or title,
+                "description": _clean_google_news_description(description, title),
                 "url": link,
                 "published": pub_date or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S +0000"),
                 "source": "Google News"
@@ -254,14 +270,42 @@ def analyze_global_stock_impact(headline: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+_MARKET_NEWS_QUERY = "Nifty Sensex India stock market RBI Fed crude"
+_market_news_cache: Dict[str, Any] = {"data": None, "fetched_at": 0.0}
+MARKET_NEWS_CACHE_TTL_SECONDS = 60  # matches the frontend's 1-minute Global News auto-refresh —
+# every poll landing within the same window (across all users/tabs) reuses one in-memory
+# snapshot instead of each triggering its own live fetch, so 1-minute polling can't multiply
+# into a CurrentsAPI-budget problem the way it would with a live call per request.
+
+
 def fetch_market_news(max_results: int = 10) -> Optional[List[Dict[str, Any]]]:
     """Broad market/macro news likely to move Indian equities generally (index-level, not
-    stock-specific): RBI/Fed policy, crude oil, global markets, India macro data."""
-    raw = _search("Nifty Sensex India stock market RBI Fed crude", max_results=max_results * 2)
+    stock-specific): RBI/Fed policy, crude oil, global markets, India macro data.
+
+    Falls back to Google News RSS (free, no rate limit) when CurrentsAPI is unavailable or
+    rate-limited — the same resilience fetch_stock_news() already has, which this previously
+    lacked. CurrentsAPI's free tier gets rate-limited under this app's existing per-stock
+    refresh load alone (see fetch_stock_news's docstring on the 1000/day budget), and this
+    function had no fallback at all: a rate-limited _search() call returned None outright, and
+    the Global News section on the dashboard rendered empty with no way to recover until the
+    next day's quota reset."""
+    now = time.time()
+    if _market_news_cache["data"] is not None and (now - _market_news_cache["fetched_at"]) < MARKET_NEWS_CACHE_TTL_SECONDS:
+        return _market_news_cache["data"]
+
+    raw = None
+    if _api_available():
+        raw = _search(_MARKET_NEWS_QUERY, max_results=max_results * 2)
+    if not raw:
+        raw = fetch_google_news_rss(f"{_MARKET_NEWS_QUERY} oil", max_results=max_results)
     if raw is None:
-        return None
+        return None  # don't cache a failure — the next call (or the next 60s window) retries live
+
     recent = _filter_recent(raw)[:max_results]
-    return [analyze_global_stock_impact(h) for h in recent]
+    result = [analyze_global_stock_impact(h) for h in recent]
+    _market_news_cache["data"] = result
+    _market_news_cache["fetched_at"] = now
+    return result
 
 
 def classify_news_signal(headlines: Optional[List[Dict[str, Any]]]) -> Dict[str, Any]:
