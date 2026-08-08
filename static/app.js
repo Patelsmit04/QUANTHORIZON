@@ -108,6 +108,17 @@ document.addEventListener("DOMContentLoaded", () => {
     let allNewsStocks = [];
     let currentNewsVerdictFilter = "ALL";
 
+    // Institutional Flow Section DOM
+    const institutionalFlowSection = document.getElementById("institutionalFlowSection");
+    const institutionalFlowNavBadge = document.getElementById("institutionalFlowNavBadge");
+    const institutionalFlowTableBody = document.getElementById("institutionalFlowTableBody");
+    const institutionalFlowEmptyState = document.getElementById("institutionalFlowEmptyState");
+    const institutionalFlowStatusBar = document.getElementById("institutionalFlowStatusBar");
+    const institutionalFlowSearchInput = document.getElementById("institutionalFlowSearchInput");
+    const btnRefreshInstitutionalFlow = document.getElementById("btnRefreshInstitutionalFlow");
+
+    let allInstitutionalFlowDeals = [];
+
     // Indices & Strategies Section DOM
     const indicesSection = document.getElementById("indicesSection");
     const indexGrid = document.getElementById("indexGrid");
@@ -237,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const sections = {
             scanner: scannerSection,
             news: newsSection,
+            institutionalFlow: institutionalFlowSection,
             indices: indicesSection,
             strategies: strategiesSection,
             history: historySection
@@ -262,6 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
         if (section === "strategies") fetchStrategies();
         if (section === "history") fetchHistorySection();
+        if (section === "institutionalFlow") fetchInstitutionalFlowSection();
     }
 
     // Mobile Navigation Drawer Tabs
@@ -719,6 +732,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const sigText = stock.signal || 'NEUTRAL';
             const pillarWeight = stock.confirmed_pillars_weight !== undefined ? stock.confirmed_pillars_weight : 0.0;
             const reqPillars = stock.required_pillars || 3;
+            const flowDetailId = `flow-detail-${stock.symbol}-${stock.rank_position || 0}`;
+            const flowChipHtml = buildInstitutionalFlowChipHTML(stock.institutional_flow, flowDetailId);
+            const flowDetailRowHtml = buildInstitutionalFlowDetailRowHTML(stock, flowDetailId);
 
             let bucketHtml = "";
             if (stock.gap_bucket_distribution && stock.gap_bucket_distribution.bucket_probabilities) {
@@ -799,6 +815,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="pillar-weight-badge text-gold">
                         ${pillarWeight}/${reqPillars} Wt
                     </span>
+                    ${flowChipHtml}
                 </td>
                 <td>
                     <button class="btn-icon view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
@@ -809,13 +826,87 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const btn = tr.querySelector(".view-detail-btn");
             if (btn) btn.addEventListener("click", () => openStockModal(stock.symbol));
+
+            const flowChip = tr.querySelector(".flow-chip");
+            if (flowChip) {
+                flowChip.addEventListener("click", () => {
+                    const detailRow = document.getElementById(flowDetailId);
+                    if (detailRow) detailRow.classList.toggle("hidden");
+                });
+            }
+
             stocksTableBody.appendChild(tr);
             if (bucketHtml) {
                 const tempTable = document.createElement("table");
                 tempTable.innerHTML = `<tbody>${bucketHtml}</tbody>`;
                 stocksTableBody.appendChild(tempTable.querySelector("tr"));
             }
+            if (flowDetailRowHtml) {
+                const tempTable = document.createElement("table");
+                tempTable.innerHTML = `<tbody>${flowDetailRowHtml}</tbody>`;
+                const detailRow = tempTable.querySelector("tr");
+                stocksTableBody.appendChild(detailRow);
+                const dealsLink = detailRow.querySelector(".flow-view-deals-link");
+                if (dealsLink) {
+                    dealsLink.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        viewInstitutionalFlowDeals(stock.symbol);
+                    });
+                }
+            }
         });
+    }
+
+    // -------------------------------------------------------------
+    // Institutional Flow (Pillar 6) — scanner row chip + expand detail.
+    // -------------------------------------------------------------
+    function buildInstitutionalFlowChipHTML(flow, detailId) {
+        if (!flow || flow.data_status === "DATA_UNAVAILABLE") return "";  // no data fetched yet today — show nothing, not a stale/fake reading
+        const side = flow.dominant_side;
+        if (side !== "BUY" && side !== "SELL") return "";
+        if (!flow.tier || flow.tier === "BELOW_THRESHOLD") return "";
+
+        const colorClass = side === "BUY" ? "text-bullish" : "text-bearish";
+        const value = Math.abs(flow.net_value_cr || 0).toFixed(1);
+        // Shadow mode (computed but not yet counted toward the live verdict, until the live-
+        // snapshot-vs-EOD-archive reconciliation has run clean for a while — see
+        // block_deal_provider.py) gets a muted/outline treatment: same hue via currentColor,
+        // dashed border instead of a filled pill, so it doesn't read as equal weight to a
+        // pillar that's actually driving the score.
+        const shadowClass = flow.shadow_mode ? "flow-chip-shadow" : "";
+        const tooltip = flow.shadow_mode
+            ? "Institutional Flow: monitoring only — not yet counted in the live verdict"
+            : "Institutional Flow: counted in the live verdict";
+        return `
+            <span class="badge flow-chip ${colorClass} ${shadowClass}" title="${tooltip}" data-detail-target="${detailId}" style="cursor:pointer;margin-top:4px;">
+                <i class="fa-solid fa-building-columns"></i> ${side === "BUY" ? "Buy" : "Sell"} ₹${value}cr
+            </span>
+        `;
+    }
+
+    function buildInstitutionalFlowDetailRowHTML(stock, detailId) {
+        const flow = stock.institutional_flow;
+        if (!flow || (!flow.buy_value_cr && !flow.sell_value_cr)) return "";
+        const netClass = flow.dominant_side === "BUY" ? "text-bullish" : (flow.dominant_side === "SELL" ? "text-bearish" : "text-sub");
+        return `
+            <tr class="flow-detail-row hidden" id="${detailId}" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
+                <td colspan="12" style="padding:8px 16px;">
+                    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:11px;">
+                        <div><i class="fa-solid fa-building-columns text-gold"></i> <strong>Institutional Flow</strong>
+                            ${flow.shadow_mode ? '<span class="badge badge-pending" style="margin-left:6px;"><i class="fa-solid fa-eye"></i> MONITORING</span>' : ''}
+                        </div>
+                        <div>Buy: <strong class="text-bullish">₹${(flow.buy_value_cr || 0).toFixed(1)}cr</strong></div>
+                        <div>Sell: <strong class="text-bearish">₹${(flow.sell_value_cr || 0).toFixed(1)}cr</strong></div>
+                        <div>Net: <strong class="${netClass}">₹${Math.abs(flow.net_value_cr || 0).toFixed(1)}cr ${escapeHtml(flow.dominant_side || "")}</strong></div>
+                        <div>Tier: <span class="badge badge-gold">${escapeHtml(flow.tier || "")}</span></div>
+                        <div style="color:var(--ink-muted);">Deal types: ${(flow.deal_types || []).map(escapeHtml).join(", ") || "—"}</div>
+                        <a href="#" class="flow-view-deals-link" style="margin-left:auto;color:var(--gold);font-weight:800;text-decoration:none;">
+                            View individual deals <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        `;
     }
 
     // -------------------------------------------------------------
@@ -1349,6 +1440,126 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // -------------------------------------------------------------
+    // 9B. INSTITUTIONAL FLOW SECTION — today's qualifying NSE bulk/block deals.
+    // -------------------------------------------------------------
+    async function fetchInstitutionalFlowSection() {
+        try {
+            if (institutionalFlowTableBody) {
+                institutionalFlowTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>`;
+            }
+            if (institutionalFlowEmptyState) institutionalFlowEmptyState.classList.add("hidden");
+
+            const response = await apiFetch("/api/institutional_flow");
+            if (!response.ok) throw new Error("Institutional flow API error");
+            const data = await response.json();
+
+            allInstitutionalFlowDeals = data.deals || [];
+            if (institutionalFlowNavBadge) institutionalFlowNavBadge.textContent = allInstitutionalFlowDeals.length;
+            updateInstitutionalFlowStatusBar(data);
+            filterAndRenderInstitutionalFlowTable();
+        } catch (error) {
+            console.error("Failed to fetch institutional flow:", error);
+            if (institutionalFlowTableBody) institutionalFlowTableBody.innerHTML = "";
+            if (institutionalFlowStatusBar) {
+                institutionalFlowStatusBar.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-bearish"></i> <span>Could not load institutional flow data right now.</span>`;
+            }
+            if (institutionalFlowEmptyState) institutionalFlowEmptyState.classList.remove("hidden");
+        }
+    }
+
+    function updateInstitutionalFlowStatusBar(data) {
+        if (!institutionalFlowStatusBar) return;
+        const meta = data.meta || {};
+        const recon = data.latest_reconciliation;
+
+        if (!meta.last_checkpoint) {
+            institutionalFlowStatusBar.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>Not fetched yet today — the live snapshot is checked shortly after the 2:20 PM afternoon block-deal window closes.</span>`;
+            return;
+        }
+
+        const lastUpdated = meta.last_updated ? new Date(meta.last_updated).toLocaleTimeString() : "--";
+        const checkpointLabel = { live_trigger: "live snapshot", final_check: "live snapshot (final check)", eod_archive: "official EOD archive" }[meta.last_checkpoint] || meta.last_checkpoint;
+
+        let reconHtml;
+        if (recon && recon.date === meta.date) {
+            const reconClass = recon.status === "CLEAN" ? "text-bullish" : (recon.status === "DISCREPANCIES_FOUND" ? "text-amber" : "text-sub");
+            reconHtml = `<span class="${reconClass}"><i class="fa-solid fa-check-double"></i> Reconciled vs. official archive: ${escapeHtml(recon.status)}</span>`;
+        } else {
+            reconHtml = `<span class="text-sub"><i class="fa-solid fa-hourglass-half"></i> Not yet reconciled against the official end-of-day archive</span>`;
+        }
+
+        // Data currently shown is the live snapshot unless the EOD archive checkpoint itself
+        // already ran — either way, this is stated plainly rather than presenting a live
+        // snapshot as if it were the final reconciled figure (see block_deal_provider.py).
+        institutionalFlowStatusBar.innerHTML = `
+            <i class="fa-solid fa-circle-check text-bullish"></i>
+            <span>Showing ${escapeHtml(checkpointLabel)} as of <strong>${lastUpdated}</strong></span>
+            <span>&middot;</span>
+            ${reconHtml}
+        `;
+    }
+
+    function filterAndRenderInstitutionalFlowTable() {
+        if (!institutionalFlowTableBody) return;
+        const searchTerm = institutionalFlowSearchInput ? institutionalFlowSearchInput.value.trim().toUpperCase() : "";
+        let filtered = allInstitutionalFlowDeals;
+        if (searchTerm) {
+            filtered = filtered.filter(d => (d.symbol || "").toUpperCase().includes(searchTerm));
+        }
+
+        institutionalFlowTableBody.innerHTML = "";
+        if (filtered.length === 0) {
+            institutionalFlowTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--ink-muted);">No qualifying deals${searchTerm ? " match that symbol" : " yet today"}.</td></tr>`;
+            if (!searchTerm && institutionalFlowEmptyState) institutionalFlowEmptyState.classList.remove("hidden");
+            return;
+        }
+        if (institutionalFlowEmptyState) institutionalFlowEmptyState.classList.add("hidden");
+
+        // Already sorted by value descending server-side (get_deals_for_day) — re-sorting here
+        // too so a client-side symbol filter can never change the ordering.
+        [...filtered].sort((a, b) => (b.value_cr || 0) - (a.value_cr || 0)).forEach(deal => {
+            const tr = document.createElement("tr");
+            const sideClass = deal.side === "BUY" ? "text-bullish" : "text-bearish";
+            tr.innerHTML = `
+                <td><strong>${escapeHtml(deal.symbol)}</strong></td>
+                <td><span class="badge flow-chip ${sideClass}">${escapeHtml(deal.side)}</span></td>
+                <td>${escapeHtml((deal.deal_type || "").toUpperCase())}</td>
+                <td><strong>₹${(deal.value_cr || 0).toFixed(2)}cr</strong></td>
+                <td>${escapeHtml(deal.deal_date || "--")}</td>
+                <td>
+                    <button class="btn-icon flow-jump-to-scanner-btn" data-symbol="${escapeAttr(deal.symbol)}" title="Jump to ${escapeAttr(deal.symbol)} in Scanner">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </button>
+                </td>
+            `;
+            const jumpBtn = tr.querySelector(".flow-jump-to-scanner-btn");
+            if (jumpBtn) jumpBtn.addEventListener("click", () => jumpToScannerRow(deal.symbol));
+            institutionalFlowTableBody.appendChild(tr);
+        });
+    }
+
+    function jumpToScannerRow(symbol) {
+        switchSection("scanner");
+        if (searchInput) {
+            searchInput.value = symbol;
+            filterAndRenderTable();
+        }
+    }
+
+    async function viewInstitutionalFlowDeals(symbol) {
+        switchSection("institutionalFlow");
+        if (institutionalFlowSearchInput) institutionalFlowSearchInput.value = symbol;
+        // switchSection() already kicked off its own fetch, but its result lands whenever it
+        // lands — awaiting a second, explicit fetch here is a deliberate small redundancy in
+        // exchange for a deterministic "fetch, then filter" order instead of guessing a delay.
+        await fetchInstitutionalFlowSection();
+        filterAndRenderInstitutionalFlowTable();
+    }
+
+    if (institutionalFlowSearchInput) institutionalFlowSearchInput.addEventListener("input", filterAndRenderInstitutionalFlowTable);
+    if (btnRefreshInstitutionalFlow) btnRefreshInstitutionalFlow.addEventListener("click", fetchInstitutionalFlowSection);
+
+    // -------------------------------------------------------------
     // 10. INDICES SECTION (Nifty 50 / Bank Nifty / Sensex)
     // -------------------------------------------------------------
     async function fetchIndexVerdicts() {
@@ -1562,6 +1773,49 @@ document.addEventListener("DOMContentLoaded", () => {
         indices.forEach(idx => indexGrid.appendChild(buildIndexCard(idx)));
     }
 
+    function buildIndexFlowValueHTML(flow) {
+        // Same "Not fetched yet" / "UNAVAILABLE" plain-text treatment already used for global
+        // cues on this card — never a colored badge implying a real reading that isn't there.
+        if (!flow || flow.status === "NOT_FETCHED_YET") {
+            return `<span class="val" style="font-size:11px;color:var(--ink-muted);">Not fetched yet</span>`;
+        }
+        if (flow.status === "UNAVAILABLE") {
+            return `<span class="val" style="font-size:11px;color:var(--ink-muted);">UNAVAILABLE</span>`;
+        }
+        const verdict = flow.verdict || "NEUTRAL";
+        const cls = verdict === "BULLISH" ? "text-bullish" : (verdict === "BEARISH" ? "text-bearish" : "text-sub");
+        return `<span class="val ${cls}" style="font-size:13px;">${escapeHtml(verdict)}</span>`;
+    }
+
+    function buildIndexFlowDetailHTML(flow) {
+        if (!flow || flow.status !== "OK") return "";
+        const totalNet = flow.total_net_value_cr;
+        const netRow = `
+            <div class="detail-row">
+                <span>Net Institutional Value</span>
+                <span class="${totalNet > 0 ? "text-bullish" : (totalNet < 0 ? "text-bearish" : "text-sub")}">
+                    ₹${Math.abs(totalNet).toFixed(1)}cr ${totalNet > 0 ? "BUY" : (totalNet < 0 ? "SELL" : "")}
+                </span>
+            </div>
+            <div class="detail-row"><span>Constituents with flow today</span><span>${flow.constituents_with_flow} / ${flow.constituents_total}</span></div>
+        `;
+        const contributors = flow.top_contributors || [];
+        const contributorRows = contributors.length
+            ? contributors.map(c => {
+                const cls = c.dominant_side === "BUY" ? "text-bullish" : (c.dominant_side === "SELL" ? "text-bearish" : "text-sub");
+                return `<div class="detail-row"><span>${escapeHtml(c.symbol)} (${c.weight_pct.toFixed(1)}% wt)</span><span class="${cls}">₹${Math.abs(c.net_value_cr).toFixed(1)}cr ${escapeHtml(c.dominant_side)}</span></div>`;
+            }).join("")
+            : `<div class="detail-row"><span style="color:var(--ink-muted);">No constituent deals today.</span><span></span></div>`;
+
+        return `
+            <div class="verdict-detail-block">
+                <div class="detail-title">CONSTITUENT INSTITUTIONAL FLOW</div>
+                ${netRow}
+                ${contributorRows}
+            </div>
+        `;
+    }
+
     function buildIndexCard(idx) {
         const card = document.createElement("div");
         card.className = "index-card";
@@ -1591,6 +1845,10 @@ document.addEventListener("DOMContentLoaded", () => {
             ? `<div class="index-card-change ${changeClass}">${changeSign}${formattedPts} (${changeSign}${formattedPct}%)</div>`
             : "";
 
+        const flow = idx.institutional_flow;
+        const flowDetailHtml = buildIndexFlowDetailHTML(flow);
+        const flowDetailId = `index-flow-detail-${idx.index_name || "idx"}`;
+
         card.innerHTML = `
             <div class="index-card-header">
                 <div>
@@ -1603,17 +1861,35 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${getPriorityBadgeHTML(idx.priority_level || "P3_LOW", sigText)}
                 </div>
             </div>
-            <div class="index-metrics-row">
+            <div class="index-metrics-row" style="grid-template-columns: repeat(4, 1fr);">
                 <div class="index-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${idx.confidence_score !== undefined ? idx.confidence_score + "%" : "--"}</span></div>
                 <div class="index-metric-box"><span class="lbl">WEIGHT</span><span class="val">${idx.confirmed_pillars_weight}/${idx.required_weight}</span></div>
                 <div class="index-metric-box"><span class="lbl">RSI</span><span class="val">${idx.rsi !== undefined ? idx.rsi : "--"}</span></div>
+                <div class="index-metric-box"><span class="lbl">FLOW</span>${buildIndexFlowValueHTML(flow)}</div>
             </div>
             <div class="index-pillars-list">${pillarsHtml}</div>
             <div>
                 <div class="form-hint" style="margin-bottom:6px;">Global cues (${(idx.global_cues && idx.global_cues.verdict) || "UNAVAILABLE"})</div>
                 <div class="global-cues-row">${cuesHtml || '<span class="cue-chip">Not fetched yet</span>'}</div>
             </div>
+            ${flowDetailHtml ? `
+            <button type="button" class="verdict-expand-toggle" data-detail-target="${flowDetailId}">
+                <i class="fa-solid fa-chevron-right"></i> Institutional Flow Detail (Constituents)
+            </button>
+            <div class="verdict-pillar-detail" id="${flowDetailId}">${flowDetailHtml}</div>
+            ` : ""}
         `;
+
+        const toggleBtn = card.querySelector(".verdict-expand-toggle");
+        if (toggleBtn) {
+            toggleBtn.addEventListener("click", () => {
+                const detail = card.querySelector(`#${CSS.escape(flowDetailId)}`);
+                if (!detail) return;
+                const isOpen = detail.classList.toggle("open");
+                toggleBtn.classList.toggle("open", isOpen);
+            });
+        }
+
         return card;
     }
 

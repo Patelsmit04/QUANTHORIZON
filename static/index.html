@@ -142,6 +142,11 @@
                         <span>NEWS</span>
                         <span class="nav-badge" id="newsNavBadge">--</span>
                     </button>
+                    <button class="main-nav-tab" data-section="institutionalFlow">
+                        <i class="fa-solid fa-building-columns"></i>
+                        <span>FLOW</span>
+                        <span class="nav-badge" id="institutionalFlowNavBadge">--</span>
+                    </button>
                 </nav>
             </div>
         </div>
@@ -202,6 +207,10 @@
                     <button class="mobile-nav-tab" data-section="news">
                         <i class="fa-solid fa-newspaper"></i>
                         <span>NEWS</span>
+                    </button>
+                    <button class="mobile-nav-tab" data-section="institutionalFlow">
+                        <i class="fa-solid fa-building-columns"></i>
+                        <span>FLOW</span>
                     </button>
                 </nav>
 
@@ -562,6 +571,58 @@
 
     </div>
     <!-- ============================== END NEWS SECTION ============================== -->
+
+    <!-- ============================== INSTITUTIONAL FLOW SECTION ============================== -->
+    <div id="institutionalFlowSection" class="hidden">
+        <div class="section-heading-row" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+            <h2 style="font-size:18px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
+                <i class="fa-solid fa-building-columns text-gold"></i> INSTITUTIONAL FLOW
+                <span style="font-size:12px;font-weight:500;color:var(--ink-muted);">(Today's NSE Bulk &amp; Block Deals, &ge; Regulatory Floor)</span>
+            </h2>
+            <button id="btnRefreshInstitutionalFlow" class="btn btn-pill btn-secondary">
+                <i class="fa-solid fa-rotate-right"></i> REFRESH
+            </button>
+        </div>
+
+        <div class="news-status-bar" id="institutionalFlowStatusBar">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Loading...</span>
+        </div>
+
+        <div class="toolbar-container" style="margin-bottom:16px;margin-top:12px;">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="institutionalFlowSearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>SYMBOL</th>
+                            <th>SIDE</th>
+                            <th>DEAL TYPE</th>
+                            <th>VALUE (&#8377;CR)</th>
+                            <th>DATE</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="institutionalFlowTableBody">
+                        <!-- Dynamic deal rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="institutionalFlowEmptyState" class="empty-state hidden">
+            <i class="fa-solid fa-building-columns fa-3x"></i>
+            <h3>No Qualifying Deals Yet Today</h3>
+            <p>The live snapshot is checked shortly after the confirmed 2:20 PM afternoon block-deal window closes, with a final check before the 3:30 PM lock. Check back after those windows, or after market hours for the reconciled end-of-day figures.</p>
+        </div>
+    </div>
+    <!-- ============================== END INSTITUTIONAL FLOW SECTION ============================== -->
 
     <!-- ============================== INDICES SECTION ============================== -->
     <div id="indicesSection" class="hidden">
