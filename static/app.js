@@ -772,12 +772,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             tr.innerHTML = `
-                <td>
+                <td data-label="RANK">
                     <span class="rank-badge ${getRankBadgeClass(stock.rank_position)}">
                         #${stock.rank_position || '-'}
                     </span>
                 </td>
-                <td>
+                <td data-label="TICKER">
                     <div class="ticker-cell">
                         <span class="symbol-name">
                             ${escapeHtml(stock.symbol)}
@@ -786,39 +786,39 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${stock.next_day_bestest_5 ? '<span class="bestest-5-badge"><i class="fa-solid fa-star"></i> NEXT DAY TOP 5</span>' : ''}
                     </div>
                 </td>
-                <td>
+                <td data-label="SIGNAL">
                     <span class="signal-badge ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
                         ${escapeHtml(sigText)}
                     </span>
                 </td>
-                <td>${getOptionTypeBadgeHTML(stock.option_type || 'NONE')}</td>
-                <td>${getPriorityBadgeHTML(stock.priority_level || 'P3_LOW', sigText)}</td>
-                <td>
+                <td data-label="OPTION TYPE">${getOptionTypeBadgeHTML(stock.option_type || 'NONE')}</td>
+                <td data-label="PRIORITY">${getPriorityBadgeHTML(stock.priority_level || 'P3_LOW', sigText)}</td>
+                <td data-label="CONFIDENCE">
                     <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
                 </td>
-                <td>
+                <td data-label="EST. GAP">
                     <span class="est-gap-pill ${estGap >= 0 ? 'est-gap-up' : 'est-gap-down'}">
                         ${estGap >= 0 ? '+' : ''}${estGap}% EST
                     </span>
                 </td>
-                <td><strong>₹${ltpVal}</strong></td>
-                <td>
+                <td data-label="LTP"><strong>₹${ltpVal}</strong></td>
+                <td data-label="VOL SURGE">
                     <div class="vol-surge-container">
                         <span class="vol-surge-text ${(stock.volume_spike || 0) >= 3.0 ? 'text-amber font-weight-800' : 'text-sub'}">
                             ${stock.volume_spike || 1.0}x
                         </span>
                     </div>
                 </td>
-                <td>
+                <td data-label="RSI">
                     <span class="rsi-badge ${getRsiColorClass(stock.rsi || 50)}">${stock.rsi || 50}</span>
                 </td>
-                <td>
+                <td data-label="PILLAR WEIGHT">
                     <span class="pillar-weight-badge text-gold">
                         ${pillarWeight}/${reqPillars} Wt
                     </span>
                     ${flowChipHtml}
                 </td>
-                <td>
+                <td data-label="ACTION">
                     <button class="btn-icon view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
                         <i class="fa-solid fa-chart-line"></i>
                     </button>

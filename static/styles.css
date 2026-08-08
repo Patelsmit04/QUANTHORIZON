@@ -1934,7 +1934,11 @@ input:checked + .slider:before { transform: translateX(16px); }
         white-space: nowrap;
     }
 
-    /* Sticky Rank/Ticker Columns on touch scroll */
+    /* Sticky Rank/Ticker Columns on touch scroll — the History and Confidence Calibration
+       tables share .data-table/.table-scroll with the scanner table but keep this simpler
+       horizontal-scroll treatment; only the scanner table (#stocksTableBody below) gets the
+       full card layout, since it's the page's primary interaction and the highest-column-count
+       table (12 columns vs. History's 11 and Calibration's 6). */
     .data-table th:nth-child(1), .data-table td:nth-child(1),
     .data-table th:nth-child(2), .data-table td:nth-child(2) {
         position: sticky;
@@ -1946,6 +1950,139 @@ input:checked + .slider:before { transform: translateX(16px); }
 
     .data-table th:nth-child(2), .data-table td:nth-child(2) {
         left: 55px;
+    }
+
+    /* =====================================================================
+       SCANNER TABLE -> CARD LAYOUT (same markup, same data — CSS restructures the existing
+       <table>/<tr>/<td> into stacked cards via flexbox `order`, no forked JS render path).
+       Ticker/Signal/Confidence stay prominent (what a user scans for first); Option Type/
+       Priority/Gap/LTP/Vol Surge/RSI/Pillar Weight become a 2-column grid; Action becomes a
+       full-width, clearly-labeled 44px-tall button instead of a small icon-only circle.
+       ===================================================================== */
+    #scannerDataTable thead { display: none; } /* column headers become per-field labels inside each card instead */
+    /* .data-table's base rule sets min-width:1100px (for the horizontal-scroll tables) — that
+       still constrains #scannerDataTable's own box even with tbody/tr overridden to block/flex
+       below, since min-width applies to the <table> element itself regardless of its children's
+       display type. Must be lifted here or every card renders 1100px wide regardless of
+       viewport. */
+    #scannerDataTable { min-width: 0; width: 100%; }
+    #stocksTableBody { display: block; }
+
+    #stocksTableBody tr {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 4px 10px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--glass-shadow);
+        padding: 14px;
+        margin-bottom: 12px;
+    }
+
+    #stocksTableBody tr.top-choice-row { border-color: var(--gold); border-width: 1.5px; }
+
+    /* The gap-probability-distribution and institutional-flow-detail sub-rows are already
+       single full-width colspan cells (free-form content, not per-field key/value pairs) —
+       keep them as simple blocks rather than flex-restructuring them. */
+    #stocksTableBody tr.gap-distribution-row,
+    #stocksTableBody tr.flow-detail-row {
+        display: block;
+        padding: 10px 14px;
+    }
+    #stocksTableBody tr.gap-distribution-row td,
+    #stocksTableBody tr.flow-detail-row td {
+        display: block;
+        white-space: normal;
+    }
+
+    #stocksTableBody td {
+        display: block;
+        padding: 0 !important;
+        border: none !important;
+        position: static !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        min-width: 0 !important;
+        white-space: normal !important;
+        font-size: 13px;
+    }
+
+    #stocksTableBody td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        color: var(--ink-muted);
+        margin-bottom: 3px;
+    }
+
+    /* Header line: Rank (small) + Ticker (prominent, grows) + Confidence (prominent, right) */
+    #stocksTableBody td:nth-child(1) { order: 1; flex: 0 0 auto; }
+    #stocksTableBody td:nth-child(2) { order: 2; flex: 1 1 auto; min-width: 100px; }
+    #stocksTableBody td:nth-child(2) .symbol-name { font-size: 16px; }
+    #stocksTableBody td:nth-child(6) { order: 3; flex: 0 0 auto; text-align: right; }
+    #stocksTableBody td:nth-child(6) .score-pill { font-size: 14px; padding: 6px 12px; }
+    #stocksTableBody td:nth-child(1)::before,
+    #stocksTableBody td:nth-child(2)::before,
+    #stocksTableBody td:nth-child(6)::before { content: none; }
+
+    /* Sub-header: Signal, full width */
+    #stocksTableBody td:nth-child(3) {
+        order: 4;
+        flex: 1 1 100%;
+    }
+    #stocksTableBody td:nth-child(3)::before { content: none; }
+    #stocksTableBody td:nth-child(3) .signal-badge { font-size: 14px; }
+
+    /* 2-column grid: Option Type, Priority, Est. Gap, LTP, Vol Surge, RSI, Pillar Weight */
+    #stocksTableBody td:nth-child(4),
+    #stocksTableBody td:nth-child(5),
+    #stocksTableBody td:nth-child(7),
+    #stocksTableBody td:nth-child(8),
+    #stocksTableBody td:nth-child(9),
+    #stocksTableBody td:nth-child(10),
+    #stocksTableBody td:nth-child(11) {
+        flex: 1 1 calc(50% - 5px);
+        border-top: 1px solid var(--gridline) !important;
+        padding-top: 8px !important;
+        margin-top: 2px;
+    }
+    #stocksTableBody td:nth-child(4) { order: 5; }
+    #stocksTableBody td:nth-child(5) { order: 6; }
+    #stocksTableBody td:nth-child(7) { order: 7; }
+    #stocksTableBody td:nth-child(8) { order: 8; }
+    #stocksTableBody td:nth-child(9) { order: 9; }
+    #stocksTableBody td:nth-child(10) { order: 10; }
+    #stocksTableBody td:nth-child(11) { order: 11; }
+
+    /* Action: full-width, 44px-tall labeled button (was a small icon-only circle) */
+    #stocksTableBody td:nth-child(12) {
+        order: 12;
+        flex: 1 1 100%;
+        border-top: 1px solid var(--gridline) !important;
+        padding-top: 10px !important;
+        margin-top: 4px;
+    }
+    #stocksTableBody td:nth-child(12)::before { content: none; }
+    #stocksTableBody td:nth-child(12) .view-detail-btn {
+        width: 100%;
+        height: 44px;
+        border-radius: var(--radius-md);
+        background: var(--gold-bg);
+        color: var(--gold);
+        font-weight: 800;
+        font-size: 12px;
+        letter-spacing: 0.4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    #stocksTableBody td:nth-child(12) .view-detail-btn::after {
+        content: "VIEW DETAILS";
     }
 
     .index-grid, .strategy-grid, .news-grid, .index-verdict-grid {
