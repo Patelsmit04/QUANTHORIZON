@@ -143,6 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const historySearchInput = document.getElementById("historySearchInput");
     const historyStrategyFilter = document.getElementById("historyStrategyFilter");
     const historyOutcomeFilter = document.getElementById("historyOutcomeFilter");
+    const historyInstitutionalFlowFilter = document.getElementById("historyInstitutionalFlowFilter");
 
     // AI Clarification Review Modal (M9) — see index.html comment for why this exists
     const clarificationModal = document.getElementById("clarificationModal");
@@ -2551,6 +2552,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const search = historySearchInput ? historySearchInput.value.trim().toUpperCase() : "";
         const stratFilter = historyStrategyFilter ? historyStrategyFilter.value : "ALL";
         const outcomeFilter = historyOutcomeFilter ? historyOutcomeFilter.value : "ALL";
+        const flowOnly = historyInstitutionalFlowFilter ? historyInstitutionalFlowFilter.checked : false;
 
         let filtered = Array.isArray(allHistoryRows) ? allHistoryRows : [];
         if (search) {
@@ -2561,6 +2563,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (outcomeFilter !== "ALL") {
             filtered = filtered.filter(r => r && r.status === outcomeFilter);
+        }
+        if (flowOnly) {
+            filtered = filtered.filter(r => r && r.institutional_flow_contributed);
         }
 
         if (filtered.length === 0) {
@@ -2579,7 +2584,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return `
                 <tr>
                     <td style="font-size:11px;color:var(--ink-muted);">${escapeHtml(r.date || r.timestamp || '--')}</td>
-                    <td><strong>${escapeHtml(r.instrument)}</strong></td>
+                    <td><strong>${escapeHtml(r.instrument)}</strong>${r.institutional_flow_contributed ? ' <i class="fa-solid fa-building-columns text-gold" title="Institutional Flow contributed to this setup&#39;s score"></i>' : ''}</td>
                     <td><span class="badge badge-gold" style="font-size:10px;">${escapeHtml(r.strategy_name)}</span></td>
                     <td><span class="signal-badge ${r.signal && r.signal.includes('BTST') ? 'text-bullish' : 'text-bearish'}">${escapeHtml(r.signal)}</span></td>
                     <td><strong>₹${r.entry_price || '0.00'}</strong></td>
@@ -2631,6 +2636,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (historySearchInput) historySearchInput.addEventListener("input", filterAndRenderHistoryTable);
     if (historyStrategyFilter) historyStrategyFilter.addEventListener("change", filterAndRenderHistoryTable);
     if (historyOutcomeFilter) historyOutcomeFilter.addEventListener("change", filterAndRenderHistoryTable);
+    if (historyInstitutionalFlowFilter) historyInstitutionalFlowFilter.addEventListener("change", filterAndRenderHistoryTable);
 
     fetchSplitAccuracy();
 });

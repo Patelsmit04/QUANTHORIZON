@@ -598,6 +598,87 @@ def get_daily_flow_meta() -> Dict[str, Any]:
     }
 
 
+def get_aggregated_flow_for_today(checkpoint: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+    """Today's per-symbol aggregated flow for one checkpoint (or the most recent one) — the
+    same dict get_institutional_flow_data() looks a single symbol up in, exposed here so a
+    caller (app.py's scheduler) can scan every symbol at once right after a checkpoint runs,
+    to decide what's newly worth a notification (see get_newly_notifiable_flows())."""
+    today_str = date.today().isoformat()
+    store = _load_daily_store()
+    day_entry = store.get(today_str, {})
+    use_checkpoint = checkpoint or day_entry.get("last_checkpoint")
+    if not use_checkpoint:
+        return {}
+    return day_entry.get(use_checkpoint) or {}
+
+
+# =========================================================================
+# NOTIFICATIONS — this module stays notification-agnostic (no log_notification/ws_broadcast
+# dependency here, matching every other provider) — it only tracks which symbols/indices have
+# ALREADY been notified about today, so app.py's scheduler (which owns the other 3 notification
+# call sites) can ask "what's newly worth telling the user about" without re-alerting on every
+# later checkpoint that still sees the same flow.
+# =========================================================================
+NOTIFIED_FLOWS_FILE = os.path.join(DATA_DIR, "institutional_flow_notified.json")
+# WEAK-tier deals don't notify — "meaningful", not the bare regulatory floor (see module docstring).
+NOTIFY_MIN_TIER = "MODERATE"
+_TIER_RANK = {"BELOW_THRESHOLD": 0, "WEAK": 1, "MODERATE": 2, "STRONG": 3}
+
+
+def _load_notified_today() -> set:
+    today_str = date.today().isoformat()
+    notified = read_json(NOTIFIED_FLOWS_FILE, default={})
+    return set(notified.get(today_str, []))
+
+
+def _mark_notified(keys: List[str]):
+    if not keys:
+        return
+    today_str = date.today().isoformat()
+    with json_file_lock(NOTIFIED_FLOWS_FILE):
+        notified = read_json(NOTIFIED_FLOWS_FILE, default={})
+        already = set(notified.get(today_str, []))
+        already.update(keys)
+        # Prune older days so this file doesn't grow forever — same-day dedup is all it's for.
+        notified = {today_str: sorted(already)}
+        atomic_write_json(NOTIFIED_FLOWS_FILE, notified)
+
+
+def get_newly_notifiable_flows(aggregated: Dict[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Symbols in `aggregated` at >= NOTIFY_MIN_TIER that haven't been notified about yet
+    today. Marks them notified as a side effect — once returned, a symbol won't be returned
+    again today even if a later checkpoint sees it at the same or a higher tier. Call right
+    after a checkpoint captures fresh data (see get_aggregated_flow_for_today())."""
+    already = _load_notified_today()
+    newly = []
+    new_keys = []
+    for sym, flow in aggregated.items():
+        if _TIER_RANK.get(flow.get("tier"), 0) < _TIER_RANK[NOTIFY_MIN_TIER]:
+            continue
+        key = f"STOCK:{sym}"
+        if key in already:
+            continue
+        newly.append(flow)
+        new_keys.append(key)
+    _mark_notified(new_keys)
+    return newly
+
+
+def get_newly_notifiable_index_flow(index_flow: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Same idea as get_newly_notifiable_flows() but for one index's aggregate (BULLISH/
+    BEARISH only — NEUTRAL never notifies). Called once per index per scoring pass from
+    app.py, right after compute_index_institutional_flow()."""
+    if not index_flow or index_flow.get("status") != "OK":
+        return None
+    if index_flow.get("verdict") not in ("BULLISH", "BEARISH"):
+        return None
+    key = f"INDEX:{index_flow.get('index_name')}"
+    if key in _load_notified_today():
+        return None
+    _mark_notified([key])
+    return index_flow
+
+
 # =========================================================================
 # RECONCILIATION — live snapshot vs. official EOD archive, logged (not silently trusted).
 # =========================================================================

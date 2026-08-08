@@ -1243,7 +1243,7 @@ def get_prediction_history(
         cursor.execute("""
             SELECT j.id, j.timestamp, j.signal_date, j.symbol, j.raw_ticker, j.signal,
                    j.predicted_direction, j.confidence_score, j.close_price_325,
-                   j.predicted_gap_pct, j.strategy_id,
+                   j.predicted_gap_pct, j.strategy_id, j.pillar_6_confirmed,
                    e.next_open_915, e.next_close_930, e.actual_gap_pct, e.is_direction_correct,
                    e.is_trade_win, e.net_pnl_pct
             FROM signal_journal j
@@ -1322,7 +1322,8 @@ def get_prediction_history(
             "realized_gap_pct": actual_gap,
             "realized_gap_bucket": realized_bucket,
             "outcome_result": outcome,
-            "status": "CLOSED" if is_evaluated else "OPEN"
+            "status": "CLOSED" if is_evaluated else "OPEN",
+            "institutional_flow_contributed": bool(r.get("pillar_6_confirmed")),
         })
 
     return history

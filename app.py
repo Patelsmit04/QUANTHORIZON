@@ -34,6 +34,7 @@ from block_deal_provider import (
     get_institutional_flow_data, maybe_run_institutional_flow_checkpoints,
     get_deals_for_day, get_daily_flow_meta, get_reconciliation_history,
     compute_index_institutional_flow,
+    get_aggregated_flow_for_today, get_newly_notifiable_flows, get_newly_notifiable_index_flow,
     SHADOW_MODE as INSTITUTIONAL_FLOW_SHADOW_MODE,
     MIN_VALUE_CR as INSTITUTIONAL_FLOW_MIN_VALUE_CR,
 )
@@ -752,6 +753,10 @@ def score_index_universe(raw: Dict[str, Any], strategy: Dict[str, Any]) -> List[
             # (NOT_FETCHED_YET / UNAVAILABLE / OK), so it can't take down index scoring itself.
             try:
                 processed["institutional_flow"] = compute_index_institutional_flow(index_name)
+                # Idempotent across the multiple strategies this function gets called once per —
+                # get_newly_notifiable_index_flow() dedupes by index+day, so only the first
+                # strategy's call in a given scan cycle actually fires a notification.
+                _notify_new_index_institutional_flow(processed["institutional_flow"])
             except Exception as e:
                 logger.warning(f"Index institutional flow aggregation failed for {index_name}: {e}")
                 processed["institutional_flow"] = {"index_name": index_name, "status": "UNAVAILABLE", "verdict": None}
@@ -1062,6 +1067,48 @@ def _snapshot_ready_stocks(today_date: str) -> List[Dict[str, Any]]:
 
 
 # -------------------------------------------------------------
+# INSTITUTIONAL FLOW NOTIFICATIONS — fires through the same bell/toast + history system as the
+# other 3 notification call sites (index verdict completion, 3:40 PM lock, SMC setup detection).
+# block_deal_provider.py stays notification-agnostic (see its own docstring on this) and only
+# tracks what's newly worth telling the user about; this module owns the actual notifying.
+# -------------------------------------------------------------
+def _notify_new_institutional_flows(checkpoint_name: str):
+    try:
+        aggregated = get_aggregated_flow_for_today(checkpoint_name)
+        for flow in get_newly_notifiable_flows(aggregated):
+            side_word = "Buy" if flow.get("dominant_side") == "BUY" else "Sell"
+            tier_word = str(flow.get("tier", "")).title()
+            value = abs(flow.get("net_value_cr", 0.0))
+            notif = log_notification(
+                notif_type="institutional_flow",
+                title=f"{flow.get('symbol')} — Institutional Flow",
+                message=f"{tier_word} {side_word} ₹{value:.1f}cr",
+                payload=flow,
+            )
+            ws_broadcast.broadcast_sync({"type": "notification", **notif})
+    except Exception as e:
+        logger.warning(f"[InstitutionalFlow] Stock-level notification check failed: {e}")
+
+
+def _notify_new_index_institutional_flow(index_flow: Dict[str, Any]):
+    try:
+        newly = get_newly_notifiable_index_flow(index_flow)
+        if not newly:
+            return
+        side_word = "Bullish" if newly.get("verdict") == "BULLISH" else "Bearish"
+        value = abs(newly.get("total_net_value_cr", 0.0))
+        notif = log_notification(
+            notif_type="institutional_flow",
+            title=f"{newly.get('index_name')} — Institutional Flow",
+            message=f"Net {side_word} ₹{value:.1f}cr across constituents",
+            payload=newly,
+        )
+        ws_broadcast.broadcast_sync({"type": "notification", **notif})
+    except Exception as e:
+        logger.warning(f"[InstitutionalFlow] Index-level notification check failed: {e}")
+
+
+# -------------------------------------------------------------
 # AUTONOMOUS BACKGROUND SCHEDULER THREAD WORKER
 # -------------------------------------------------------------
 def background_scheduler_worker():
@@ -1092,7 +1139,9 @@ def background_scheduler_worker():
             # of open/closed because its "live_trigger"/"final_check" windows (~2:30/3:15 PM
             # IST) fall DURING market hours (the is_open branch below), while "eod_archive"
             # (~7:30 PM) falls after close — see block_deal_provider.py.
-            maybe_run_institutional_flow_checkpoints()
+            flow_checkpoint_ran = maybe_run_institutional_flow_checkpoints()
+            if flow_checkpoint_ran:
+                _notify_new_institutional_flows(flow_checkpoint_ran)
 
             # Market Schedule Scanning Engine. Regular scanning runs through 3:14 PM; from
             # 3:14 PM the closing_sequence module's own snapshot -> CAS close -> scoring ->

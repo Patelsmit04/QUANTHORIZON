@@ -15,6 +15,7 @@ def isolated_files(tmp_path, monkeypatch):
     monkeypatch.setattr(bdp, "DAILY_FLOW_FILE", str(tmp_path / "institutional_flow_daily.json"))
     monkeypatch.setattr(bdp, "RECONCILIATION_FILE", str(tmp_path / "institutional_flow_reconciliation.json"))
     monkeypatch.setattr(bdp, "CHECKPOINTS_META_FILE", str(tmp_path / "institutional_flow_checkpoints.json"))
+    monkeypatch.setattr(bdp, "NOTIFIED_FLOWS_FILE", str(tmp_path / "institutional_flow_notified.json"))
     monkeypatch.setattr(bdp, "MIN_VALUE_CR", 25.0)
     monkeypatch.setattr(bdp, "TIER_MODERATE_CR", 50.0)
     monkeypatch.setattr(bdp, "TIER_STRONG_CR", 150.0)
@@ -263,6 +264,47 @@ def test_run_eod_reconciliation_persists_individual_deals_for_deals_panel(monkey
     deals = bdp.get_deals_for_day(checkpoint="eod_archive")
     assert len(deals) == 2
     assert deals[0]["symbol"] == "RELIANCE"  # sorted by value_cr descending
+
+
+# =========================================================================
+# NOTIFICATIONS — "newly notifiable" dedup (the actual notifying happens in app.py)
+# =========================================================================
+def test_get_newly_notifiable_flows_excludes_weak_tier():
+    aggregated = {
+        "RELIANCE": {"symbol": "RELIANCE", "tier": "STRONG", "dominant_side": "BUY", "net_value_cr": 120.0},
+        "TCS": {"symbol": "TCS", "tier": "WEAK", "dominant_side": "BUY", "net_value_cr": 30.0},
+    }
+    newly = bdp.get_newly_notifiable_flows(aggregated)
+    assert [f["symbol"] for f in newly] == ["RELIANCE"]
+
+
+def test_get_newly_notifiable_flows_does_not_repeat_same_symbol_same_day():
+    aggregated = {"RELIANCE": {"symbol": "RELIANCE", "tier": "STRONG", "dominant_side": "BUY", "net_value_cr": 120.0}}
+    first = bdp.get_newly_notifiable_flows(aggregated)
+    second = bdp.get_newly_notifiable_flows(aggregated)  # same checkpoint data seen again
+    assert len(first) == 1
+    assert second == []
+
+
+def test_get_newly_notifiable_flows_notifies_new_symbol_even_after_another_already_notified():
+    bdp.get_newly_notifiable_flows({"RELIANCE": {"symbol": "RELIANCE", "tier": "STRONG", "dominant_side": "BUY", "net_value_cr": 120.0}})
+    newly = bdp.get_newly_notifiable_flows({
+        "RELIANCE": {"symbol": "RELIANCE", "tier": "STRONG", "dominant_side": "BUY", "net_value_cr": 120.0},
+        "HDFCBANK": {"symbol": "HDFCBANK", "tier": "MODERATE", "dominant_side": "SELL", "net_value_cr": -40.0},
+    })
+    assert [f["symbol"] for f in newly] == ["HDFCBANK"]
+
+
+def test_get_newly_notifiable_index_flow_only_for_directional_verdicts():
+    assert bdp.get_newly_notifiable_index_flow({"index_name": "NIFTY50", "status": "OK", "verdict": "NEUTRAL"}) is None
+    assert bdp.get_newly_notifiable_index_flow({"index_name": "NIFTY50", "status": "NOT_FETCHED_YET", "verdict": None}) is None
+
+    result = bdp.get_newly_notifiable_index_flow({"index_name": "NIFTY50", "status": "OK", "verdict": "BULLISH"})
+    assert result is not None
+
+    # Same index, same day — already notified, must not fire again.
+    again = bdp.get_newly_notifiable_index_flow({"index_name": "NIFTY50", "status": "OK", "verdict": "BULLISH"})
+    assert again is None
 
 
 # =========================================================================
