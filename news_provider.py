@@ -346,14 +346,18 @@ def _ensure_data_dir():
 
 def _load_news_cache() -> Dict[str, Any]:
     if USE_POSTGRES:
-        return pg_read_json("stock_news_cache", default={})
+        pg_data = pg_read_json("stock_news_cache", default={})
+        if pg_data and len(pg_data) > 0:
+            return pg_data
     return read_json(STOCK_NEWS_CACHE_FILE, default={})
 
 
 def _save_news_cache(cache: Dict[str, Any]) -> None:
     if USE_POSTGRES:
-        pg_write_json("stock_news_cache", cache)
-        return
+        try:
+            pg_write_json("stock_news_cache", cache)
+        except Exception as e:
+            logger.warning(f"Failed writing news cache to Postgres: {e}")
     _ensure_data_dir()
     atomic_write_json(STOCK_NEWS_CACHE_FILE, cache)
 
