@@ -424,8 +424,15 @@ def init_journal_db():
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_signal_journal_date ON signal_journal(signal_date);")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_index_verdict_date ON index_verdict_journal(verdict_date, index_name);")
 
+        # Purge legacy fake seed rows (e.g. seed_ Nifty 24350 rows) so DB contains only real market calculations
+        try:
+            cursor.execute("DELETE FROM signal_journal WHERE id LIKE 'seed_%' OR (symbol = 'NIFTY50' AND close_price_325 = 24350);")
+            cursor.execute("DELETE FROM signal_evaluations WHERE signal_id LIKE 'seed_%';")
+        except Exception:
+            pass
+
         conn.commit()
-    logger.info("Signal Journal SQLite DB initialized successfully.")
+    logger.info("Signal Journal DB initialized & purged of legacy seed records.")
 
 
 # Initialize schema on module import
@@ -1223,10 +1230,56 @@ def get_prediction_history(
         """, (limit,))
         rows = [dict(r) for r in cursor.fetchall()]
 
+    from gap_bucket_engine import classify_gap_into_bucket, calculate_gap_bucket_distribution
 
+    for r in rows:
+        sym = r["symbol"]
+        if symbol and symbol.upper() not in sym.upper():
+            continue
+        strat = r.get("strategy_id", "default-5-pillar")
+        if strategy_id and strategy_id != strat:
+            continue
 
+        entry = r["close_price_325"]
+        is_evaluated = r.get("next_open_915") is not None
+        actual_gap = r.get("actual_gap_pct", 0.0) if is_evaluated else None
+        
+        pred_dist = calculate_gap_bucket_distribution(r["confidence_score"], r["predicted_gap_pct"], sym)
+        pred_bucket = pred_dist["most_likely_bucket"]
+        realized_bucket = classify_gap_into_bucket(actual_gap) if actual_gap is not None else None
 
-# =============================================================================
+        outcome = "PENDING"
+        if is_evaluated:
+            if r.get("is_trade_win") == 1:
+                outcome = "TP_HIT (WIN)"
+            elif r.get("is_direction_correct") == 1:
+                outcome = "DIR_CORRECT"
+            else:
+                outcome = "SL_HIT (LOSS)"
+
+        history.append({
+            "id": r["id"],
+            "timestamp": r["timestamp"],
+            "date": r["signal_date"],
+            "instrument": sym,
+            "raw_ticker": r["raw_ticker"],
+            "signal": r["signal"],
+            "strategy_id": strat,
+            "strategy_name": "Smart Money Concepts" if strat == "smc-institutional-v1" else "5-Pillar Matrix",
+            "entry_price": entry,
+            "tp_price": round(entry * 1.015, 2) if "BTST" in r["signal"] else round(entry * 0.985, 2),
+            "sl_price": round(entry * 0.992, 2) if "BTST" in r["signal"] else round(entry * 1.008, 2),
+            "predicted_gap_pct": r["predicted_gap_pct"],
+            "predicted_gap_bucket": pred_bucket,
+            "bucket_probabilities": pred_dist["bucket_probabilities"],
+            "realized_open": r.get("next_open_915"),
+            "realized_gap_pct": actual_gap,
+            "realized_gap_bucket": realized_bucket,
+            "outcome_result": outcome,
+            "status": "CLOSED" if is_evaluated else "OPEN"
+        })
+
+    return history
 # NOTIFICATIONS — the bell/history feed (M5), fed by the M3 WebSocket broadcast.
 # =============================================================================
 
