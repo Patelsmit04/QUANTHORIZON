@@ -168,39 +168,128 @@ def _seed_default_strategy_if_missing():
     # pattern as every other read-modify-write in this file, kept consistent).
     with _state_lock():
         store = _load_all()
-        if DEFAULT_STRATEGY_ID in store:
-            return
         now = datetime.now(timezone.utc).isoformat()
-        strategy = {
-            "id": DEFAULT_STRATEGY_ID,
-            "name": "Default 5-Pillar",
-            "description": "The original scanner behavior: every pillar active, liquidity-tiered "
-                            "thresholds for stocks, both fundamentals and news gates on.",
-            "target_scope": ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX"],
-            "active_pillars": {p: True for p in ALL_PILLAR_NAMES},
-            "required_weight_override": None,
-            "fundamentals_gate_enabled": True,
-            "news_gate_enabled": True,
-            "auto_paper_trade": False,
-            "is_active": True,
-            "is_builtin": True,
-            "clarification": {
-                "confirmed": True,
-                "confirmed_at": now,
-                "target_summary": "Every tracked stock plus Nifty 50, Bank Nifty, and Sensex.",
-                "pillar_summary": "All 5 stock pillars and all 6 index pillars active — no pillar disabled.",
-                "confirmation_bar_summary": "Engine defaults unchanged: liquidity-tiered for stocks (3.0/4.0), fixed 2.0 for indices.",
-                "gate_summary": "Both the fundamentals and news quality gates are on.",
-                "assumptions": [],
-                "plain_summary": "The baseline scanner behavior every custom strategy is compared against — nothing disabled, nothing loosened.",
-                "auto_confirmed_reason": "Built-in default strategy — matches the original scanner behavior exactly, no clarification needed.",
-            },
-            "created_at": now,
-            "updated_at": now,
-        }
-        strategy["config_hash"] = _compute_config_hash(strategy)
-        store[DEFAULT_STRATEGY_ID] = strategy
-        _save_all(store)
+        needs_save = False
+
+        if DEFAULT_STRATEGY_ID not in store:
+            strategy = {
+                "id": DEFAULT_STRATEGY_ID,
+                "name": "Default 5-Pillar",
+                "description": "The original scanner behavior: every pillar active, liquidity-tiered "
+                                "thresholds for stocks, both fundamentals and news gates on.",
+                "target_scope": ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX"],
+                "active_pillars": {p: True for p in ALL_PILLAR_NAMES},
+                "required_weight_override": None,
+                "fundamentals_gate_enabled": True,
+                "news_gate_enabled": True,
+                "auto_paper_trade": False,
+                "is_active": True,
+                "is_builtin": True,
+                "clarification": {
+                    "confirmed": True,
+                    "confirmed_at": now,
+                    "target_summary": "Every tracked stock plus Nifty 50, Bank Nifty, and Sensex.",
+                    "pillar_summary": "All 5 stock pillars and all 6 index pillars active — no pillar disabled.",
+                    "confirmation_bar_summary": "Engine defaults unchanged: liquidity-tiered for stocks (3.0/4.0), fixed 2.0 for indices.",
+                    "gate_summary": "Both the fundamentals and news quality gates are on.",
+                    "assumptions": [],
+                    "plain_summary": "The baseline scanner behavior every custom strategy is compared against — nothing disabled, nothing loosened.",
+                    "auto_confirmed_reason": "Built-in default strategy — matches the original scanner behavior exactly, no clarification needed.",
+                },
+                "created_at": now,
+                "updated_at": now,
+            }
+            strategy["config_hash"] = _compute_config_hash(strategy)
+            store[DEFAULT_STRATEGY_ID] = strategy
+            needs_save = True
+
+        smc_id = "smc-institutional-v1"
+        smc_code = (
+            "# AlgoTrader Python Strategy Logic\n"
+            "# SMC (Smart Money Concepts): structure shift + order block/FVG + liquidity sweep confirmation\n\n"
+            "from smc_helpers import (\n"
+            "    detect_market_structure,\n"
+            "    detect_liquidity_sweep,\n"
+            "    find_nearest_order_block,\n"
+            "    find_nearest_fvg,\n"
+            "    premium_discount_zone,\n"
+            "    check_inducement_cleared,\n"
+            "    next_opposing_liquidity_pool,\n"
+            "    distance_pct\n"
+            ")\n\n"
+            "def evaluate_signal(df, pillars_matrix=None):\n"
+            "    combine_with_pillars = False\n"
+            "    structure = detect_market_structure(df)\n"
+            "    swept = detect_liquidity_sweep(df)\n"
+            "    ob_zone = find_nearest_order_block(df, direction=structure)\n"
+            "    fvg_zone = find_nearest_fvg(df, direction=structure)\n"
+            "    zone_state = premium_discount_zone(df)\n"
+            "    inducement_clear = check_inducement_cleared(df)\n"
+            "    signal = None\n"
+            "    entry = tp_pct = sl_pct = None\n"
+            "    if structure in ('bullish_bos', 'bullish_choch') and swept == 'sell_side_swept' \\\n"
+            "       and zone_state == 'discount' and inducement_clear and (ob_zone or fvg_zone):\n"
+            "        entry_zone = ob_zone or fvg_zone\n"
+            "        signal = 'BTST_BUY'\n"
+            "        entry = entry_zone['level']\n"
+            "        sl_pct = distance_pct(entry, entry_zone['invalidation'])\n"
+            "        tp_pct = distance_pct(entry, next_opposing_liquidity_pool(df))\n"
+            "    elif structure in ('bearish_bos', 'bearish_choch') and swept == 'buy_side_swept' \\\n"
+            "         and zone_state == 'premium' and inducement_clear and (ob_zone or fvg_zone):\n"
+            "        entry_zone = ob_zone or fvg_zone\n"
+            "        signal = 'STBT_SELL'\n"
+            "        entry = entry_zone['level']\n"
+            "        sl_pct = distance_pct(entry, entry_zone['invalidation'])\n"
+            "        tp_pct = distance_pct(entry, next_opposing_liquidity_pool(df))\n"
+            "    if signal is None:\n"
+            "        return None\n"
+            "    if combine_with_pillars and pillars_matrix:\n"
+            "        score = sum(pillars_matrix.values())\n"
+            "        if score < 3.0:\n"
+            "            return None\n"
+            "    return {\n"
+            "        'signal': signal,\n"
+            "        'entry': entry,\n"
+            "        'tp_pct': tp_pct,\n"
+            "        'sl_pct': sl_pct,\n"
+            "        'reason': f'{structure} + {swept} + {zone_state} zone, OB/FVG confirmed'\n"
+            "    }\n"
+        )
+        if smc_id not in store or not store[smc_id].get("python_code"):
+            smc_strat = {
+                "id": smc_id,
+                "name": "SMC (Smart Money Concepts)",
+                "description": "Detects institutional order flow via market structure shifts, order blocks, fair value gaps, and liquidity sweeps — entries taken at premium/discount extremes with sweep confirmation.",
+                "target_scope": ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX"],
+                "active_pillars": {p: True for p in ALL_PILLAR_NAMES},
+                "required_weight_override": None,
+                "fundamentals_gate_enabled": True,
+                "news_gate_enabled": True,
+                "auto_paper_trade": False,
+                "is_active": True,
+                "is_builtin": False,
+                "scope_toggles": {"stocks": False, "indices": False},
+                "python_code": smc_code,
+                "clarification": {
+                    "confirmed": True,
+                    "confirmed_at": now,
+                    "target_summary": "Stocks Intraday/Scalping and Index Options (Nifty/BankNifty/Sensex).",
+                    "pillar_summary": "SMC Structure Shifts (BOS/CHoCH), OB/FVG, Liquidity Sweeps, and OTE retracements.",
+                    "confirmation_bar_summary": "High-conviction SMC entry filters.",
+                    "gate_summary": "Both fundamentals and news gates enabled.",
+                    "assumptions": [],
+                    "plain_summary": "Detects institutional order block re-entries, FVG fills, and liquidity sweeps.",
+                    "auto_confirmed_reason": "Custom SMC strategy card.",
+                },
+                "created_at": now,
+                "updated_at": now,
+            }
+            smc_strat["config_hash"] = _compute_config_hash(smc_strat)
+            store[smc_id] = smc_strat
+            needs_save = True
+
+        if needs_save:
+            _save_all(store)
 
 
 def list_strategies(active_only: bool = False) -> List[Dict[str, Any]]:

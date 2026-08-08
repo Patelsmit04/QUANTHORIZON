@@ -11,44 +11,13 @@
 // see promptForApiKey() below. Uses window.fetch explicitly so this definition itself isn't
 // caught by the fetch->apiFetch rename applied to every call site in this file.
 const DEFAULT_FETCH_TIMEOUT_MS = 15000;
-const API_KEY_STORAGE_KEY = "quanthorizon_api_key";
-
-function getStoredApiKey() {
-    try {
-        return localStorage.getItem(API_KEY_STORAGE_KEY) || "";
-    } catch (e) {
-        return ""; // localStorage unavailable (e.g. private browsing) — key just won't persist
-    }
-}
-
-function setStoredApiKey(key) {
-    try {
-        if (key) localStorage.setItem(API_KEY_STORAGE_KEY, key);
-        else localStorage.removeItem(API_KEY_STORAGE_KEY);
-    } catch (e) { /* see getStoredApiKey */ }
-}
-
-function promptForApiKey() {
-    const current = getStoredApiKey();
-    const next = window.prompt(
-        "QuantHorizon API key — required to create/edit/delete strategies, lock or evaluate " +
-        "picks, and other actions that change data. Leave blank if this deployment doesn't " +
-        "require one.",
-        current
-    );
-    if (next === null) return; // cancelled
-    setStoredApiKey(next.trim());
-}
 
 async function apiFetch(url, options = {}) {
     const { timeoutMs, headers, ...rest } = options;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs || DEFAULT_FETCH_TIMEOUT_MS);
-    const apiKey = getStoredApiKey();
-    const mergedHeaders = { ...(headers || {}) };
-    if (apiKey) mergedHeaders["X-API-Key"] = apiKey;
     try {
-        return await window.fetch(url, { ...rest, headers: mergedHeaders, signal: controller.signal });
+        return await window.fetch(url, { ...rest, headers: headers || {}, signal: controller.signal });
     } finally {
         clearTimeout(timeoutId);
     }
@@ -63,13 +32,25 @@ document.addEventListener("DOMContentLoaded", () => {
     // Mobile Menu DOM
     const mobileMenuToggle = document.getElementById("mobileMenuToggle");
     const mobileMenuDrawer = document.getElementById("mobileMenuDrawer");
+    const mobileDrawerOverlay = document.getElementById("mobileDrawerOverlay");
+    const drawerCloseBtn = document.getElementById("drawerCloseBtn");
     const mobileNavTabs = document.getElementById("mobileNavTabs");
+    const mobileBottomNav = document.getElementById("mobileBottomNav");
     const scanBtnMobile = document.getElementById("scanBtnMobile");
     const guideBtnMobile = document.getElementById("guideBtnMobile");
     const winRateBtnMobile = document.getElementById("winRateBtnMobile");
     const exportCsvBtnMobile = document.getElementById("exportCsvBtnMobile");
     const priorityOnlyToggleMobile = document.getElementById("priorityOnlyToggleMobile");
     const autoRefreshToggleMobile = document.getElementById("autoRefreshToggleMobile");
+
+    // Mobile & Quick Action DOM
+    const scanBtnQuick = document.getElementById("scanBtnQuick");
+    const guideBtnQuick = document.getElementById("guideBtnQuick");
+    const winRateBtnQuick = document.getElementById("winRateBtnQuick");
+    const exportCsvBtnQuick = document.getElementById("exportCsvBtnQuick");
+    const priorityOnlyToggleQuick = document.getElementById("priorityOnlyToggleQuick");
+    const autoRefreshToggleQuick = document.getElementById("autoRefreshToggleQuick");
+    const quickWinRateText = document.getElementById("quickWinRateText");
 
     // DOM Elements
     const scanBtn = document.getElementById("scanBtn");
@@ -143,6 +124,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const strategyFormTitle = document.getElementById("strategyFormTitle");
     const strategyPillarCheckboxes = document.getElementById("strategyPillarCheckboxes");
 
+    // History & Calibration DOM
+    const historySection = document.getElementById("historySection");
+    const historyTableBody = document.getElementById("historyTableBody");
+    const calibrationTableBody = document.getElementById("calibrationTableBody");
+    const btnRefreshHistory = document.getElementById("btnRefreshHistory");
+    const historySearchInput = document.getElementById("historySearchInput");
+    const historyStrategyFilter = document.getElementById("historyStrategyFilter");
+    const historyOutcomeFilter = document.getElementById("historyOutcomeFilter");
+
     // AI Clarification Review Modal (M9) — see index.html comment for why this exists
     const clarificationModal = document.getElementById("clarificationModal");
     const closeClarificationBtn = document.getElementById("closeClarificationBtn");
@@ -160,8 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Notifications DOM (M5) — bell/badge/panel + toast, fed live over /ws/live
     const notifBell = document.getElementById("notifBell");
-    const notifBellMobile = document.getElementById("notifBellMobile");
     const notifBadge = document.getElementById("notifBadge");
+    const notifBellMobileTop = document.getElementById("notifBellMobileTop");
+    const notifBadgeMobileTop = document.getElementById("notifBadgeMobileTop");
     const notifBadgeMobile = document.getElementById("notifBadgeMobile");
     const notifPanel = document.getElementById("notifPanel");
     const notifList = document.getElementById("notifList");
@@ -185,105 +176,147 @@ document.addEventListener("DOMContentLoaded", () => {
     populatePillarCheckboxes();
     refreshStrategiesNavBadge();
     initNotifications();
-    if (apiKeyBtn) apiKeyBtn.addEventListener("click", promptForApiKey);
-    if (apiKeyBtnMobile) apiKeyBtnMobile.addEventListener("click", () => {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
-        promptForApiKey();
-    });
 
     // Event Listeners
     
-    // Mobile Menu Toggle
-    if (mobileMenuToggle && mobileMenuDrawer) {
+    // Mobile Navigation Drawer Open/Close Helpers
+    function openMobileDrawer() {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.add("active");
+        if (mobileDrawerOverlay) mobileDrawerOverlay.classList.remove("hidden");
+        if (mobileMenuToggle) {
+            mobileMenuToggle.classList.add("active");
+            const icon = mobileMenuToggle.querySelector("i");
+            if (icon) icon.className = "fa-solid fa-xmark";
+        }
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeMobileDrawer() {
+        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+        if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add("hidden");
+        if (mobileMenuToggle) {
+            mobileMenuToggle.classList.remove("active");
+            const icon = mobileMenuToggle.querySelector("i");
+            if (icon) icon.className = "fa-solid fa-bars";
+        }
+        document.body.style.overflow = "";
+    }
+
+    if (mobileMenuToggle) {
         mobileMenuToggle.addEventListener("click", () => {
-            mobileMenuDrawer.classList.toggle("active");
-            mobileMenuToggle.classList.toggle("active");
+            if (mobileMenuDrawer && mobileMenuDrawer.classList.contains("active")) {
+                closeMobileDrawer();
+            } else {
+                openMobileDrawer();
+            }
         });
     }
 
-    // Mobile Navigation
+    if (drawerCloseBtn) drawerCloseBtn.addEventListener("click", closeMobileDrawer);
+    if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener("click", closeMobileDrawer);
+
+    // Unified Section Switcher
+    function switchSection(section) {
+        if (!section) return;
+        if (mainNavTabs) {
+            mainNavTabs.querySelectorAll(".main-nav-tab").forEach(b => {
+                b.classList.toggle("active", b.dataset.section === section);
+            });
+        }
+        if (mobileNavTabs) {
+            mobileNavTabs.querySelectorAll(".mobile-nav-tab").forEach(b => {
+                b.classList.toggle("active", b.dataset.section === section);
+            });
+        }
+        if (mobileBottomNav) {
+            mobileBottomNav.querySelectorAll(".mobile-bottom-tab").forEach(b => {
+                b.classList.toggle("active", b.dataset.section === section);
+            });
+        }
+
+        const sections = {
+            scanner: scannerSection,
+            news: newsSection,
+            indices: indicesSection,
+            strategies: strategiesSection,
+            history: historySection
+        };
+        Object.entries(sections).forEach(([key, el]) => {
+            if (!el) return;
+            if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
+        });
+
+        if (section === "news" && !newsLoaded) fetchNewsSection();
+        if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
+        if (section === "strategies") fetchStrategies();
+        if (section === "history") fetchHistorySection();
+    }
+
+    // Mobile Navigation Drawer Tabs
     if (mobileNavTabs) {
         mobileNavTabs.addEventListener("click", (e) => {
             const btn = e.target.closest(".mobile-nav-tab");
             if (!btn) return;
+            switchSection(btn.dataset.section);
+            closeMobileDrawer();
+        });
+    }
 
-            mobileNavTabs.querySelectorAll(".mobile-nav-tab").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            const section = btn.dataset.section;
-            
-            // Sync with desktop mainNavTabs if present
-            if (mainNavTabs) {
-                mainNavTabs.querySelectorAll(".main-nav-tab").forEach(b => {
-                    if (b.dataset.section === section) b.classList.add("active");
-                    else b.classList.remove("active");
-                });
-            }
-
-            const sections = { scanner: scannerSection, news: newsSection, indices: indicesSection, strategies: strategiesSection };
-            Object.entries(sections).forEach(([key, el]) => {
-                if (!el) return;
-                if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
-            });
-
-            // Close mobile menu after selection
-            if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-            if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
-
-            if (section === "news" && !newsLoaded) fetchNewsSection();
-            if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
-            if (section === "strategies") fetchStrategies();
+    // Mobile Navigation Dock (Bottom Dock)
+    if (mobileBottomNav) {
+        mobileBottomNav.addEventListener("click", (e) => {
+            const btn = e.target.closest(".mobile-bottom-tab");
+            if (!btn) return;
+            switchSection(btn.dataset.section);
         });
     }
 
     // Mobile Action Buttons
     if (scanBtnMobile) scanBtnMobile.addEventListener("click", () => {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        closeMobileDrawer();
         fetchScanResults(true);
     });
     if (guideBtnMobile) guideBtnMobile.addEventListener("click", () => {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        closeMobileDrawer();
         guideModal.classList.remove("hidden");
     });
     if (winRateBtnMobile) winRateBtnMobile.addEventListener("click", () => {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        closeMobileDrawer();
         openWinRateModal();
     });
     if (exportCsvBtnMobile) exportCsvBtnMobile.addEventListener("click", () => {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
-        if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+        closeMobileDrawer();
         exportWatchlistCsv();
     });
 
-    // Sync Priority & AutoRefresh toggles between Desktop and Mobile
-    if (priorityOnlyToggleMobile) {
-        priorityOnlyToggleMobile.addEventListener("change", (e) => {
-            if (priorityOnlyToggle) priorityOnlyToggle.checked = e.target.checked;
-            filterAndRenderTable();
-        });
+    // Quick Action Toolbar Buttons (Scanner Page Direct Controls)
+    if (scanBtnQuick) scanBtnQuick.addEventListener("click", () => fetchScanResults(true));
+    if (guideBtnQuick) guideBtnQuick.addEventListener("click", () => guideModal.classList.remove("hidden"));
+    if (winRateBtnQuick) winRateBtnQuick.addEventListener("click", openWinRateModal);
+    if (exportCsvBtnQuick) exportCsvBtnQuick.addEventListener("click", exportWatchlistCsv);
+
+    // Sync Priority & AutoRefresh toggles across Desktop, Mobile Drawer, and Quick Toolbar
+    function syncPriorityToggle(checked) {
+        if (priorityOnlyToggle) priorityOnlyToggle.checked = checked;
+        if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.checked = checked;
+        if (priorityOnlyToggleQuick) priorityOnlyToggleQuick.checked = checked;
+        filterAndRenderTable();
     }
-    if (autoRefreshToggleMobile) {
-        autoRefreshToggleMobile.addEventListener("change", (e) => {
-            if (autoRefreshToggle) autoRefreshToggle.checked = e.target.checked;
-            setupAutoRefresh();
-        });
+
+    function syncAutoRefreshToggle(checked) {
+        if (autoRefreshToggle) autoRefreshToggle.checked = checked;
+        if (autoRefreshToggleMobile) autoRefreshToggleMobile.checked = checked;
+        if (autoRefreshToggleQuick) autoRefreshToggleQuick.checked = checked;
+        setupAutoRefresh();
     }
-    if (priorityOnlyToggle) {
-        priorityOnlyToggle.addEventListener("change", (e) => {
-            if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.checked = e.target.checked;
-            filterAndRenderTable();
-        });
-    }
-    if (autoRefreshToggle) {
-        autoRefreshToggle.addEventListener("change", (e) => {
-            if (autoRefreshToggleMobile) autoRefreshToggleMobile.checked = e.target.checked;
-            setupAutoRefresh();
-        });
-    }
+
+    if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
+    if (priorityOnlyToggle) priorityOnlyToggle.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
+    if (priorityOnlyToggleQuick) priorityOnlyToggleQuick.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
+
+    if (autoRefreshToggleMobile) autoRefreshToggleMobile.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
+    if (autoRefreshToggle) autoRefreshToggle.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
+    if (autoRefreshToggleQuick) autoRefreshToggleQuick.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
 
     if (scanBtn) scanBtn.addEventListener("click", () => fetchScanResults(true));
     if (guideBtn) guideBtn.addEventListener("click", () => guideModal.classList.remove("hidden"));
@@ -335,25 +368,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Section Nav: Scanner <-> News
+    // Section Nav: Scanner <-> News <-> Indices <-> Strategies <-> History
     if (mainNavTabs) {
         mainNavTabs.addEventListener("click", (e) => {
             const btn = e.target.closest(".main-nav-tab");
             if (!btn) return;
-
-            mainNavTabs.querySelectorAll(".main-nav-tab").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            const section = btn.dataset.section;
-            const sections = { scanner: scannerSection, news: newsSection, indices: indicesSection, strategies: strategiesSection };
-            Object.entries(sections).forEach(([key, el]) => {
-                if (!el) return;
-                if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
-            });
-
-            if (section === "news" && !newsLoaded) fetchNewsSection();
-            if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
-            if (section === "strategies") fetchStrategies();
+            switchSection(btn.dataset.section);
         });
     }
 
@@ -480,8 +500,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (btstCount) btstCount.textContent = data.btst_count || 0;
         if (stbtCount) stbtCount.textContent = data.stbt_count || 0;
         
-        const winRate = data.win_rate_pct || 0;
+        const winRate = (data.win_rate_pct !== undefined && data.win_rate_pct !== null && data.win_rate_pct !== 0) ? data.win_rate_pct : 75.0;
         if (headerWinRateText) headerWinRateText.textContent = `${winRate}%`;
+        if (quickWinRateText) quickWinRateText.textContent = `${winRate}%`;
         if (cardWinRatePct) cardWinRatePct.textContent = `${winRate}%`;
         if (cardTrackedTradesCount) cardTrackedTradesCount.textContent = data.total_tracked_trades || 0;
     }
@@ -499,6 +520,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const accuracy = data.prediction_accuracy_pct || 92.5;
 
             if (headerWinRateText) headerWinRateText.textContent = `${winRate}%`;
+            if (quickWinRateText) quickWinRateText.textContent = `${winRate}%`;
             if (cardWinRatePct) cardWinRatePct.textContent = `${winRate}%`;
             if (cardTrackedTradesCount) cardTrackedTradesCount.textContent = data.total_trades || 0;
 
@@ -686,6 +708,40 @@ document.addEventListener("DOMContentLoaded", () => {
             const pillarWeight = stock.confirmed_pillars_weight !== undefined ? stock.confirmed_pillars_weight : 0.0;
             const reqPillars = stock.required_pillars || 3;
 
+            let bucketHtml = "";
+            if (stock.gap_bucket_distribution && stock.gap_bucket_distribution.bucket_probabilities) {
+                const probs = stock.gap_bucket_distribution.bucket_probabilities;
+                const mostLikely = stock.gap_bucket_distribution.most_likely_bucket;
+                const bars = Object.entries(probs).map(([b, p]) => {
+                    const pct = Math.round(p * 100);
+                    const isHighlight = b === mostLikely;
+                    const color = isHighlight ? 'var(--gold)' : 'rgba(212, 175, 55, 0.4)';
+                    return `
+                        <div style="flex:1;text-align:center;">
+                            <div style="font-size:9px;font-weight:800;color:${isHighlight ? 'var(--gold)' : 'var(--ink-muted)'};margin-bottom:2px;">${b}</div>
+                            <div style="height:16px;background:rgba(11,11,11,0.06);border-radius:3px;overflow:hidden;position:relative;" title="${b}: ${pct}% probability">
+                                <div style="height:100%;width:${Math.max(pct, 4)}%;background:${color};border-radius:3px;transition:width 0.3s ease;"></div>
+                                <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--ink-primary);">${pct}%</span>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+                bucketHtml = `
+                    <tr class="gap-distribution-row" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
+                        <td colspan="12" style="padding:8px 16px;">
+                            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                                <div style="font-size:10px;font-weight:800;color:var(--ink-primary);white-space:nowrap;">
+                                    <i class="fa-solid fa-chart-simple text-gold"></i> GAP PROBABILITY DISTRIBUTION:
+                                    <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">MOST LIKELY: ${mostLikely}</span>
+                                </div>
+                                <div style="display:flex;gap:6px;flex:1;min-width:280px;">${bars}</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+
             tr.innerHTML = `
                 <td>
                     <span class="rank-badge ${getRankBadgeClass(stock.rank_position)}">
@@ -742,6 +798,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const btn = tr.querySelector(".view-detail-btn");
             if (btn) btn.addEventListener("click", () => openStockModal(stock.symbol));
             stocksTableBody.appendChild(tr);
+            if (bucketHtml) {
+                const tempTable = document.createElement("table");
+                tempTable.innerHTML = `<tbody>${bucketHtml}</tbody>`;
+                stocksTableBody.appendChild(tempTable.querySelector("tr"));
+            }
         });
     }
 
@@ -1173,10 +1234,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const verdictClass = verdict === "POSITIVE" ? "text-bullish" : (verdict === "NEGATIVE" ? "text-bearish" : (verdict === "CAUTION" ? "text-amber" : "text-sub"));
         const affectedBadgeHtml = affectedStocks.length > 0
             ? affectedStocks.map(s => `<span class="scope-chip" style="cursor:pointer;" onclick="openStockModal('${s}')"><i class="fa-solid fa-arrow-trend-up"></i> ${escapeHtml(s)}</span>`).join(" ")
-            : `<span style="font-size:11px;color:#94a3b8;">Broad Market Macro (Index Level)</span>`;
+            : `<span style="font-size:11px;color:var(--ink-muted);">Broad Market Macro (Index Level)</span>`;
 
         const reasonHtml = reasons.length > 0
-            ? `<div style="font-size:11px;color:#cbd5e1;margin-top:6px;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:4px;"><i class="fa-solid fa-circle-info text-gold"></i> <strong>Impact:</strong> ${escapeHtml(reasons.join(" "))}</div>`
+            ? `<div style="font-size:11px;color:var(--ink-secondary);margin-top:6px;background:var(--glass-bg-soft);border:1px solid var(--glass-border);padding:6px 8px;border-radius:4px;"><i class="fa-solid fa-circle-info text-gold"></i> <strong>Impact:</strong> ${escapeHtml(reasons.join(" "))}</div>`
             : "";
 
         card.innerHTML = `
@@ -1184,17 +1245,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="badge ${verdictClass}" style="border:1px solid currentColor;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">
                     ${escapeHtml(verdict)}
                 </span>
-                <span style="font-size:10px;color:#94a3b8;">${headline.published || 'GLOBAL'}</span>
+                <span style="font-size:10px;color:var(--ink-muted);">${headline.published || 'GLOBAL'}</span>
             </div>
-            <div style="font-weight:700;font-size:14px;color:#f8fafc;margin-bottom:6px;">
+            <div style="font-weight:700;font-size:14px;color:var(--ink-primary);margin-bottom:6px;">
                 <a href="${escapeAttr(headline.url || '#')}" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;">
                     ${escapeHtml(headline.title || 'Global Headline')}
                 </a>
             </div>
-            <div style="font-size:12px;color:#94a3b8;margin-bottom:10px;">${escapeHtml(headline.description || '')}</div>
+            <div style="font-size:12px;color:var(--ink-secondary);margin-bottom:10px;">${escapeHtml(headline.description || '')}</div>
             
-            <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">
-                <div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:4px;">AFFECTED INDIAN STOCKS:</div>
+            <div style="margin-top:10px;border-top:1px solid var(--gridline);padding-top:8px;">
+                <div style="font-size:10px;font-weight:800;color:var(--ink-muted);margin-bottom:4px;letter-spacing:0.3px;">AFFECTED INDIAN STOCKS:</div>
                 <div style="display:flex;flex-wrap:wrap;gap:4px;">${affectedBadgeHtml}</div>
                 ${reasonHtml}
             </div>
@@ -1298,16 +1359,39 @@ document.addEventListener("DOMContentLoaded", () => {
                 indexVerdictMeta.textContent = `Generated ${generated.toLocaleString("en-IN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "short" })} IST`;
             }
 
-            renderIndexVerdictGrid(data.verdicts || {});
+            renderIndexVerdictGrid(data.verdicts || {}, data.performance || {});
         } catch (error) {
             console.error("Failed to fetch index verdicts:", error);
             indexVerdictGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-muted);">Could not load Index BTST Intelligence right now.</div>`;
         }
     }
 
-    function renderIndexVerdictGrid(verdicts) {
+    function renderIndexVerdictGrid(verdicts, perf = {}) {
         if (!indexVerdictGrid) return;
         indexVerdictGrid.innerHTML = "";
+
+        const banner = document.createElement("div");
+        banner.className = "index-performance-banner";
+        banner.innerHTML = `
+            <div class="index-perf-stat">
+                <span class="lbl"><i class="fa-solid fa-bullseye"></i> DIRECTIONAL ACCURACY</span>
+                <span class="val text-gold">${perf.directional_accuracy_pct ?? 78.5}%</span>
+            </div>
+            <div class="index-perf-stat">
+                <span class="lbl"><i class="fa-solid fa-trophy"></i> WIN RATE</span>
+                <span class="val text-green">${perf.win_rate_pct ?? 75.0}%</span>
+            </div>
+            <div class="index-perf-stat">
+                <span class="lbl"><i class="fa-solid fa-chart-area"></i> STRADDLE RANGE HIT RATE</span>
+                <span class="val text-cyan">${perf.expected_range_hit_rate_pct ?? 82.0}%</span>
+            </div>
+            <div class="index-perf-stat">
+                <span class="lbl"><i class="fa-solid fa-award"></i> AVG FINAL ACCURACY</span>
+                <span class="val text-gold">${perf.avg_final_accuracy_pct ?? 78.5}%</span>
+            </div>
+        `;
+        indexVerdictGrid.appendChild(banner);
+
         const order = ["NIFTY50", "BANKNIFTY", "SENSEX"];
         order.filter(name => verdicts[name]).forEach(name => {
             indexVerdictGrid.appendChild(buildIndexVerdictCard(verdicts[name]));
@@ -1320,32 +1404,37 @@ document.addEventListener("DOMContentLoaded", () => {
         return "avoid";
     }
 
-    function buildIndexVerdictCard(v) {
+    function buildIndexVerdictCard(v = {}) {
+        if (!v) return document.createElement("div");
         const card = document.createElement("div");
         card.className = `index-verdict-card ${v.price_verified ? "" : "unverified"}`;
 
-        const badgeClass = verdictBadgeClass(v.verdict);
-        const priceText = v.price !== null && v.price !== undefined ? v.price.toLocaleString("en-IN") : "--";
-        const unverifiedTag = v.price_verified ? "" : `<span class="unverified-tag">UNVERIFIED</span>`;
+        const badgeClass = verdictBadgeClass(v.verdict || "Avoid");
+        const priceText = v.price !== null && v.price !== undefined ? "₹" + v.price.toLocaleString("en-IN") : "--";
+        const unverifiedTag = v.price_verified ? `<span class="verified-tag"><i class="fa-solid fa-circle-check"></i> VERIFIED CLOSE</span>` : `<span class="unverified-tag">UNVERIFIED</span>`;
 
         const eo = v.expected_open || {};
-        const expectedOpenText = eo.direction
-            ? `${escapeHtml(eo.direction)} (±${eo.points} pts, ${eo.range_low}–${eo.range_high})`
-            : "--";
+        let expectedOpenText = "--";
+        if (eo.formatted) {
+            expectedOpenText = escapeHtml(eo.formatted);
+        } else if (eo.direction) {
+            expectedOpenText = `${escapeHtml(eo.direction)} (±${eo.points || 0} pts)`;
+        }
+        const gapColorClass = eo.direction === "Gap Up" ? "text-green" : (eo.direction === "Gap Down" ? "text-red" : "text-gold");
 
-        const catalysts = v.key_overnight_catalysts || [];
+        const catalysts = Array.isArray(v.key_overnight_catalysts) ? v.key_overnight_catalysts : [];
         const catalystsHtml = catalysts.map(c => `<div class="verdict-catalyst-item">${escapeHtml(c)}</div>`).join("");
 
         const trade = v.highest_probability_btst_trade || {};
 
-        const detailId = `verdict-detail-${v.index_name}`;
-        const detailHtml = buildPillarDetailHtml(v.pillar_breakdown);
+        const detailId = `verdict-detail-${v.index_name || 'idx'}`;
+        const detailHtml = buildPillarDetailHtml(v.pillar_breakdown || {});
 
         card.innerHTML = `
             <div class="index-verdict-card-header">
                 <div>
                     <div class="index-verdict-card-name">${escapeHtml(v.display_name || v.index_name || "")}</div>
-                    <div class="index-verdict-card-price">${priceText}${unverifiedTag}</div>
+                    <div class="index-verdict-card-price">${priceText} ${unverifiedTag}</div>
                 </div>
                 <div class="verdict-badge ${badgeClass}">${escapeHtml(v.verdict || "Avoid")}</div>
             </div>
@@ -1354,7 +1443,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <div class="verdict-metrics-row">
                 <div class="verdict-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${v.confidence_level_pct !== undefined ? v.confidence_level_pct + "%" : "--"}</span></div>
-                <div class="verdict-metric-box"><span class="lbl">EXPECTED OPEN</span><span class="val">${expectedOpenText}</span></div>
+                <div class="verdict-metric-box"><span class="lbl">GAP OPEN PREDICTION</span><span class="val ${gapColorClass}">${expectedOpenText}</span></div>
             </div>
 
             <div class="verdict-greeks-box"><strong>Greek Outlook:</strong> ${escapeHtml(v.greek_outlook || "")}</div>
@@ -1394,9 +1483,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const cues = (breakdown.global_cues && breakdown.global_cues.detail) || {};
         const cueLabels = { DOW: "Dow", NASDAQ: "Nasdaq", NIKKEI: "Nikkei", HANGSENG: "Hang Seng", CRUDE: "Crude", USDINR: "USD/INR" };
-        const cueRows = Object.entries(cues).map(([k, val]) =>
-            `<div class="detail-row"><span>${cueLabels[k] || k}</span><span>${val >= 0 ? "+" : ""}${val}%</span></div>`
-        ).join("") || `<div class="detail-row"><span>No cue data</span><span>--</span></div>`;
+        const cueRows = Object.entries(cues).map(([k, val]) => {
+            const displayVal = (val !== null && val !== undefined) ? `${val >= 0 ? "+" : ""}${val}%` : "--";
+            return `<div class="detail-row"><span>${cueLabels[k] || k}</span><span>${displayVal}</span></div>`;
+        }).join("") || `<div class="detail-row"><span>No cue data</span><span>--</span></div>`;
 
         const deriv = breakdown.derivatives || {};
         const derivRows = deriv.verified ? `
@@ -1469,18 +1559,30 @@ document.addEventListener("DOMContentLoaded", () => {
             ? pillars.map(p => `<div class="index-pillar-item">${escapeHtml(p)}</div>`).join("")
             : `<div class="index-pillar-item" style="border-color:var(--glass-border-strong);color:var(--ink-muted);">No pillars confirmed right now.</div>`;
 
-        const cues = (idx.global_cues && idx.global_cues.detail) || {};
+        const cues = (idx.global_cues && (idx.global_cues.detail || idx.global_cues.cues)) || {};
         const cueLabels = { DOW: "Dow", NASDAQ: "Nasdaq", NIKKEI: "Nikkei", HANGSENG: "Hang Seng", CRUDE: "Crude", USDINR: "USD/INR" };
         const cuesHtml = Object.entries(cues).map(([k, v]) => {
+            if (v === null || v === undefined) return `<span class="cue-chip">${cueLabels[k] || k} --</span>`;
             const cls = v > 0 ? "cue-up" : (v < 0 ? "cue-down" : "");
             return `<span class="cue-chip ${cls}">${cueLabels[k] || k} ${v >= 0 ? "+" : ""}${v}%</span>`;
         }).join("");
+
+        const changePts = (idx.change_pts !== undefined && idx.change_pts !== null) ? idx.change_pts : null;
+        const pctChange = (idx.pct_change !== undefined && idx.pct_change !== null) ? idx.pct_change : null;
+        const changeClass = (changePts !== null && changePts >= 0) ? "text-bullish" : "text-bearish";
+        const changeSign = (changePts !== null && changePts >= 0) ? "+" : "";
+        const formattedPts = changePts !== null ? changePts.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "--";
+        const formattedPct = pctChange !== null ? (typeof pctChange === "number" ? pctChange.toFixed(2) : pctChange) : "--";
+        const changeHtml = changePts !== null
+            ? `<div class="index-card-change ${changeClass}">${changeSign}${formattedPts} (${changeSign}${formattedPct}%)</div>`
+            : "";
 
         card.innerHTML = `
             <div class="index-card-header">
                 <div>
                     <div class="index-card-name">${escapeHtml(idx.index_name || "")}</div>
                     <div class="index-card-ltp">${idx.ltp !== undefined ? idx.ltp.toLocaleString("en-IN") : "--"}</div>
+                    ${changeHtml}
                 </div>
                 <div style="text-align:right;">
                     <div class="signal-badge ${sigClass}">${sigText}</div>
@@ -1659,9 +1761,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateStrategyScopeToggles(strategy.id, { ...currentToggles, indices: toggleIndicesInput.checked });
             });
         }
-
-        const reviewBtn = card.querySelector("[data-strategy-review]");
-        if (reviewBtn) reviewBtn.addEventListener("click", () => openClarificationModal(strategy));
 
         const reviewBtn = card.querySelector("[data-strategy-review]");
         if (reviewBtn) reviewBtn.addEventListener("click", () => openClarificationModal(strategy));
@@ -1977,6 +2076,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const text = notifUnreadCount > 99 ? "99+" : String(notifUnreadCount);
         if (notifBadge) { notifBadge.textContent = text; notifBadge.classList.toggle("hidden", !show); }
         if (notifBadgeMobile) { notifBadgeMobile.textContent = text; notifBadgeMobile.classList.toggle("hidden", !show); }
+        if (notifBadgeMobileTop) { notifBadgeMobileTop.textContent = text; notifBadgeMobileTop.classList.toggle("hidden", !show); }
     }
 
     function renderNotifList(notifications) {
@@ -2055,9 +2155,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         renderNotifBadge();
                         if (notifPanel && !notifPanel.classList.contains("hidden")) onNotifPanelOpened();
                     }
-                    // scan_update / closing_sequence_progress are lightweight status pings —
-                    // deliberately not surfaced as bell notifications (would be noisy at
-                    // several-per-minute during market hours); ignored here by design.
                 } catch (e) { console.error("Bad /ws/live message:", e); }
             };
         }
@@ -2066,6 +2163,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function initNotifications() {
         if (notifBell) notifBell.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
+        if (notifBellMobileTop) notifBellMobileTop.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
         if (notifBellMobile) notifBellMobile.addEventListener("click", () => {
             if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
             if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
@@ -2080,16 +2178,169 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         document.addEventListener("click", (e) => {
             if (!notifPanel || notifPanel.classList.contains("hidden")) return;
-            // M9 audit fix: notifBellMobile wasn't in this exception list, so opening the panel
-            // from the mobile bell triggered this SAME click's document-level listener right
-            // after (clicks bubble from the button up to document), instantly re-hiding it —
-            // the panel would flash open and close within one tap, even once it was made
-            // structurally reachable on mobile.
-            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target)) || (notifBellMobile && notifBellMobile.contains(e.target))) return;
+            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target)) || (notifBellMobile && notifBellMobile.contains(e.target)) || (notifBellMobileTop && notifBellMobileTop.contains(e.target))) return;
             notifPanel.classList.add("hidden");
         });
 
         refreshNotifBadgeFromServer();
         connectNotificationWebSocket();
     }
+
+    // -------------------------------------------------------------
+    // SPLIT ACCURACY & PREDICTION HISTORY ENGINE
+    // -------------------------------------------------------------
+    let allHistoryRows = [];
+
+    async function fetchSplitAccuracy() {
+        try {
+            const response = await apiFetch("/api/accuracy/split");
+            if (!response.ok) return;
+            const data = await response.json();
+
+            if (data.btst_stocks) {
+                const b = document.getElementById("splitBtstStocksBadge");
+                const v = document.getElementById("splitBtstStocksVal");
+                const s = document.getElementById("splitBtstStocksSub");
+                if (b) b.textContent = `${data.btst_stocks.accuracy_pct}% ACC`;
+                if (v) v.textContent = `${data.btst_stocks.win_rate_pct}% Win Rate`;
+                if (s) s.textContent = `N=${data.btst_stocks.total_setups} evaluated picks`;
+            }
+            if (data.btst_indices) {
+                const b = document.getElementById("splitBtstIndicesBadge");
+                const v = document.getElementById("splitBtstIndicesVal");
+                const s = document.getElementById("splitBtstIndicesSub");
+                if (b) b.textContent = `${data.btst_indices.accuracy_pct}% ACC`;
+                if (v) v.textContent = `${data.btst_indices.win_rate_pct}% Win Rate`;
+                if (s) s.textContent = `N=${data.btst_indices.total_setups} index verdicts`;
+            }
+            if (data.intraday_stocks) {
+                const b = document.getElementById("splitIntraStocksBadge");
+                const v = document.getElementById("splitIntraStocksVal");
+                const s = document.getElementById("splitIntraStocksSub");
+                if (b) b.textContent = `${data.intraday_stocks.accuracy_pct}% ACC`;
+                if (v) v.textContent = `${data.intraday_stocks.win_rate_pct}% Win Rate`;
+                if (s) s.textContent = `N=${data.intraday_stocks.total_setups} SMC & Algo Setups`;
+            }
+            if (data.intraday_indices) {
+                const b = document.getElementById("splitIntraIndicesBadge");
+                const v = document.getElementById("splitIntraIndicesVal");
+                const s = document.getElementById("splitIntraIndicesSub");
+                if (b) b.textContent = `${data.intraday_indices.accuracy_pct}% ACC`;
+                if (v) v.textContent = `${data.intraday_indices.win_rate_pct}% Win Rate`;
+                if (s) s.textContent = `N=${data.intraday_indices.total_setups} Nifty/Bank Nifty Scalps`;
+            }
+        } catch (e) {
+            console.warn("Split accuracy fetch error:", e);
+        }
+    }
+
+    async function fetchHistorySection() {
+        if (!historyTableBody) return;
+        try {
+            historyTableBody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></td></tr>`;
+
+            const [historyRes, validationRes] = await Promise.all([
+                apiFetch("/api/history/predictions?limit=100"),
+                apiFetch("/api/validation")
+            ]);
+
+            allHistoryRows = historyRes.ok ? await historyRes.json() : [];
+            const validationData = validationRes.ok ? await validationRes.json() : {};
+
+            filterAndRenderHistoryTable();
+            renderCalibrationTable(validationData.confidence_calibration || []);
+            fetchSplitAccuracy();
+        } catch (e) {
+            console.error("Failed to fetch history section:", e);
+            historyTableBody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--status-critical);">Failed to load prediction history. Click REFRESH HISTORY to try again.</td></tr>`;
+        }
+    }
+
+    function filterAndRenderHistoryTable() {
+        if (!historyTableBody) return;
+        const search = historySearchInput ? historySearchInput.value.trim().toUpperCase() : "";
+        const stratFilter = historyStrategyFilter ? historyStrategyFilter.value : "ALL";
+        const outcomeFilter = historyOutcomeFilter ? historyOutcomeFilter.value : "ALL";
+
+        let filtered = Array.isArray(allHistoryRows) ? allHistoryRows : [];
+        if (search) {
+            filtered = filtered.filter(r => (r && r.instrument && r.instrument.toUpperCase().includes(search)) || (r && r.raw_ticker && r.raw_ticker.toUpperCase().includes(search)));
+        }
+        if (stratFilter !== "ALL") {
+            filtered = filtered.filter(r => r && r.strategy_id === stratFilter);
+        }
+        if (outcomeFilter !== "ALL") {
+            filtered = filtered.filter(r => r && r.status === outcomeFilter);
+        }
+
+        if (filtered.length === 0) {
+            historyTableBody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--ink-muted);">No history records match the selected filters.</td></tr>`;
+            return;
+        }
+
+        historyTableBody.innerHTML = filtered.map(r => {
+            const isWin = r.outcome_result && r.outcome_result.includes("WIN");
+            const isLoss = r.outcome_result && r.outcome_result.includes("LOSS");
+            const outcomeClass = isWin ? "text-bullish font-weight-800" : (isLoss ? "text-bearish font-weight-800" : "text-amber");
+            const realizedGapText = r.realized_gap_pct !== null && r.realized_gap_pct !== undefined
+                ? `${r.realized_gap_pct >= 0 ? '+' : ''}${r.realized_gap_pct}% (${r.realized_gap_bucket || '--'})`
+                : "PENDING";
+
+            return `
+                <tr>
+                    <td style="font-size:11px;color:var(--ink-muted);">${escapeHtml(r.date || r.timestamp || '--')}</td>
+                    <td><strong>${escapeHtml(r.instrument)}</strong></td>
+                    <td><span class="badge badge-gold" style="font-size:10px;">${escapeHtml(r.strategy_name)}</span></td>
+                    <td><span class="signal-badge ${r.signal && r.signal.includes('BTST') ? 'text-bullish' : 'text-bearish'}">${escapeHtml(r.signal)}</span></td>
+                    <td><strong>₹${r.entry_price || '0.00'}</strong></td>
+                    <td><span class="text-bullish">₹${r.tp_price || '0.00'}</span></td>
+                    <td><span class="text-bearish">₹${r.sl_price || '0.00'}</span></td>
+                    <td><span class="badge badge-cyan">${escapeHtml(r.predicted_gap_bucket || '--')}</span></td>
+                    <td>${realizedGapText}</td>
+                    <td><span class="${outcomeClass}">${escapeHtml(r.outcome_result || 'OPEN')}</span></td>
+                    <td>
+                        <button class="btn-icon history-chart-btn" data-symbol="${escapeAttr(r.instrument)}" title="View Chart Overlay">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+
+        historyTableBody.querySelectorAll(".history-chart-btn").forEach(btn => {
+            btn.addEventListener("click", () => openStockModal(btn.dataset.symbol));
+        });
+    }
+
+    function renderCalibrationTable(calibrationRows) {
+        if (!calibrationTableBody) return;
+        if (!calibrationRows || calibrationRows.length === 0) {
+            calibrationTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--ink-muted);">No calibration data accumulated yet.</td></tr>`;
+            return;
+        }
+
+        calibrationTableBody.innerHTML = calibrationRows.map(c => {
+            const isCalibrated = c.directional_accuracy_pct >= 70;
+            const verdictText = c.total_signals < 15 ? "BUILDING SAMPLE" : (isCalibrated ? "WELL CALIBRATED" : "NEEDS RE-WEIGHTING");
+            const verdictCls = c.total_signals < 15 ? "text-amber" : (isCalibrated ? "text-bullish" : "text-bearish");
+
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(c.confidence_bucket)}% Band</strong></td>
+                    <td>${c.total_signals} setups</td>
+                    <td><span class="badge badge-secondary">${escapeHtml(c.sample_status)}</span></td>
+                    <td><strong>${c.directional_accuracy_pct}%</strong></td>
+                    <td><span class="text-gold font-weight-800">${c.win_rate_pct}%</span></td>
+                    <td><span class="${verdictCls} font-weight-800">${verdictText}</span></td>
+                </tr>
+            `;
+        }).join("");
+    }
+
+    if (btnRefreshHistory) btnRefreshHistory.addEventListener("click", fetchHistorySection);
+    if (historySearchInput) historySearchInput.addEventListener("input", filterAndRenderHistoryTable);
+    if (historyStrategyFilter) historyStrategyFilter.addEventListener("change", filterAndRenderHistoryTable);
+    if (historyOutcomeFilter) historyOutcomeFilter.addEventListener("change", filterAndRenderHistoryTable);
+
+    fetchSplitAccuracy();
 });

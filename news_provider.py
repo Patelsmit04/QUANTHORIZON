@@ -132,15 +132,52 @@ def _filter_recent(headlines: List[Dict[str, Any]], hours: int = RECENCY_HOURS) 
     return recent
 
 
+import xml.etree.ElementTree as ET
+
+
+def fetch_google_news_rss(query: str, max_results: int = 6) -> Optional[List[Dict[str, Any]]]:
+    """
+    Fetch news from Google News RSS feed for Indian stock queries.
+    Completely free, no API key required, zero 1000 request limit!
+    """
+    try:
+        url = f"https://news.google.com/rss/search?q={requests.utils.quote(query)}&hl=en-IN&gl=IN&ceid=IN:en"
+        resp = requests.get(url, headers=REQUEST_HEADERS, timeout=10)
+        if resp.status_code != 200:
+            return None
+        root = ET.fromstring(resp.content)
+        items = root.findall("./channel/item")
+        results = []
+        for item in items[:max_results]:
+            title = item.findtext("title", "")
+            link = item.findtext("link", "")
+            pub_date = item.findtext("pubDate", "")
+            description = item.findtext("description", "")
+            results.append({
+                "title": title,
+                "description": description or title,
+                "url": link,
+                "published": pub_date or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S +0000"),
+                "source": "Google News"
+            })
+        return results
+    except Exception as e:
+        logger.warning(f"Google News RSS fetch failed for query '{query}': {e}")
+        return None
+
+
 def fetch_stock_news(symbol: str, company_name: str, max_results: int = 5) -> Optional[List[Dict[str, Any]]]:
     """
     Fetch recent news for one stock. `company_name` should be the readable company name
-    (e.g. "Axis Bank"), not the raw ticker — ticker-only search is even noisier than company
-    names. Returns None if the API is unavailable/failed (FAIL LOUD), [] if it succeeded but
-    found nothing relevant/recent.
+    (e.g. "Axis Bank"). Uses CurrentsAPI if key is available, falling back to Google News RSS
+    to protect the 1000 request limit and guarantee complete coverage.
     """
     clean_sym = symbol.replace(".NS", "").upper()
-    raw = _search(f"{company_name} India NSE", max_results=max_results * 2)
+    raw = None
+    if _api_available():
+        raw = _search(f"{company_name} India NSE", max_results=max_results * 2)
+    if not raw:
+        raw = fetch_google_news_rss(f"{company_name} share price news NSE", max_results=max_results)
     if raw is None:
         return None
     recent = _filter_recent(raw)
@@ -309,14 +346,18 @@ def _ensure_data_dir():
 
 def _load_news_cache() -> Dict[str, Any]:
     if USE_POSTGRES:
-        return pg_read_json("stock_news_cache", default={})
+        pg_data = pg_read_json("stock_news_cache", default={})
+        if pg_data and len(pg_data) > 0:
+            return pg_data
     return read_json(STOCK_NEWS_CACHE_FILE, default={})
 
 
 def _save_news_cache(cache: Dict[str, Any]) -> None:
     if USE_POSTGRES:
-        pg_write_json("stock_news_cache", cache)
-        return
+        try:
+            pg_write_json("stock_news_cache", cache)
+        except Exception as e:
+            logger.warning(f"Failed writing news cache to Postgres: {e}")
     _ensure_data_dir()
     atomic_write_json(STOCK_NEWS_CACHE_FILE, cache)
 
@@ -352,29 +393,26 @@ BURST_SAFE_CHUNK_SIZE = 40
 BURST_COOLDOWN_SECONDS = 45
 
 
-def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers: int = 4) -> Dict[str, Any]:
-    """
-    symbols_with_names: {clean_symbol: company_name} for the FULL F&O universe (every stock
-    with an option chain — not just today's BTST/STBT picks). One API call per stock, paced in
-    burst-safe chunks (see BURST_SAFE_CHUNK_SIZE) — a full 211-stock pass takes a few minutes,
-    which is fine for a background job that runs at most 3x/day.
+def interruptible_sleep(secs: float) -> bool:
+    time.sleep(secs)
+    return False
 
-    Guarded by should_refresh_universe_news() at the call site — this function itself only
-    guards against concurrent runs (lock file), it doesn't re-check the daily budget, so callers
-    must check should_refresh_universe_news() first.
+
+def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers: int = 6) -> Dict[str, Any]:
+    """
+    symbols_with_names: {clean_symbol: company_name} for the FULL F&O universe.
+    Uses CurrentsAPI when configured, with robust Google News RSS fallback for 100% stock coverage.
     """
     _ensure_data_dir()
     with file_lock(NEWS_REFRESH_LOCK_FILE, LOCK_STALE_AFTER_SECONDS, label="Universe news refresh") as acquired:
         if not acquired:
             return {"fetched": 0, "failed": 0, "skipped": "ALREADY_IN_PROGRESS"}
 
-        if not _api_available():
-            return {"fetched": 0, "failed": 0, "skipped": "NO_API_KEY"}
-
         cache = _load_news_cache()
         today_str = date.today().isoformat()
         fetched, failed = 0, 0
         t0 = time.time()
+        using_api = _api_available()
 
         symbol_items = list(symbols_with_names.items())
         num_chunks = (len(symbol_items) + BURST_SAFE_CHUNK_SIZE - 1) // BURST_SAFE_CHUNK_SIZE
@@ -415,8 +453,9 @@ def refresh_universe_news_cache(symbols_with_names: Dict[str, str], max_workers:
 
             is_last_chunk = (chunk_idx + BURST_SAFE_CHUNK_SIZE) >= len(symbol_items)
             if not is_last_chunk:
-                logger.info(f"Chunk done ({fetched} ok / {failed} failed so far) — cooling down {BURST_COOLDOWN_SECONDS}s for the burst limit...")
-                if interruptible_sleep(BURST_COOLDOWN_SECONDS):
+                cooldown = BURST_COOLDOWN_SECONDS if using_api else 1.0
+                logger.info(f"Chunk done ({fetched} ok / {failed} failed so far) — cooling down {cooldown}s...")
+                if interruptible_sleep(cooldown):
                     logger.info("News refresh interrupted by shutdown signal.")
                     break
 

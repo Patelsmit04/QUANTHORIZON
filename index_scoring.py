@@ -132,7 +132,13 @@ def classify_global_cues(cues: Optional[Dict[str, float]]) -> Dict[str, Any]:
     else:
         verdict = "MIXED"
 
-    return {"verdict": verdict, "cues": cues, "bullish_count": bullish_count, "bearish_count": bearish_count}
+    return {
+        "verdict": verdict,
+        "cues": cues,
+        "detail": cues,
+        "bullish_count": bullish_count,
+        "bearish_count": bearish_count
+    }
 
 
 def evaluate_index_signal(
@@ -181,10 +187,12 @@ def evaluate_index_signal(
     df_index = df_index.dropna(subset=["Close", "Open", "High", "Low"]).copy()
     latest = df_index.iloc[-1]
     session_open = float(df_index.iloc[0]["Open"])
+    prev_close = float(df_index.iloc[-2]["Close"]) if len(df_index) >= 2 else session_open
     daily_high = float(df_index["High"].max())
     daily_low = float(df_index["Low"].min())
     ltp = float(latest["Close"])
-    pct_change = round(((ltp - session_open) / session_open) * 100, 2)
+    change_pts = round(ltp - prev_close, 2)
+    pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
 
     delta = df_index["Close"].diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
@@ -218,10 +226,10 @@ def evaluate_index_signal(
         n_ltp = float(df_nifty.iloc[-1]["Close"])
         nifty_pct_change = round(((n_ltp - n_open) / n_open) * 100, 2)
         rs_diff = round(pct_change - nifty_pct_change, 2)
-        if bullish_bias and rs_diff >= 0.15:
+        if rs_diff >= 0.15 or (bullish_bias and rs_diff >= 0.05):
             p_rs_weight = 1.0 * _mult("Index: Relative Strength")
             confirmed_pillars.append(f"RS vs Nifty (Outperforming +{rs_diff}%)")
-        elif bearish_bias and rs_diff <= -0.15:
+        elif rs_diff <= -0.15 or (bearish_bias and rs_diff <= -0.05):
             p_rs_weight = 1.0 * _mult("Index: Relative Strength")
             confirmed_pillars.append(f"RS vs Nifty (Underperforming {rs_diff}%)")
     pillar_weights["Index: Relative Strength"] = p_rs_weight
@@ -231,10 +239,10 @@ def evaluate_index_signal(
     global_verdict = "UNAVAILABLE"
     if global_cues_read is not None:
         global_verdict = global_cues_read.get("verdict", "UNAVAILABLE")
-        if bullish_bias and global_verdict == "TAILWIND":
+        if global_verdict == "TAILWIND":
             p_global_weight = 1.0 * _mult("Index: Global Cues")
             confirmed_pillars.append("Global Cues: Tailwind (US/Asia + crude/INR supportive)")
-        elif bearish_bias and global_verdict == "HEADWIND":
+        elif global_verdict == "HEADWIND":
             p_global_weight = 1.0 * _mult("Index: Global Cues")
             confirmed_pillars.append("Global Cues: Headwind (US/Asia + crude/INR against)")
     pillar_weights["Index: Global Cues"] = p_global_weight
@@ -244,10 +252,10 @@ def evaluate_index_signal(
     news_verdict = "UNAVAILABLE"
     if news_classification is not None:
         news_verdict = news_classification.get("verdict", "UNAVAILABLE")
-        if bullish_bias and news_verdict == "POSITIVE":
+        if news_verdict == "POSITIVE":
             p_news_weight = 1.0 * _mult("Index: Macro News")
             confirmed_pillars.append("Macro News: Positive")
-        elif bearish_bias and news_verdict == "NEGATIVE":
+        elif news_verdict == "NEGATIVE":
             p_news_weight = 1.0 * _mult("Index: Macro News")
             confirmed_pillars.append("Macro News: Negative")
     pillar_weights["Index: Macro News"] = p_news_weight
@@ -259,17 +267,17 @@ def evaluate_index_signal(
 
     # Pillar: Derivatives Positioning (NIFTY50/BANKNIFTY only — no verified Sensex source)
     p_derivatives_weight = 0.0
-    derivatives_result = analyze_index_derivatives(option_chain, chain_spot, bullish_bias, bearish_bias) if option_chain else {
+    derivatives_result = analyze_index_derivatives(option_chain, chain_spot, True, True) if option_chain else {
         "verified": False, "reason": "Unable to verify live options chain data.",
         "pcr": None, "max_pain": None, "oi_buildup": {"verdict": "UNAVAILABLE"},
         "support_resistance": None, "expected_move": None,
     }
     oi_verdict = derivatives_result.get("oi_buildup", {}).get("verdict", "UNAVAILABLE")
     if derivatives_result.get("verified"):
-        if bullish_bias and oi_verdict in ("CALL_LONG_BUILDUP", "PUT_SHORT_COVERING"):
+        if oi_verdict in ("CALL_LONG_BUILDUP", "PUT_SHORT_COVERING"):
             p_derivatives_weight = 1.0 * _mult("Index: Derivatives Positioning")
             confirmed_pillars.append(f"Derivatives: {oi_verdict.replace('_', ' ').title()}")
-        elif bearish_bias and oi_verdict in ("PUT_LONG_BUILDUP", "CALL_LONG_UNWINDING"):
+        elif oi_verdict in ("PUT_LONG_BUILDUP", "CALL_LONG_UNWINDING"):
             p_derivatives_weight = 1.0 * _mult("Index: Derivatives Positioning")
             confirmed_pillars.append(f"Derivatives: {oi_verdict.replace('_', ' ').title()}")
     pillar_weights["Index: Derivatives Positioning"] = p_derivatives_weight
@@ -281,10 +289,10 @@ def evaluate_index_signal(
     }
     better_side = greeks_result.get("better_positioned_side")
     if greeks_result.get("verified"):
-        if bullish_bias and better_side == "CALL (CE)":
+        if better_side == "CALL (CE)":
             p_greeks_weight = 1.0 * _mult("Index: Greeks Outlook")
             confirmed_pillars.append("Greeks: Calls carry lighter overnight theta burn")
-        elif bearish_bias and better_side == "PUT (PE)":
+        elif better_side == "PUT (PE)":
             p_greeks_weight = 1.0 * _mult("Index: Greeks Outlook")
             confirmed_pillars.append("Greeks: Puts carry lighter overnight theta burn")
     pillar_weights["Index: Greeks Outlook"] = p_greeks_weight
@@ -346,6 +354,9 @@ def evaluate_index_signal(
         "confidence_score": confidence_score,
         "predicted_gap_pct": predicted_gap_pct,
         "ltp": round(ltp, 2),
+        "prev_close": round(prev_close, 2),
+        "change_pts": round(change_pts, 2),
+        "pct_change": round(pct_change, 2),
         "day_high": round(daily_high, 2),
         "day_low": round(daily_low, 2),
         "range_position_pct": range_position_pct,

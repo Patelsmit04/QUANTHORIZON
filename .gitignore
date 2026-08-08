@@ -2,6 +2,8 @@
 __pycache__/
 *.pyc
 data/*.json
+!data/stock_news_cache.json
+!data/last_market_scan.json
 data/*.db
 data/*.lock
 .env
@@ -14,3 +16,4 @@ venv/
 .venv/
 *.log
 .vercel
+.aider*
