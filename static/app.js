@@ -30,28 +30,19 @@ document.addEventListener("DOMContentLoaded", () => {
     let autoRefreshInterval = null;
     let newsRefreshInterval = null;
 
-    // Mobile Menu DOM
+    // Sidebar / Mobile Drawer DOM — #appSidebar is the single nav source for both the
+    // desktop persistent rail and the mobile full-height drawer (see styles.css .app-sidebar).
     const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-    const mobileMenuDrawer = document.getElementById("mobileMenuDrawer");
+    const appSidebar = document.getElementById("appSidebar");
     const mobileDrawerOverlay = document.getElementById("mobileDrawerOverlay");
     const drawerCloseBtn = document.getElementById("drawerCloseBtn");
-    const mobileNavTabs = document.getElementById("mobileNavTabs");
-    const mobileBottomNav = document.getElementById("mobileBottomNav");
+    const sidebarNav = document.getElementById("sidebarNav");
+    const sidebarCollapseBtn = document.getElementById("sidebarCollapseBtn");
     const scanBtnMobile = document.getElementById("scanBtnMobile");
-    const guideBtnMobile = document.getElementById("guideBtnMobile");
     const winRateBtnMobile = document.getElementById("winRateBtnMobile");
     const exportCsvBtnMobile = document.getElementById("exportCsvBtnMobile");
     const priorityOnlyToggleMobile = document.getElementById("priorityOnlyToggleMobile");
     const autoRefreshToggleMobile = document.getElementById("autoRefreshToggleMobile");
-
-    // Mobile & Quick Action DOM
-    const scanBtnQuick = document.getElementById("scanBtnQuick");
-    const guideBtnQuick = document.getElementById("guideBtnQuick");
-    const winRateBtnQuick = document.getElementById("winRateBtnQuick");
-    const exportCsvBtnQuick = document.getElementById("exportCsvBtnQuick");
-    const priorityOnlyToggleQuick = document.getElementById("priorityOnlyToggleQuick");
-    const autoRefreshToggleQuick = document.getElementById("autoRefreshToggleQuick");
-    const quickWinRateText = document.getElementById("quickWinRateText");
 
     // DOM Elements
     const scanBtn = document.getElementById("scanBtn");
@@ -69,8 +60,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const scanProgressBar = document.getElementById("scanProgressBar");
     
     // Metrics DOM
+    const dashboardSection = document.getElementById("dashboardSection");
     const totalScanned = document.getElementById("totalScanned");
     const priority1Count = document.getElementById("priority1Count");
+    const signalsNavBadge = document.getElementById("signalsNavBadge");
     const btstCount = document.getElementById("btstCount");
     const stbtCount = document.getElementById("stbtCount");
     const visibleCount = document.getElementById("visibleCount");
@@ -85,28 +78,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const stockModal = document.getElementById("stockModal");
     const closeModalBtn = document.getElementById("closeModalBtn");
     
-    const guideModal = document.getElementById("guideModal");
-    const closeGuideBtn = document.getElementById("closeGuideBtn");
-
     const winRateModal = document.getElementById("winRateModal");
     const closeWinRateBtn = document.getElementById("closeWinRateBtn");
     const lockPicksBtn = document.getElementById("lockPicksBtn");
     const evaluatePicksBtn = document.getElementById("evaluatePicksBtn");
     const winRateHistoryBody = document.getElementById("winRateHistoryBody");
 
+    // Guide / Rules Section DOM
+    const guideSection = document.getElementById("guideSection");
+    const rulesSection = document.getElementById("rulesSection");
+    const exportCsvBtnGuide = document.getElementById("exportCsvBtnGuide");
+    const winRateBtnGuide = document.getElementById("winRateBtnGuide");
+
     // Nav & News Section DOM
-    const mainNavTabs = document.getElementById("mainNavTabs");
     const scannerSection = document.getElementById("scannerSection");
-    const newsSection = document.getElementById("newsSection");
-    const newsNavBadge = document.getElementById("newsNavBadge");
+    const stocksNewsSection = document.getElementById("stocksNewsSection");
+    const globalNewsSection = document.getElementById("globalNewsSection");
+    const stocksNewsNavBadge = document.getElementById("stocksNewsNavBadge");
     const newsGrid = document.getElementById("newsGrid");
     const newsEmptyState = document.getElementById("newsEmptyState");
     const newsStatusBar = document.getElementById("newsStatusBar");
     const newsSearchInput = document.getElementById("newsSearchInput");
     const newsVerdictFilters = document.getElementById("newsVerdictFilters");
+    const globalNewsVerdictFilters = document.getElementById("globalNewsVerdictFilters");
+    const globalNewsEmptyState = document.getElementById("globalNewsEmptyState");
 
     let allNewsStocks = [];
     let currentNewsVerdictFilter = "ALL";
+    let currentGlobalNewsVerdictFilter = "ALL";
 
     // Institutional Flow Section DOM
     const institutionalFlowSection = document.getElementById("institutionalFlowSection");
@@ -138,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // History & Calibration DOM
     const historySection = document.getElementById("historySection");
     const historyTableBody = document.getElementById("historyTableBody");
-    const calibrationTableBody = document.getElementById("calibrationTableBody");
+    const calibrationCardGrid = document.getElementById("calibrationCardGrid");
     const btnRefreshHistory = document.getElementById("btnRefreshHistory");
     const historySearchInput = document.getElementById("historySearchInput");
     const historyStrategyFilter = document.getElementById("historyStrategyFilter");
@@ -191,9 +190,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Event Listeners
     
-    // Mobile Navigation Drawer Open/Close Helpers
+    // Mobile Navigation Drawer Open/Close Helpers — #appSidebar doubles as the mobile drawer
+    // (see .app-sidebar / .app-sidebar.active in styles.css under the 1023px breakpoint).
     function openMobileDrawer() {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.add("active");
+        if (appSidebar) appSidebar.classList.add("active");
         if (mobileDrawerOverlay) mobileDrawerOverlay.classList.remove("hidden");
         if (mobileMenuToggle) {
             mobileMenuToggle.classList.add("active");
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function closeMobileDrawer() {
-        if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+        if (appSidebar) appSidebar.classList.remove("active");
         if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add("hidden");
         if (mobileMenuToggle) {
             mobileMenuToggle.classList.remove("active");
@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (mobileMenuToggle) {
         mobileMenuToggle.addEventListener("click", () => {
-            if (mobileMenuDrawer && mobileMenuDrawer.classList.contains("active")) {
+            if (appSidebar && appSidebar.classList.contains("active")) {
                 closeMobileDrawer();
             } else {
                 openMobileDrawer();
@@ -227,41 +227,59 @@ document.addEventListener("DOMContentLoaded", () => {
     if (drawerCloseBtn) drawerCloseBtn.addEventListener("click", closeMobileDrawer);
     if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener("click", closeMobileDrawer);
 
-    // Unified Section Switcher
-    function switchSection(section) {
+    // Desktop Sidebar Collapse (persists across reloads)
+    const SIDEBAR_COLLAPSED_KEY = "qh_sidebar_collapsed";
+    if (appSidebar && localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "1") {
+        appSidebar.classList.add("collapsed");
+    }
+    if (sidebarCollapseBtn) {
+        sidebarCollapseBtn.addEventListener("click", () => {
+            if (!appSidebar) return;
+            const collapsed = appSidebar.classList.toggle("collapsed");
+            localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
+        });
+    }
+
+    // Sidebar destination -> URL hash, so every section is deep-linkable and back/forward-safe.
+    const SECTION_HASHES = {
+        dashboard: "dashboard", scanner: "signals", stocksNews: "stocks-news",
+        globalNews: "global-news", institutionalFlow: "institutional-flow",
+        indices: "index-intelligence", strategies: "strategies", history: "history",
+        guide: "guide", rules: "rules"
+    };
+    const HASH_TO_SECTION = Object.fromEntries(Object.entries(SECTION_HASHES).map(([k, v]) => [v, k]));
+    let suppressHashUpdate = false;
+
+    // Unified Section Switcher — #sidebarNav is the single nav source for both the desktop
+    // rail and the mobile drawer (see appSidebar above), so only one active-state loop is needed.
+    function switchSection(section, opts = {}) {
         if (!section) return;
-        if (mainNavTabs) {
-            mainNavTabs.querySelectorAll(".main-nav-tab").forEach(b => {
-                b.classList.toggle("active", b.dataset.section === section);
-            });
-        }
-        if (mobileNavTabs) {
-            mobileNavTabs.querySelectorAll(".mobile-nav-tab").forEach(b => {
-                b.classList.toggle("active", b.dataset.section === section);
-            });
-        }
-        if (mobileBottomNav) {
-            mobileBottomNav.querySelectorAll(".mobile-bottom-tab").forEach(b => {
+        if (sidebarNav) {
+            sidebarNav.querySelectorAll(".sidebar-nav-item").forEach(b => {
                 b.classList.toggle("active", b.dataset.section === section);
             });
         }
 
         const sections = {
+            dashboard: dashboardSection,
             scanner: scannerSection,
-            news: newsSection,
+            stocksNews: stocksNewsSection,
+            globalNews: globalNewsSection,
             institutionalFlow: institutionalFlowSection,
             indices: indicesSection,
             strategies: strategiesSection,
-            history: historySection
+            history: historySection,
+            guide: guideSection,
+            rules: rulesSection
         };
         Object.entries(sections).forEach(([key, el]) => {
             if (!el) return;
             if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
         });
 
-        if (section === "news") {
+        if (section === "stocksNews" || section === "globalNews") {
             fetchNewsSection();
-            // Global/macro news auto-refreshes every 1 min while this tab is open — the
+            // Global/macro news auto-refreshes every 1 min while either news tab is open — the
             // per-stock side stays served from the once-daily background cache either way
             // (see fetchNewsSection's own comment), and the global side is now backed by a
             // 60s server-side cache (news_provider.fetch_market_news) so this poll interval
@@ -276,35 +294,47 @@ document.addEventListener("DOMContentLoaded", () => {
         if (section === "strategies") fetchStrategies();
         if (section === "history") fetchHistorySection();
         if (section === "institutionalFlow") fetchInstitutionalFlowSection();
+
+        if (!opts.fromHash && SECTION_HASHES[section]) {
+            suppressHashUpdate = true;
+            window.location.hash = "/" + SECTION_HASHES[section];
+            // Reset on next tick — setting location.hash fires 'hashchange' asynchronously.
+            setTimeout(() => { suppressHashUpdate = false; }, 0);
+        }
     }
 
-    // Mobile Navigation Drawer Tabs
-    if (mobileNavTabs) {
-        mobileNavTabs.addEventListener("click", (e) => {
-            const btn = e.target.closest(".mobile-nav-tab");
+    // Sidebar Navigation (desktop rail + mobile drawer, single element)
+    if (sidebarNav) {
+        sidebarNav.addEventListener("click", (e) => {
+            const btn = e.target.closest(".sidebar-nav-item");
             if (!btn) return;
             switchSection(btn.dataset.section);
             closeMobileDrawer();
         });
     }
 
-    // Mobile Navigation Dock (Bottom Dock)
-    if (mobileBottomNav) {
-        mobileBottomNav.addEventListener("click", (e) => {
-            const btn = e.target.closest(".mobile-bottom-tab");
-            if (!btn) return;
-            switchSection(btn.dataset.section);
-        });
+    // Secondary links that jump straight to a section (e.g. "View Full Quantitative Rules")
+    document.addEventListener("click", (e) => {
+        const jumpBtn = e.target.closest("[data-section-link]");
+        if (!jumpBtn) return;
+        switchSection(jumpBtn.dataset.sectionLink);
+    });
+
+    function routeFromHash() {
+        const raw = (window.location.hash || "").replace(/^#\/?/, "");
+        const section = HASH_TO_SECTION[raw] || "dashboard";
+        switchSection(section, { fromHash: true });
     }
+    window.addEventListener("hashchange", () => {
+        if (suppressHashUpdate) return;
+        routeFromHash();
+    });
+    routeFromHash();
 
     // Mobile Action Buttons
     if (scanBtnMobile) scanBtnMobile.addEventListener("click", () => {
         closeMobileDrawer();
         fetchScanResults(true);
-    });
-    if (guideBtnMobile) guideBtnMobile.addEventListener("click", () => {
-        closeMobileDrawer();
-        guideModal.classList.remove("hidden");
     });
     if (winRateBtnMobile) winRateBtnMobile.addEventListener("click", () => {
         closeMobileDrawer();
@@ -315,38 +345,31 @@ document.addEventListener("DOMContentLoaded", () => {
         exportWatchlistCsv();
     });
 
-    // Quick Action Toolbar Buttons (Scanner Page Direct Controls)
-    if (scanBtnQuick) scanBtnQuick.addEventListener("click", () => fetchScanResults(true));
-    if (guideBtnQuick) guideBtnQuick.addEventListener("click", () => guideModal.classList.remove("hidden"));
-    if (winRateBtnQuick) winRateBtnQuick.addEventListener("click", openWinRateModal);
-    if (exportCsvBtnQuick) exportCsvBtnQuick.addEventListener("click", exportWatchlistCsv);
+    // Guide / Export / Settings section actions
+    if (exportCsvBtnGuide) exportCsvBtnGuide.addEventListener("click", exportWatchlistCsv);
+    if (winRateBtnGuide) winRateBtnGuide.addEventListener("click", openWinRateModal);
 
-    // Sync Priority & AutoRefresh toggles across Desktop, Mobile Drawer, and Quick Toolbar
+    // Sync Priority & AutoRefresh toggles across Desktop Top Bar and Mobile Drawer
     function syncPriorityToggle(checked) {
         if (priorityOnlyToggle) priorityOnlyToggle.checked = checked;
         if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.checked = checked;
-        if (priorityOnlyToggleQuick) priorityOnlyToggleQuick.checked = checked;
         filterAndRenderTable();
     }
 
     function syncAutoRefreshToggle(checked) {
         if (autoRefreshToggle) autoRefreshToggle.checked = checked;
         if (autoRefreshToggleMobile) autoRefreshToggleMobile.checked = checked;
-        if (autoRefreshToggleQuick) autoRefreshToggleQuick.checked = checked;
         setupAutoRefresh();
     }
 
     if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
     if (priorityOnlyToggle) priorityOnlyToggle.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
-    if (priorityOnlyToggleQuick) priorityOnlyToggleQuick.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
 
     if (autoRefreshToggleMobile) autoRefreshToggleMobile.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
     if (autoRefreshToggle) autoRefreshToggle.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
-    if (autoRefreshToggleQuick) autoRefreshToggleQuick.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
 
     if (scanBtn) scanBtn.addEventListener("click", () => fetchScanResults(true));
-    if (guideBtn) guideBtn.addEventListener("click", () => guideModal.classList.remove("hidden"));
-    if (closeGuideBtn) closeGuideBtn.addEventListener("click", () => guideModal.classList.add("hidden"));
+    if (guideBtn) guideBtn.addEventListener("click", () => switchSection("rules"));
 
     if (winRateBtn) winRateBtn.addEventListener("click", openWinRateModal);
     if (closeWinRateBtn) closeWinRateBtn.addEventListener("click", () => winRateModal.classList.add("hidden"));
@@ -394,15 +417,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Section Nav: Scanner <-> News <-> Indices <-> Strategies <-> History
-    if (mainNavTabs) {
-        mainNavTabs.addEventListener("click", (e) => {
-            const btn = e.target.closest(".main-nav-tab");
-            if (!btn) return;
-            switchSection(btn.dataset.section);
-        });
-    }
-
     if (newsVerdictFilters) {
         newsVerdictFilters.addEventListener("click", (e) => {
             const btn = e.target.closest(".tab-btn");
@@ -413,6 +427,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             currentNewsVerdictFilter = btn.dataset.verdict;
             renderNewsGrid();
+        });
+    }
+
+    if (globalNewsVerdictFilters) {
+        globalNewsVerdictFilters.addEventListener("click", (e) => {
+            const btn = e.target.closest(".tab-btn");
+            if (!btn) return;
+
+            globalNewsVerdictFilters.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            currentGlobalNewsVerdictFilter = btn.dataset.verdict;
+            renderGlobalNewsGrid();
         });
     }
 
@@ -523,12 +550,12 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateSummaryMetrics(data) {
         if (totalScanned) totalScanned.textContent = data.total_scanned || 0;
         if (priority1Count) priority1Count.textContent = data.priority_1_count || 0;
+        if (signalsNavBadge) signalsNavBadge.textContent = data.priority_1_count || 0;
         if (btstCount) btstCount.textContent = data.btst_count || 0;
         if (stbtCount) stbtCount.textContent = data.stbt_count || 0;
-        
+
         const winRate = (data.win_rate_pct !== undefined && data.win_rate_pct !== null && data.win_rate_pct !== 0) ? data.win_rate_pct : 75.0;
         if (headerWinRateText) headerWinRateText.textContent = `${winRate}%`;
-        if (quickWinRateText) quickWinRateText.textContent = `${winRate}%`;
         if (cardWinRatePct) cardWinRatePct.textContent = `${winRate}%`;
         if (cardTrackedTradesCount) cardTrackedTradesCount.textContent = data.total_tracked_trades || 0;
     }
@@ -546,7 +573,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const accuracy = data.prediction_accuracy_pct || 92.5;
 
             if (headerWinRateText) headerWinRateText.textContent = `${winRate}%`;
-            if (quickWinRateText) quickWinRateText.textContent = `${winRate}%`;
             if (cardWinRatePct) cardWinRatePct.textContent = `${winRate}%`;
             if (cardTrackedTradesCount) cardTrackedTradesCount.textContent = data.total_trades || 0;
 
@@ -1182,10 +1208,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target === stockModal) hideModal();
     });
 
-    if (guideModal) guideModal.addEventListener("click", (e) => {
-        if (e.target === guideModal) guideModal.classList.add("hidden");
-    });
-
     if (winRateModal) winRateModal.addEventListener("click", (e) => {
         if (e.target === winRateModal) winRateModal.classList.add("hidden");
     });
@@ -1238,6 +1260,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 globalGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
             }
             if (newsEmptyState) newsEmptyState.classList.add("hidden");
+            if (globalNewsEmptyState) globalNewsEmptyState.classList.add("hidden");
 
             const response = await apiFetch("/api/news");
             if (!response.ok) throw new Error("News API error");
@@ -1254,13 +1277,26 @@ document.addEventListener("DOMContentLoaded", () => {
             if (newsStatusBar) {
                 newsStatusBar.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-bearish"></i> <span>Could not load news right now.</span>`;
             }
+            const globalStatusBarEl = document.getElementById("globalNewsStatusBar");
+            if (globalStatusBarEl) {
+                globalStatusBarEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-bearish"></i> <span>Could not load global news right now.</span>`;
+            }
             if (newsEmptyState) newsEmptyState.classList.remove("hidden");
+            if (globalNewsEmptyState) globalNewsEmptyState.classList.remove("hidden");
         }
     }
 
     function updateNewsStatusBar(data) {
         const meta = data.cache_meta || {};
-        if (newsNavBadge) newsNavBadge.textContent = data.total_covered || 0;
+        if (stocksNewsNavBadge) stocksNewsNavBadge.textContent = data.total_covered || 0;
+
+        const globalStatusBarEl = document.getElementById("globalNewsStatusBar");
+        if (globalStatusBarEl) {
+            globalStatusBarEl.innerHTML = (allGlobalNews && allGlobalNews.length > 0)
+                ? `<i class="fa-solid fa-circle-check text-bullish"></i> <span>Tracking <strong>${allGlobalNews.length}</strong> global &amp; macro headlines</span> <span>&middot;</span> <span>Refreshes every 1 min while this page is open</span>`
+                : `<i class="fa-solid fa-circle-info"></i> <span>No global macro news cached yet.</span>`;
+        }
+
         if (!newsStatusBar) return;
 
         if (!meta.last_refresh_completed_at) {
@@ -1272,8 +1308,6 @@ document.addEventListener("DOMContentLoaded", () => {
         newsStatusBar.innerHTML = `
             <i class="fa-solid fa-circle-check text-bullish"></i>
             <span>Covering <strong>${data.total_covered}</strong> F&amp;O stocks</span>
-            <span>&middot;</span>
-            <span>Global Macro Coverage Active</span>
             <span>&middot;</span>
             <span>Last refreshed <strong>${lastRefresh}</strong></span>
         `;
@@ -1317,13 +1351,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const globalGrid = document.getElementById("globalNewsGrid");
         if (!globalGrid) return;
 
+        let filtered = allGlobalNews || [];
+        if (currentGlobalNewsVerdictFilter !== "ALL") {
+            filtered = filtered.filter(item => (item.verdict || "NEUTRAL").toUpperCase() === currentGlobalNewsVerdictFilter);
+        }
+
         globalGrid.innerHTML = "";
-        if (!allGlobalNews || allGlobalNews.length === 0) {
-            globalGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--ink-muted);">No global macro news items fetched yet.</div>`;
+        if (filtered.length === 0) {
+            globalGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--ink-muted);">No global macro news items${currentGlobalNewsVerdictFilter !== "ALL" ? " match that filter" : " fetched yet"}.</div>`;
             return;
         }
 
-        allGlobalNews.forEach(item => {
+        filtered.forEach(item => {
             globalGrid.appendChild(buildGlobalNewsCard(item));
         });
     }
@@ -1522,12 +1561,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const tr = document.createElement("tr");
             const sideClass = deal.side === "BUY" ? "text-bullish" : "text-bearish";
             tr.innerHTML = `
-                <td><strong>${escapeHtml(deal.symbol)}</strong></td>
-                <td><span class="badge flow-chip ${sideClass}">${escapeHtml(deal.side)}</span></td>
-                <td>${escapeHtml((deal.deal_type || "").toUpperCase())}</td>
-                <td><strong>₹${(deal.value_cr || 0).toFixed(2)}cr</strong></td>
-                <td>${escapeHtml(deal.deal_date || "--")}</td>
-                <td>
+                <td data-label="SYMBOL"><strong>${escapeHtml(deal.symbol)}</strong></td>
+                <td data-label="SIDE"><span class="badge flow-chip ${sideClass}">${escapeHtml(deal.side)}</span></td>
+                <td data-label="DEAL TYPE">${escapeHtml((deal.deal_type || "").toUpperCase())}</td>
+                <td data-label="VALUE (₹CR)"><strong>₹${(deal.value_cr || 0).toFixed(2)}cr</strong></td>
+                <td data-label="DATE">${escapeHtml(deal.deal_date || "--")}</td>
+                <td data-label="ACTION">
                     <button class="btn-icon flow-jump-to-scanner-btn" data-symbol="${escapeAttr(deal.symbol)}" title="Jump to ${escapeAttr(deal.symbol)} in Scanner">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </button>
@@ -2456,8 +2495,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (notifBell) notifBell.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
         if (notifBellMobileTop) notifBellMobileTop.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
         if (notifBellMobile) notifBellMobile.addEventListener("click", () => {
-            if (mobileMenuDrawer) mobileMenuDrawer.classList.remove("active");
+            if (appSidebar) appSidebar.classList.remove("active");
             if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
+            if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add("hidden");
+            document.body.style.overflow = "";
             if (notifPanel) { notifPanel.classList.remove("hidden"); onNotifPanelOpened(); }
         });
         if (notifMarkAllBtn) notifMarkAllBtn.addEventListener("click", async (e) => {
@@ -2583,17 +2624,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             return `
                 <tr>
-                    <td style="font-size:11px;color:var(--ink-muted);">${escapeHtml(r.date || r.timestamp || '--')}</td>
-                    <td><strong>${escapeHtml(r.instrument)}</strong>${r.institutional_flow_contributed ? ' <i class="fa-solid fa-building-columns text-gold" title="Institutional Flow contributed to this setup&#39;s score"></i>' : ''}</td>
-                    <td><span class="badge badge-gold" style="font-size:10px;">${escapeHtml(r.strategy_name)}</span></td>
-                    <td><span class="signal-badge ${r.signal && r.signal.includes('BTST') ? 'text-bullish' : 'text-bearish'}">${escapeHtml(r.signal)}</span></td>
-                    <td><strong>₹${r.entry_price || '0.00'}</strong></td>
-                    <td><span class="text-bullish">₹${r.tp_price || '0.00'}</span></td>
-                    <td><span class="text-bearish">₹${r.sl_price || '0.00'}</span></td>
-                    <td><span class="badge badge-cyan">${escapeHtml(r.predicted_gap_bucket || '--')}</span></td>
-                    <td>${realizedGapText}</td>
-                    <td><span class="${outcomeClass}">${escapeHtml(r.outcome_result || 'OPEN')}</span></td>
-                    <td>
+                    <td data-label="DATE / TIME" style="font-size:11px;color:var(--ink-muted);">${escapeHtml(r.date || r.timestamp || '--')}</td>
+                    <td data-label="INSTRUMENT"><strong>${escapeHtml(r.instrument)}</strong>${r.institutional_flow_contributed ? ' <i class="fa-solid fa-building-columns text-gold" title="Institutional Flow contributed to this setup&#39;s score"></i>' : ''}</td>
+                    <td data-label="STRATEGY"><span class="badge badge-gold" style="font-size:10px;">${escapeHtml(r.strategy_name)}</span></td>
+                    <td data-label="SIGNAL"><span class="signal-badge ${r.signal && r.signal.includes('BTST') ? 'text-bullish' : 'text-bearish'}">${escapeHtml(r.signal)}</span></td>
+                    <td data-label="ENTRY"><strong>₹${r.entry_price || '0.00'}</strong></td>
+                    <td data-label="TARGET (TP)"><span class="text-bullish">₹${r.tp_price || '0.00'}</span></td>
+                    <td data-label="STOP LOSS (SL)"><span class="text-bearish">₹${r.sl_price || '0.00'}</span></td>
+                    <td data-label="PREDICTED BUCKET"><span class="badge badge-cyan">${escapeHtml(r.predicted_gap_bucket || '--')}</span></td>
+                    <td data-label="REALIZED GAP">${realizedGapText}</td>
+                    <td data-label="OUTCOME RESULT"><span class="${outcomeClass}">${escapeHtml(r.outcome_result || 'OPEN')}</span></td>
+                    <td data-label="ACTION">
                         <button class="btn-icon history-chart-btn" data-symbol="${escapeAttr(r.instrument)}" title="View Chart Overlay">
                             <i class="fa-solid fa-chart-line"></i>
                         </button>
@@ -2607,27 +2648,45 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Confidence Calibration & Bucket Accuracy — rendered as visual bar-cards instead of a
+    // wide table on both desktop and mobile (six confidence bands read better as bars than
+    // as a dense row of numbers, and it sidesteps the "table forced onto a phone" problem
+    // entirely rather than needing a separate mobile-only layout for this one section).
     function renderCalibrationTable(calibrationRows) {
-        if (!calibrationTableBody) return;
+        if (!calibrationCardGrid) return;
         if (!calibrationRows || calibrationRows.length === 0) {
-            calibrationTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--ink-muted);">No calibration data accumulated yet.</td></tr>`;
+            calibrationCardGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--ink-muted);">No calibration data accumulated yet.</div>`;
             return;
         }
 
-        calibrationTableBody.innerHTML = calibrationRows.map(c => {
+        calibrationCardGrid.innerHTML = calibrationRows.map(c => {
             const isCalibrated = c.directional_accuracy_pct >= 70;
             const verdictText = c.total_signals < 15 ? "BUILDING SAMPLE" : (isCalibrated ? "WELL CALIBRATED" : "NEEDS RE-WEIGHTING");
             const verdictCls = c.total_signals < 15 ? "text-amber" : (isCalibrated ? "text-bullish" : "text-bearish");
+            const accuracyPct = Math.max(0, Math.min(100, c.directional_accuracy_pct || 0));
+            const winRatePct = Math.max(0, Math.min(100, c.win_rate_pct || 0));
 
             return `
-                <tr>
-                    <td><strong>${escapeHtml(c.confidence_bucket)}% Band</strong></td>
-                    <td>${c.total_signals} setups</td>
-                    <td><span class="badge badge-secondary">${escapeHtml(c.sample_status)}</span></td>
-                    <td><strong>${c.directional_accuracy_pct}%</strong></td>
-                    <td><span class="text-gold font-weight-800">${c.win_rate_pct}%</span></td>
-                    <td><span class="${verdictCls} font-weight-800">${verdictText}</span></td>
-                </tr>
+                <div class="calibration-bar-card">
+                    <div class="calibration-bar-card-header">
+                        <span class="calibration-bar-card-band">${escapeHtml(c.confidence_bucket)}% Band</span>
+                        <span class="calibration-bar-card-n">${c.total_signals} setups &middot; ${escapeHtml(c.sample_status)}</span>
+                    </div>
+                    <div class="calibration-bar-row">
+                        <span class="calibration-bar-label">DIRECTIONAL ACC.</span>
+                        <div class="calibration-bar-track"><div class="calibration-bar-fill accuracy" style="width:${accuracyPct}%;"></div></div>
+                        <span class="calibration-bar-value">${c.directional_accuracy_pct}%</span>
+                    </div>
+                    <div class="calibration-bar-row">
+                        <span class="calibration-bar-label">WIN RATE</span>
+                        <div class="calibration-bar-track"><div class="calibration-bar-fill winrate" style="width:${winRatePct}%;"></div></div>
+                        <span class="calibration-bar-value">${c.win_rate_pct}%</span>
+                    </div>
+                    <div class="calibration-bar-card-footer">
+                        <span style="font-size:10px;color:var(--ink-muted);">CALIBRATION VERDICT</span>
+                        <span class="${verdictCls} font-weight-800" style="font-size:11px;">${verdictText}</span>
+                    </div>
+                </div>
             `;
         }).join("");
     }
