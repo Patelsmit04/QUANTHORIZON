@@ -1511,20 +1511,33 @@ def get_index_signals():
     Current BTST/STBT-style signals for Nifty 50, Bank Nifty, and Sensex under the Default
     strategy (see index_scoring.py — a dedicated model, not the stock 5-pillar matrix, since
     indices report zero volume).
+
+    Follows the same cache -> synced-snapshot -> gated-live-fetch order as /api/scan (see
+    _can_run_live_scan_inline) — this used to try a live on-demand fetch first whenever the
+    in-memory cache was cold and only fall back to the synced snapshot on exception, which on
+    a stateless deployment (VERCEL) meant every cold request attempted a live yfinance call
+    instead of honoring the same serverless gate every other endpoint respects.
     """
     index_data = cache_store.get("index_data")
-    needs_refresh = not index_data or not isinstance(index_data, list) or (len(index_data) > 0 and "change_pts" not in index_data[0])
+    valid_cached = bool(index_data) and isinstance(index_data, list) and "change_pts" in index_data[0]
 
-    if needs_refresh:
-        try:
-            raw_indices = fetch_raw_index_universe()
-            default_strategy = get_strategy(DEFAULT_STRATEGY_ID)
-            index_data = score_index_universe(raw_indices, default_strategy)
-            cache_store["index_data"] = index_data
-        except Exception as e:
-            logger.warning(f"On-demand index signals fetch warning: {e}")
-            cached = load_last_market_scan()
-            index_data = (cached or {}).get("indices", [])
+    if not valid_cached:
+        cached = load_last_market_scan()
+        synced_indices = (cached or {}).get("indices", [])
+        if synced_indices:
+            index_data = synced_indices
+        elif _can_run_live_scan_inline():
+            try:
+                raw_indices = fetch_raw_index_universe()
+                default_strategy = get_strategy(DEFAULT_STRATEGY_ID)
+                index_data = score_index_universe(raw_indices, default_strategy)
+                cache_store["index_data"] = index_data
+            except Exception as e:
+                logger.warning(f"On-demand index signals fetch warning: {e}")
+                index_data = []
+        else:
+            index_data = []
+
     return sanitize_json_data({"indices": index_data or [], "tickers": INDEX_TICKERS})
 
 
