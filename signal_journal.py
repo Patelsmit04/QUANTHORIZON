@@ -1230,6 +1230,30 @@ def get_prediction_history(
         """, (limit,))
         rows = [dict(r) for r in cursor.fetchall()]
 
+        if not rows:
+            scan_file = os.path.join(DATA_DIR, "last_market_scan.json")
+            if os.path.exists(scan_file):
+                try:
+                    with open(scan_file, "r") as f:
+                        scan_data = json.load(f)
+                    stocks = scan_data.get("stocks", [])
+                    for st in stocks:
+                        if st.get("priority_level") in ["P1_HIGH", "P2_MEDIUM"] and st.get("signal") != "NEUTRAL":
+                            log_signal_entry(st, strategy_id=st.get("strategy_id", "default-5-pillar"))
+                    cursor.execute("""
+                        SELECT j.id, j.timestamp, j.signal_date, j.symbol, j.raw_ticker, j.signal,
+                               j.predicted_direction, j.confidence_score, j.close_price_325,
+                               j.predicted_gap_pct, j.strategy_id,
+                               e.next_open_915, e.next_close_930, e.actual_gap_pct, e.is_direction_correct,
+                               e.is_trade_win, e.net_pnl_pct
+                        FROM signal_journal j
+                        LEFT JOIN signal_evaluations e ON j.id = e.signal_id
+                        ORDER BY j.timestamp DESC LIMIT ?
+                    """, (limit,))
+                    rows = [dict(r) for r in cursor.fetchall()]
+                except Exception as ex:
+                    logger.warning(f"Failed to bootstrap signal_journal from last_market_scan: {ex}")
+
     from gap_bucket_engine import classify_gap_into_bucket, calculate_gap_bucket_distribution
 
     for r in rows:
