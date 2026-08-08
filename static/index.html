@@ -18,9 +18,209 @@
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=6.0.0">
+    <link rel="stylesheet" href="/static/styles.css?v=6.1.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=6.1.0">
 </head>
 <body>
-RESTORED_PARTIAL_PLEASE_USE_GITHUB_HISTORY
+
+    <!-- Live notification toasts (see /ws/live, wired in app.js) -->
+    <div id="toastContainer"></div>
+
+    <div class="app-shell">
+
+        <!-- ============================== LEFT SIDEBAR (desktop persistent / mobile drawer) ============================== -->
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <div class="app-logo-frame">
+                    <img src="/static/logo.png" alt="QuantHorizon Logo">
+                </div>
+                <div class="sidebar-brand-text">
+                    <div class="drawer-title">Quant<span>Horizon</span></div>
+                    <div class="drawer-subtitle">Institutional BTST Engine</div>
+                </div>
+                <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar" aria-label="Collapse sidebar">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav" id="sidebarNav">
+                <button class="sidebar-nav-item active" data-section="dashboard" title="Dashboard">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span class="nav-label">Dashboard</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="scanner" title="Signals Engine">
+                    <i class="fa-solid fa-crosshairs"></i>
+                    <span class="nav-label">Signals Engine</span>
+                    <span class="nav-badge" id="signalsNavBadge">0</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="stocksNews" title="Stocks News">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                    <span class="nav-label">Stocks News</span>
+                    <span class="nav-badge" id="stocksNewsNavBadge">--</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="globalNews" title="Global & Macro News">
+                    <i class="fa-solid fa-globe"></i>
+                    <span class="nav-label">Global & Macro News</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="institutionalFlow" title="Institutional Flow">
+                    <i class="fa-solid fa-building-columns"></i>
+                    <span class="nav-label">Institutional Flow</span>
+                    <span class="nav-badge" id="institutionalFlowNavBadge">--</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="indices" title="Index Intelligence">
+                    <i class="fa-solid fa-chart-column"></i>
+                    <span class="nav-label">Index Intelligence</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="history" title="History & Calibration">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span class="nav-label">History & Calibration</span>
+                    <span class="nav-badge" id="historyNavBadge">LIVE</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="strategies" title="Strategies">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span class="nav-label">Strategies</span>
+                    <span class="nav-badge" id="strategiesNavBadge">--</span>
+                </button>
+
+                <div class="sidebar-nav-divider"></div>
+
+                <button class="sidebar-nav-item" data-section="guide" title="Guide / Export / Settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span class="nav-label">Guide / Export / Settings</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="rules" title="Rules">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span class="nav-label">Rules</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-mobile-controls">
+                <div class="drawer-section-label"><i class="fa-solid fa-sliders"></i> QUICK CONTROLS</div>
+                <div class="mobile-toggles-row">
+                    <div class="mobile-toggle-card">
+                        <span><i class="fa-solid fa-fire text-gold"></i> PRIORITY ONLY</span>
+                        <label class="switch">
+                            <input type="checkbox" id="priorityOnlyToggleMobile" aria-label="Show priority picks only">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="mobile-toggle-card">
+                        <span><i class="fa-solid fa-rotate-right"></i> AUTO REFRESH</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoRefreshToggleMobile" checked aria-label="Toggle auto refresh">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="drawer-section-label"><i class="fa-solid fa-layer-group"></i> ACTIONS & ANALYTICS</div>
+                <div class="mobile-menu-controls">
+                    <button id="scanBtnMobile" class="btn btn-pill btn-primary drawer-btn">
+                        <i class="fa-solid fa-bolt"></i> SCAN NOW
+                    </button>
+                    <button id="winRateBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
+                        <i class="fa-solid fa-trophy text-gold"></i> WIN RATE ANALYTICS
+                    </button>
+                    <button id="exportCsvBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
+                        <i class="fa-solid fa-file-csv"></i> EXPORT CSV
+                    </button>
+                    <button id="notifBellMobile" class="btn btn-pill btn-secondary drawer-btn">
+                        <i class="fa-solid fa-bell"></i> NOTIFICATIONS
+                        <span class="notif-badge hidden" id="notifBadgeMobile">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="paper-trade-badge">
+                    <i class="fa-solid fa-circle-info"></i> PAPER / SIMULATED ONLY — no real money moves through this system.
+                </div>
+            </div>
+        </aside>
+
+        <div class="mobile-drawer-overlay hidden" id="mobileDrawerOverlay"></div>
+
+        <div class="app-main">
+            <header class="content-topbar">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="topbar-brand-mini">
+                    <div class="app-logo-frame sm">
+                        <img src="/static/logo.png" alt="QuantHorizon Logo">
+                    </div>
+                </div>
+                <div class="market-status-box">
+                    <div class="status-indicator live-pulse" id="statusDot"></div>
+                    <div class="status-text">
+                        <span class="status-label">MARKET STATUS</span>
+                        <span id="marketStatusText" class="status-value">OPEN</span>
+                    </div>
+                    <div class="timer-box">
+                        <span class="timer-label" id="scanModeLabel">MODE:</span>
+                        <span id="marketTimer" class="timer-value">OFF-MARKET SNAPSHOT (3:30 PM Scan Locked)</span>
+                    </div>
+                </div>
+                <div class="topbar-spacer"></div>
+                <div class="header-actions">
+                    <div class="priority-toggle-box">
+                        <i class="fa-solid fa-fire text-gold"></i>
+                        <span>PRIORITY ONLY</span>
+                        <label class="switch">
+                            <input type="checkbox" id="priorityOnlyToggle" aria-label="Show priority picks only">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="auto-refresh-toggle">
+                        <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
+                        <span>AUTO</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoRefreshToggle" checked aria-label="Toggle auto refresh">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <button id="winRateBtn" class="btn btn-pill btn-secondary" title="View BTST Win Rate Analytics">
+                        <i class="fa-solid fa-trophy text-gold"></i>
+                        <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
+                    </button>
+                    <button id="guideBtn" class="btn btn-pill btn-secondary" title="Priority Ranking & Gap Prediction Rules">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span>GUIDE</span>
+                    </button>
+                    <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>CSV</span>
+                    </button>
+                    <button id="scanBtn" class="btn btn-pill btn-primary">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>SCAN NOW</span>
+                    </button>
+                    <div class="notif-bell-wrap">
+                        <button id="notifBell" class="btn-icon" title="Notifications" aria-label="Notifications">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="notif-badge hidden" id="notifBadge">0</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="notif-panel hidden" id="notifPanel">
+                <div class="notif-panel-header">
+                    <span>NOTIFICATIONS</span>
+                    <button class="notif-mark-all-btn" id="notifMarkAllBtn">Mark all read</button>
+                </div>
+                <div id="notifList"><div class="notif-empty">No notifications yet.</div></div>
+            </div>
+
+            <main class="main-content">
+            <!-- FULL BODY CONTINUES - this push may still be incomplete if truncated by size limits -->
+            <div id="dashboardSection"><p>Loading full restore...</p></div>
+            </main>
+        </div>
+    </div>
+    <script src="/static/app.js?v=6.1.0"></script>
 </body>
 </html>
