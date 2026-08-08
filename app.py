@@ -32,7 +32,10 @@ from nse_data_provider import (
 )
 from block_deal_provider import (
     get_institutional_flow_data, maybe_run_institutional_flow_checkpoints,
+    get_deals_for_day, get_daily_flow_meta, get_reconciliation_history,
+    compute_index_institutional_flow,
     SHADOW_MODE as INSTITUTIONAL_FLOW_SHADOW_MODE,
+    MIN_VALUE_CR as INSTITUTIONAL_FLOW_MIN_VALUE_CR,
 )
 from fo_universe import get_canonical_fo_tickers, NSE_FO_STOCKS, is_valid_fo_stock
 from vix_provider import fetch_india_vix
@@ -742,6 +745,16 @@ def score_index_universe(raw: Dict[str, Any], strategy: Dict[str, Any]) -> List[
             )
             processed["strategy_id"] = strategy["id"]
             processed["strategy_name"] = strategy["name"]
+            # Constituent-weighted institutional flow — a separate signal from the pillar
+            # matrix above (index_scoring.py has no relationship to scoring_engine.py's
+            # per-stock Pillar 6), attached here so the frontend gets it in the same payload
+            # rather than a second round-trip. Never raises — always returns a status dict
+            # (NOT_FETCHED_YET / UNAVAILABLE / OK), so it can't take down index scoring itself.
+            try:
+                processed["institutional_flow"] = compute_index_institutional_flow(index_name)
+            except Exception as e:
+                logger.warning(f"Index institutional flow aggregation failed for {index_name}: {e}")
+                processed["institutional_flow"] = {"index_name": index_name, "status": "UNAVAILABLE", "verdict": None}
             results.append(processed)
         except Exception as e:
             logger.warning(f"Index scoring failed for {index_name} under strategy {strategy['id']}: {e}")
@@ -1488,6 +1501,34 @@ def get_news_section(
         "total_matched": len(rows),
         "stocks": rows,
         "global_news": global_news
+    })
+
+
+@app.get("/api/institutional_flow")
+def get_institutional_flow_section(
+    symbol: Optional[str] = Query(None, description="Filter to one symbol's individual deals (e.g. RELIANCE)"),
+    limit: Optional[int] = Query(None, description="Cap the number of deals returned, biggest first")
+):
+    """
+    Today's qualifying NSE bulk/block deals (>= INSTITUTIONAL_FLOW_MIN_VALUE_CR), sorted by
+    value descending — backs the dedicated Institutional Flow panel (no symbol filter) and the
+    scanner row's per-stock deal breakdown (symbol filter). See block_deal_provider.py's module
+    docstring for the live-snapshot-vs-EOD-archive two-stage data flow this reflects: `meta`
+    tells the caller which checkpoint's data this is and when it was captured, and
+    `latest_reconciliation` is None until the EOD reconciliation checkpoint has actually run
+    today — the frontend should show data as provisional/unreconciled until that's non-null,
+    not present a live snapshot as if it were final.
+    """
+    deals = get_deals_for_day(symbol=symbol, limit=limit)
+    meta = get_daily_flow_meta()
+    recon_history = get_reconciliation_history(limit=1)
+
+    return sanitize_json_data({
+        "deals": deals,
+        "meta": meta,
+        "latest_reconciliation": recon_history[-1] if recon_history else None,
+        "shadow_mode": INSTITUTIONAL_FLOW_SHADOW_MODE,
+        "min_value_cr": INSTITUTIONAL_FLOW_MIN_VALUE_CR,
     })
 
 

@@ -63,6 +63,7 @@ import os
 import csv
 import io
 import re
+import time
 import logging
 from datetime import datetime, date, timezone, timedelta
 from typing import Dict, Any, List, Optional
@@ -168,6 +169,11 @@ def _get_live_client():
     if _live_client is None:
         client = NSELive()
         client._routes["large_deals"] = "/snapshot-capital-market-largedeal"
+        # jugaad_data's own NSELive already wires this route as "live_index" — reusing that
+        # name instead of re-adding it, confirmed live (Aug 2026): returns each constituent's
+        # ffmc (free-float market cap), the same basis NSE's own free-float weighting uses, so
+        # index weight can be derived directly (see _get_index_constituent_weights()) without a
+        # separate weight-table source that would go stale between rebalances.
         _live_client = client
     return _live_client
 
@@ -231,6 +237,7 @@ def _pick(record: Dict[str, Any], candidates: List[str]) -> Optional[Any]:
 
 _SYMBOL_KEYS = ["symbol"]
 _SIDE_KEYS = ["buysell", "buysellindicator", "buysellind"]
+_DATE_KEYS = ["date"]
 _QTY_KEYS = ["quantitytraded", "quantity", "qty", "qtytraded"]
 # NSE's actual archive header (confirmed via live fetch, Aug 2026): "Trade Price / Wght. Avg.
 # Price" — normalizes to "tradepricewghtavgprice". The live snapshot API instead uses "watp"
@@ -313,11 +320,17 @@ def _parse_deal_records(rows: List[Dict[str, Any]], deal_type: str) -> List[Dict
             except (TypeError, ValueError):
                 continue
 
+        date_raw = _pick(row, _DATE_KEYS)
+
         out.append({
             "symbol": str(symbol).strip().upper().replace(".NS", ""),
             "side": side,
             "value_cr": round(value_cr, 4),
             "deal_type": deal_type,
+            # NSE's bulk/block feeds report a trading DAY, not an intraday time, for each deal —
+            # this is that day-level field as NSE reports it, kept as-is (not reformatted, so no
+            # date-parsing assumption is baked in). Falls back to today when a row omits it.
+            "deal_date": str(date_raw).strip() if date_raw else date.today().isoformat(),
         })
     return out
 
@@ -390,12 +403,12 @@ def aggregate_symbol_flows(records: List[Dict[str, Any]], as_of: Optional[str] =
 # =========================================================================
 # HIGH-LEVEL FETCHERS
 # =========================================================================
-def fetch_live_large_deals() -> Optional[Dict[str, Dict[str, Any]]]:
-    """Live intraday snapshot (bulk + block combined). Call only after the confirmed 2:20 PM
-    afternoon block-deal window closes — see LIVE_TRIGGER_HOUR/MINUTE. Returns None only if
-    BOTH bandtypes failed to fetch (never a partial result silently passed off as complete —
-    a partial fetch, e.g. bulk succeeded but block failed, still returns what it has, since
-    that's real data for the bandtype that worked)."""
+def _gather_live_records() -> Optional[List[Dict[str, Any]]]:
+    """Deduped, parsed individual deal records (not yet filtered to >= MIN_VALUE_CR, not yet
+    aggregated) — shared by fetch_live_large_deals() (aggregate-only, unchanged public
+    behavior) and the checkpoint runner, which also needs the raw per-deal rows for the deals
+    panel / scanner-row expand breakdown (see get_deals_for_day()). None only if BOTH bandtypes
+    failed to fetch."""
     if not _JUGAAD_AVAILABLE:
         logger.warning("jugaad_data not available — cannot fetch institutional flow data.")
         return None
@@ -417,13 +430,25 @@ def fetch_live_large_deals() -> Optional[Dict[str, Dict[str, Any]]]:
 
     if not any_success:
         return None
-    return aggregate_symbol_flows(_dedupe_records(all_records))
+    return _dedupe_records(all_records)
 
 
-def fetch_eod_archive_deals() -> Optional[Dict[str, Dict[str, Any]]]:
-    """Official end-of-day consolidated bulk.csv + block.csv — the reconciliation ground truth
-    and the only source ever used for backtesting. Only reflects the latest published trading
-    day (no historical-date parameter on these archive routes)."""
+def fetch_live_large_deals() -> Optional[Dict[str, Dict[str, Any]]]:
+    """Live intraday snapshot (bulk + block combined). Call only after the confirmed 2:20 PM
+    afternoon block-deal window closes — see LIVE_TRIGGER_HOUR/MINUTE. Returns None only if
+    BOTH bandtypes failed to fetch (never a partial result silently passed off as complete —
+    a partial fetch, e.g. bulk succeeded but block failed, still returns what it has, since
+    that's real data for the bandtype that worked)."""
+    records = _gather_live_records()
+    if records is None:
+        return None
+    return aggregate_symbol_flows(records)
+
+
+def _gather_archive_records() -> Optional[List[Dict[str, Any]]]:
+    """Parsed individual deal records from the official EOD bulk.csv + block.csv — shared by
+    fetch_eod_archive_deals() and run_eod_reconciliation() (which also persists the raw rows
+    for the deals panel). None only if BOTH files failed to fetch."""
     if not _JUGAAD_AVAILABLE:
         logger.warning("jugaad_data not available — cannot fetch institutional flow archive data.")
         return None
@@ -441,7 +466,27 @@ def fetch_eod_archive_deals() -> Optional[Dict[str, Dict[str, Any]]]:
 
     if not any_success:
         return None
-    return aggregate_symbol_flows(all_records)
+    return all_records
+
+
+def fetch_eod_archive_deals() -> Optional[Dict[str, Dict[str, Any]]]:
+    """Official end-of-day consolidated bulk.csv + block.csv — the reconciliation ground truth
+    and the only source ever used for backtesting. Only reflects the latest published trading
+    day (no historical-date parameter on these archive routes)."""
+    records = _gather_archive_records()
+    if records is None:
+        return None
+    return aggregate_symbol_flows(records)
+
+
+def _qualifying_deals(records: List[Dict[str, Any]], as_of: str) -> List[Dict[str, Any]]:
+    """Individual deal rows clearing MIN_VALUE_CR (same threshold aggregate_symbol_flows
+    applies), sorted by value descending — the per-deal detail an aggregate bucket alone can't
+    show. `as_of` is when THIS checkpoint captured the data (data freshness); each deal also
+    carries its own NSE-reported `deal_date` from _parse_deal_records (which trading day)."""
+    qualifying = [dict(r, as_of=as_of) for r in records if r["value_cr"] >= MIN_VALUE_CR]
+    qualifying.sort(key=lambda r: r["value_cr"], reverse=True)
+    return qualifying
 
 
 # =========================================================================
@@ -457,13 +502,22 @@ def _save_daily_store(store: Dict[str, Any]):
     atomic_write_json(DAILY_FLOW_FILE, store)
 
 
-def _persist_snapshot(today_str: str, checkpoint: str, aggregated: Dict[str, Dict[str, Any]]):
+def _persist_snapshot(
+    today_str: str,
+    checkpoint: str,
+    aggregated: Dict[str, Dict[str, Any]],
+    deals: Optional[List[Dict[str, Any]]] = None,
+):
     with json_file_lock(DAILY_FLOW_FILE):
         store = _load_daily_store()
         day_entry = store.get(today_str, {})
         day_entry[checkpoint] = aggregated
         day_entry["last_checkpoint"] = checkpoint
         day_entry["last_updated"] = _ist_now().isoformat()
+        if deals is not None:
+            deals_by_checkpoint = day_entry.get("deals_by_checkpoint", {})
+            deals_by_checkpoint[checkpoint] = deals
+            day_entry["deals_by_checkpoint"] = deals_by_checkpoint
         store[today_str] = day_entry
 
         for old_date in list(store.keys()):
@@ -496,6 +550,52 @@ def get_institutional_flow_data(symbol: str, checkpoint: Optional[str] = None) -
         return None
     snapshot = day_entry.get(use_checkpoint) or {}
     return snapshot.get(clean_sym)
+
+
+def get_deals_for_day(
+    checkpoint: Optional[str] = None,
+    symbol: Optional[str] = None,
+    limit: Optional[int] = None,
+) -> List[Dict[str, Any]]:
+    """Individual qualifying deals (>= MIN_VALUE_CR) captured today, sorted by value_cr
+    descending — backs the deals panel and the scanner-row expand breakdown. Fast local lookup
+    only, same convention as get_institutional_flow_data() (never triggers a live fetch).
+    Returns [] when nothing has been captured yet today — an empty list is a normal, valid
+    state (no qualifying deals, or not fetched yet) — see get_daily_flow_meta() to tell those
+    two cases apart for a freshness indicator."""
+    today_str = date.today().isoformat()
+    store = _load_daily_store()
+    day_entry = store.get(today_str)
+    if not day_entry:
+        return []
+
+    use_checkpoint = checkpoint or day_entry.get("last_checkpoint")
+    if not use_checkpoint:
+        return []
+
+    deals = list((day_entry.get("deals_by_checkpoint") or {}).get(use_checkpoint, []))
+    if symbol:
+        clean_sym = symbol.replace(".NS", "").upper()
+        deals = [d for d in deals if d.get("symbol") == clean_sym]
+
+    deals.sort(key=lambda d: d.get("value_cr", 0), reverse=True)
+    return deals[:limit] if limit else deals
+
+
+def get_daily_flow_meta() -> Dict[str, Any]:
+    """Freshness metadata for today so far — which checkpoints have actually run, and when.
+    Backs the deals-panel freshness indicator ('Live snapshot as of HH:MM — reconciled at... /
+    not yet reconciled'), combined with get_reconciliation_history(limit=1) for the
+    reconciliation status specifically."""
+    today_str = date.today().isoformat()
+    store = _load_daily_store()
+    day_entry = store.get(today_str, {})
+    return {
+        "date": today_str,
+        "last_checkpoint": day_entry.get("last_checkpoint"),
+        "last_updated": day_entry.get("last_updated"),
+        "checkpoints_captured": [c for c in ("live_trigger", "final_check", "eod_archive") if c in day_entry],
+    }
 
 
 # =========================================================================
@@ -537,11 +637,12 @@ def run_eod_reconciliation() -> Dict[str, Any]:
         "status": "ARCHIVE_UNAVAILABLE",
     }
 
-    archive = fetch_eod_archive_deals()
-    if archive is None:
+    archive_records = _gather_archive_records()
+    if archive_records is None:
         logger.warning("[InstitutionalFlow] EOD reconciliation: archive fetch failed — cannot reconcile today.")
         _append_reconciliation_record(result)
         return result
+    archive = aggregate_symbol_flows(archive_records)
 
     result["archive_symbol_count"] = len(archive)
     live_syms = set(live_snapshot.keys())
@@ -569,9 +670,136 @@ def run_eod_reconciliation() -> Dict[str, Any]:
     else:
         logger.info(f"[InstitutionalFlow] EOD reconciliation clean for {today_str} ({len(archive)} symbols).")
 
-    _persist_snapshot(today_str, "eod_archive", archive)
+    _persist_snapshot(today_str, "eod_archive", archive, deals=_qualifying_deals(archive_records, _ist_now().isoformat()))
     _append_reconciliation_record(result)
     return result
+
+
+# =========================================================================
+# INDEX-LEVEL AGGREGATION — Nifty 50 / Bank Nifty only. Sensex is a BSE index; nseindia.com has
+# no constituent data for it, so it stays honestly UNAVAILABLE here rather than faked — the same
+# treatment this codebase already gives Sensex options elsewhere (see index_depth_analysis.py).
+# =========================================================================
+_NSE_INDEX_QUERY = {
+    "NIFTY50": "NIFTY 50",
+    "BANKNIFTY": "NIFTY BANK",
+}
+
+_INDEX_WEIGHTS_CACHE: Dict[str, Dict[str, Any]] = {}
+INDEX_WEIGHTS_CACHE_TTL_SECONDS = 1800  # constituent weights barely move intraday — a 30-min
+# cache avoids a live fetch on every /api/indices poll. Rebalances happen at most twice a year,
+# never mid-day, so staleness within a trading day is a non-issue.
+
+# |net_value_cr| below this reads as NEUTRAL rather than a directional call on a razor-thin sign.
+INDEX_NEUTRAL_BAND_CR = _env_float("INSTITUTIONAL_FLOW_INDEX_NEUTRAL_BAND_CR", 10.0)
+
+
+def _fetch_index_constituent_weights(nse_index_name: str) -> Optional[Dict[str, float]]:
+    """{symbol: weight_pct}, derived from each constituent's live free-float market cap (ffmc)
+    — NSE's own free-float weighting methodology, computed directly rather than sourced from a
+    separately-maintained (and easily stale) weight table. None only on total fetch failure."""
+    cached = _INDEX_WEIGHTS_CACHE.get(nse_index_name)
+    if cached and (time.time() - cached["fetched_at"]) < INDEX_WEIGHTS_CACHE_TTL_SECONDS:
+        return cached["weights"]
+
+    def _do():
+        client = _get_live_client()
+        return client.get("live_index", {"index": nse_index_name})
+
+    result = call_with_retry(_do, label=f"NSE index constituents [{nse_index_name}]")
+    if result is None:
+        _reset_live_client()
+        return None
+
+    data = result.get("data") if isinstance(result, dict) else None
+    if not isinstance(data, list):
+        logger.warning(f"[InstitutionalFlow] Unexpected index-constituent response shape for {nse_index_name}.")
+        return None
+
+    ffmc_by_symbol: Dict[str, float] = {}
+    for row in data:
+        symbol = row.get("symbol")
+        ffmc = row.get("ffmc")
+        # Skips the index-summary row itself (its "symbol" is the index name and ffmc is null)
+        # and any malformed rows, rather than letting either corrupt the weight normalization.
+        if not symbol or symbol == nse_index_name or not isinstance(ffmc, (int, float)) or ffmc <= 0:
+            continue
+        ffmc_by_symbol[symbol] = ffmc
+
+    total_ffmc = sum(ffmc_by_symbol.values())
+    if total_ffmc <= 0:
+        logger.warning(f"[InstitutionalFlow] No usable constituent ffmc data for {nse_index_name}.")
+        return None
+
+    weights = {sym: round(100.0 * ffmc / total_ffmc, 4) for sym, ffmc in ffmc_by_symbol.items()}
+    _INDEX_WEIGHTS_CACHE[nse_index_name] = {"weights": weights, "fetched_at": time.time()}
+    return weights
+
+
+def _unavailable_index_flow(index_name: str, status: str, reason: Optional[str] = None) -> Dict[str, Any]:
+    return {
+        "index_name": index_name, "status": status, "verdict": None, "total_net_value_cr": None,
+        "constituents_with_flow": 0, "constituents_total": 0, "top_contributors": [], "as_of": None,
+        "reason": reason,
+    }
+
+
+def compute_index_institutional_flow(index_name: str) -> Dict[str, Any]:
+    """Constituent-weighted aggregate institutional flow for one index (index_scoring.py's
+    short key, e.g. "NIFTY50"/"BANKNIFTY"/"SENSEX"). Combines each constituent's live
+    free-float weight with its own already-captured same-day flow — get_institutional_flow_data()
+    never triggers a live fetch itself, same convention as the rest of this module.
+
+    status: NOT_FETCHED_YET (today's checkpoints haven't captured anything yet — nothing to
+    aggregate, not "no signal"); UNAVAILABLE (no NSE constituent source for this index, or the
+    live weight fetch failed); OK (aggregated normally, even if zero constituents had
+    qualifying flow today — that's a real NEUTRAL reading, not unavailable).
+    """
+    daily_meta = get_daily_flow_meta()
+    if not daily_meta.get("last_checkpoint"):
+        return _unavailable_index_flow(index_name, "NOT_FETCHED_YET")
+
+    nse_query = _NSE_INDEX_QUERY.get(index_name)
+    if not nse_query:
+        return _unavailable_index_flow(index_name, "UNAVAILABLE", "No NSE constituent-weight source for this index (BSE-listed).")
+
+    weights = _fetch_index_constituent_weights(nse_query)
+    if weights is None:
+        return _unavailable_index_flow(index_name, "UNAVAILABLE", "Live constituent-weight fetch failed.")
+
+    contributors = []
+    total_net_cr = 0.0
+    for symbol, weight_pct in weights.items():
+        flow = get_institutional_flow_data(symbol)
+        if not flow:
+            continue
+        total_net_cr += flow.get("net_value_cr", 0.0)
+        contributors.append({
+            "symbol": symbol,
+            "weight_pct": weight_pct,
+            "net_value_cr": flow.get("net_value_cr", 0.0),
+            "dominant_side": flow.get("dominant_side", "NONE"),
+            "tier": flow.get("tier", "BELOW_THRESHOLD"),
+        })
+
+    total_net_cr = round(total_net_cr, 2)
+    if not contributors or abs(total_net_cr) < INDEX_NEUTRAL_BAND_CR:
+        verdict = "NEUTRAL"
+    else:
+        verdict = "BULLISH" if total_net_cr > 0 else "BEARISH"
+
+    contributors.sort(key=lambda c: abs(c["net_value_cr"]), reverse=True)
+
+    return {
+        "index_name": index_name,
+        "status": "OK",
+        "verdict": verdict,
+        "total_net_value_cr": total_net_cr,
+        "constituents_with_flow": len(contributors),
+        "constituents_total": len(weights),
+        "top_contributors": contributors[:5],
+        "as_of": daily_meta.get("last_updated"),
+    }
 
 
 # =========================================================================
@@ -619,12 +847,14 @@ def maybe_run_institutional_flow_checkpoints() -> Optional[str]:
                 logger.warning("[InstitutionalFlow] EOD reconciliation checkpoint: archive still unavailable — will retry next tick.")
                 continue
         else:
-            aggregated = fetch_live_large_deals()
-            if aggregated is None:
+            records = _gather_live_records()
+            if records is None:
                 logger.warning(f"[InstitutionalFlow] Checkpoint '{name}' fetch failed — will retry next tick.")
                 continue
-            _persist_snapshot(today_str, name, aggregated)
-            logger.info(f"[InstitutionalFlow] Checkpoint '{name}' captured {len(aggregated)} symbol(s) with flow >= {MIN_VALUE_CR}cr.")
+            aggregated = aggregate_symbol_flows(records)
+            deals = _qualifying_deals(records, _ist_now().isoformat())
+            _persist_snapshot(today_str, name, aggregated, deals=deals)
+            logger.info(f"[InstitutionalFlow] Checkpoint '{name}' captured {len(aggregated)} symbol(s), {len(deals)} qualifying deal(s) >= {MIN_VALUE_CR}cr.")
 
         _mark_checkpoint_done(name, today_str)
         return name
