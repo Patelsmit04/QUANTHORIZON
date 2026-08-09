@@ -317,7 +317,15 @@ document.addEventListener("DOMContentLoaded", () => {
         Object.entries(sections).forEach(([key, el]) => {
             if (!el) return;
             const isMergedDashboard = (section === "dashboard" || section === "scanner") && (key === "dashboard" || key === "scanner");
-            if (key === section || isMergedDashboard) el.classList.remove("hidden"); else el.classList.add("hidden");
+            const shouldShow = key === section || isMergedDashboard;
+            // Use BOTH class toggle AND inline style to guarantee visibility
+            if (shouldShow) {
+                el.classList.remove("hidden");
+                el.style.display = "block";
+            } else {
+                el.classList.add("hidden");
+                el.style.display = "none";
+            }
         });
 
         if (section === "scanner" && scannerSection) {
