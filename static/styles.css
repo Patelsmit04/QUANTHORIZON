@@ -65,6 +65,57 @@
     --topbar-height: 68px;
 }
 
+/* Light Theme Overrides (data-theme="light") */
+[data-theme="light"] {
+    --page-bg-1: #f8fafc;
+    --page-bg-2: #f1f5f9;
+    --page-bg-3: #e2e8f0;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-bg-strong: rgba(255, 255, 255, 0.96);
+    --glass-bg-soft: #f1f5f9;
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-border-strong: rgba(0, 0, 0, 0.16);
+    --glass-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    --glass-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
+    
+    --ink-primary: #0f172a;
+    --ink-secondary: #334155;
+    --ink-muted: #64748b;
+    --gridline: rgba(0, 0, 0, 0.08);
+    
+    --card-bg: #ffffff;
+    --gold: #d97706;
+    --gold-bright: #b45309;
+    --gold-bg: rgba(217, 119, 6, 0.12);
+}
+
+[data-theme="light"] body {
+    background: #f8fafc;
+    color: var(--ink-primary);
+}
+
+[data-theme="light"] .content-topbar {
+    background: rgba(255, 255, 255, 0.94);
+    border-bottom: 1px solid var(--glass-border-strong);
+}
+
+[data-theme="light"] .app-sidebar {
+    background: #ffffff;
+    border-right: 1px solid var(--glass-border-strong);
+}
+
+[data-theme="light"] .data-table th {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+[data-theme="light"] .search-box input,
+[data-theme="light"] .sort-box select {
+    background: #ffffff;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {

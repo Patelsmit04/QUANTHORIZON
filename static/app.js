@@ -90,6 +90,40 @@ document.addEventListener("DOMContentLoaded", () => {
     const exportCsvBtnGuide = document.getElementById("exportCsvBtnGuide");
     const winRateBtnGuide = document.getElementById("winRateBtnGuide");
 
+    // Light / Dark Theme Switcher
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const themeToggleIcon = document.getElementById("themeToggleIcon");
+
+    function applyTheme(theme) {
+        if (theme === "light") {
+            document.documentElement.setAttribute("data-theme", "light");
+            if (themeToggleIcon) {
+                themeToggleIcon.classList.remove("fa-moon");
+                themeToggleIcon.classList.add("fa-sun");
+            }
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+            if (themeToggleIcon) {
+                themeToggleIcon.classList.remove("fa-sun");
+                themeToggleIcon.classList.add("fa-moon");
+            }
+        }
+        try {
+            localStorage.setItem("qh-theme", theme);
+        } catch (e) {}
+    }
+
+    const storedTheme = localStorage.getItem("qh-theme") || "dark";
+    applyTheme(storedTheme);
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            const currentTheme = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+            const nextTheme = currentTheme === "light" ? "dark" : "light";
+            applyTheme(nextTheme);
+        });
+    }
+
     // Nav & News Section DOM
     const scannerSection = document.getElementById("scannerSection");
     const stocksNewsSection = document.getElementById("stocksNewsSection");
@@ -845,8 +879,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${flowChipHtml}
                 </td>
                 <td data-label="ACTION">
-                    <button class="btn-icon view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
+                    <button class="btn btn-pill btn-secondary view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
                         <i class="fa-solid fa-chart-line"></i>
+                        <span>VIEW DETAILS</span>
                     </button>
                 </td>
             `;
