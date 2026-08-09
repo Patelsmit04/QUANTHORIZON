@@ -322,17 +322,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (section === "scanner" && scannerSection) {
             scannerSection.scrollIntoView({ behavior: "smooth" });
-        } else if (section === "dashboard" && dashboardSection) {
+        } else {
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
         if (section === "stocksNews" || section === "globalNews") {
             fetchNewsSection();
-            // Global/macro news auto-refreshes every 1 min while either news tab is open — the
-            // per-stock side stays served from the once-daily background cache either way
-            // (see fetchNewsSection's own comment), and the global side is now backed by a
-            // 60s server-side cache (news_provider.fetch_market_news) so this poll interval
-            // can't multiply into repeated live CurrentsAPI calls.
             if (newsRefreshInterval) clearInterval(newsRefreshInterval);
             newsRefreshInterval = setInterval(fetchNewsSection, 60000);
         } else if (newsRefreshInterval) {
@@ -347,7 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!opts.fromHash && SECTION_HASHES[section]) {
             suppressHashUpdate = true;
             window.location.hash = "/" + SECTION_HASHES[section];
-            // Reset on next tick — setting location.hash fires 'hashchange' asynchronously.
             setTimeout(() => { suppressHashUpdate = false; }, 0);
         }
     }
@@ -357,6 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sidebarNav.addEventListener("click", (e) => {
             const btn = e.target.closest(".sidebar-nav-item");
             if (!btn) return;
+            e.preventDefault();
             switchSection(btn.dataset.section);
             closeMobileDrawer();
         });

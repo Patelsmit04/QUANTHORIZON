@@ -88,17 +88,16 @@
       "depth_analysis": "HINDALCO (TIER_1) — BTST (BUY) CALL (CE), MODERATE conviction, confidence 94/100. Price Rs.1059.60 is trading above VWAP (Rs.1019.61) with RSI at 74.6 (bullish momentum), on a 3.45x volume surge vs the session baseline. 4 of 5 technical pillars confirmed (weight 3.5/3 required for TIER_1): Pillar 2: Vol Persistence Only (3.86x) [Delivery NOT confirmed]; Pillar 3: RS vs Nifty (Outperforming +7.14%); Pillar 4: Vol Spike (3.45x); Pillar 5: Marubozu Close (Range Pos: 100.0%). Estimated next-day open gap: +3.5%. Futures OI data was unavailable for this scan — Pillar 1 excluded, not assumed. Fundamentals (Basic Materials): P/E 17.1x, ROE 10.3%, Debt/Equity 73%, earnings growth -50.9%. Quality verdict: STABLE. Watch items — Earnings declining sharply (-50.9%). Stock-specific news: unavailable for this scan (not yet fetched or fetch failed) — no news gate applied. Broader market backdrop: not fetched for this scan. This is a probability-ranked read from the data available at lock time, not a guaranteed outcome — treat confidence/priority as relative conviction, not certainty.",
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.099,
+          "2-3%": 0.515,
+          "3%+": 0.374
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -173,17 +172,16 @@
       "depth_analysis": "M&M (TIER_1) — BTST (BUY) CALL (CE), MODERATE conviction, confidence 92/100. Price Rs.3502.00 is trading above VWAP (Rs.3440.88) with RSI at 56.6 (bullish momentum), on a 2.25x volume surge vs the session baseline. 4 of 5 technical pillars confirmed (weight 3.5/3 required for TIER_1): Pillar 2: Vol Persistence Only (1.63x) [Delivery NOT confirmed]; Pillar 3: RS vs Nifty (Outperforming +1.2%); Pillar 4: Vol Spike (2.25x); Pillar 5: Marubozu Close (Range Pos: 98.08%). Estimated next-day open gap: +2.2%. Futures OI data was unavailable for this scan — Pillar 1 excluded, not assumed. Fundamentals (Consumer Cyclical): P/E 20.7x, Debt/Equity 125%, earnings growth +33.4%. Quality verdict: STABLE. Watch items — Elevated leverage (Debt/Equity 125%). Stock-specific news: unavailable for this scan (not yet fetched or fetch failed) — no news gate applied. Broader market backdrop: not fetched for this scan. This is a probability-ranked read from the data available at lock time, not a guaranteed outcome — treat confidence/priority as relative conviction, not certainty.",
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.019,
+          "1-2%": 0.325,
+          "2-3%": 0.559,
+          "3%+": 0.097
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -256,17 +254,16 @@
       "depth_analysis": "IRB (TIER_2) — STBT (SELL) PUT (PE), MODERATE conviction, confidence 89/100. Price Rs.19.60 is trading below VWAP (Rs.20.02) with RSI at 36.2 (bearish momentum), on a 11.31x volume surge vs the session baseline. 4 of 5 technical pillars confirmed (weight 4.0/4 required for TIER_2): Pillar 2: Vol Persistence (6.29x) + T+1 Delivery Confirmed; Pillar 3: RS vs Nifty (Underperforming -2.93%); Pillar 4: Vol Spike (11.31x); Pillar 5: Marubozu Close (Range Pos: 0.0%). Estimated next-day open gap: -7.0%. Futures OI data was unavailable for this scan — Pillar 1 excluded, not assumed. Fundamentals (Industrials): P/E 25.6x, Debt/Equity 96%, earnings growth +47.1%. Quality verdict: STABLE. No red or yellow flags identified. Stock-specific news: unavailable for this scan (not yet fetched or fetch failed) — no news gate applied. Broader market backdrop: not fetched for this scan. This is a probability-ranked read from the data available at lock time, not a guaranteed outcome — treat confidence/priority as relative conviction, not certainty.",
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.045,
+          "2-3%": 0.322,
+          "3%+": 0.621
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -338,17 +335,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.013,
+          "1-2%": 0.029,
+          "2-3%": 0.301,
+          "3%+": 0.657
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -420,17 +416,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.044,
+          "2-3%": 0.344,
+          "3%+": 0.6
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -502,17 +497,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.013,
+          "1-2%": 0.026,
+          "2-3%": 0.297,
+          "3%+": 0.664
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -584,17 +578,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.05,
+          "2-3%": 0.401,
+          "3%+": 0.537
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -666,17 +659,16 @@
       "depth_analysis": "ICICIBANK (TIER_1) — STBT (SELL) PUT (PE), MODERATE conviction, confidence 83/100. Price Rs.1421.00 is trading below VWAP (Rs.1443.14) with RSI at 30.4 (bearish momentum), on a 2.59x volume surge vs the session baseline. 3 of 5 technical pillars confirmed (weight 3.0/3 required for TIER_1): Pillar 2: Vol Persistence (1.63x) + T+1 Delivery Confirmed; Pillar 3: RS vs Nifty (Underperforming -1.49%); Pillar 4: Vol Spike (2.59x). Estimated next-day open gap: -2.9%. Futures OI data was unavailable for this scan — Pillar 1 excluded, not assumed. Fundamentals (Financial Services): P/E 18.8x, ROE 16.1%, earnings growth +13.8%. Quality verdict: STABLE. No red or yellow flags identified. Stock-specific news: unavailable for this scan (not yet fetched or fetch failed) — no news gate applied. Broader market backdrop: not fetched for this scan. This is a probability-ranked read from the data available at lock time, not a guaranteed outcome — treat confidence/priority as relative conviction, not certainty.",
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.017,
+          "1-2%": 0.149,
+          "2-3%": 0.43,
+          "3%+": 0.404
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -749,17 +741,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.032,
+          "1-2%": 0.245,
+          "2-3%": 0.48,
+          "3%+": 0.243
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -832,17 +823,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.124,
+          "2-3%": 0.454,
+          "3%+": 0.412
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -913,17 +903,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.013,
+          "1-2%": 0.04,
+          "2-3%": 0.317,
+          "3%+": 0.63
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -994,17 +983,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.13,
+          "2-3%": 0.451,
+          "3%+": 0.409
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1075,17 +1063,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.092,
+          "2-3%": 0.397,
+          "3%+": 0.5
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1158,17 +1145,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.118,
+          "2-3%": 0.447,
+          "3%+": 0.425
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1239,17 +1225,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.046,
+          "2-3%": 0.366,
+          "3%+": 0.576
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1320,17 +1305,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.133,
+          "2-3%": 0.455,
+          "3%+": 0.402
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1403,17 +1387,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.114,
+          "2-3%": 0.423,
+          "3%+": 0.453
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1484,17 +1467,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.058,
+          "2-3%": 0.361,
+          "3%+": 0.569
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1565,17 +1547,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.073,
+          "2-3%": 0.374,
+          "3%+": 0.542
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1648,17 +1629,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.056,
+          "2-3%": 0.331,
+          "3%+": 0.601
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1729,17 +1709,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.057,
+          "2-3%": 0.354,
+          "3%+": 0.577
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1812,17 +1791,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.059,
+          "2-3%": 0.334,
+          "3%+": 0.595
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1893,17 +1871,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.105,
+          "2-3%": 0.413,
+          "3%+": 0.472
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -1974,17 +1951,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.053,
+          "2-3%": 0.34,
+          "3%+": 0.595
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2055,17 +2031,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.034,
+          "1-2%": 0.211,
+          "2-3%": 0.442,
+          "3%+": 0.313
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2135,17 +2110,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.072,
+          "2-3%": 0.359,
+          "3%+": 0.558
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2215,17 +2189,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.114,
+          "2-3%": 0.391,
+          "3%+": 0.483
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2295,17 +2268,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.1,
+          "2-3%": 0.412,
+          "3%+": 0.478
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2377,17 +2349,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.026,
+          "1-2%": 0.186,
+          "2-3%": 0.44,
+          "3%+": 0.348
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2459,17 +2430,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.017,
+          "1-2%": 0.138,
+          "2-3%": 0.406,
+          "3%+": 0.439
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2541,17 +2511,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.096,
+          "2-3%": 0.4,
+          "3%+": 0.493
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2624,17 +2593,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.107,
+          "2-3%": 0.385,
+          "3%+": 0.497
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2707,17 +2675,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.141,
+          "2-3%": 0.453,
+          "3%+": 0.394
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2792,17 +2759,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.078,
+          "2-3%": 0.345,
+          "3%+": 0.566
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2873,17 +2839,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.068,
+          "2-3%": 0.34,
+          "3%+": 0.58
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -2954,17 +2919,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.033,
+          "1-2%": 0.243,
+          "2-3%": 0.475,
+          "3%+": 0.249
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3035,17 +2999,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.048,
+          "2-3%": 0.331,
+          "3%+": 0.609
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3120,17 +3083,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.024,
+          "1-2%": 0.173,
+          "2-3%": 0.43,
+          "3%+": 0.373
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3201,17 +3163,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.029,
+          "1-2%": 0.184,
+          "2-3%": 0.425,
+          "3%+": 0.362
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3282,17 +3243,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.081,
+          "2-3%": 0.389,
+          "3%+": 0.519
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3363,17 +3323,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.016,
+          "1-2%": 0.139,
+          "2-3%": 0.419,
+          "3%+": 0.426
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3446,17 +3405,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.014,
+          "1-2%": 0.137,
+          "2-3%": 0.425,
+          "3%+": 0.424
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3527,17 +3485,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.101,
+          "2-3%": 0.389,
+          "3%+": 0.5
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3610,17 +3567,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.077,
+          "2-3%": 0.344,
+          "3%+": 0.568
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3691,17 +3647,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.071,
+          "2-3%": 0.342,
+          "3%+": 0.575
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3774,17 +3729,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.014,
+          "1-2%": 0.12,
+          "2-3%": 0.393,
+          "3%+": 0.473
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3855,17 +3809,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.083,
+          "2-3%": 0.36,
+          "3%+": 0.546
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -3936,17 +3889,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.056,
+          "2-3%": 0.332,
+          "3%+": 0.6
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4017,17 +3969,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.062,
+          "2-3%": 0.357,
+          "3%+": 0.569
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4098,17 +4049,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.062,
+          "2-3%": 0.337,
+          "3%+": 0.589
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4179,17 +4129,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.062,
+          "2-3%": 0.336,
+          "3%+": 0.59
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4262,17 +4211,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.094,
+          "2-3%": 0.4,
+          "3%+": 0.495
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4345,17 +4293,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.083,
+          "2-3%": 0.358,
+          "3%+": 0.548
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4426,17 +4373,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.08,
+          "2-3%": 0.361,
+          "3%+": 0.548
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4510,17 +4456,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.081,
+          "2-3%": 0.35,
+          "3%+": 0.558
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4591,17 +4536,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.06,
+          "2-3%": 0.352,
+          "3%+": 0.576
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4674,17 +4618,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.099,
+          "2-3%": 0.396,
+          "3%+": 0.495
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4755,17 +4698,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.029,
+          "1-2%": 0.204,
+          "2-3%": 0.452,
+          "3%+": 0.315
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4836,17 +4778,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.114,
+          "2-3%": 0.387,
+          "3%+": 0.487
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4917,17 +4858,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.029,
+          "1-2%": 0.215,
+          "2-3%": 0.465,
+          "3%+": 0.291
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -4998,17 +4938,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.021,
+          "1-2%": 0.169,
+          "2-3%": 0.443,
+          "3%+": 0.367
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5079,17 +5018,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.01,
+          "1-2%": 0.105,
+          "2-3%": 0.397,
+          "3%+": 0.488
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5162,17 +5100,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.019,
+          "1-2%": 0.147,
+          "2-3%": 0.416,
+          "3%+": 0.418
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5243,17 +5180,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.028,
+          "1-2%": 0.175,
+          "2-3%": 0.417,
+          "3%+": 0.38
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5324,17 +5260,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.063,
+          "2-3%": 0.346,
+          "3%+": 0.579
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5407,17 +5342,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.015,
+          "1-2%": 0.13,
+          "2-3%": 0.402,
+          "3%+": 0.453
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5488,17 +5422,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.017,
+          "1-2%": 0.134,
+          "2-3%": 0.399,
+          "3%+": 0.45
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5569,17 +5502,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.013,
+          "1-2%": 0.142,
+          "2-3%": 0.447,
+          "3%+": 0.398
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5650,17 +5582,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.015,
+          "1-2%": 0.126,
+          "2-3%": 0.397,
+          "3%+": 0.462
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5731,17 +5662,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.054,
+          "1-2%": 0.248,
+          "2-3%": 0.425,
+          "3%+": 0.273
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5812,17 +5742,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.073,
+          "2-3%": 0.36,
+          "3%+": 0.556
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5893,17 +5822,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.021,
+          "1-2%": 0.17,
+          "2-3%": 0.444,
+          "3%+": 0.365
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -5974,17 +5902,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.062,
+          "1-2%": 0.298,
+          "2-3%": 0.44,
+          "3%+": 0.2
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6055,17 +5982,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.079,
+          "1-2%": 0.29,
+          "2-3%": 0.409,
+          "3%+": 0.222
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6138,17 +6064,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.077,
+          "1-2%": 0.286,
+          "2-3%": 0.409,
+          "3%+": 0.228
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6222,17 +6147,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.019,
+          "1-2%": 0.151,
+          "2-3%": 0.419,
+          "3%+": 0.411
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6304,17 +6228,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.051,
+          "1-2%": 0.252,
+          "2-3%": 0.436,
+          "3%+": 0.261
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6386,17 +6309,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.039,
+          "1-2%": 0.199,
+          "2-3%": 0.415,
+          "3%+": 0.347
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6466,17 +6388,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.027,
+          "1-2%": 0.179,
+          "2-3%": 0.427,
+          "3%+": 0.367
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6548,17 +6469,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.024,
+          "1-2%": 0.163,
+          "2-3%": 0.417,
+          "3%+": 0.396
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6628,17 +6548,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.072,
+          "2-3%": 0.361,
+          "3%+": 0.556
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6710,17 +6629,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.043,
+          "1-2%": 0.213,
+          "2-3%": 0.419,
+          "3%+": 0.325
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6792,17 +6710,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.028,
+          "1-2%": 0.196,
+          "2-3%": 0.445,
+          "3%+": 0.331
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6872,17 +6789,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.013,
+          "1-2%": 0.122,
+          "2-3%": 0.404,
+          "3%+": 0.461
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -6954,17 +6870,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.106,
+          "2-3%": 0.374,
+          "3%+": 0.508
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7034,17 +6949,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.023,
+          "1-2%": 0.164,
+          "2-3%": 0.421,
+          "3%+": 0.392
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7118,17 +7032,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.088,
+          "2-3%": 0.357,
+          "3%+": 0.544
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7198,17 +7111,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.082,
+          "2-3%": 0.35,
+          "3%+": 0.557
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7280,17 +7192,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.016,
+          "1-2%": 0.151,
+          "2-3%": 0.44,
+          "3%+": 0.393
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7361,17 +7272,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.143,
+          "1-2%": 0.379,
+          "2-3%": 0.358,
+          "3%+": 0.12
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7443,17 +7353,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.019,
+          "1-2%": 0.134,
+          "2-3%": 0.389,
+          "3%+": 0.458
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7523,17 +7432,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.014,
+          "1-2%": 0.111,
+          "2-3%": 0.37,
+          "3%+": 0.505
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7603,17 +7511,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.086,
+          "2-3%": 0.369,
+          "3%+": 0.534
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7685,17 +7592,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.092,
+          "2-3%": 0.362,
+          "3%+": 0.535
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7765,17 +7671,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.093,
+          "2-3%": 0.377,
+          "3%+": 0.519
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7847,17 +7752,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.013,
+          "1-2%": 0.107,
+          "2-3%": 0.367,
+          "3%+": 0.513
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -7927,17 +7831,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.092,
+          "2-3%": 0.361,
+          "3%+": 0.536
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8009,17 +7912,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.019,
+          "1-2%": 0.158,
+          "2-3%": 0.435,
+          "3%+": 0.388
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8089,17 +7991,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.091,
+          "2-3%": 0.36,
+          "3%+": 0.538
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8171,17 +8072,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.02,
+          "1-2%": 0.151,
+          "2-3%": 0.415,
+          "3%+": 0.414
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8253,17 +8153,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.021,
+          "1-2%": 0.161,
+          "2-3%": 0.427,
+          "3%+": 0.391
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8333,17 +8232,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.12,
+          "2-3%": 0.419,
+          "3%+": 0.45
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8415,17 +8313,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.036,
+          "1-2%": 0.206,
+          "2-3%": 0.43,
+          "3%+": 0.328
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8497,17 +8394,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.069,
+          "1-2%": 0.284,
+          "2-3%": 0.421,
+          "3%+": 0.226
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8577,17 +8473,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.103,
+          "1-2%": 0.327,
+          "2-3%": 0.392,
+          "3%+": 0.178
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8659,17 +8554,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.074,
+          "1-2%": 0.288,
+          "2-3%": 0.415,
+          "3%+": 0.223
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8741,17 +8635,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.144,
+          "1-2%": 0.341,
+          "2-3%": 0.354,
+          "3%+": 0.161
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8823,17 +8716,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.114,
+          "1-2%": 0.329,
+          "2-3%": 0.381,
+          "3%+": 0.176
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8905,17 +8797,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.098,
+          "2-3%": 0.352,
+          "3%+": 0.538
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -8985,17 +8876,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.033,
+          "1-2%": 0.182,
+          "2-3%": 0.408,
+          "3%+": 0.377
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9067,17 +8957,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.026,
+          "1-2%": 0.17,
+          "2-3%": 0.417,
+          "3%+": 0.387
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9149,17 +9038,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.033,
+          "1-2%": 0.187,
+          "2-3%": 0.416,
+          "3%+": 0.364
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9231,17 +9119,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.047,
+          "1-2%": 0.221,
+          "2-3%": 0.417,
+          "3%+": 0.315
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9313,17 +9200,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.099,
+          "2-3%": 0.369,
+          "3%+": 0.521
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9393,17 +9279,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.092,
+          "2-3%": 0.356,
+          "3%+": 0.541
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9473,17 +9358,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.039,
+          "1-2%": 0.219,
+          "2-3%": 0.434,
+          "3%+": 0.308
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9553,17 +9437,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.029,
+          "1-2%": 0.17,
+          "2-3%": 0.406,
+          "3%+": 0.395
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9633,17 +9516,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.013,
+          "1-2%": 0.107,
+          "2-3%": 0.362,
+          "3%+": 0.518
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9713,17 +9595,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.018,
+          "1-2%": 0.138,
+          "2-3%": 0.402,
+          "3%+": 0.442
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9795,17 +9676,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.046,
+          "1-2%": 0.218,
+          "2-3%": 0.416,
+          "3%+": 0.32
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9877,17 +9757,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.024,
+          "1-2%": 0.15,
+          "2-3%": 0.395,
+          "3%+": 0.431
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -9957,17 +9836,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.018,
+          "1-2%": 0.123,
+          "2-3%": 0.37,
+          "3%+": 0.489
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10037,17 +9915,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.026,
+          "1-2%": 0.163,
+          "2-3%": 0.407,
+          "3%+": 0.404
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10119,17 +9996,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.017,
+          "1-2%": 0.124,
+          "2-3%": 0.377,
+          "3%+": 0.482
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10202,17 +10078,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.023,
+          "1-2%": 0.164,
+          "2-3%": 0.422,
+          "3%+": 0.391
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10284,17 +10159,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.022,
+          "1-2%": 0.152,
+          "2-3%": 0.405,
+          "3%+": 0.421
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10364,17 +10238,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.084,
+          "2-3%": 0.358,
+          "3%+": 0.547
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10444,17 +10317,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.03,
+          "1-2%": 0.181,
+          "2-3%": 0.42,
+          "3%+": 0.369
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10524,17 +10396,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.028,
+          "1-2%": 0.165,
+          "2-3%": 0.402,
+          "3%+": 0.405
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10606,17 +10477,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.082,
+          "2-3%": 0.347,
+          "3%+": 0.56
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10686,17 +10556,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.063,
+          "1-2%": 0.245,
+          "2-3%": 0.405,
+          "3%+": 0.287
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10766,17 +10635,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.035,
+          "1-2%": 0.208,
+          "2-3%": 0.437,
+          "3%+": 0.32
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10846,17 +10714,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.058,
+          "1-2%": 0.246,
+          "2-3%": 0.416,
+          "3%+": 0.28
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -10926,17 +10793,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.086,
+          "2-3%": 0.348,
+          "3%+": 0.555
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11006,17 +10872,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.042,
+          "1-2%": 0.211,
+          "2-3%": 0.419,
+          "3%+": 0.328
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11086,17 +10951,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.017,
+          "1-2%": 0.139,
+          "2-3%": 0.412,
+          "3%+": 0.432
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11166,17 +11030,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.074,
+          "1-2%": 0.284,
+          "2-3%": 0.414,
+          "3%+": 0.228
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11246,17 +11109,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.015,
+          "1-2%": 0.124,
+          "2-3%": 0.389,
+          "3%+": 0.472
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11326,17 +11188,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.082,
+          "2-3%": 0.346,
+          "3%+": 0.561
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11408,17 +11269,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.025,
+          "1-2%": 0.159,
+          "2-3%": 0.403,
+          "3%+": 0.413
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11492,17 +11352,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.069,
+          "2-3%": 0.34,
+          "3%+": 0.579
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11572,17 +11431,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.013,
+          "1-2%": 0.104,
+          "2-3%": 0.359,
+          "3%+": 0.524
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11652,17 +11510,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.05,
+          "1-2%": 0.217,
+          "2-3%": 0.405,
+          "3%+": 0.328
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11734,17 +11591,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.02,
+          "1-2%": 0.133,
+          "2-3%": 0.378,
+          "3%+": 0.469
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11814,17 +11670,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.1,
+          "1-2%": 0.308,
+          "2-3%": 0.389,
+          "3%+": 0.203
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11896,17 +11751,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.026,
+          "1-2%": 0.164,
+          "2-3%": 0.406,
+          "3%+": 0.404
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -11976,17 +11830,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.097,
+          "2-3%": 0.367,
+          "3%+": 0.525
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12060,17 +11913,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.031,
+          "1-2%": 0.166,
+          "2-3%": 0.395,
+          "3%+": 0.408
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12140,17 +11992,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.021,
+          "1-2%": 0.137,
+          "2-3%": 0.386,
+          "3%+": 0.456
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12220,17 +12071,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.019,
+          "1-2%": 0.139,
+          "2-3%": 0.399,
+          "3%+": 0.443
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12300,17 +12150,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.099,
+          "2-3%": 0.368,
+          "3%+": 0.522
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12380,17 +12229,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.109,
+          "2-3%": 0.383,
+          "3%+": 0.497
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12460,17 +12308,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.029,
+          "1-2%": 0.185,
+          "2-3%": 0.428,
+          "3%+": 0.358
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12540,17 +12387,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.093,
+          "1-2%": 0.287,
+          "2-3%": 0.389,
+          "3%+": 0.231
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12620,17 +12466,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.026,
+          "1-2%": 0.176,
+          "2-3%": 0.427,
+          "3%+": 0.371
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12702,17 +12547,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.077,
+          "2-3%": 0.35,
+          "3%+": 0.562
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12784,17 +12628,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.079,
+          "2-3%": 0.345,
+          "3%+": 0.565
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12864,17 +12707,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.03,
+          "1-2%": 0.175,
+          "2-3%": 0.409,
+          "3%+": 0.386
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -12944,17 +12786,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.05,
+          "1-2%": 0.219,
+          "2-3%": 0.407,
+          "3%+": 0.324
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13024,17 +12865,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.014,
+          "1-2%": 0.105,
+          "2-3%": 0.353,
+          "3%+": 0.528
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13106,17 +12946,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.019,
+          "1-2%": 0.137,
+          "2-3%": 0.395,
+          "3%+": 0.449
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13186,17 +13025,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.075,
+          "2-3%": 0.343,
+          "3%+": 0.571
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13268,17 +13106,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.097,
+          "2-3%": 0.352,
+          "3%+": 0.54
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13348,17 +13185,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.05,
+          "1-2%": 0.213,
+          "2-3%": 0.401,
+          "3%+": 0.336
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13428,17 +13264,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.049,
+          "1-2%": 0.225,
+          "2-3%": 0.415,
+          "3%+": 0.311
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13510,17 +13345,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.096,
+          "2-3%": 0.351,
+          "3%+": 0.542
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13594,17 +13428,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.02,
+          "1-2%": 0.136,
+          "2-3%": 0.384,
+          "3%+": 0.46
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13676,17 +13509,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.019,
+          "1-2%": 0.138,
+          "2-3%": 0.394,
+          "3%+": 0.449
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13756,17 +13588,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.052,
+          "1-2%": 0.242,
+          "2-3%": 0.425,
+          "3%+": 0.281
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13836,17 +13667,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.117,
+          "1-2%": 0.333,
+          "2-3%": 0.378,
+          "3%+": 0.172
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13918,17 +13748,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.013,
+          "1-2%": 0.101,
+          "2-3%": 0.352,
+          "3%+": 0.534
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -13998,17 +13827,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.012,
+          "1-2%": 0.072,
+          "2-3%": 0.342,
+          "3%+": 0.574
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14078,17 +13906,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.024,
+          "1-2%": 0.154,
+          "2-3%": 0.401,
+          "3%+": 0.421
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14158,17 +13985,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.104,
+          "2-3%": 0.37,
+          "3%+": 0.515
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14238,17 +14064,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.036,
+          "1-2%": 0.19,
+          "2-3%": 0.411,
+          "3%+": 0.363
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14321,17 +14146,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.011,
+          "1-2%": 0.092,
+          "2-3%": 0.366,
+          "3%+": 0.531
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14401,17 +14225,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.015,
+          "1-2%": 0.115,
+          "2-3%": 0.368,
+          "3%+": 0.502
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "3%+",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14483,17 +14306,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.032,
+          "1-2%": 0.182,
+          "2-3%": 0.412,
+          "3%+": 0.374
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14565,17 +14387,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.032,
+          "1-2%": 0.189,
+          "2-3%": 0.422,
+          "3%+": 0.357
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14645,17 +14466,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.14,
+          "1-2%": 0.364,
+          "2-3%": 0.36,
+          "3%+": 0.136
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14727,17 +14547,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.068,
+          "1-2%": 0.272,
+          "2-3%": 0.416,
+          "3%+": 0.244
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14811,17 +14630,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.054,
+          "1-2%": 0.221,
+          "2-3%": 0.401,
+          "3%+": 0.324
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14891,17 +14709,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.1,
+          "1-2%": 0.333,
+          "2-3%": 0.397,
+          "3%+": 0.17
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -14973,17 +14790,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.13,
+          "1-2%": 0.33,
+          "2-3%": 0.364,
+          "3%+": 0.176
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15055,17 +14871,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.143,
+          "1-2%": 0.332,
+          "2-3%": 0.354,
+          "3%+": 0.171
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15137,17 +14952,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.051,
+          "1-2%": 0.213,
+          "2-3%": 0.399,
+          "3%+": 0.337
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15219,17 +15033,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.055,
+          "1-2%": 0.24,
+          "2-3%": 0.416,
+          "3%+": 0.289
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15301,17 +15114,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.089,
+          "1-2%": 0.291,
+          "2-3%": 0.396,
+          "3%+": 0.224
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15383,17 +15195,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.11,
+          "1-2%": 0.341,
+          "2-3%": 0.387,
+          "3%+": 0.162
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15465,17 +15276,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.073,
+          "1-2%": 0.268,
+          "2-3%": 0.405,
+          "3%+": 0.254
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15544,17 +15354,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.063,
+          "1-2%": 0.252,
+          "2-3%": 0.412,
+          "3%+": 0.273
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15623,17 +15432,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.116,
+          "1-2%": 0.323,
+          "2-3%": 0.377,
+          "3%+": 0.184
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15704,17 +15512,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.106,
+          "1-2%": 0.305,
+          "2-3%": 0.381,
+          "3%+": 0.208
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15783,17 +15590,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.085,
+          "1-2%": 0.269,
+          "2-3%": 0.389,
+          "3%+": 0.257
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15864,17 +15670,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.063,
+          "1-2%": 0.256,
+          "2-3%": 0.415,
+          "3%+": 0.266
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -15943,17 +15748,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.03,
-          "0.3-0.5%": 0.05,
-          "0.5-1.0%": 0.12,
-          "1.0-1.7%": 0.2,
-          "1.7-2.0%": 0.25,
-          "2.0-3.0%": 0.23,
-          "3.0%+": 0.12
+          "0-1%": 0.056,
+          "1-2%": 0.213,
+          "2-3%": 0.389,
+          "3%+": 0.342
         },
-        "most_likely_bucket": "1.7-2.0%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16024,17 +15828,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.157,
+          "1-2%": 0.35,
+          "2-3%": 0.344,
+          "3%+": 0.149
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16105,17 +15908,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.228,
+          "1-2%": 0.397,
+          "2-3%": 0.288,
+          "3%+": 0.087
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16184,17 +15986,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.166,
+          "1-2%": 0.345,
+          "2-3%": 0.336,
+          "3%+": 0.153
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16263,17 +16064,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.203,
+          "1-2%": 0.371,
+          "2-3%": 0.309,
+          "3%+": 0.117
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16342,17 +16142,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.194,
+          "1-2%": 0.349,
+          "2-3%": 0.314,
+          "3%+": 0.143
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16423,17 +16222,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.103,
+          "1-2%": 0.302,
+          "2-3%": 0.384,
+          "3%+": 0.211
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16504,17 +16302,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.223,
+          "1-2%": 0.376,
+          "2-3%": 0.294,
+          "3%+": 0.107
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16583,17 +16380,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.122,
+          "1-2%": 0.295,
+          "2-3%": 0.361,
+          "3%+": 0.222
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "2-3%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16662,17 +16458,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.182,
+          "1-2%": 0.347,
+          "2-3%": 0.324,
+          "3%+": 0.147
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16741,17 +16536,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.228,
+          "1-2%": 0.352,
+          "2-3%": 0.291,
+          "3%+": 0.129
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16820,17 +16614,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.182,
+          "1-2%": 0.344,
+          "2-3%": 0.323,
+          "3%+": 0.151
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16899,17 +16692,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.26,
+          "1-2%": 0.375,
+          "2-3%": 0.269,
+          "3%+": 0.096
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -16976,17 +16768,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.177,
+          "1-2%": 0.325,
+          "2-3%": 0.323,
+          "3%+": 0.175
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     },
     {
@@ -17053,17 +16844,16 @@
       "next_day_bestest_5": false,
       "gap_bucket_distribution": {
         "bucket_probabilities": {
-          "0-0.3%": 0.05,
-          "0.3-0.5%": 0.08,
-          "0.5-1.0%": 0.17,
-          "1.0-1.7%": 0.28,
-          "1.7-2.0%": 0.22,
-          "2.0-3.0%": 0.14,
-          "3.0%+": 0.06
+          "0-1%": 0.217,
+          "1-2%": 0.342,
+          "2-3%": 0.297,
+          "3%+": 0.144
         },
-        "most_likely_bucket": "1.0-1.7%",
+        "most_likely_bucket": "1-2%",
         "sample_size": 0,
-        "is_empirical": false
+        "is_empirical": false,
+        "is_sufficient": false,
+        "is_model_estimate": true
       }
     }
   ],
