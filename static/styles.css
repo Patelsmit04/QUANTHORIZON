@@ -716,6 +716,33 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     to   { transform: translateX(-50%); }
 }
 
+/* Mobile: taller ticker bar, bigger/bolder item text (point 1 refinement) */
+@media (max-width: 767px) {
+    .index-ticker-bar {
+        padding: 12px 0;
+    }
+    .index-ticker-item {
+        font-size: 14px;
+        font-weight: 800;
+    }
+}
+
+/* Mobile: keep CSV + SCAN NOW on one row instead of wrapping (point 2 refinement) */
+@media (max-width: 480px) {
+    .dashboard-heading-actions {
+        flex-wrap: nowrap;
+        gap: 6px;
+    }
+    .dashboard-heading-actions .btn {
+        padding: 8px 10px;
+        font-size: 12px;
+        min-width: 0;
+    }
+    .dashboard-heading-actions .btn span {
+        display: none;
+    }
+}
+
 .scan-hero-btn {
     background: linear-gradient(135deg, var(--gold-bright), var(--gold)) !important;
     color: #ffffff !important;
@@ -1012,6 +1039,15 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 .ticker-cell { display: flex; flex-direction: column; gap: 3px; }
 .symbol-name { font-family: var(--font-heading); font-weight: 700; font-size: 13px; }
+
+/* PRIORITY crown renders on its own line so its presence never shifts where the signal
+   badge / confidence pill start in the row (point 3 fix). */
+.priority-crown-badge { display: block; font-size: 10px; margin-top: 2px; }
+
+/* Explicit size so this doesn't inherit the larger TICKER-cell font-size set for mobile
+   (mobile-audit.css) — was rendering visibly larger/inconsistent vs symbol-name/score-pill
+   (point 3 fix). */
+.signal-badge-header { font-family: var(--font-heading); font-weight: 800; font-size: 12px; }
 
 .bestest-5-badge {
     display: inline-flex; align-items: center; gap: 4px;
@@ -1429,6 +1465,32 @@ input:checked + .slider:before { transform: translateX(16px); }
 }
 .guide-step-box h4 { font-size: 13px; margin-bottom: 6px; }
 .guide-step-box p { font-size: 12px; color: var(--ink-secondary); line-height: 1.6; }
+.guide-step-box code, #rulesSection code {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Mobile: Guide/Export/Settings + Rules pages read as a clean vertical stack with real
+   spacing rather than whatever the generic rail treatment happened to produce. */
+@media (max-width: 767px) {
+    .guide-step-box {
+        padding: 14px 16px;
+        margin-bottom: 10px;
+    }
+    .guide-step-box h4 {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    .guide-step-box p {
+        font-size: 12.5px;
+        line-height: 1.55;
+    }
+    #rulesSection > p {
+        font-size: 13px;
+        line-height: 1.6;
+        padding: 0 2px;
+    }
+}
 
 /* ==========================================
    PAGE-LEVEL SECTION HEADINGS (every sidebar destination)
@@ -1583,6 +1645,10 @@ input:checked + .slider:before { transform: translateX(16px); }
     gap: 16px;
 }
 
+/* Jump links (Index Intelligence page) to BTST Intelligence / Live Index Signals */
+.indices-jump-links { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
 .index-card {
     background: var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -1688,6 +1754,30 @@ input:checked + .slider:before { transform: translateX(16px); }
 .verdict-badge.avoid { background: rgba(11, 11, 11, 0.06); color: var(--ink-muted); }
 
 .verdict-primary-reason { font-size: 13px; color: var(--ink-secondary); line-height: 1.5; }
+
+/* Mobile: stat boxes were squished to 2-3 cols inside an already-narrow rail card
+   (index-metrics-row's 4-col layout is set via an inline style at render time in app.js,
+   so !important is required here to win). Drop to 2 columns and give boxes room to wrap. */
+@media (max-width: 767px) {
+    .index-metrics-row,
+    .verdict-metrics-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+    .index-metric-box,
+    .verdict-metric-box {
+        min-height: 52px;
+        padding: 10px 8px !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .index-metric-box .val,
+    .verdict-metric-box .val {
+        font-size: 13px;
+        line-height: 1.3;
+    }
+}
 
 .verdict-metrics-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .verdict-metric-box {
@@ -2674,6 +2764,21 @@ input:checked + .slider:before { transform: translateX(16px); }
     opacity: 0.65;
     filter: grayscale(0.2);
 }
+
+/* Collapsed-by-default strategy cards: header (name + toggle + chevron) always visible,
+   everything else lives in .strategy-card-body — same accordion technique as
+   .verdict-expand-toggle/.verdict-pillar-detail, applies at all viewport widths. */
+.strategy-card-header-controls { display: flex; align-items: center; gap: 10px; }
+
+.strategy-card-expand-toggle {
+    background: none; border: none; color: var(--ink-secondary); font-size: 14px;
+    cursor: pointer; padding: 4px; display: flex; align-items: center; line-height: 1;
+}
+.strategy-card-expand-toggle i { transition: transform 0.15s ease; }
+.strategy-card-expand-toggle.open i { transform: rotate(180deg); }
+
+.strategy-card-body { display: none; flex-direction: column; gap: 14px; }
+.strategy-card-body.open { display: flex; }
 
 .strategy-toggles-box {
     background: var(--gold-bg, rgba(201, 148, 51, 0.08));

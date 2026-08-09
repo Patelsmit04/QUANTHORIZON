@@ -29,6 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentFilter = "ALL";
     let autoRefreshInterval = null;
     let newsRefreshInterval = null;
+    // Strategy cards rebuild #strategyGrid from scratch on every toggle/edit action, so
+    // collapsed/expanded state must survive that — tracked here, not as a DOM class.
+    const expandedStrategyIds = new Set();
 
     // Sidebar / Mobile Drawer DOM — #appSidebar is the single nav source for both the
     // desktop persistent rail and the mobile full-height drawer (see styles.css .app-sidebar).
@@ -866,7 +869,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="ticker-header-flex">
                         <span class="symbol-name">
                             ${escapeHtml(stock.symbol)}
-                            ${stock.rank_position <= 2 ? ' <span class="text-gold" style="font-size:10px;"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
+                            ${stock.rank_position <= 2 ? '<span class="text-gold priority-crown-badge"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
                         </span>
                         <span class="signal-badge-header ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
                             ${escapeHtml(sigText)}
@@ -1395,7 +1398,10 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         }
 
-        const verdictRank = { NEGATIVE: 0, CAUTION: 1, POSITIVE: 2, NEUTRAL: 3, NO_RECENT_NEWS: 4, UNAVAILABLE: 5 };
+        const isMobile = window.matchMedia('(max-width: 1023px)').matches;
+        const verdictRank = isMobile
+            ? { POSITIVE: 0, NEUTRAL: 1, CAUTION: 2, NEGATIVE: 3, NO_RECENT_NEWS: 4, UNAVAILABLE: 5 }
+            : { NEGATIVE: 0, CAUTION: 1, POSITIVE: 2, NEUTRAL: 3, NO_RECENT_NEWS: 4, UNAVAILABLE: 5 };
         filtered = [...filtered].sort((a, b) => {
             const ra = verdictRank[(a.classification && a.classification.verdict) || "UNAVAILABLE"] ?? 9;
             const rb = verdictRank[(b.classification && b.classification.verdict) || "UNAVAILABLE"] ?? 9;
@@ -1421,6 +1427,15 @@ document.addEventListener("DOMContentLoaded", () => {
         let filtered = allGlobalNews || [];
         if (currentGlobalNewsVerdictFilter !== "ALL") {
             filtered = filtered.filter(item => (item.verdict || "NEUTRAL").toUpperCase() === currentGlobalNewsVerdictFilter);
+        }
+
+        if (window.matchMedia('(max-width: 1023px)').matches) {
+            const verdictRank = { POSITIVE: 0, NEUTRAL: 1, CAUTION: 2, NEGATIVE: 3, UNAVAILABLE: 4 };
+            filtered = [...filtered].sort((a, b) => {
+                const ra = verdictRank[(a.verdict || "NEUTRAL").toUpperCase()] ?? 9;
+                const rb = verdictRank[(b.verdict || "NEUTRAL").toUpperCase()] ?? 9;
+                return ra - rb;
+            });
         }
 
         globalGrid.innerHTML = "";
@@ -2107,6 +2122,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const indexPerf = paperTrading.index_scope || {};
         const toggles = strategy.scope_toggles || { stocks: true, indices: true };
         const needsClarification = !strategy.is_builtin && strategy.clarification && !strategy.clarification.confirmed;
+        const isExpanded = expandedStrategyIds.has(strategy.id);
 
         card.innerHTML = `
             <div class="strategy-card-header">
@@ -2116,75 +2132,96 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${strategy.is_builtin ? '<span class="builtin-tag">BUILT-IN</span>' : ""}
                     </div>
                 </div>
-                <label class="switch" title="Active / Inactive">
-                    <input type="checkbox" ${strategy.is_active ? "checked" : ""} data-strategy-toggle="${strategy.id}">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-            <div class="strategy-card-desc">${escapeHtml(strategy.description || "No description.")}</div>
-            
-            <!-- Per-Strategy Scope Toggles -->
-            <div class="strategy-toggles-box">
-                <div class="strategy-toggle-item">
-                    <span><i class="fa-solid fa-arrow-trend-up text-cyan"></i> Scope A: Stocks (Intraday/Scalping)</span>
-                    <label class="switch" title="Enable live scanning on Stock charts">
-                        <input type="checkbox" ${toggles.stocks ? "checked" : ""} data-scope-toggle-stocks="${strategy.id}">
+                <div class="strategy-card-header-controls">
+                    <label class="switch" title="Active / Inactive">
+                        <input type="checkbox" ${strategy.is_active ? "checked" : ""} data-strategy-toggle="${strategy.id}">
                         <span class="slider round"></span>
                     </label>
-                </div>
-                <div class="strategy-toggle-item">
-                    <span><i class="fa-solid fa-chart-line text-gold"></i> Scope B: Index Options (Nifty/BankNifty/Sensex)</span>
-                    <label class="switch" title="Enable live scanning on Index Option charts">
-                        <input type="checkbox" ${toggles.indices ? "checked" : ""} data-scope-toggle-indices="${strategy.id}">
-                        <span class="slider round"></span>
-                    </label>
+                    <button type="button" class="strategy-card-expand-toggle ${isExpanded ? "open" : ""}" data-strategy-expand="${strategy.id}" aria-expanded="${isExpanded}" title="Show/hide details">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
                 </div>
             </div>
 
-            ${strategy.python_code ? `
-            <div style="margin-top:6px;">
-                <span class="form-hint" style="display:block;margin-bottom:2px;font-size:10px;">PYTHON STRATEGY LOGIC:</span>
-                <div class="strategy-code-box"><code>${escapeHtml(strategy.python_code)}</code></div>
-            </div>` : ""}
+            <div class="strategy-card-body ${isExpanded ? "open" : ""}">
+                <div class="strategy-card-desc">${escapeHtml(strategy.description || "No description.")}</div>
 
-            <!-- Per-Strategy Performance Stats Breakdown -->
-            <div class="perf-breakdown-grid">
-                <div class="perf-scope-card">
-                    <div class="perf-scope-title"><i class="fa-solid fa-arrow-trend-up"></i> STOCKS SCOPE</div>
-                    <table class="perf-metrics-table">
-                        <tr><td>Trades / Win Rate</td><td class="val">${stockPerf.total_trades || 0} (${stockPerf.win_rate_pct || 0}%)</td></tr>
-                        <tr><td>Max DD / Profit Factor</td><td class="val">${stockPerf.max_drawdown_pct || 0}% / ${stockPerf.profit_factor || 0}</td></tr>
-                    </table>
+                <!-- Per-Strategy Scope Toggles -->
+                <div class="strategy-toggles-box">
+                    <div class="strategy-toggle-item">
+                        <span><i class="fa-solid fa-arrow-trend-up text-cyan"></i> Scope A: Stocks (Intraday/Scalping)</span>
+                        <label class="switch" title="Enable live scanning on Stock charts">
+                            <input type="checkbox" ${toggles.stocks ? "checked" : ""} data-scope-toggle-stocks="${strategy.id}">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="strategy-toggle-item">
+                        <span><i class="fa-solid fa-chart-line text-gold"></i> Scope B: Index Options (Nifty/BankNifty/Sensex)</span>
+                        <label class="switch" title="Enable live scanning on Index Option charts">
+                            <input type="checkbox" ${toggles.indices ? "checked" : ""} data-scope-toggle-indices="${strategy.id}">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </div>
-                <div class="perf-scope-card">
-                    <div class="perf-scope-title"><i class="fa-solid fa-chart-line"></i> INDEX OPTIONS SCOPE</div>
-                    <table class="perf-metrics-table">
-                        <tr><td>Trades / Win Rate</td><td class="val">${indexPerf.total_trades || 0} (${indexPerf.win_rate_pct || 0}%)</td></tr>
-                        <tr><td>Max DD / Profit Factor</td><td class="val">${indexPerf.max_drawdown_pct || 0}% / ${indexPerf.profit_factor || 0}</td></tr>
-                    </table>
+
+                ${strategy.python_code ? `
+                <div style="margin-top:6px;">
+                    <span class="form-hint" style="display:block;margin-bottom:2px;font-size:10px;">PYTHON STRATEGY LOGIC:</span>
+                    <div class="strategy-code-box"><code>${escapeHtml(strategy.python_code)}</code></div>
+                </div>` : ""}
+
+                <!-- Per-Strategy Performance Stats Breakdown -->
+                <div class="perf-breakdown-grid">
+                    <div class="perf-scope-card">
+                        <div class="perf-scope-title"><i class="fa-solid fa-arrow-trend-up"></i> STOCKS SCOPE</div>
+                        <table class="perf-metrics-table">
+                            <tr><td>Trades / Win Rate</td><td class="val">${stockPerf.total_trades || 0} (${stockPerf.win_rate_pct || 0}%)</td></tr>
+                            <tr><td>Max DD / Profit Factor</td><td class="val">${stockPerf.max_drawdown_pct || 0}% / ${stockPerf.profit_factor || 0}</td></tr>
+                        </table>
+                    </div>
+                    <div class="perf-scope-card">
+                        <div class="perf-scope-title"><i class="fa-solid fa-chart-line"></i> INDEX OPTIONS SCOPE</div>
+                        <table class="perf-metrics-table">
+                            <tr><td>Trades / Win Rate</td><td class="val">${indexPerf.total_trades || 0} (${indexPerf.win_rate_pct || 0}%)</td></tr>
+                            <tr><td>Max DD / Profit Factor</td><td class="val">${indexPerf.max_drawdown_pct || 0}% / ${indexPerf.profit_factor || 0}</td></tr>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <div class="strategy-flags-row">
-                <span class="strategy-flag ${strategy.fundamentals_gate_enabled ? "on" : ""}">Fundamentals ${strategy.fundamentals_gate_enabled ? "ON" : "OFF"}</span>
-                <span class="strategy-flag ${strategy.news_gate_enabled ? "on" : ""}">News ${strategy.news_gate_enabled ? "ON" : "OFF"}</span>
-                <span class="strategy-flag ${strategy.auto_paper_trade ? "on" : ""}">Auto Paper ${strategy.auto_paper_trade ? "ON" : "OFF"}</span>
-            </div>
+                <div class="strategy-flags-row">
+                    <span class="strategy-flag ${strategy.fundamentals_gate_enabled ? "on" : ""}">Fundamentals ${strategy.fundamentals_gate_enabled ? "ON" : "OFF"}</span>
+                    <span class="strategy-flag ${strategy.news_gate_enabled ? "on" : ""}">News ${strategy.news_gate_enabled ? "ON" : "OFF"}</span>
+                    <span class="strategy-flag ${strategy.auto_paper_trade ? "on" : ""}">Auto Paper ${strategy.auto_paper_trade ? "ON" : "OFF"}</span>
+                </div>
 
-            ${needsClarification ? `
-            <div class="strategy-flags-row" style="margin-top:8px;">
-                <span class="strategy-flag" style="color:var(--gold);border-color:var(--gold);">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Unconfirmed — pending AI clarification confirmation
-                </span>
-            </div>` : ""}
+                ${needsClarification ? `
+                <div class="strategy-flags-row" style="margin-top:8px;">
+                    <span class="strategy-flag" style="color:var(--gold);border-color:var(--gold);">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Unconfirmed — pending AI clarification confirmation
+                    </span>
+                </div>` : ""}
 
-            <div class="strategy-card-actions">
-                ${needsClarification ? `<button class="btn btn-primary" data-strategy-review="${strategy.id}"><i class="fa-solid fa-robot"></i> REVIEW &amp; CONFIRM</button>` : ""}
-                <button class="btn btn-secondary" data-strategy-edit="${strategy.id}"><i class="fa-solid fa-pen"></i> EDIT</button>
-                <button class="btn btn-secondary" data-strategy-execute="${strategy.id}"><i class="fa-solid fa-bolt"></i> RUN NOW</button>
-                ${strategy.is_builtin ? "" : `<button class="btn btn-secondary" data-strategy-delete="${strategy.id}"><i class="fa-solid fa-trash"></i></button>`}
+                <div class="strategy-card-actions">
+                    ${needsClarification ? `<button class="btn btn-primary" data-strategy-review="${strategy.id}"><i class="fa-solid fa-robot"></i> REVIEW &amp; CONFIRM</button>` : ""}
+                    <button class="btn btn-secondary" data-strategy-edit="${strategy.id}"><i class="fa-solid fa-pen"></i> EDIT</button>
+                    <button class="btn btn-secondary" data-strategy-execute="${strategy.id}"><i class="fa-solid fa-bolt"></i> RUN NOW</button>
+                    ${strategy.is_builtin ? "" : `<button class="btn btn-secondary" data-strategy-delete="${strategy.id}"><i class="fa-solid fa-trash"></i></button>`}
+                </div>
             </div>
         `;
+
+        const expandBtn = card.querySelector("[data-strategy-expand]");
+        if (expandBtn) {
+            expandBtn.addEventListener("click", () => {
+                const body = card.querySelector(".strategy-card-body");
+                if (!body) return;
+                const isOpen = body.classList.toggle("open");
+                expandBtn.classList.toggle("open", isOpen);
+                expandBtn.setAttribute("aria-expanded", String(isOpen));
+                if (isOpen) expandedStrategyIds.add(strategy.id);
+                else expandedStrategyIds.delete(strategy.id);
+            });
+        }
 
         const toggleActiveInput = card.querySelector("[data-strategy-toggle]");
         if (toggleActiveInput) toggleActiveInput.addEventListener("change", () => toggleStrategyActive(strategy.id, toggleActiveInput.checked));

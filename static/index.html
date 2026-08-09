@@ -495,9 +495,17 @@
                     <h2 class="section-page-title"><i class="fa-solid fa-chart-column text-gold"></i> INDEX INTELLIGENCE
                         <span class="section-page-subtitle">Post-Close Verdict &amp; Live Index Signals</span>
                     </h2>
+                    <div class="indices-jump-links">
+                        <button type="button" class="btn btn-pill btn-secondary btn-sm" onclick="document.getElementById('indexVerdictJumpTarget').scrollIntoView({behavior:'smooth', block:'start'});">
+                            <i class="fa-solid fa-arrow-down"></i><span>BTST Intelligence</span>
+                        </button>
+                        <button type="button" class="btn btn-pill btn-secondary btn-sm" onclick="document.getElementById('liveIndexSignalsJumpTarget').scrollIntoView({behavior:'smooth', block:'start'});">
+                            <i class="fa-solid fa-arrow-down"></i><span>Live Index Signals</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="index-verdict-heading-row">
+                <div class="index-verdict-heading-row" id="indexVerdictJumpTarget">
                     <h2 class="index-verdict-heading">Index BTST Intelligence <span class="index-verdict-heading-sub">Post-Close Verdict</span></h2>
                     <div id="indexVerdictMeta" class="form-hint"></div>
                 </div>
@@ -510,7 +518,7 @@
                     <p>This deeper derivatives + Greeks + macro read runs once, shortly after market close — check back after 3:45 PM IST.</p>
                 </div>
 
-                <div class="index-verdict-heading-row" style="margin-top:28px;">
+                <div class="index-verdict-heading-row" id="liveIndexSignalsJumpTarget" style="margin-top:28px;">
                     <h2 class="index-verdict-heading">Live Index Signals</h2>
                 </div>
                 <section class="index-grid" id="indexGrid">

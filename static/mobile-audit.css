@@ -9,8 +9,7 @@
    Leaving them in the topbar causes overflow, tiny targets, and vertical bloat. */
 @media (max-width: 1023px) {
     .header-actions #winRateBtn,
-    .header-actions #guideBtn,
-    .header-actions #exportCsvBtn {
+    .header-actions #guideBtn {
         display: none !important;
     }
 
@@ -92,12 +91,8 @@
 
 /* 4. Horizontal Flex Scroll Rails for all score cards & grids across the web app */
 @media (max-width: 1023px) {
-    .index-grid,
     .strategy-grid,
-    .index-verdict-grid,
     .calibration-card-grid,
-    .guide-settings-grid,
-    .news-grid,
     .split-accuracy-grid,
     .metrics-grid,
     .legend-pills-row,
@@ -113,12 +108,8 @@
         flex-wrap: nowrap !important;
     }
 
-    .index-grid::-webkit-scrollbar,
     .strategy-grid::-webkit-scrollbar,
-    .index-verdict-grid::-webkit-scrollbar,
     .calibration-card-grid::-webkit-scrollbar,
-    .guide-settings-grid::-webkit-scrollbar,
-    .news-grid::-webkit-scrollbar,
     .split-accuracy-grid::-webkit-scrollbar,
     .metrics-grid::-webkit-scrollbar,
     .legend-pills-row::-webkit-scrollbar,
@@ -126,12 +117,8 @@
         display: none;
     }
 
-    .index-card,
     .strategy-card,
-    .index-verdict-card,
     .calibration-bar-card,
-    .guide-step-box,
-    .news-card,
     .split-accuracy-grid .metric-card,
     .metrics-grid .metric-card,
     .legend-pill-card,
@@ -353,6 +340,66 @@
         max-width: 100% !important;
         margin-bottom: 0 !important;
         padding: 12px 14px !important;
+    }
+
+    /* B1b. Stocks News + Global News: vertical stack instead of horizontal rail
+       (both sections share .news-grid/.news-card) */
+    .news-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        overflow-x: visible !important;
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .news-card {
+        flex: initial !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* B1c. Index Intelligence: BTST verdict cards + Live Index Signal cards, vertical stack */
+    .index-verdict-grid,
+    .index-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        overflow-x: visible !important;
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .index-verdict-card,
+    .index-card {
+        flex: initial !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* B1d. Guide/Export/Settings: vertical stack instead of horizontal rail */
+    .guide-settings-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        overflow-x: visible !important;
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .guide-settings-grid .guide-step-box {
+        flex: initial !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin-bottom: 0 !important;
     }
 
     /* B2. Section Header clean stacking */
