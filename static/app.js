@@ -308,8 +308,15 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         Object.entries(sections).forEach(([key, el]) => {
             if (!el) return;
-            if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
+            const isMergedDashboard = (section === "dashboard" || section === "scanner") && (key === "dashboard" || key === "scanner");
+            if (key === section || isMergedDashboard) el.classList.remove("hidden"); else el.classList.add("hidden");
         });
+
+        if (section === "scanner" && scannerSection) {
+            scannerSection.scrollIntoView({ behavior: "smooth" });
+        } else if (section === "dashboard" && dashboardSection) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
 
         if (section === "stocksNews" || section === "globalNews") {
             fetchNewsSection();

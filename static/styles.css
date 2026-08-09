@@ -616,6 +616,39 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 .timer-label { font-size: 10px; font-weight: 700; color: var(--ink-muted); }
 .timer-value { font-family: var(--font-heading); font-size: 12px; font-weight: 700; color: var(--cat-blue); }
 
+/* Quick Controls Bar (Pic 1 Refresh) */
+.quick-controls-bar {
+    width: 100%;
+    padding: 12px 24px;
+    background: var(--glass-bg-soft);
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.quick-controls-inner {
+    max-width: 1680px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.scan-hero-btn {
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold)) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35) !important;
+    padding: 9px 20px !important;
+}
+
+.scan-hero-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(212, 175, 55, 0.45) !important;
+}
+
 /* Header Actions */
 .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 

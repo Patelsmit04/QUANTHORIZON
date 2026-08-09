@@ -18,8 +18,8 @@
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=6.4.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=6.4.0">
+    <link rel="stylesheet" href="/static/styles.css?v=6.5.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=6.5.0">
 </head>
 <body>
 
@@ -165,39 +165,11 @@
 
                 <div class="topbar-spacer"></div>
 
-                <!-- Top Bar Action Controls -->
+                <!-- Right Header Chrome Buttons -->
                 <div class="header-actions">
-                    <div class="priority-toggle-box">
-                        <i class="fa-solid fa-fire text-gold"></i>
-                        <span>PRIORITY ONLY</span>
-                        <label class="switch">
-                            <input type="checkbox" id="priorityOnlyToggle" aria-label="Show priority picks only">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-
-                    <div class="auto-refresh-toggle">
-                        <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
-                        <span>AUTO</span>
-                        <label class="switch">
-                            <input type="checkbox" id="autoRefreshToggle" checked aria-label="Toggle auto refresh">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-
-                    <button id="winRateBtn" class="btn btn-pill btn-secondary" title="View BTST Win Rate Analytics">
+                    <button id="winRateBtn" class="btn btn-pill btn-secondary winrate-topbar-btn" title="View BTST Win Rate Analytics">
                         <i class="fa-solid fa-trophy text-gold"></i>
                         <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
-                    </button>
-
-                    <button id="guideBtn" class="btn btn-pill btn-secondary" title="Priority Ranking & Gap Prediction Rules">
-                        <i class="fa-solid fa-circle-question"></i>
-                        <span>GUIDE</span>
-                    </button>
-
-                    <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
-                        <i class="fa-solid fa-file-csv"></i>
-                        <span>CSV</span>
                     </button>
 
                     <button id="themeToggleBtn" class="btn-icon theme-toggle-btn" title="Toggle Light/Dark Theme" aria-label="Toggle Light/Dark Theme">
@@ -212,6 +184,44 @@
                     </div>
                 </div>
             </header>
+
+            <!-- Quick Controls Sub-Bar (UI/UX Refreshed per Pic 1) -->
+            <div class="quick-controls-bar" id="quickControlsBar">
+                <div class="quick-controls-inner">
+                    <div class="priority-toggle-box">
+                        <i class="fa-solid fa-fire text-gold"></i>
+                        <span>PRIORITY ONLY</span>
+                        <label class="switch">
+                            <input type="checkbox" id="priorityOnlyToggle" aria-label="Show priority picks only">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+
+                    <button id="guideBtn" class="btn btn-pill btn-secondary" title="Priority Ranking & Gap Prediction Rules">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span>GUIDE</span>
+                    </button>
+
+                    <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span>CSV</span>
+                    </button>
+
+                    <button id="scanBtn" class="btn btn-pill btn-primary scan-hero-btn">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>SCAN NOW</span>
+                    </button>
+
+                    <div class="auto-refresh-toggle">
+                        <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
+                        <span>AUTO</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoRefreshToggle" checked aria-label="Toggle auto refresh">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
 
             <!-- Notification panel — fixed-position overlay so it's reachable from either bell
                  regardless of which controls the current breakpoint has collapsed. -->
@@ -306,17 +316,6 @@
                         </div>
                     </div>
 
-                    <!-- Card 3: BTST Win Rate Score -->
-                    <div class="metric-card card-winrate">
-                        <div class="metric-header">
-                            <span class="metric-title">🏆 BTST WIN RATE</span>
-                            <div class="card-icon-bubble text-gold"><i class="fa-solid fa-trophy"></i></div>
-                        </div>
-                        <div class="metric-body">
-                            <span id="cardWinRatePct" class="metric-value text-gold">0.0%</span>
-                            <span class="metric-subtext"><span id="cardTrackedTradesCount">0</span> Overnight Trades Analyzed</span>
-                        </div>
-                    </div>
 
                     <!-- Card 4: BTST Calls -->
                     <div class="metric-card card-bullish">
@@ -382,7 +381,7 @@
             <!-- ============================== END DASHBOARD SECTION ============================== -->
 
             <!-- ============================== SCANNER / SIGNALS ENGINE SECTION ============================== -->
-            <div id="scannerSection" class="hidden">
+            <div id="scannerSection">
 
                 <div class="section-heading-row">
                     <h2 class="section-page-title"><i class="fa-solid fa-crosshairs text-gold"></i> SIGNALS ENGINE
@@ -1101,6 +1100,6 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=6.4.0"></script>
+    <script src="/static/app.js?v=6.5.0"></script>
 </body>
 </html>

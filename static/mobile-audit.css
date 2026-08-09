@@ -324,33 +324,54 @@
 
 /* --- B) DASHBOARD PAGE (<= 767px) --- */
 @media (max-width: 767px) {
-    /* B1. KPI / Accuracy cards: Horizontal snap-scroll card rail */
-    .split-accuracy-grid,
-    .metrics-grid {
-        display: flex !important;
-        overflow-x: auto !important;
-        scroll-snap-type: x mandatory !important;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        padding: 4px 16px 12px 16px !important;
-        margin-left: -12px !important;
-        margin-right: -12px !important;
-        gap: 12px !important;
-        flex-wrap: nowrap !important;
+    /* Quick Controls Bar Mobile Layout (Pic 1 Refresh) */
+    .quick-controls-bar {
+        padding: 12px 14px !important;
+        background: var(--glass-bg-soft) !important;
     }
 
-    .split-accuracy-grid::-webkit-scrollbar,
-    .metrics-grid::-webkit-scrollbar {
-        display: none;
+    .quick-controls-inner {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 8px 10px !important;
+    }
+
+    .quick-controls-inner .priority-toggle-box,
+    .quick-controls-inner .auto-refresh-toggle,
+    .quick-controls-inner .btn {
+        margin: 0 !important;
+    }
+
+    /* B1. Win Rate Accuracy Cards & Overview Metrics Cards: 2x2 Grid Style */
+    .split-accuracy-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        overflow-x: visible !important;
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .metrics-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        overflow-x: visible !important;
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 
     .split-accuracy-grid .metric-card,
     .metrics-grid .metric-card {
-        flex: 0 0 82% !important;
-        min-width: 250px !important;
-        max-width: 300px !important;
-        scroll-snap-align: start !important;
+        flex: initial !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
         margin-bottom: 0 !important;
+        padding: 12px 14px !important;
     }
 
     /* B2. Section Header clean stacking */
