@@ -1951,8 +1951,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
             const indices = data.indices || [];
 
-            const itemsHtml = indices.map(buildTickerItemHTML).join("")
-                + buildTickerItemHTML({index_name: "GIFT NIFTY", ltp: null, change_pts: null, pct_change: null});
+            const itemsHtml = indices.map(buildTickerItemHTML).join("");
 
             // Duplicate the item list once so the marquee (translateX 0 -> -50%) loops seamlessly.
             indexTickerTrack.innerHTML = itemsHtml + itemsHtml;

@@ -56,7 +56,7 @@ from news_provider import (
     should_refresh_universe_news, refresh_universe_news_cache, get_cached_stock_news,
     get_all_cached_news, get_universe_news_meta
 )
-from index_scoring import evaluate_index_signal, fetch_global_cues, classify_global_cues, INDEX_TICKERS
+from index_scoring import evaluate_index_signal, fetch_global_cues, classify_global_cues, INDEX_TICKERS, fetch_gift_nifty_live
 from options_chain_provider import fetch_index_option_chain, get_nearest_expiry_chain, OPTION_CHAIN_INDICES
 from index_depth_analysis import build_index_btst_verdicts
 import strategy_manager as sm
@@ -727,7 +727,7 @@ def score_index_universe(raw: Dict[str, Any], strategy: Dict[str, Any]) -> List[
 
     results = []
     for index_name in INDEX_TICKERS:
-        if index_name not in scope:
+        if index_name not in scope and index_name != "GIFTNIFTY":
             continue
         df_index = raw["index_dfs"].get(index_name)
         df_nifty = raw["index_dfs"].get("NIFTY50") if index_name != "NIFTY50" else None
@@ -1642,6 +1642,13 @@ def get_index_signals():
                 index_data = []
         else:
             index_data = []
+
+    # Guarantee GIFTNIFTY is always present in index_data response
+    if index_data and isinstance(index_data, list):
+        if not any(idx.get("index_name") == "GIFTNIFTY" for idx in index_data):
+            gift_live = fetch_gift_nifty_live()
+            if gift_live:
+                index_data.append(gift_live)
 
     return sanitize_json_data({"indices": index_data or [], "tickers": INDEX_TICKERS})
 

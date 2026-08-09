@@ -177,7 +177,7 @@ def _seed_default_strategy_if_missing():
                 "name": "5-Pillar",
                 "description": "The original scanner behavior: every pillar active, liquidity-tiered "
                                 "thresholds for stocks, both fundamentals and news gates on.",
-                "target_scope": ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX"],
+                "target_scope": ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX", "GIFTNIFTY"],
                 "active_pillars": {p: True for p in ALL_PILLAR_NAMES},
                 "required_weight_override": None,
                 "fundamentals_gate_enabled": True,
@@ -188,7 +188,7 @@ def _seed_default_strategy_if_missing():
                 "clarification": {
                     "confirmed": True,
                     "confirmed_at": now,
-                    "target_summary": "Every tracked stock plus Nifty 50, Bank Nifty, and Sensex.",
+                    "target_summary": "Every tracked stock plus Nifty 50, Bank Nifty, Sensex, and Gift Nifty.",
                     "pillar_summary": "All 5 stock pillars and all 6 index pillars active — no pillar disabled.",
                     "confirmation_bar_summary": "Engine defaults unchanged: liquidity-tiered for stocks (3.0/4.0), fixed 2.0 for indices.",
                     "gate_summary": "Both the fundamentals and news quality gates are on.",
@@ -203,9 +203,12 @@ def _seed_default_strategy_if_missing():
             store[DEFAULT_STRATEGY_ID] = strategy
             needs_save = True
         else:
-            if store[DEFAULT_STRATEGY_ID].get("name") != "5-Pillar" or not store[DEFAULT_STRATEGY_ID].get("is_builtin"):
-                store[DEFAULT_STRATEGY_ID]["name"] = "5-Pillar"
-                store[DEFAULT_STRATEGY_ID]["is_builtin"] = True
+            def_strat = store[DEFAULT_STRATEGY_ID]
+            if def_strat.get("name") != "5-Pillar" or not def_strat.get("is_builtin") or "GIFTNIFTY" not in def_strat.get("target_scope", []):
+                def_strat["name"] = "5-Pillar"
+                def_strat["is_builtin"] = True
+                if "GIFTNIFTY" not in def_strat.get("target_scope", []):
+                    def_strat.setdefault("target_scope", []).append("GIFTNIFTY")
                 needs_save = True
 
         smc_id = "smc-institutional-v1"
