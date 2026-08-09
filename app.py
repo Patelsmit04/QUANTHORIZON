@@ -237,11 +237,14 @@ def get_market_schedule_info() -> Dict[str, Any]:
     scan_cutoff_mins = 15 * 60 + 14    # 3:14 PM = 914 mins — regular scanning stops here
     closing_seq_end_mins = 15 * 60 + 40  # 3:40 PM = 940 mins — the new lock time
 
-    if is_weekend:
+    today_date_str = ist_now.strftime("%Y-%m-%d")
+    is_holiday = closing_sequence.is_trading_holiday(today_date_str)
+
+    if is_weekend or is_holiday:
         return {
-            "status": "CLOSED (3:40 PM SCAN LOCKED)",
+            "status": "CLOSED (TRADING HOLIDAY)" if is_holiday else "CLOSED (3:40 PM SCAN LOCKED)",
             "is_open": False,
-            "mode": "OFF-MARKET SNAPSHOT (WEEKEND — 3:40 PM LOCKED)",
+            "mode": "OFF-MARKET SNAPSHOT (HOLIDAY — 3:40 PM LOCKED)" if is_holiday else "OFF-MARKET SNAPSHOT (WEEKEND — 3:40 PM LOCKED)",
             "sleep_seconds": 30
         }
 

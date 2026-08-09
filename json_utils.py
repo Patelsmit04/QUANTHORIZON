@@ -40,8 +40,8 @@ import uuid
 from contextlib import contextmanager
 from typing import Any, Iterator
 
-_REPLACE_RETRY_ATTEMPTS = 5
-_REPLACE_RETRY_DELAY_SECONDS = 0.02
+_REPLACE_RETRY_ATTEMPTS = 10
+_REPLACE_RETRY_DELAY_SECONDS = 0.05
 
 
 def atomic_write_json(filepath: str, data: Any):

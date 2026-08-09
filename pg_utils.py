@@ -32,7 +32,12 @@ from typing import Any, Iterator, Optional
 try:
     from psycopg.types.json import Jsonb
 except ImportError:
-    Jsonb = None
+    try:
+        from psycopg2.extras import Json as Jsonb
+    except ImportError:
+        import json
+        def Jsonb(data):
+            return json.dumps(data)
 
 USE_POSTGRES = False
 

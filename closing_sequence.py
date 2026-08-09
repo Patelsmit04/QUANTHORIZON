@@ -238,6 +238,9 @@ def run_step_if_due(
     pipeline advancing through snapshot -> cas_close -> scoring -> broadcast -> lock in real
     time, not just receive the one final push. The 3:38 PM step additionally sends the richer
     "closing_sequence_final_picks" event with the full picks payload — see _step_broadcast."""
+    if is_trading_holiday(today_date):
+        return None
+
     state = _load_state(today_date)
 
     def _notify(step: str):
