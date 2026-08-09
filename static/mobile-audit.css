@@ -1,0 +1,594 @@
+/* ============================================================================
+   MOBILE AUDIT HARDENING — Aug 2026
+   Addresses remaining audit failures: cramped topbar, desktop controls
+   still visible on phone, grids forcing overflow, modal tables, touch targets.
+   =========================================================================== */
+
+/* 1. Hide desktop-only header controls on mobile/tablet drawer breakpoint.
+   The drawer already exposes Priority Only, Auto, Scan, Win Rate, CSV, Notifs.
+   Leaving them in the topbar causes overflow, tiny targets, and vertical bloat. */
+@media (max-width: 1023px) {
+    .header-actions .priority-toggle-box,
+    .header-actions .auto-refresh-toggle,
+    .header-actions #winRateBtn,
+    .header-actions #guideBtn,
+    .header-actions #exportCsvBtn {
+        display: none !important;
+    }
+
+    .content-topbar {
+        flex-wrap: nowrap;
+        min-height: 56px;
+        padding: 8px 12px;
+        gap: 10px;
+    }
+
+    .header-actions {
+        gap: 6px;
+        flex-wrap: nowrap;
+        margin-left: auto;
+    }
+
+    .header-actions #scanBtn {
+        padding: 10px 14px;
+        font-size: 12px;
+        min-height: 44px;
+    }
+
+    .header-actions #notifBell,
+    .header-actions .btn-icon {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+        font-size: 13px !important;
+    }
+
+    .topbar-brand {
+        gap: 12px;
+    }
+
+    .topbar-brand-title {
+        font-size: 1.18rem;
+        font-weight: 800;
+    }
+}
+
+/* 2. Phone: even tighter topbar — keep only hamburger + brand + scan + bell */
+@media (max-width: 560px) {
+    .content-topbar {
+        padding: 6px 10px;
+        min-height: 52px;
+        gap: 8px;
+    }
+
+    .topbar-brand-title {
+        font-size: 1rem;
+    }
+
+    .header-actions #scanBtn span {
+        display: none; /* icon-only SCAN on very small screens */
+    }
+
+    .header-actions #scanBtn {
+        padding: 10px 12px;
+        min-width: 44px;
+    }
+}
+
+/* 3. Kill horizontal page overflow globally on mobile */
+@media (max-width: 1023px) {
+    html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    .app-main,
+    .main-content,
+    .table-container,
+    .table-card,
+    .table-scroll {
+        max-width: 100%;
+        min-width: 0;
+    }
+}
+
+/* 4. Horizontal Flex Scroll Rails for all score cards & grids across the web app */
+@media (max-width: 1023px) {
+    .index-grid,
+    .strategy-grid,
+    .index-verdict-grid,
+    .calibration-card-grid,
+    .guide-settings-grid,
+    .news-grid,
+    .split-accuracy-grid,
+    .metrics-grid,
+    .legend-pills-row,
+    .winrate-stats-grid {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 8px !important;
+        gap: 12px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .index-grid::-webkit-scrollbar,
+    .strategy-grid::-webkit-scrollbar,
+    .index-verdict-grid::-webkit-scrollbar,
+    .calibration-card-grid::-webkit-scrollbar,
+    .guide-settings-grid::-webkit-scrollbar,
+    .news-grid::-webkit-scrollbar,
+    .split-accuracy-grid::-webkit-scrollbar,
+    .metrics-grid::-webkit-scrollbar,
+    .legend-pills-row::-webkit-scrollbar,
+    .winrate-stats-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .index-card,
+    .strategy-card,
+    .index-verdict-card,
+    .calibration-bar-card,
+    .guide-step-box,
+    .news-card,
+    .split-accuracy-grid .metric-card,
+    .metrics-grid .metric-card,
+    .legend-pill-card,
+    .winrate-stat-card {
+        flex: 0 0 82% !important;
+        min-width: 260px !important;
+        max-width: 320px !important;
+        scroll-snap-align: start !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+/* 5. Win Rate modal + other mini-tables: prevent desktop table leakage */
+@media (max-width: 768px) {
+    .modal-large {
+        max-width: 100%;
+    }
+
+    .recent-candles-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+    }
+
+    .recent-candles-wrapper .data-table,
+    .mini-table {
+        min-width: 720px; /* still scrollable inside wrapper, not the page */
+    }
+
+    .winrate-action-bar {
+        flex-direction: column;
+    }
+
+    .winrate-action-bar .btn {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+    }
+
+    .winrate-stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* 6. Touch targets — switches, filter chips, nav items */
+@media (max-width: 1023px) {
+    .switch {
+        width: 44px;
+        height: 26px;
+    }
+
+    .switch .slider:before {
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(18px);
+    }
+
+    .tab-btn {
+        min-height: 40px;
+        padding: 10px 14px;
+    }
+
+    .sidebar-nav-item {
+        min-height: 48px;
+        padding: 12px 14px;
+    }
+
+    .mobile-toggle-card {
+        min-height: 48px;
+    }
+
+    .drawer-btn {
+        min-height: 48px;
+    }
+}
+
+/* 7. Section headings & filters — prevent wrap overflow */
+@media (max-width: 768px) {
+    .section-page-title {
+        font-size: 16px;
+        gap: 6px;
+    }
+
+    .section-page-subtitle {
+        display: block;
+        width: 100%;
+        margin-top: 4px;
+        font-size: 11px;
+    }
+
+    .section-heading-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .section-heading-row .btn {
+        width: 100%;
+        min-height: 44px;
+        justify-content: center;
+    }
+
+    .sticky-filter-row {
+        top: 56px;
+    }
+}
+
+/* 8. Premium empty / loading skeleton feel */
+.empty-state {
+    padding: 48px 20px;
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    opacity: 0.5;
+    margin-bottom: 8px;
+}
+
+.empty-state h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.empty-state p {
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 280px;
+}
+
+/* Skeleton loading placeholders */
+.skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg,
+        rgba(255,255,255,0.04) 25%,
+        rgba(255,255,255,0.08) 50%,
+        rgba(255,255,255,0.04) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+/* 9. Real-time vs locked badge utility (small screens) */
+.badge-live {
+    background: var(--status-good-bg);
+    color: var(--status-good);
+}
+
+.badge-locked {
+    background: var(--status-warning-bg);
+    color: var(--status-warning);
+}
+
+/* 10. Consistent 8pt spacing scale on mobile content */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 12px 12px 24px;
+        margin-top: 12px;
+    }
+
+    .metric-card,
+    .news-card,
+    .index-card,
+    .strategy-card,
+    .index-verdict-card {
+        padding: 14px 16px;
+    }
+}
+
+/* ============================================================================
+   MOBILE UX UPGRADE — DASHBOARD & SIGNALS ENGINE ONLY
+   =========================================================================== */
+
+/* --- B) DASHBOARD PAGE (<= 767px) --- */
+@media (max-width: 767px) {
+    /* Quick Controls Bar Mobile Layout (Pic 1 Refresh) */
+    .quick-controls-bar {
+        padding: 12px 14px !important;
+        background: var(--glass-bg-soft) !important;
+    }
+
+    .quick-controls-inner {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 8px 10px !important;
+    }
+
+    .quick-controls-inner .priority-toggle-box,
+    .quick-controls-inner .auto-refresh-toggle,
+    .quick-controls-inner .btn {
+        margin: 0 !important;
+    }
+
+    /* B1. Win Rate Accuracy Cards & Overview Metrics Cards: 2x2 Grid Style */
+    .split-accuracy-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        overflow-x: visible !important;
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .metrics-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        overflow-x: visible !important;
+        padding: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .split-accuracy-grid .metric-card,
+    .metrics-grid .metric-card {
+        flex: initial !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin-bottom: 0 !important;
+        padding: 12px 14px !important;
+    }
+
+    /* B2. Section Header clean stacking */
+    .section-page-title {
+        font-size: 1.1rem;
+        flex-wrap: wrap;
+    }
+
+    .section-page-subtitle {
+        font-size: 0.8rem;
+        margin-top: 2px;
+    }
+
+    /* B3. Priority Ranking Legend: 1-column stack */
+    .legend-pills-row {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    .legend-rules-link {
+        width: 100% !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* --- C) SIGNALS ENGINE PAGE (<= 767px) --- */
+@media (max-width: 767px) {
+    /* C1. Filter Chips 2x2 Grid Layout (Request 2) */
+    .toolbar-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .filter-tabs {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+        gap: 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
+        padding-bottom: 0 !important;
+    }
+
+    .filter-tabs .tab-btn {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        min-height: 40px !important;
+        justify-content: center !important;
+        font-size: 0.8rem !important;
+        padding: 8px 6px !important;
+        border-radius: 10px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .toolbar-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .search-box,
+    .sort-box {
+        width: 100%;
+    }
+
+    .search-box input,
+    .sort-box select {
+        width: 100%;
+        min-height: 42px;
+        font-size: 16px !important; /* iOS zoom prevention */
+    }
+
+    /* C2. Table -> Compact 2-Column Cards (Request 4: Perfect Space Utilization) */
+    #scannerSection .table-container {
+        overflow-x: visible;
+        padding: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+
+    #scannerDataTable,
+    #scannerDataTable > tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    #scannerDataTable > thead {
+        display: none;
+    }
+
+    #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row) {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        background: var(--card-bg, rgba(23, 23, 23, 0.8));
+        border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.12));
+        border-radius: 14px;
+        padding: 12px 14px;
+        gap: 8px 10px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    #scannerDataTable > tbody > tr.top-choice-row {
+        border: 1.5px solid var(--gold, #c99433);
+        box-shadow: 0 0 16px rgba(201, 148, 51, 0.18);
+        background: linear-gradient(180deg, rgba(201, 148, 51, 0.08) 0%, var(--card-bg, rgba(23, 23, 23, 0.8)) 100%);
+    }
+
+    /* Transform td cells inside signal card into compact pills */
+    #scannerDataTable > tbody > tr > td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 8px;
+        border: 1px solid var(--glass-border);
+        background: var(--glass-bg-soft);
+        border-radius: 8px;
+        font-size: 0.8rem;
+    }
+
+    #scannerDataTable > tbody > tr > td:before {
+        content: attr(data-label);
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: var(--ink-muted);
+        text-transform: uppercase;
+        margin-right: 6px;
+    }
+
+    /* Top Line: Ticker, Signal Badge & Score Pill in 1 Horizontal Top Row */
+    #scannerDataTable > tbody > tr > td[data-label="TICKER"] {
+        grid-column: 1 / -1;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--glass-border);
+        border-radius: 0;
+        font-size: 1.05rem;
+        font-weight: 800;
+        padding: 4px 0 8px 0;
+    }
+    #scannerDataTable > tbody > tr > td[data-label="TICKER"] .ticker-header-flex {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        gap: 6px !important;
+    }
+    #scannerDataTable > tbody > tr > td[data-label="TICKER"]:before {
+        display: none;
+    }
+
+    #scannerDataTable > tbody > tr > td[data-label="RANK"],
+    #scannerDataTable > tbody > tr > td[data-label="SIGNAL"],
+    #scannerDataTable > tbody > tr > td[data-label="CONFIDENCE"] {
+        display: none !important;
+    }
+
+    /* Action Cell: Full-Width Button spans 2 columns */
+    #scannerDataTable > tbody > tr > td[data-label="ACTION"] {
+        grid-column: 1 / -1;
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-top: 1px solid var(--glass-border);
+        border-radius: 0;
+        padding-top: 6px;
+    }
+    #scannerDataTable > tbody > tr > td[data-label="ACTION"]:before {
+        display: none;
+    }
+    #scannerDataTable > tbody > tr > td[data-label="ACTION"] .view-detail-btn {
+        width: 100%;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        font-weight: 700;
+        border-radius: 999px;
+    }
+
+    /* Expandable Gap Probability & Flow Rows */
+    #scannerDataTable > tbody > tr.gap-distribution-row,
+    #scannerDataTable > tbody > tr.flow-detail-row {
+        display: block !important;
+        width: 100% !important;
+        background: var(--glass-bg-soft) !important;
+        border: 1px dashed var(--glass-border-strong) !important;
+        border-radius: 10px !important;
+        padding: 10px !important;
+        margin-top: -4px !important;
+        margin-bottom: 8px !important;
+    }
+
+    #scannerDataTable > tbody > tr.gap-distribution-row td,
+    #scannerDataTable > tbody > tr.flow-detail-row td {
+        display: block !important;
+        width: 100% !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+    }
+}

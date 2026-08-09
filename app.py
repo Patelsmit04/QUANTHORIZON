@@ -941,7 +941,8 @@ def _run_full_scan_pipeline_impl() -> Dict[str, Any]:
         s["gap_bucket_distribution"] = calculate_gap_bucket_distribution(
             s.get("confidence_score", 70),
             s.get("predicted_gap_pct", 0.0),
-            s.get("symbol")
+            s.get("symbol"),
+            s.get("signal", "")
         )
 
     scan_response = {
@@ -1121,6 +1122,15 @@ def background_scheduler_worker():
         cache_store["scan_summary"] = saved_snapshot
         cache_store["timestamp"] = time.time()
         logger.info(f"Loaded persistent 5-Pillar snapshot ({saved_snapshot.get('timestamp')}) from disk.")
+        # Re-compute gap bucket distributions with current engine (format may have changed)
+        from gap_bucket_engine import calculate_gap_bucket_distribution
+        for s in (cache_store["data"] or []):
+            s["gap_bucket_distribution"] = calculate_gap_bucket_distribution(
+                s.get("confidence_score", 70),
+                s.get("predicted_gap_pct", 0.0),
+                s.get("symbol"),
+                s.get("signal", "")
+            )
 
     while True:
         try:

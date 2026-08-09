@@ -90,6 +90,40 @@ document.addEventListener("DOMContentLoaded", () => {
     const exportCsvBtnGuide = document.getElementById("exportCsvBtnGuide");
     const winRateBtnGuide = document.getElementById("winRateBtnGuide");
 
+    // Light / Dark Theme Switcher
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const themeToggleIcon = document.getElementById("themeToggleIcon");
+
+    function applyTheme(theme) {
+        if (theme === "light") {
+            document.documentElement.setAttribute("data-theme", "light");
+            if (themeToggleIcon) {
+                themeToggleIcon.classList.remove("fa-moon");
+                themeToggleIcon.classList.add("fa-sun");
+            }
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+            if (themeToggleIcon) {
+                themeToggleIcon.classList.remove("fa-sun");
+                themeToggleIcon.classList.add("fa-moon");
+            }
+        }
+        try {
+            localStorage.setItem("qh-theme", theme);
+        } catch (e) {}
+    }
+
+    const storedTheme = localStorage.getItem("qh-theme") || "dark";
+    applyTheme(storedTheme);
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            const currentTheme = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+            const nextTheme = currentTheme === "light" ? "dark" : "light";
+            applyTheme(nextTheme);
+        });
+    }
+
     // Nav & News Section DOM
     const scannerSection = document.getElementById("scannerSection");
     const stocksNewsSection = document.getElementById("stocksNewsSection");
@@ -274,8 +308,15 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         Object.entries(sections).forEach(([key, el]) => {
             if (!el) return;
-            if (key === section) el.classList.remove("hidden"); else el.classList.add("hidden");
+            const isMergedDashboard = (section === "dashboard" || section === "scanner") && (key === "dashboard" || key === "scanner");
+            if (key === section || isMergedDashboard) el.classList.remove("hidden"); else el.classList.add("hidden");
         });
+
+        if (section === "scanner" && scannerSection) {
+            scannerSection.scrollIntoView({ behavior: "smooth" });
+        } else if (section === "dashboard" && dashboardSection) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
 
         if (section === "stocksNews" || section === "globalNews") {
             fetchNewsSection();
@@ -322,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function routeFromHash() {
         const raw = (window.location.hash || "").replace(/^#\/?/, "");
-        const section = HASH_TO_SECTION[raw] || "dashboard";
+        const section = HASH_TO_SECTION[raw] || "scanner";
         switchSection(section, { fromHash: true });
     }
     window.addEventListener("hashchange", () => {
@@ -380,6 +421,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (exportCsvBtn) exportCsvBtn.addEventListener("click", exportWatchlistCsv);
     if (autoRefreshToggle) autoRefreshToggle.addEventListener("change", setupAutoRefresh);
     if (priorityOnlyToggle) priorityOnlyToggle.addEventListener("change", filterAndRenderTable);
+    if (filterTabs) {
+        filterTabs.addEventListener("click", (e) => {
+            const btn = e.target.closest(".tab-btn");
+            if (!btn) return;
+            filterTabs.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentFilter = btn.dataset.filter || "ALL";
+            filterAndRenderTable();
+        });
+    }
     if (searchInput) searchInput.addEventListener("input", filterAndRenderTable);
     if (sortSelect) sortSelect.addEventListener("change", filterAndRenderTable);
     if (closeModalBtn) closeModalBtn.addEventListener("click", hideModal);
@@ -766,21 +817,46 @@ document.addEventListener("DOMContentLoaded", () => {
             let bucketHtml = "";
             if (stock.gap_bucket_distribution && stock.gap_bucket_distribution.bucket_probabilities) {
                 const probs = stock.gap_bucket_distribution.bucket_probabilities;
-                const mostLikely = stock.gap_bucket_distribution.most_likely_bucket;
-                const bars = Object.entries(probs).map(([b, p]) => {
+                const distMeta = stock.gap_bucket_distribution;
+                const isSufficient = distMeta.is_sufficient === true || distMeta.is_empirical === true;
+                const sampleSize = distMeta.sample_size || 0;
+
+                // Backend now sends 4 clean buckets directly: "0-1%", "1-2%", "2-3%", "3%+"
+                const mapped = {
+                    "0-1%": probs["0-1%"] || 0,
+                    "1-2%": probs["1-2%"] || 0,
+                    "2-3%": probs["2-3%"] || 0,
+                    "3%+": probs["3%+"] || 0
+                };
+
+                let maxLabel = "0-1%";
+                let maxVal = -1;
+                Object.entries(mapped).forEach(([b, p]) => {
+                    if (p > maxVal) {
+                        maxVal = p;
+                        maxLabel = b;
+                    }
+                });
+
+                const bars = Object.entries(mapped).map(([b, p]) => {
                     const pct = Math.round(p * 100);
-                    const isHighlight = b === mostLikely;
-                    const color = isHighlight ? 'var(--gold)' : 'rgba(212, 175, 55, 0.4)';
+                    const isHighlight = b === maxLabel;
+                    const color = isHighlight ? 'var(--gold)' : 'rgba(212, 175, 55, 0.35)';
                     return `
                         <div style="flex:1;text-align:center;">
                             <div style="font-size:9px;font-weight:800;color:${isHighlight ? 'var(--gold)' : 'var(--ink-muted)'};margin-bottom:2px;">${b}</div>
-                            <div style="height:16px;background:rgba(11,11,11,0.06);border-radius:3px;overflow:hidden;position:relative;" title="${b}: ${pct}% probability">
-                                <div style="height:100%;width:${Math.max(pct, 4)}%;background:${color};border-radius:3px;transition:width 0.3s ease;"></div>
-                                <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--ink-primary);">${pct}%</span>
+                            <div style="height:16px;background:rgba(11,11,11,0.06);border-radius:4px;overflow:hidden;position:relative;" title="${b}: ${pct}% probability${!isSufficient ? ' (model estimate)' : ''}">
+                                <div style="height:100%;width:${Math.max(pct, 5)}%;background:${color};border-radius:4px;transition:width 0.3s ease;${!isSufficient ? 'opacity:0.75;' : ''}"></div>
+                                <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;color:var(--ink-primary);">${pct}%</span>
                             </div>
                         </div>
                     `;
                 }).join("");
+
+                const sufficiencyLabel = isSufficient
+                    ? `<span class="badge badge-gold" style="font-size:9px;margin-left:4px;">MOST LIKELY: ${maxLabel}</span>`
+                    : `<span class="badge" style="font-size:8px;margin-left:4px;background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);padding:2px 6px;border-radius:4px;">PRELIMINARY (n=${sampleSize})</span>
+                       <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">EST. LIKELY: ${maxLabel}</span>`;
 
                 bucketHtml = `
                     <tr class="gap-distribution-row" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
@@ -788,9 +864,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                                 <div style="font-size:10px;font-weight:800;color:var(--ink-primary);white-space:nowrap;">
                                     <i class="fa-solid fa-chart-simple text-gold"></i> GAP PROBABILITY DISTRIBUTION:
-                                    <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">MOST LIKELY: ${mostLikely}</span>
+                                    ${sufficiencyLabel}
                                 </div>
-                                <div style="display:flex;gap:6px;flex:1;min-width:280px;">${bars}</div>
+                                <div style="display:flex;gap:8px;flex:1;min-width:240px;">${bars}</div>
                             </div>
                         </td>
                     </tr>
@@ -804,12 +880,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     </span>
                 </td>
                 <td data-label="TICKER">
-                    <div class="ticker-cell">
+                    <div class="ticker-header-flex">
                         <span class="symbol-name">
                             ${escapeHtml(stock.symbol)}
                             ${stock.rank_position <= 2 ? ' <span class="text-gold" style="font-size:10px;"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
                         </span>
-                        ${stock.next_day_bestest_5 ? '<span class="bestest-5-badge"><i class="fa-solid fa-star"></i> NEXT DAY TOP 5</span>' : ''}
+                        <span class="signal-badge-header ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
+                            ${escapeHtml(sigText)}
+                        </span>
+                        <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
                     </div>
                 </td>
                 <td data-label="SIGNAL">
@@ -845,8 +924,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${flowChipHtml}
                 </td>
                 <td data-label="ACTION">
-                    <button class="btn-icon view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
+                    <button class="btn btn-pill btn-secondary view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
                         <i class="fa-solid fa-chart-line"></i>
+                        <span>VIEW DETAILS</span>
                     </button>
                 </td>
             `;
@@ -2492,16 +2572,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function initNotifications() {
-        if (notifBell) notifBell.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
-        if (notifBellMobileTop) notifBellMobileTop.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
-        if (notifBellMobile) notifBellMobile.addEventListener("click", () => {
+        if (typeof notifBell !== "undefined" && notifBell) notifBell.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
+        if (typeof notifBellMobileTop !== "undefined" && notifBellMobileTop) notifBellMobileTop.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
+        if (typeof notifBellMobile !== "undefined" && notifBellMobile) notifBellMobile.addEventListener("click", () => {
             if (appSidebar) appSidebar.classList.remove("active");
             if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
             if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add("hidden");
             document.body.style.overflow = "";
             if (notifPanel) { notifPanel.classList.remove("hidden"); onNotifPanelOpened(); }
         });
-        if (notifMarkAllBtn) notifMarkAllBtn.addEventListener("click", async (e) => {
+        if (typeof notifMarkAllBtn !== "undefined" && notifMarkAllBtn) notifMarkAllBtn.addEventListener("click", async (e) => {
             e.stopPropagation();
             await apiFetch("/api/notifications/read_all", { method: "POST" });
             notifUnreadCount = 0;
@@ -2510,7 +2590,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         document.addEventListener("click", (e) => {
             if (!notifPanel || notifPanel.classList.contains("hidden")) return;
-            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target)) || (notifBellMobile && notifBellMobile.contains(e.target)) || (notifBellMobileTop && notifBellMobileTop.contains(e.target))) return;
+            const b1 = typeof notifBell !== "undefined" && notifBell && notifBell.contains(e.target);
+            const b2 = typeof notifBellMobile !== "undefined" && notifBellMobile && notifBellMobile.contains(e.target);
+            const b3 = typeof notifBellMobileTop !== "undefined" && notifBellMobileTop && notifBellMobileTop.contains(e.target);
+            if (notifPanel.contains(e.target) || b1 || b2 || b3) return;
             notifPanel.classList.add("hidden");
         });
 
