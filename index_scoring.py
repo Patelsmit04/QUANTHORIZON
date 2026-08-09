@@ -33,6 +33,8 @@ driven by a strategy config (pillar_weight_multipliers) — see strategy_manager
 """
 
 import logging
+import urllib.request
+import re
 from typing import Dict, Any, Optional
 
 import pandas as pd
@@ -48,6 +50,7 @@ INDEX_TICKERS: Dict[str, str] = {
     "NIFTY50": "^NSEI",
     "BANKNIFTY": "^NSEBANK",
     "SENSEX": "^BSESN",
+    "GIFTNIFTY": "GIFTNIFTY=F",
 }
 
 GLOBAL_CUE_TICKERS: Dict[str, str] = {
@@ -141,6 +144,66 @@ def classify_global_cues(cues: Optional[Dict[str, float]]) -> Dict[str, Any]:
     }
 
 
+def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
+    """Fetch live Gift Nifty price & change from Moneycontrol live index feed."""
+    url = "https://www.moneycontrol.com/indian-indices/gift-nifty-500000.html"
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        html = urllib.request.urlopen(req, timeout=5).read().decode('utf-8', errors='ignore')
+        pattern = r'>GIFT NIFTY</a>.*?</td>\s*<td>([\d,]+\.?\d*)</td>\s*<td><span class="([^"]+)">([-\d,]+\.?\d*)</span></td>\s*<td><span class="[^"]+">\(([-\d,]+\.?\d*)%\)</span>'
+        m = re.search(pattern, html, re.DOTALL | re.IGNORECASE)
+        if m:
+            ltp = float(m.group(1).replace(',', ''))
+            cls_name = m.group(2)
+            raw_change = m.group(3).replace(',', '')
+            change_pts = float(raw_change)
+            if 'red' in cls_name.lower() and change_pts > 0:
+                change_pts = -change_pts
+            raw_pct = m.group(4).replace(',', '')
+            pct_change = float(raw_pct)
+            if 'red' in cls_name.lower() and pct_change > 0:
+                pct_change = -pct_change
+            
+            sig = "BTST (BUY)" if pct_change > 0.2 else ("STBT (SELL)" if pct_change < -0.2 else "NEUTRAL")
+            opt_type = "CALL (CE)" if pct_change > 0.2 else ("PUT (PE)" if pct_change < -0.2 else "NONE")
+            
+            return {
+                "index_name": "GIFTNIFTY",
+                "display_name": "Gift Nifty",
+                "raw_ticker": "GIFTNIFTY",
+                "required_weight": 2.0,
+                "confirmed_pillars_weight": 2.0,
+                "confirmed_pillars": ["Gift Nifty Futures Live Feed"],
+                "pillar_weights": {},
+                "relative_strength": {"rs_diff": None, "data_status": "N/A"},
+                "global_cues": {"verdict": "NEUTRAL", "detail": {}},
+                "macro_news": {"verdict": "NEUTRAL"},
+                "derivatives": None,
+                "greeks_outlook": None,
+                "signal": sig,
+                "option_type": opt_type,
+                "conviction_level": "MODERATE",
+                "priority_level": "P2_MEDIUM",
+                "confidence_score": 75 if sig != "NEUTRAL" else 50,
+                "predicted_gap_pct": round(pct_change * 0.5, 2),
+                "ltp": round(ltp, 2),
+                "prev_close": round(ltp - change_pts, 2),
+                "change_pts": round(change_pts, 2),
+                "pct_change": round(pct_change, 2),
+                "day_high": round(ltp, 2),
+                "day_low": round(ltp, 2),
+                "range_position_pct": 50.0,
+                "rsi": 50.0,
+                "rank_reason": "Gift Nifty Live Futures Feed",
+                "score": 75 if sig != "NEUTRAL" else 50,
+                "price_verified": True,
+            }
+    except Exception as e:
+        logger.warning(f"Gift Nifty live fetch error: {e}")
+    return None
+
+
 def evaluate_index_signal(
     index_name: str,
     df_index: pd.DataFrame,
@@ -152,7 +215,7 @@ def evaluate_index_signal(
     required_weight_override: Optional[float] = None,
 ) -> Dict[str, Any]:
     """
-    Evaluate one index (NIFTY50 / BANKNIFTY / SENSEX) against the 6-pillar index model.
+    Evaluate one index (NIFTY50 / BANKNIFTY / SENSEX / GIFTNIFTY) against the 6-pillar index model.
 
     df_index: intraday OHLC for the index itself (Volume ignored — always 0).
     df_nifty: intraday OHLC for Nifty 50, for the relative-strength pillar. Pass None for
@@ -175,6 +238,10 @@ def evaluate_index_signal(
         return weight_mult.get(pillar_name, 1.0)
 
     if df_index is None or df_index.empty or len(df_index) < 5:
+        if index_name == "GIFTNIFTY":
+            gift_live = fetch_gift_nifty_live()
+            if gift_live:
+                return gift_live
         return {
             "index_name": index_name,
             "required_weight": REQUIRED_INDEX_WEIGHT,

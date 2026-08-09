@@ -91,7 +91,6 @@
 
 /* 4. Horizontal Flex Scroll Rails for all score cards & grids across the web app */
 @media (max-width: 1023px) {
-    .strategy-grid,
     .calibration-card-grid,
     .split-accuracy-grid,
     .metrics-grid,
@@ -108,7 +107,6 @@
         flex-wrap: nowrap !important;
     }
 
-    .strategy-grid::-webkit-scrollbar,
     .calibration-card-grid::-webkit-scrollbar,
     .split-accuracy-grid::-webkit-scrollbar,
     .metrics-grid::-webkit-scrollbar,
@@ -117,7 +115,6 @@
         display: none;
     }
 
-    .strategy-card,
     .calibration-bar-card,
     .split-accuracy-grid .metric-card,
     .metrics-grid .metric-card,
@@ -128,6 +125,20 @@
         max-width: 320px !important;
         scroll-snap-align: start !important;
         margin-bottom: 0 !important;
+    }
+
+    /* Strategy grid — vertical scrolling on mobile */
+    .strategy-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        overflow-x: visible !important;
+    }
+    .strategy-grid .strategy-card {
+        flex: initial !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
     }
 }
 

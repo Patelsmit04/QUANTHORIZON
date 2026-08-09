@@ -174,7 +174,7 @@ def _seed_default_strategy_if_missing():
         if DEFAULT_STRATEGY_ID not in store:
             strategy = {
                 "id": DEFAULT_STRATEGY_ID,
-                "name": "Default 5-Pillar",
+                "name": "5-Pillar",
                 "description": "The original scanner behavior: every pillar active, liquidity-tiered "
                                 "thresholds for stocks, both fundamentals and news gates on.",
                 "target_scope": ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX"],
@@ -202,6 +202,11 @@ def _seed_default_strategy_if_missing():
             strategy["config_hash"] = _compute_config_hash(strategy)
             store[DEFAULT_STRATEGY_ID] = strategy
             needs_save = True
+        else:
+            if store[DEFAULT_STRATEGY_ID].get("name") != "5-Pillar" or not store[DEFAULT_STRATEGY_ID].get("is_builtin"):
+                store[DEFAULT_STRATEGY_ID]["name"] = "5-Pillar"
+                store[DEFAULT_STRATEGY_ID]["is_builtin"] = True
+                needs_save = True
 
         smc_id = "smc-institutional-v1"
         smc_code = (

@@ -1968,12 +1968,16 @@ INDEX_TICKER_MAP = {
     "^NSEBANK": "^NSEBANK",
     "SENSEX": "^BSESN",
     "^BSESN": "^BSESN",
+    "GIFTNIFTY": "GIFTNIFTY=F",
+    "GIFT NIFTY": "GIFTNIFTY=F",
+    "GIFTNIFTY=F": "GIFTNIFTY=F",
 }
 
 INDEX_DISPLAY_NAMES = {
     "^NSEI": "Nifty 50",
     "^NSEBANK": "Bank Nifty",
     "^BSESN": "Sensex",
+    "GIFTNIFTY=F": "Gift Nifty",
 }
 
 

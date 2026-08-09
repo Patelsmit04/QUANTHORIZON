@@ -51,8 +51,8 @@
     --bearish: #f04949;
     --bearish-bg: rgba(240, 73, 73, 0.14);
 
-    --font-heading: 'Outfit', 'Segoe UI', sans-serif;
-    --font-body: 'Inter', 'Segoe UI', sans-serif;
+    --font-heading: 'Josefin Sans', 'Segoe UI', sans-serif;
+    --font-body: 'Josefin Sans', 'Segoe UI', sans-serif;
 
     --radius-lg: 24px;
     --radius-md: 16px;
@@ -324,8 +324,8 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 }
 
 .topbar-brand-title {
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 1.32rem;
+    font-family: var(--font-heading);
+    font-size: 1.55rem;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--ink-primary, #ffffff);
@@ -397,10 +397,10 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 
 /* App Logo Frame — Square with Circular Corners */
 .app-logo-frame {
-    width: 46px;
-    height: 46px;
+    width: 52px;
+    height: 52px;
     aspect-ratio: 1 / 1;
-    border-radius: 12px;
+    border-radius: 14px;
     background: linear-gradient(135deg, rgba(201, 148, 51, 0.2), rgba(27, 175, 122, 0.2));
     border: 1px solid var(--glass-border-strong);
     overflow: hidden;
@@ -425,9 +425,9 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 }
 
 .app-logo-frame.sm {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
 }
 
 .app-logo-frame.md {
@@ -497,7 +497,7 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 .drawer-title {
     font-family: var(--font-heading);
     font-weight: 800;
-    font-size: 18px;
+    font-size: 21px;
     color: var(--ink-primary);
 }
 
@@ -552,8 +552,8 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 }
 
 .sidebar-nav-item i {
-    font-size: 16px;
-    width: 18px;
+    font-size: 14px;
+    width: 16px;
     text-align: center;
     color: var(--ink-muted);
     transition: color 0.18s ease;
@@ -1038,7 +1038,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 .mini-table td { padding: 10px 12px; font-size: 12px; border-bottom: 1px solid var(--gridline); white-space: nowrap; }
 
 .ticker-cell { display: flex; flex-direction: column; gap: 3px; }
-.symbol-name { font-family: var(--font-heading); font-weight: 700; font-size: 13px; }
+.symbol-name { font-family: var(--font-heading); font-weight: 700; font-size: 12px; }
 
 /* PRIORITY crown renders on its own line so its presence never shifts where the signal
    badge / confidence pill start in the row (point 3 fix). */
@@ -1068,7 +1068,8 @@ input:checked + .slider:before { transform: translateX(16px); }
 .rank-top2 { background: rgba(11,11,11,0.10); color: var(--ink-primary); }
 .rank-top3 { background: rgba(169, 122, 28, 0.16); color: var(--gold); }
 
-.signal-badge { font-family: var(--font-heading); font-weight: 800; font-size: 12px; }
+.signal-badge { font-family: var(--font-heading); font-weight: 800; font-size: 11px; }
+.signal-badge-header { font-family: var(--font-heading); font-weight: 700; font-size: 11px; white-space: nowrap; }
 
 .badge {
     display: inline-flex; align-items: center; gap: 5px;
@@ -1663,6 +1664,58 @@ input:checked + .slider:before { transform: translateX(16px); }
 }
 
 .index-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+
+/* Index Section Switcher — Segmented Toggle */
+.index-section-switcher {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border-strong);
+    border-radius: var(--radius-pill);
+    padding: 4px;
+    margin-bottom: 18px;
+    width: fit-content;
+}
+.index-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: var(--radius-pill);
+    border: none;
+    background: transparent;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--ink-muted);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+.index-tab-btn:hover {
+    color: var(--ink-primary);
+    background: var(--glass-bg-soft);
+}
+.index-tab-btn.active {
+    background: linear-gradient(135deg, var(--gold), var(--gold-bright));
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+}
+.index-tab-btn.active i { color: #ffffff; }
+@media (max-width: 767px) {
+    .index-section-switcher {
+        width: 100%;
+    }
+    .index-tab-btn {
+        flex: 1 1 0;
+        justify-content: center;
+        padding: 10px 12px;
+        font-size: 11px;
+    }
+}
+
 .index-card-name { font-family: var(--font-heading); font-weight: 800; font-size: 18px; }
 .index-card-ltp { font-family: var(--font-heading); font-size: 22px; font-weight: 800; margin-top: 4px; }
 .index-card-change { font-family: var(--font-heading); font-size: 12px; font-weight: 700; margin-top: 3px; }

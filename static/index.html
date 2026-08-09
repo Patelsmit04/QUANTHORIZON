@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>QuantHorizon — High-Conviction Institutional Engine & Gap Predictor</title>
     <link rel="icon" type="image/png" href="/static/logo.png">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/static/logo.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -495,35 +500,32 @@
                     <h2 class="section-page-title"><i class="fa-solid fa-chart-column text-gold"></i> INDEX INTELLIGENCE
                         <span class="section-page-subtitle">Post-Close Verdict &amp; Live Index Signals</span>
                     </h2>
-                    <div class="indices-jump-links">
-                        <button type="button" class="btn btn-pill btn-secondary btn-sm" onclick="document.getElementById('indexVerdictJumpTarget').scrollIntoView({behavior:'smooth', block:'start'});">
-                            <i class="fa-solid fa-arrow-down"></i><span>BTST Intelligence</span>
-                        </button>
-                        <button type="button" class="btn btn-pill btn-secondary btn-sm" onclick="document.getElementById('liveIndexSignalsJumpTarget').scrollIntoView({behavior:'smooth', block:'start'});">
-                            <i class="fa-solid fa-arrow-down"></i><span>Live Index Signals</span>
-                        </button>
+                <div class="index-section-switcher" id="indexSectionSwitcher" style="margin-top:14px;">
+                    <button class="index-tab-btn active" data-index-view="intelligence">
+                        <i class="fa-solid fa-brain"></i> BTST Intelligence
+                    </button>
+                    <button class="index-tab-btn" data-index-view="signals">
+                        <i class="fa-solid fa-signal"></i> Live Index Signals
+                    </button>
+                </div>
+
+                <div id="indexIntelligenceView">
+                    <div id="indexVerdictMeta" class="form-hint" style="margin-bottom:10px;"></div>
+                    <section class="index-verdict-grid" id="indexVerdictGrid">
+                        <!-- Dynamic structured verdict cards injected by JS -->
+                    </section>
+                    <div id="indexVerdictEmptyState" class="empty-state hidden">
+                        <i class="fa-solid fa-chart-line fa-3x"></i>
+                        <h3>Index BTST Intelligence Hasn't Run Yet Today</h3>
+                        <p>This deeper derivatives + Greeks + macro read runs once, shortly after market close — check back after 3:45 PM IST.</p>
                     </div>
                 </div>
 
-                <div class="index-verdict-heading-row" id="indexVerdictJumpTarget">
-                    <h2 class="index-verdict-heading">Index BTST Intelligence <span class="index-verdict-heading-sub">Post-Close Verdict</span></h2>
-                    <div id="indexVerdictMeta" class="form-hint"></div>
+                <div id="indexSignalsView" class="hidden">
+                    <section class="index-grid" id="indexGrid">
+                        <!-- Dynamic index cards injected by JS -->
+                    </section>
                 </div>
-                <section class="index-verdict-grid" id="indexVerdictGrid">
-                    <!-- Dynamic structured verdict cards injected by JS -->
-                </section>
-                <div id="indexVerdictEmptyState" class="empty-state hidden">
-                    <i class="fa-solid fa-chart-line fa-3x"></i>
-                    <h3>Index BTST Intelligence Hasn't Run Yet Today</h3>
-                    <p>This deeper derivatives + Greeks + macro read runs once, shortly after market close — check back after 3:45 PM IST.</p>
-                </div>
-
-                <div class="index-verdict-heading-row" id="liveIndexSignalsJumpTarget" style="margin-top:28px;">
-                    <h2 class="index-verdict-heading">Live Index Signals</h2>
-                </div>
-                <section class="index-grid" id="indexGrid">
-                    <!-- Dynamic index cards injected by JS -->
-                </section>
             </div>
             <!-- ============================== END INDICES SECTION ============================== -->
 
@@ -532,7 +534,7 @@
 
                 <div class="section-heading-row">
                     <h2 class="section-page-title"><i class="fa-solid fa-sliders text-gold"></i> STRATEGIES
-                        <span class="section-page-subtitle">Default 5-Pillar Matrix + Your Custom Presets</span>
+                        <span class="section-page-subtitle">5-Pillar Matrix + Your Custom Presets</span>
                     </h2>
                 </div>
 

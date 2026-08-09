@@ -15,6 +15,7 @@ data/*.lock
 .idea/
 venv/
 .venv/
+*.db
 *.log
 .vercel
 .aider*

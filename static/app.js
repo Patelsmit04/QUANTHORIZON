@@ -156,6 +156,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Indices & Strategies Section DOM
     const indicesSection = document.getElementById("indicesSection");
+    const indexSectionSwitcher = document.getElementById("indexSectionSwitcher");
+    const indexIntelligenceView = document.getElementById("indexIntelligenceView");
+    const indexSignalsView = document.getElementById("indexSignalsView");
     const indexGrid = document.getElementById("indexGrid");
     const indexTickerTrack = document.getElementById("indexTickerTrack");
     const indexVerdictGrid = document.getElementById("indexVerdictGrid");
@@ -427,6 +430,23 @@ document.addEventListener("DOMContentLoaded", () => {
             toggle.setAttribute("aria-expanded", String(expanding));
             toggle.querySelector("i").classList.toggle("fa-chevron-up", expanding);
             toggle.querySelector("i").classList.toggle("fa-chevron-down", !expanding);
+        });
+    }
+
+    if (indexSectionSwitcher) {
+        indexSectionSwitcher.addEventListener("click", (e) => {
+            const btn = e.target.closest(".index-tab-btn");
+            if (!btn) return;
+            indexSectionSwitcher.querySelectorAll(".index-tab-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            const view = btn.dataset.indexView;
+            if (view === "intelligence") {
+                if (indexIntelligenceView) indexIntelligenceView.classList.remove("hidden");
+                if (indexSignalsView) indexSignalsView.classList.add("hidden");
+            } else if (view === "signals") {
+                if (indexIntelligenceView) indexIntelligenceView.classList.add("hidden");
+                if (indexSignalsView) indexSignalsView.classList.remove("hidden");
+            }
         });
     }
 
