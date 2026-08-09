@@ -116,6 +116,33 @@
     border-color: #cbd5e1;
 }
 
+[data-theme="light"] .sort-box select option {
+    background: #ffffff !important;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .tab-btn {
+    background: #ffffff;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+[data-theme="light"] .tab-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+[data-theme="light"] .tab-btn.active {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    border-color: #0f172a !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2) !important;
+}
+
+[data-theme="light"] .tab-btn.active i {
+    color: #ffffff !important;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -2077,9 +2104,6 @@ input:checked + .slider:before { transform: translateX(16px); }
         align-items: center;
         justify-content: center;
         gap: 8px;
-    }
-    #stocksTableBody td:nth-child(12) .view-detail-btn::after {
-        content: "VIEW DETAILS";
     }
 
     .index-grid, .strategy-grid, .news-grid, .index-verdict-grid {

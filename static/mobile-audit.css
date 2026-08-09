@@ -405,7 +405,51 @@
 
 /* --- C) SIGNALS ENGINE PAGE (<= 767px) --- */
 @media (max-width: 767px) {
-    /* C1. Table -> Cards (Zero horizontal page scroll) */
+    /* C1. Filter Chips 2x2 Grid Layout (Request 2) */
+    .filter-tabs {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        width: 100% !important;
+        overflow-x: visible !important;
+        padding-bottom: 0 !important;
+    }
+
+    .filter-tabs .tab-btn {
+        width: 100% !important;
+        min-height: 40px !important;
+        justify-content: center !important;
+        font-size: 0.8rem !important;
+        padding: 8px 10px !important;
+        border-radius: 10px !important;
+        white-space: nowrap !important;
+    }
+
+    .toolbar-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .toolbar-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .search-box,
+    .sort-box {
+        width: 100%;
+    }
+
+    .search-box input,
+    .sort-box select {
+        width: 100%;
+        min-height: 42px;
+        font-size: 16px !important; /* iOS zoom prevention */
+    }
+
+    /* C2. Table -> Compact 2-Column Cards (Request 4: Perfect Space Utilization) */
     #scannerSection .table-container {
         overflow-x: visible;
         padding: 0;
@@ -418,7 +462,7 @@
     #scannerDataTable > tbody {
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 12px;
         width: 100%;
     }
 
@@ -427,48 +471,54 @@
     }
 
     #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row) {
-        display: flex;
-        flex-direction: column;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
         background: var(--card-bg, rgba(23, 23, 23, 0.8));
         border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.12));
-        border-radius: 16px;
-        padding: 16px;
-        gap: 10px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        border-radius: 14px;
+        padding: 12px 14px;
+        gap: 8px 10px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     }
 
     #scannerDataTable > tbody > tr.top-choice-row {
         border: 1.5px solid var(--gold, #c99433);
-        box-shadow: 0 0 20px rgba(201, 148, 51, 0.2);
+        box-shadow: 0 0 16px rgba(201, 148, 51, 0.18);
         background: linear-gradient(180deg, rgba(201, 148, 51, 0.08) 0%, var(--card-bg, rgba(23, 23, 23, 0.8)) 100%);
     }
 
-    /* Transform td cells inside signal card */
+    /* Transform td cells inside signal card into compact pills */
     #scannerDataTable > tbody > tr > td {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 4px 0;
-        border: none;
-        background: transparent;
-        font-size: 0.85rem;
+        padding: 6px 8px;
+        border: 1px solid var(--glass-border);
+        background: var(--glass-bg-soft);
+        border-radius: 8px;
+        font-size: 0.8rem;
     }
 
     #scannerDataTable > tbody > tr > td:before {
         content: attr(data-label);
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 800;
         letter-spacing: 0.04em;
         color: var(--ink-muted);
         text-transform: uppercase;
+        margin-right: 6px;
     }
 
-    /* Header Line: Ticker & Score */
+    /* Top Line: Ticker & Crown Badge span 2 columns */
     #scannerDataTable > tbody > tr > td[data-label="TICKER"] {
-        font-size: 1.1rem;
-        font-weight: 800;
-        padding-bottom: 8px;
+        grid-column: 1 / -1;
+        background: transparent;
+        border: none;
         border-bottom: 1px solid var(--glass-border);
+        border-radius: 0;
+        font-size: 1.05rem;
+        font-weight: 800;
+        padding: 2px 0 6px 0;
     }
     #scannerDataTable > tbody > tr > td[data-label="TICKER"]:before {
         display: none;
@@ -478,36 +528,52 @@
         display: none;
     }
 
-    /* Action Cell: Full-Width 44px Button */
+    /* Sub-Header: Signal badge spans 2 columns */
+    #scannerDataTable > tbody > tr > td[data-label="SIGNAL"] {
+        grid-column: 1 / -1;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 0 0 4px 0;
+        font-size: 0.9rem;
+        font-weight: 800;
+    }
+
+    /* Action Cell: Full-Width Button spans 2 columns */
     #scannerDataTable > tbody > tr > td[data-label="ACTION"] {
+        grid-column: 1 / -1;
         width: 100%;
-        padding-top: 10px;
+        background: transparent;
+        border: none;
         border-top: 1px solid var(--glass-border);
+        border-radius: 0;
+        padding-top: 6px;
     }
     #scannerDataTable > tbody > tr > td[data-label="ACTION"]:before {
         display: none;
     }
     #scannerDataTable > tbody > tr > td[data-label="ACTION"] .view-detail-btn {
         width: 100%;
-        min-height: 44px;
+        min-height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         font-weight: 700;
+        border-radius: 999px;
     }
 
-    /* Expandable Gap Probability & Flow Rows: Block layout */
+    /* Expandable Gap Probability & Flow Rows */
     #scannerDataTable > tbody > tr.gap-distribution-row,
     #scannerDataTable > tbody > tr.flow-detail-row {
         display: block !important;
         width: 100% !important;
         background: var(--glass-bg-soft) !important;
         border: 1px dashed var(--glass-border-strong) !important;
-        border-radius: 12px !important;
-        padding: 12px !important;
-        margin-top: -6px !important;
-        margin-bottom: 10px !important;
+        border-radius: 10px !important;
+        padding: 10px !important;
+        margin-top: -4px !important;
+        margin-bottom: 8px !important;
     }
 
     #scannerDataTable > tbody > tr.gap-distribution-row td,
@@ -515,49 +581,7 @@
         display: block !important;
         width: 100% !important;
         padding: 0 !important;
-    }
-
-    /* C2. Filter Chips & Toolbar */
-    .toolbar-container {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-
-    .filter-tabs {
-        display: flex !important;
-        overflow-x: auto !important;
-        flex-wrap: nowrap !important;
-        scrollbar-width: none;
-        padding-bottom: 4px;
-        gap: 8px;
-        width: 100%;
-    }
-    .filter-tabs::-webkit-scrollbar {
-        display: none;
-    }
-
-    .filter-tabs .tab-btn {
-        flex: 0 0 auto !important;
-        min-height: 44px !important;
-        white-space: nowrap !important;
-    }
-
-    .toolbar-actions {
-        flex-direction: column;
-        width: 100%;
-        gap: 10px;
-    }
-
-    .search-box,
-    .sort-box {
-        width: 100%;
-    }
-
-    .search-box input,
-    .sort-box select {
-        width: 100%;
-        min-height: 44px;
-        font-size: 16px !important; /* iOS zoom prevention */
+        background: transparent !important;
+        border: none !important;
     }
 }
