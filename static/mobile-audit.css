@@ -42,23 +42,16 @@
         min-width: 44px;
     }
 
-    .market-status-box {
-        flex: 1 1 auto;
-        min-width: 0;
-        padding: 6px 10px;
+    .topbar-brand {
         gap: 8px;
     }
 
-    .market-status-box .status-label {
-        display: none;
-    }
-
-    .market-status-box .timer-box {
-        display: none;
+    .topbar-brand-title {
+        font-size: 1.1rem;
     }
 }
 
-/* 2. Phone: even tighter topbar — keep only hamburger + logo + status + scan + bell */
+/* 2. Phone: even tighter topbar — keep only hamburger + brand + scan + bell */
 @media (max-width: 560px) {
     .content-topbar {
         padding: 6px 10px;
@@ -66,12 +59,8 @@
         gap: 8px;
     }
 
-    .market-status-box {
-        padding: 4px 8px;
-    }
-
-    .market-status-box .status-text {
-        min-width: 0;
+    .topbar-brand-title {
+        font-size: 1rem;
     }
 
     .header-actions #scanBtn span {

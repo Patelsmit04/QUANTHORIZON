@@ -222,7 +222,25 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     flex-wrap: wrap;
 }
 
-.topbar-brand-mini { display: none; flex-shrink: 0; }
+.topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.topbar-brand-title {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink-primary, #ffffff);
+    line-height: 1;
+}
+
+.topbar-brand-title span {
+    color: var(--gold, #c99433);
+}
 .topbar-spacer { flex: 1 1 auto; }
 
 @media (min-width: 1024px) {
@@ -266,7 +284,6 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     }
     .drawer-close-btn:hover { background: var(--gold-bg); color: var(--gold); }
     .sidebar-mobile-controls { display: block; }
-    .topbar-brand-mini { display: flex; }
 }
 
 /* App Logo Frame — Square with Circular Corners */

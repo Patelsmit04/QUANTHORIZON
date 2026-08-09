@@ -18,8 +18,8 @@
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=6.1.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=6.1.0">
+    <link rel="stylesheet" href="/static/styles.css?v=6.2.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=6.2.0">
 </head>
 <body>
 
@@ -156,23 +156,11 @@
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
-                <div class="topbar-brand-mini">
+                <div class="topbar-brand">
                     <div class="app-logo-frame sm">
                         <img src="/static/logo.png" alt="QuantHorizon Logo">
                     </div>
-                </div>
-
-                <!-- Market Status Pill (mode/timer sub-label hides under 768px via CSS) -->
-                <div class="market-status-box">
-                    <div class="status-indicator live-pulse" id="statusDot"></div>
-                    <div class="status-text">
-                        <span class="status-label">MARKET STATUS</span>
-                        <span id="marketStatusText" class="status-value">OPEN</span>
-                    </div>
-                    <div class="timer-box">
-                        <span class="timer-label" id="scanModeLabel">MODE:</span>
-                        <span id="marketTimer" class="timer-value">OFF-MARKET SNAPSHOT (3:30 PM Scan Locked)</span>
-                    </div>
+                    <div class="topbar-brand-title">Quant<span>Horizon</span></div>
                 </div>
 
                 <div class="topbar-spacer"></div>
@@ -1114,6 +1102,6 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=6.1.0"></script>
+    <script src="/static/app.js?v=6.2.0"></script>
 </body>
 </html>
