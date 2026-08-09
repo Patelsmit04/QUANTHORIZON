@@ -817,27 +817,17 @@ document.addEventListener("DOMContentLoaded", () => {
             let bucketHtml = "";
             if (stock.gap_bucket_distribution && stock.gap_bucket_distribution.bucket_probabilities) {
                 const probs = stock.gap_bucket_distribution.bucket_probabilities;
-                
-                // Aggregate probabilities into 4 clean buckets: 0-1%, 1-2%, 2-3%, 3%+
-                const mapped = {
-                    "0-1%": 0,
-                    "1-2%": 0,
-                    "2-3%": 0,
-                    "3%+": 0
-                };
+                const distMeta = stock.gap_bucket_distribution;
+                const isSufficient = distMeta.is_sufficient === true || distMeta.is_empirical === true;
+                const sampleSize = distMeta.sample_size || 0;
 
-                Object.entries(probs).forEach(([b, p]) => {
-                    const key = b.toString();
-                    if (key.includes("0-0.3") || key.includes("0.3-0.5") || key.includes("0.5-1.0") || key.includes("0-1")) {
-                        mapped["0-1%"] += p;
-                    } else if (key.includes("1.0-1.7") || key.includes("1.7-2.0") || key.includes("1-2")) {
-                        mapped["1-2%"] += p;
-                    } else if (key.includes("2.0-3.0") || key.includes("2-3")) {
-                        mapped["2-3%"] += p;
-                    } else {
-                        mapped["3%+"] += p;
-                    }
-                });
+                // Backend now sends 4 clean buckets directly: "0-1%", "1-2%", "2-3%", "3%+"
+                const mapped = {
+                    "0-1%": probs["0-1%"] || 0,
+                    "1-2%": probs["1-2%"] || 0,
+                    "2-3%": probs["2-3%"] || 0,
+                    "3%+": probs["3%+"] || 0
+                };
 
                 let maxLabel = "0-1%";
                 let maxVal = -1;
@@ -855,13 +845,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     return `
                         <div style="flex:1;text-align:center;">
                             <div style="font-size:9px;font-weight:800;color:${isHighlight ? 'var(--gold)' : 'var(--ink-muted)'};margin-bottom:2px;">${b}</div>
-                            <div style="height:16px;background:rgba(11,11,11,0.06);border-radius:4px;overflow:hidden;position:relative;" title="${b}: ${pct}% probability">
-                                <div style="height:100%;width:${Math.max(pct, 5)}%;background:${color};border-radius:4px;transition:width 0.3s ease;"></div>
+                            <div style="height:16px;background:rgba(11,11,11,0.06);border-radius:4px;overflow:hidden;position:relative;" title="${b}: ${pct}% probability${!isSufficient ? ' (model estimate)' : ''}">
+                                <div style="height:100%;width:${Math.max(pct, 5)}%;background:${color};border-radius:4px;transition:width 0.3s ease;${!isSufficient ? 'opacity:0.75;' : ''}"></div>
                                 <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;color:var(--ink-primary);">${pct}%</span>
                             </div>
                         </div>
                     `;
                 }).join("");
+
+                const sufficiencyLabel = isSufficient
+                    ? `<span class="badge badge-gold" style="font-size:9px;margin-left:4px;">MOST LIKELY: ${maxLabel}</span>`
+                    : `<span class="badge" style="font-size:8px;margin-left:4px;background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);padding:2px 6px;border-radius:4px;">PRELIMINARY (n=${sampleSize})</span>
+                       <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">EST. LIKELY: ${maxLabel}</span>`;
 
                 bucketHtml = `
                     <tr class="gap-distribution-row" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
@@ -869,7 +864,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                                 <div style="font-size:10px;font-weight:800;color:var(--ink-primary);white-space:nowrap;">
                                     <i class="fa-solid fa-chart-simple text-gold"></i> GAP PROBABILITY DISTRIBUTION:
-                                    <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">MOST LIKELY: ${maxLabel}</span>
+                                    ${sufficiencyLabel}
                                 </div>
                                 <div style="display:flex;gap:8px;flex:1;min-width:240px;">${bars}</div>
                             </div>

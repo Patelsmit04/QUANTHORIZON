@@ -1290,7 +1290,7 @@ def get_prediction_history(
         is_evaluated = r.get("next_open_915") is not None
         actual_gap = r.get("actual_gap_pct", 0.0) if is_evaluated else None
         
-        pred_dist = calculate_gap_bucket_distribution(r["confidence_score"], r["predicted_gap_pct"], sym)
+        pred_dist = calculate_gap_bucket_distribution(r["confidence_score"], r["predicted_gap_pct"], sym, r.get("signal", ""))
         pred_bucket = pred_dist["most_likely_bucket"]
         realized_bucket = classify_gap_into_bucket(actual_gap) if actual_gap is not None else None
 

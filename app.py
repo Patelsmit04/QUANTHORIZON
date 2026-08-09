@@ -941,7 +941,8 @@ def _run_full_scan_pipeline_impl() -> Dict[str, Any]:
         s["gap_bucket_distribution"] = calculate_gap_bucket_distribution(
             s.get("confidence_score", 70),
             s.get("predicted_gap_pct", 0.0),
-            s.get("symbol")
+            s.get("symbol"),
+            s.get("signal", "")
         )
 
     scan_response = {
