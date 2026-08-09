@@ -4,6 +4,7 @@ __pycache__/
 data/*.json
 !data/stock_news_cache.json
 !data/last_market_scan.json
+!data/event_calendar.json
 data/*.db
 data/*.lock
 .env

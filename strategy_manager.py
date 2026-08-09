@@ -288,6 +288,61 @@ def _seed_default_strategy_if_missing():
             store[smc_id] = smc_strat
             needs_save = True
 
+        # Intraday Strategy Engine (strategy_engine.py) — 6 rule-based options-alert
+        # strategies (spec: VWAP Pullback / Breakdown Spike / ORB / OI Surge / Death Cross /
+        # Volatility Straddle). These are pure on/off toggle registrations, not python_code-
+        # driven pillar strategies — strategy_engine.py calls strategy_engine_rules.py
+        # directly and only reads scope_toggles/is_active from here (same check
+        # smc_scanner.is_smc_scope_enabled does for smc-institutional-v1 above). Default ON
+        # for every applicable scope, per the spec ("Default: All strategies ON").
+        intraday_specs = [
+            ("vwap-pullback-v1", "VWAP Pullback", "Buy Call on a bullish pullback to VWAP/EMA with an RSI reversal above 50.",
+             ["NIFTY50", "BANKNIFTY", "SENSEX"], {"stocks": False, "indices": True}),
+            ("breakdown-spike-v1", "Breakdown Spike", "Buy Put on a range breakdown confirmed by a 1.5x volume spike.",
+             ["NIFTY50", "BANKNIFTY", "SENSEX"], {"stocks": False, "indices": True}),
+            ("orb-v1", "ORB", "Opening Range Breakout — Buy Call/Put on a break of the first 30 minutes' high/low.",
+             ["NIFTY50", "BANKNIFTY", "SENSEX"], {"stocks": False, "indices": True}),
+            ("oi-surge-v1", "OI Surge", "Buy 1-strike-OTM Call on a 15-min price surge with long OI build-up.",
+             ["STOCKS"], {"stocks": True, "indices": False}),
+            ("death-cross-v1", "Death Cross", "Buy ATM Put on a 15-min 5/20 EMA death cross with short OI build-up.",
+             ["STOCKS"], {"stocks": True, "indices": False}),
+            ("volatility-straddle-v1", "Volatility Straddle", "Buy ATM Call + Put ahead of a high-impact event when IV is in its low percentile. Sensex excluded — no live options data source exists for it.",
+             ["STOCKS", "NIFTY50", "BANKNIFTY"], {"stocks": True, "indices": True}),
+        ]
+        for strat_id, strat_name, desc, target_scope, scope_toggles in intraday_specs:
+            if strat_id in store:
+                continue
+            strat = {
+                "id": strat_id,
+                "name": strat_name,
+                "description": desc,
+                "target_scope": target_scope,
+                "active_pillars": {p: True for p in ALL_PILLAR_NAMES},
+                "required_weight_override": None,
+                "fundamentals_gate_enabled": True,
+                "news_gate_enabled": True,
+                "auto_paper_trade": False,
+                "is_active": True,
+                "is_builtin": True,
+                "scope_toggles": scope_toggles,
+                "clarification": {
+                    "confirmed": True,
+                    "confirmed_at": now,
+                    "target_summary": ", ".join(target_scope),
+                    "pillar_summary": "Rule-based condition chain (strategy_engine_rules.py), not the pillar matrix.",
+                    "confirmation_bar_summary": "Fixed rule conditions from the intraday Strategy Engine spec.",
+                    "gate_summary": "Fundamentals/news gates not applicable — this is an intraday rule engine, not the BTST pillar model.",
+                    "assumptions": [],
+                    "plain_summary": desc,
+                    "auto_confirmed_reason": "Built-in intraday Strategy Engine strategy — no clarification needed.",
+                },
+                "created_at": now,
+                "updated_at": now,
+            }
+            strat["config_hash"] = _compute_config_hash(strat)
+            store[strat_id] = strat
+            needs_save = True
+
         if needs_save:
             _save_all(store)
 

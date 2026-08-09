@@ -1,0 +1,6 @@
+{
+  "_note": "Manually maintained. Add RBI MPC dates, the Union Budget date, and any per-stock results dates you know about. 'scope' is 'ALL' (applies to every asset), an index name (NIFTY50/BANKNIFTY/SENSEX), or a bare stock symbol (no .NS suffix). Used only by Strategy F (Volatility Straddle)'s 48-hour event filter — nothing here is fetched automatically.",
+  "events": [
+    {"date": "2026-08-06", "label": "RBI MPC Policy (example — replace with real upcoming dates)", "scope": "ALL"}
+  ]
+}

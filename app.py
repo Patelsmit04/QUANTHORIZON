@@ -2204,6 +2204,20 @@ def start_smc_scanner_on_startup():
         logger.warning(f"Could not start SMC Scanner on startup: {e}")
 
 
+@app.on_event("startup")
+def start_strategy_engine_on_startup():
+    # Gated like the main scheduler (lifespan(), above) — a serverless cold start has no
+    # business spinning up a background thread that dies with the instance.
+    if os.environ.get("VERCEL"):
+        return
+    try:
+        from strategy_engine import strategy_engine
+        strategy_engine.start_background_worker()
+        logger.info("Intraday Strategy Engine started on app startup.")
+    except Exception as e:
+        logger.warning(f"Could not start Intraday Strategy Engine on startup: {e}")
+
+
 @app.get("/", response_class=HTMLResponse)
 def serve_dashboard():
     return FileResponse("static/index.html")
