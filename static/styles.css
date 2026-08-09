@@ -276,8 +276,13 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 .topbar-brand {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex-shrink: 0;
+}
+
+.app-logo-frame.sm {
+    width: 36px;
+    height: 36px;
 }
 
 .topbar-brand-title {
@@ -287,6 +292,21 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     letter-spacing: -0.02em;
     color: var(--ink-primary, #ffffff);
     line-height: 1;
+}
+
+.mobile-menu-toggle {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border-strong);
+    background: var(--glass-bg-soft);
+    color: var(--ink-primary);
+    font-size: 14px;
+    margin-right: 14px;
+    cursor: pointer;
 }
 
 .topbar-brand-title span {

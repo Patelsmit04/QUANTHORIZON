@@ -363,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function routeFromHash() {
         const raw = (window.location.hash || "").replace(/^#\/?/, "");
-        const section = HASH_TO_SECTION[raw] || "dashboard";
+        const section = HASH_TO_SECTION[raw] || "scanner";
         switchSection(section, { fromHash: true });
     }
     window.addEventListener("hashchange", () => {

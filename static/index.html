@@ -18,8 +18,8 @@
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=6.5.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=6.5.0">
+    <link rel="stylesheet" href="/static/styles.css?v=6.6.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=6.6.0">
 </head>
 <body>
 
@@ -47,13 +47,9 @@
             </div>
 
             <nav class="sidebar-nav" id="sidebarNav">
-                <button class="sidebar-nav-item active" data-section="dashboard" title="Dashboard">
-                    <i class="fa-solid fa-gauge-high"></i>
-                    <span class="nav-label">Dashboard</span>
-                </button>
-                <button class="sidebar-nav-item" data-section="scanner" title="Signals Engine">
+                <button class="sidebar-nav-item active" data-section="scanner" title="Scanner">
                     <i class="fa-solid fa-crosshairs"></i>
-                    <span class="nav-label">Signals Engine</span>
+                    <span class="nav-label">Scanner</span>
                     <span class="nav-badge" id="signalsNavBadge">0</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="stocksNews" title="Stocks News">
@@ -96,46 +92,6 @@
                     <span class="nav-label">Rules</span>
                 </button>
             </nav>
-
-            <!-- Mobile-only quick controls: identical toggles/actions to the desktop sticky top bar,
-                 surfaced here too since the top bar's secondary controls collapse on small screens
-                 and the drawer is the one place on mobile guaranteed to have room for all of them. -->
-            <div class="sidebar-mobile-controls">
-                <div class="drawer-section-label"><i class="fa-solid fa-sliders"></i> QUICK CONTROLS</div>
-                <div class="mobile-toggles-row">
-                    <div class="mobile-toggle-card">
-                        <span><i class="fa-solid fa-fire text-gold"></i> PRIORITY ONLY</span>
-                        <label class="switch">
-                            <input type="checkbox" id="priorityOnlyToggleMobile" aria-label="Show priority picks only">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="mobile-toggle-card">
-                        <span><i class="fa-solid fa-rotate-right"></i> AUTO REFRESH</span>
-                        <label class="switch">
-                            <input type="checkbox" id="autoRefreshToggleMobile" checked aria-label="Toggle auto refresh">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="drawer-section-label"><i class="fa-solid fa-layer-group"></i> ACTIONS &amp; ANALYTICS</div>
-                <div class="mobile-menu-controls">
-                    <button id="scanBtnMobile" class="btn btn-pill btn-primary drawer-btn">
-                        <i class="fa-solid fa-bolt"></i> SCAN NOW
-                    </button>
-                    <button id="winRateBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
-                        <i class="fa-solid fa-trophy text-gold"></i> WIN RATE ANALYTICS
-                    </button>
-                    <button id="exportCsvBtnMobile" class="btn btn-pill btn-secondary drawer-btn">
-                        <i class="fa-solid fa-file-csv"></i> EXPORT CSV
-                    </button>
-                    <button id="notifBellMobile" class="btn btn-pill btn-secondary drawer-btn">
-                        <i class="fa-solid fa-bell"></i> NOTIFICATIONS
-                        <span class="notif-badge hidden" id="notifBadgeMobile">0</span>
-                    </button>
-                </div>
-            </div>
 
             <div class="sidebar-footer">
                 <div class="paper-trade-badge">
@@ -197,10 +153,6 @@
                         </label>
                     </div>
 
-                    <button id="guideBtn" class="btn btn-pill btn-secondary" title="Priority Ranking & Gap Prediction Rules">
-                        <i class="fa-solid fa-circle-question"></i>
-                        <span>GUIDE</span>
-                    </button>
 
                     <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
                         <i class="fa-solid fa-file-csv"></i>
@@ -343,39 +295,7 @@
 
                 </section>
 
-                <!-- Clean Priority Ranking Legend Card (summary — full detail lives on the Rules page) -->
-                <section class="ranking-legend-card">
-                    <div class="legend-header">
-                        <div class="legend-title-wrap">
-                            <i class="fa-solid fa-layer-group text-gold"></i>
-                            <span class="legend-title">PRIORITY RANKING LEGEND</span>
-                        </div>
-                        <span class="legend-subtitle">How Stocks Are Filtered &amp; Ranked By Conviction</span>
-                    </div>
-                    <div class="legend-pills-row">
-                        <div class="legend-pill-card legend-p1-pill">
-                            <span class="badge badge-p1-high"><i class="fa-solid fa-fire"></i> PRIORITY 1</span>
-                            <div class="legend-text">
-                                <strong>High Conviction (85%–100% Score)</strong>: Price within 0.3% of High/Low + Vol Surge ≥ 3.0x + VWAP/RSI Confluence.
-                            </div>
-                        </div>
-                        <div class="legend-pill-card legend-p2-pill">
-                            <span class="badge badge-p2-medium"><i class="fa-solid fa-bolt"></i> PRIORITY 2</span>
-                            <div class="legend-text">
-                                <strong>Moderate Conviction (65%–84% Score)</strong>: Standard breakout within 0.5%–1.0% of High/Low + Vol Surge ≥ 1.8x.
-                            </div>
-                        </div>
-                        <div class="legend-pill-card legend-p3-pill">
-                            <span class="badge badge-p3-low"><i class="fa-solid fa-eye"></i> WATCHLIST</span>
-                            <div class="legend-text">
-                                <strong>Accumulation / Watchlist (&lt;65% Score)</strong>: Early volume surge without full price breakout.
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-pill btn-secondary legend-rules-link" data-section-link="rules">
-                        <i class="fa-solid fa-scale-balanced"></i> View Full Quantitative Rules
-                    </button>
-                </section>
+
 
             </div>
             <!-- ============================== END DASHBOARD SECTION ============================== -->
@@ -1100,6 +1020,6 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=6.5.0"></script>
+    <script src="/static/app.js?v=6.6.0"></script>
 </body>
 </html>
