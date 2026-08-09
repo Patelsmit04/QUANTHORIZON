@@ -2248,6 +2248,31 @@ def start_strategy_engine_on_startup():
         logger.warning(f"Could not start Intraday Strategy Engine on startup: {e}")
 
 
+@app.get("/manifest.json")
+def get_manifest():
+    return FileResponse(os.path.join(STATIC_DIR, "manifest.json"), media_type="application/json")
+
+
+@app.get("/favicon.ico")
+def get_favicon():
+    return FileResponse(os.path.join(STATIC_DIR, "favicon.ico"), media_type="image/x-icon")
+
+
+@app.get("/apple-touch-icon.png")
+def get_apple_touch_icon():
+    return FileResponse(os.path.join(STATIC_DIR, "apple-touch-icon.png"), media_type="image/png")
+
+
+@app.get("/icon-192.png")
+def get_icon_192():
+    return FileResponse(os.path.join(STATIC_DIR, "icon-192.png"), media_type="image/png")
+
+
+@app.get("/icon-512.png")
+def get_icon_512():
+    return FileResponse(os.path.join(STATIC_DIR, "icon-512.png"), media_type="image/png")
+
+
 @app.get("/", response_class=HTMLResponse)
 @app.get("/scanner", response_class=HTMLResponse)
 @app.get("/signals", response_class=HTMLResponse)
