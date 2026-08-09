@@ -421,6 +421,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (exportCsvBtn) exportCsvBtn.addEventListener("click", exportWatchlistCsv);
     if (autoRefreshToggle) autoRefreshToggle.addEventListener("change", setupAutoRefresh);
     if (priorityOnlyToggle) priorityOnlyToggle.addEventListener("change", filterAndRenderTable);
+    if (filterTabs) {
+        filterTabs.addEventListener("click", (e) => {
+            const btn = e.target.closest(".tab-btn");
+            if (!btn) return;
+            filterTabs.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentFilter = btn.dataset.filter || "ALL";
+            filterAndRenderTable();
+        });
+    }
     if (searchInput) searchInput.addEventListener("input", filterAndRenderTable);
     if (sortSelect) sortSelect.addEventListener("change", filterAndRenderTable);
     if (closeModalBtn) closeModalBtn.addEventListener("click", hideModal);
@@ -807,17 +817,47 @@ document.addEventListener("DOMContentLoaded", () => {
             let bucketHtml = "";
             if (stock.gap_bucket_distribution && stock.gap_bucket_distribution.bucket_probabilities) {
                 const probs = stock.gap_bucket_distribution.bucket_probabilities;
-                const mostLikely = stock.gap_bucket_distribution.most_likely_bucket;
-                const bars = Object.entries(probs).map(([b, p]) => {
+                
+                // Aggregate probabilities into 4 clean buckets: 0-1%, 1-2%, 2-3%, 3%+
+                const mapped = {
+                    "0-1%": 0,
+                    "1-2%": 0,
+                    "2-3%": 0,
+                    "3%+": 0
+                };
+
+                Object.entries(probs).forEach(([b, p]) => {
+                    const key = b.toString();
+                    if (key.includes("0-0.3") || key.includes("0.3-0.5") || key.includes("0.5-1.0") || key.includes("0-1")) {
+                        mapped["0-1%"] += p;
+                    } else if (key.includes("1.0-1.7") || key.includes("1.7-2.0") || key.includes("1-2")) {
+                        mapped["1-2%"] += p;
+                    } else if (key.includes("2.0-3.0") || key.includes("2-3")) {
+                        mapped["2-3%"] += p;
+                    } else {
+                        mapped["3%+"] += p;
+                    }
+                });
+
+                let maxLabel = "0-1%";
+                let maxVal = -1;
+                Object.entries(mapped).forEach(([b, p]) => {
+                    if (p > maxVal) {
+                        maxVal = p;
+                        maxLabel = b;
+                    }
+                });
+
+                const bars = Object.entries(mapped).map(([b, p]) => {
                     const pct = Math.round(p * 100);
-                    const isHighlight = b === mostLikely;
-                    const color = isHighlight ? 'var(--gold)' : 'rgba(212, 175, 55, 0.4)';
+                    const isHighlight = b === maxLabel;
+                    const color = isHighlight ? 'var(--gold)' : 'rgba(212, 175, 55, 0.35)';
                     return `
                         <div style="flex:1;text-align:center;">
                             <div style="font-size:9px;font-weight:800;color:${isHighlight ? 'var(--gold)' : 'var(--ink-muted)'};margin-bottom:2px;">${b}</div>
-                            <div style="height:16px;background:rgba(11,11,11,0.06);border-radius:3px;overflow:hidden;position:relative;" title="${b}: ${pct}% probability">
-                                <div style="height:100%;width:${Math.max(pct, 4)}%;background:${color};border-radius:3px;transition:width 0.3s ease;"></div>
-                                <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:var(--ink-primary);">${pct}%</span>
+                            <div style="height:16px;background:rgba(11,11,11,0.06);border-radius:4px;overflow:hidden;position:relative;" title="${b}: ${pct}% probability">
+                                <div style="height:100%;width:${Math.max(pct, 5)}%;background:${color};border-radius:4px;transition:width 0.3s ease;"></div>
+                                <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;color:var(--ink-primary);">${pct}%</span>
                             </div>
                         </div>
                     `;
@@ -829,9 +869,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                                 <div style="font-size:10px;font-weight:800;color:var(--ink-primary);white-space:nowrap;">
                                     <i class="fa-solid fa-chart-simple text-gold"></i> GAP PROBABILITY DISTRIBUTION:
-                                    <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">MOST LIKELY: ${mostLikely}</span>
+                                    <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">MOST LIKELY: ${maxLabel}</span>
                                 </div>
-                                <div style="display:flex;gap:6px;flex:1;min-width:280px;">${bars}</div>
+                                <div style="display:flex;gap:8px;flex:1;min-width:240px;">${bars}</div>
                             </div>
                         </td>
                     </tr>
@@ -845,12 +885,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     </span>
                 </td>
                 <td data-label="TICKER">
-                    <div class="ticker-cell">
+                    <div class="ticker-header-flex">
                         <span class="symbol-name">
                             ${escapeHtml(stock.symbol)}
                             ${stock.rank_position <= 2 ? ' <span class="text-gold" style="font-size:10px;"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
                         </span>
-                        ${stock.next_day_bestest_5 ? '<span class="bestest-5-badge"><i class="fa-solid fa-star"></i> NEXT DAY TOP 5</span>' : ''}
+                        <span class="signal-badge-header ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
+                            ${escapeHtml(sigText)}
+                        </span>
+                        <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
                     </div>
                 </td>
                 <td data-label="SIGNAL">

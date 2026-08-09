@@ -300,21 +300,31 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     flex-wrap: wrap;
 }
 
+.mobile-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 99990;
+    transition: opacity 0.3s ease;
+}
+
 .topbar-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     flex-shrink: 0;
 }
 
 .app-logo-frame.sm {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
 }
 
 .topbar-brand-title {
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 1.25rem;
+    font-size: 1.28rem;
     font-weight: 800;
     letter-spacing: -0.02em;
     color: var(--ink-primary, #ffffff);
@@ -322,8 +332,8 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 }
 
 .mobile-menu-toggle {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -331,7 +341,7 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     border: 1px solid var(--glass-border-strong);
     background: var(--glass-bg-soft);
     color: var(--ink-primary);
-    font-size: 14px;
+    font-size: 13px;
     margin-right: 14px;
     cursor: pointer;
 }

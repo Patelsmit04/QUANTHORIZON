@@ -509,7 +509,7 @@
         margin-right: 6px;
     }
 
-    /* Top Line: Ticker & Crown Badge span 2 columns */
+    /* Top Line: Ticker, Signal Badge & Score Pill in 1 Horizontal Top Row */
     #scannerDataTable > tbody > tr > td[data-label="TICKER"] {
         grid-column: 1 / -1;
         background: transparent;
@@ -518,25 +518,23 @@
         border-radius: 0;
         font-size: 1.05rem;
         font-weight: 800;
-        padding: 2px 0 6px 0;
+        padding: 4px 0 8px 0;
+    }
+    #scannerDataTable > tbody > tr > td[data-label="TICKER"] .ticker-header-flex {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        gap: 6px !important;
     }
     #scannerDataTable > tbody > tr > td[data-label="TICKER"]:before {
         display: none;
     }
 
-    #scannerDataTable > tbody > tr > td[data-label="RANK"] {
-        display: none;
-    }
-
-    /* Sub-Header: Signal badge spans 2 columns */
-    #scannerDataTable > tbody > tr > td[data-label="SIGNAL"] {
-        grid-column: 1 / -1;
-        background: transparent;
-        border: none;
-        border-radius: 0;
-        padding: 0 0 4px 0;
-        font-size: 0.9rem;
-        font-weight: 800;
+    #scannerDataTable > tbody > tr > td[data-label="RANK"],
+    #scannerDataTable > tbody > tr > td[data-label="SIGNAL"],
+    #scannerDataTable > tbody > tr > td[data-label="CONFIDENCE"] {
+        display: none !important;
     }
 
     /* Action Cell: Full-Width Button spans 2 columns */
