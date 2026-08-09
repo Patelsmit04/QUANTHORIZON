@@ -2202,7 +2202,8 @@ async def ws_live(websocket: WebSocket):
         ws_broadcast.unregister(websocket)
 
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.on_event("startup")
 def start_smc_scanner_on_startup():
@@ -2230,7 +2231,7 @@ def start_strategy_engine_on_startup():
 
 @app.get("/", response_class=HTMLResponse)
 def serve_dashboard():
-    return FileResponse("static/index.html")
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
 if __name__ == "__main__":

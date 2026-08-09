@@ -65,4 +65,3 @@ def get_ist_now() -> datetime:
 def get_ist_today_str() -> str:
     """Returns current date string (YYYY-MM-DD) explicitly in Asia/Kolkata (IST) timezone."""
     return get_ist_now().strftime("%Y-%m-%d")
-
