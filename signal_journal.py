@@ -804,11 +804,11 @@ def get_index_verdict_metrics_summary(index_name: Optional[str] = None) -> Dict[
         return {
             "total_evaluated_verdicts": 0,
             "sample_guardrail": sample_guardrail_msg,
-            "directional_accuracy_pct": 78.5,
-            "win_rate_pct": 75.0,
-            "current_accuracy_pct": 78.5,
-            "avg_final_accuracy_pct": 78.5,
-            "expected_range_hit_rate_pct": 82.0,
+            "directional_accuracy_pct": 0.0,
+            "win_rate_pct": 0.0,
+            "current_accuracy_pct": 0.0,
+            "avg_final_accuracy_pct": 0.0,
+            "expected_range_hit_rate_pct": 0.0,
             "is_baseline": True
         }
 
@@ -1031,16 +1031,16 @@ def get_metrics_summary(strategy_id: Optional[str] = None) -> Dict[str, Any]:
             "total_evaluated_signals": 0,
             "total_executed_trades": 0,
             "sample_guardrail": sample_guardrail_msg,
-            "directional_accuracy_pct": 78.5,
-            "win_rate_pct": 75.0,
-            "call_precision_pct": 76.0,
-            "put_precision_pct": 74.0,
-            "current_accuracy_pct": 78.5,
-            "avg_final_accuracy_pct": 78.5,
-            "avg_win_pnl_pct": 4.5,
-            "avg_loss_pnl_pct": 2.1,
-            "expectancy_pnl_pct": 2.4,
-            "profit_factor": 2.1,
+            "directional_accuracy_pct": 0.0,
+            "win_rate_pct": 0.0,
+            "call_precision_pct": 0.0,
+            "put_precision_pct": 0.0,
+            "current_accuracy_pct": 0.0,
+            "avg_final_accuracy_pct": 0.0,
+            "avg_win_pnl_pct": 0.0,
+            "avg_loss_pnl_pct": 0.0,
+            "expectancy_pnl_pct": 0.0,
+            "profit_factor": 0.0,
             "vix_regime_breakdown": {},
             "daily_history": [],
             "is_baseline": True
@@ -1196,7 +1196,7 @@ def get_split_accuracy_metrics() -> Dict[str, Any]:
     intra_stocks = [r for r in intra_rows if r["symbol"] not in INDEX_TICKERS]
     intra_indices = [r for r in intra_rows if r["symbol"] in INDEX_TICKERS]
 
-    def _calc_split(rows: List[Dict[str, Any]], default_acc: float = 78.5, default_win: float = 75.0) -> Dict[str, Any]:
+    def _calc_split(rows: List[Dict[str, Any]], default_acc: float = 0.0, default_win: float = 0.0) -> Dict[str, Any]:
         if not rows:
             return {"total_setups": 0, "win_rate_pct": default_win, "accuracy_pct": default_acc, "is_baseline": True}
         corr = sum(1 for r in rows if r.get("is_direction_correct") == 1)
@@ -1211,18 +1211,18 @@ def get_split_accuracy_metrics() -> Dict[str, Any]:
     return {
         "btst_stocks": {
             "total_setups": btst_stocks_summary.get("total_evaluated_signals", 0),
-            "win_rate_pct": btst_stocks_summary.get("win_rate_pct", 75.0),
-            "accuracy_pct": btst_stocks_summary.get("directional_accuracy_pct", 78.5),
+            "win_rate_pct": btst_stocks_summary.get("win_rate_pct", 0.0),
+            "accuracy_pct": btst_stocks_summary.get("directional_accuracy_pct", 0.0),
             "is_baseline": btst_stocks_summary.get("is_baseline", True)
         },
         "btst_indices": {
             "total_setups": btst_indices_summary.get("total_evaluated_verdicts", 0),
-            "win_rate_pct": btst_indices_summary.get("win_rate_pct", 75.0),
-            "accuracy_pct": btst_indices_summary.get("directional_accuracy_pct", 78.5),
+            "win_rate_pct": btst_indices_summary.get("win_rate_pct", 0.0),
+            "accuracy_pct": btst_indices_summary.get("directional_accuracy_pct", 0.0),
             "is_baseline": btst_indices_summary.get("is_baseline", True)
         },
-        "intraday_stocks": _calc_split(intra_stocks, default_acc=82.0, default_win=76.5),
-        "intraday_indices": _calc_split(intra_indices, default_acc=80.5, default_win=75.5)
+        "intraday_stocks": _calc_split(intra_stocks, default_acc=0.0, default_win=0.0),
+        "intraday_indices": _calc_split(intra_indices, default_acc=0.0, default_win=0.0)
     }
 
 

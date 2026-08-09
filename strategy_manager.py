@@ -331,7 +331,7 @@ def _seed_default_strategy_if_missing():
                 "news_gate_enabled": True,
                 "auto_paper_trade": False,
                 "is_active": True,
-                "is_builtin": True,
+                "is_builtin": False,
                 "scope_toggles": scope_toggles,
                 "clarification": {
                     "confirmed": True,
@@ -350,6 +350,12 @@ def _seed_default_strategy_if_missing():
             strat["config_hash"] = _compute_config_hash(strat)
             store[strat_id] = strat
             needs_save = True
+
+        # Migration: Ensure ONLY DEFAULT_STRATEGY_ID ("default-5-pillar") has is_builtin = True
+        for sid, sdata in list(store.items()):
+            if sid != DEFAULT_STRATEGY_ID and sdata.get("is_builtin"):
+                sdata["is_builtin"] = False
+                needs_save = True
 
         if needs_save:
             _save_all(store)
