@@ -90,41 +90,57 @@
     }
 }
 
-/* 4. Force single-column grids that still used large minmax on phones */
-@media (max-width: 480px) {
+/* 4. Horizontal Flex Scroll Rails for all score cards & grids across the web app */
+@media (max-width: 1023px) {
     .index-grid,
     .strategy-grid,
     .index-verdict-grid,
     .calibration-card-grid,
     .guide-settings-grid,
     .news-grid,
-    .split-accuracy-grid {
-        grid-template-columns: 1fr !important;
-    }
-
-    .index-verdict-grid,
-    .strategy-grid,
-    .index-grid {
-        /* override minmax(340/360) that forced overflow */
+    .split-accuracy-grid,
+    .metrics-grid,
+    .legend-pills-row,
+    .winrate-stats-grid {
         display: flex !important;
-        flex-direction: column;
-        gap: 12px;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 8px !important;
+        gap: 12px !important;
+        flex-wrap: nowrap !important;
     }
 
-    .index-verdict-card,
+    .index-grid::-webkit-scrollbar,
+    .strategy-grid::-webkit-scrollbar,
+    .index-verdict-grid::-webkit-scrollbar,
+    .calibration-card-grid::-webkit-scrollbar,
+    .guide-settings-grid::-webkit-scrollbar,
+    .news-grid::-webkit-scrollbar,
+    .split-accuracy-grid::-webkit-scrollbar,
+    .metrics-grid::-webkit-scrollbar,
+    .legend-pills-row::-webkit-scrollbar,
+    .winrate-stats-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .index-card,
     .strategy-card,
-    .index-card {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-    }
-
-    .calibration-card-grid {
-        grid-template-columns: 1fr !important;
-    }
-
-    .calibration-bar-card {
-        min-width: 0;
+    .index-verdict-card,
+    .calibration-bar-card,
+    .guide-step-box,
+    .news-card,
+    .split-accuracy-grid .metric-card,
+    .metrics-grid .metric-card,
+    .legend-pill-card,
+    .winrate-stat-card {
+        flex: 0 0 82% !important;
+        min-width: 260px !important;
+        max-width: 320px !important;
+        scroll-snap-align: start !important;
+        margin-bottom: 0 !important;
     }
 }
 

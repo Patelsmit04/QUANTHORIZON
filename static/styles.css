@@ -1152,20 +1152,12 @@ input:checked + .slider:before { transform: translateX(16px); }
         margin-top: 16px;
     }
 
-    .metrics-grid {
-        grid-template-columns: 1fr;
-    }
-
     .metric-card {
         padding: 16px;
     }
 
     .metric-value {
         font-size: 24px;
-    }
-
-    .legend-pills-row {
-        grid-template-columns: 1fr;
     }
 
     .table-scroll {
