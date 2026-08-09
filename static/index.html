@@ -142,37 +142,11 @@
                 </div>
             </header>
 
-            <!-- Quick Controls Sub-Bar (UI/UX Refreshed per Pic 1) -->
-            <div class="quick-controls-bar" id="quickControlsBar">
-                <div class="quick-controls-inner">
-                    <div class="priority-toggle-box">
-                        <i class="fa-solid fa-fire text-gold"></i>
-                        <span>PRIORITY ONLY</span>
-                        <label class="switch">
-                            <input type="checkbox" id="priorityOnlyToggle" aria-label="Show priority picks only">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-
-
-                    <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
-                        <i class="fa-solid fa-file-csv"></i>
-                        <span>CSV</span>
-                    </button>
-
-                    <button id="scanBtn" class="btn btn-pill btn-primary scan-hero-btn">
-                        <i class="fa-solid fa-bolt"></i>
-                        <span>SCAN NOW</span>
-                    </button>
-
-                    <div class="auto-refresh-toggle">
-                        <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
-                        <span>AUTO</span>
-                        <label class="switch">
-                            <input type="checkbox" id="autoRefreshToggle" checked aria-label="Toggle auto refresh">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
+            <!-- Live Index Ticker Tape (Nifty 50 / Bank Nifty / Sensex / Gift Nifty) — global,
+                 shown below the topbar on every section (see app.js fetchTickerIndices()). -->
+            <div class="index-ticker-bar" id="indexTickerBar">
+                <div class="index-ticker-track" id="indexTickerTrack">
+                    <!-- JS-populated, item list duplicated once for a seamless marquee loop -->
                 </div>
             </div>
 
@@ -196,6 +170,14 @@
                     <h2 class="section-page-title"><i class="fa-solid fa-gauge-high text-gold"></i> DASHBOARD
                         <span class="section-page-subtitle">Live Accuracy, Priority Mix &amp; Today's Snapshot</span>
                     </h2>
+                    <div class="dashboard-heading-actions">
+                        <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
+                            <i class="fa-solid fa-file-csv"></i><span>CSV</span>
+                        </button>
+                        <button id="scanBtn" class="btn btn-pill btn-primary scan-hero-btn">
+                            <i class="fa-solid fa-bolt"></i><span>SCAN NOW</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Split Live-Updating Accuracy Dashboard (4 Independent Horizon & Scope Categories) -->
@@ -246,7 +228,7 @@
                 <section class="metrics-grid">
 
                     <!-- Card 1: Total Scanned -->
-                    <div class="metric-card">
+                    <div class="metric-card" id="metricCardTotalScanned">
                         <div class="metric-header">
                             <span class="metric-title">TOTAL SCANNED</span>
                             <div class="card-icon-bubble"><i class="fa-solid fa-database"></i></div>
@@ -258,7 +240,7 @@
                     </div>
 
                     <!-- Card 2: Priority 1 High Conviction -->
-                    <div class="metric-card card-p1">
+                    <div class="metric-card card-p1" id="metricCardPriority1">
                         <div class="metric-header">
                             <span class="metric-title">🔥 PRIORITY 1 (TIER 1)</span>
                             <div class="card-icon-bubble text-gold"><i class="fa-solid fa-crown"></i></div>
@@ -271,7 +253,7 @@
 
 
                     <!-- Card 4: BTST Calls -->
-                    <div class="metric-card card-bullish">
+                    <div class="metric-card card-bullish" id="metricCardBtst">
                         <div class="metric-header">
                             <span class="metric-title">BTST CALLS (CE)</span>
                             <div class="card-icon-bubble text-bullish"><i class="fa-solid fa-arrow-trend-up"></i></div>
@@ -283,7 +265,7 @@
                     </div>
 
                     <!-- Card 5: STBT Puts -->
-                    <div class="metric-card card-bearish">
+                    <div class="metric-card card-bearish" id="metricCardStbt">
                         <div class="metric-header">
                             <span class="metric-title">STBT PUTS (PE)</span>
                             <div class="card-icon-bubble text-bearish"><i class="fa-solid fa-arrow-trend-down"></i></div>
@@ -312,22 +294,6 @@
 
                 <!-- Controls & Filter Toolbar -->
                 <section class="toolbar-container">
-                    <!-- Filter Tabs -->
-                    <div class="filter-tabs" id="filterTabs">
-                        <button class="tab-btn active" data-filter="ALL">
-                            <i class="fa-solid fa-border-all"></i> ALL STOCKS
-                        </button>
-                        <button class="tab-btn btn-tab-watch" data-filter="WATCHLIST">
-                            <i class="fa-solid fa-eye"></i> WATCHLIST
-                        </button>
-                        <button class="tab-btn btn-tab-bullish" data-filter="BTST">
-                            <i class="fa-solid fa-circle-arrow-up"></i> BTST (CALL)
-                        </button>
-                        <button class="tab-btn btn-tab-bearish" data-filter="STBT">
-                            <i class="fa-solid fa-circle-arrow-down"></i> STBT (PUT)
-                        </button>
-                    </div>
-
                     <!-- Toolbar Actions (Search & Sort) -->
                     <div class="toolbar-actions">
                         <div class="search-box">

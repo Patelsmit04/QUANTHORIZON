@@ -5,11 +5,9 @@
    =========================================================================== */
 
 /* 1. Hide desktop-only header controls on mobile/tablet drawer breakpoint.
-   The drawer already exposes Priority Only, Auto, Scan, Win Rate, CSV, Notifs.
+   The drawer already exposes Scan, Win Rate, CSV, Notifs.
    Leaving them in the topbar causes overflow, tiny targets, and vertical bloat. */
 @media (max-width: 1023px) {
-    .header-actions .priority-toggle-box,
-    .header-actions .auto-refresh-toggle,
     .header-actions #winRateBtn,
     .header-actions #guideBtn,
     .header-actions #exportCsvBtn {
@@ -326,25 +324,6 @@
 
 /* --- B) DASHBOARD PAGE (<= 767px) --- */
 @media (max-width: 767px) {
-    /* Quick Controls Bar Mobile Layout (Pic 1 Refresh) */
-    .quick-controls-bar {
-        padding: 12px 14px !important;
-        background: var(--glass-bg-soft) !important;
-    }
-
-    .quick-controls-inner {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-        gap: 8px 10px !important;
-    }
-
-    .quick-controls-inner .priority-toggle-box,
-    .quick-controls-inner .auto-refresh-toggle,
-    .quick-controls-inner .btn {
-        margin: 0 !important;
-    }
-
     /* B1. Win Rate Accuracy Cards & Overview Metrics Cards: 2x2 Grid Style */
     .split-accuracy-grid {
         display: grid !important;
@@ -590,5 +569,28 @@
         padding: 0 !important;
         background: transparent !important;
         border: none !important;
+    }
+
+    /* Collapsed by default: the Ticker cell alone already shows name + signal badge +
+       confidence pill + chevron inline (see .ticker-header-flex above) — everything else,
+       plus the gap-distribution/institutional-flow detail sub-rows, stays hidden until the
+       chevron toggle adds .expanded to every row sharing the same data-row-key. */
+    #scannerDataTable > tbody > tr:not(.expanded) > td:not([data-label="TICKER"]) {
+        display: none !important;
+    }
+    #scannerDataTable > tbody > tr.gap-distribution-row:not(.expanded),
+    #scannerDataTable > tbody > tr.flow-detail-row:not(.expanded) {
+        display: none !important;
+    }
+
+    .row-expand-toggle {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--ink-muted);
+        font-size: 16px;
+        padding: 4px 6px;
+        line-height: 1;
+        transition: transform 0.2s ease;
     }
 }

@@ -1131,6 +1131,11 @@ def background_scheduler_worker():
                 s.get("symbol"),
                 s.get("signal", "")
             )
+        # Persist the recomputed 4-bucket format back to disk/Postgres — otherwise the
+        # checked-in/stored snapshot stays permanently in whatever stale format it was last
+        # saved in, and every restart has to re-patch it in memory instead of serving the
+        # already-correct file.
+        save_last_market_scan(cache_store["scan_summary"])
 
     while True:
         try:

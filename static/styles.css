@@ -114,6 +114,7 @@
     background: #ffffff;
     color: #0f172a;
     border-color: #cbd5e1;
+    color-scheme: light;
 }
 
 [data-theme="light"] .sort-box select option {
@@ -673,24 +674,46 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 .timer-label { font-size: 10px; font-weight: 700; color: var(--ink-muted); }
 .timer-value { font-family: var(--font-heading); font-size: 12px; font-weight: 700; color: var(--cat-blue); }
 
-/* Quick Controls Bar (Pic 1 Refresh) */
-.quick-controls-bar {
-    width: 100%;
-    padding: 12px 24px;
-    background: var(--glass-bg-soft);
-    border-bottom: 1px solid var(--glass-border);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-}
-
-.quick-controls-inner {
-    max-width: 1680px;
-    margin: 0 auto;
+/* Dashboard heading actions (CSV / SCAN NOW) — inline in the Dashboard section-heading-row */
+.dashboard-heading-actions {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
+}
+
+/* Live index ticker tape — slow auto-scrolling marquee below the topbar, global (every
+   section). Speed (40s per loop) is tuned for the "slow, like Zerodha/Groww" request; if the
+   item count grows a lot, lengthen the duration to keep the per-item scroll speed constant. */
+.index-ticker-bar {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    background: var(--glass-bg-soft);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 8px 0;
+}
+
+.index-ticker-track {
+    display: inline-flex;
+    gap: 32px;
+    animation: index-ticker-scroll 40s linear infinite;
+}
+
+.index-ticker-bar:hover .index-ticker-track { animation-play-state: paused; }
+
+.index-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 0 16px;
+}
+
+@keyframes index-ticker-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
 }
 
 .scan-hero-btn {
@@ -708,25 +731,6 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 
 /* Header Actions */
 .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-
-.priority-toggle-box, .auto-refresh-toggle {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--ink-secondary);
-    background: var(--glass-bg-soft);
-    border: 1px solid var(--glass-border);
-    padding: 7px 16px;
-    border-radius: var(--radius-pill);
-}
-
-.priority-toggle-box { 
-    border-color: rgba(169, 122, 28, 0.3); 
-    background: var(--gold-bg); 
-    color: var(--gold); 
-}
 
 .toggle-label {
     display: block;
@@ -752,7 +756,6 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 }
 
 input:checked + .slider { background-color: var(--bullish); }
-#priorityOnlyToggle:checked + .slider { background-color: var(--gold); }
 input:checked + .slider:before { transform: translateX(16px); }
 
 /* Pill Buttons */
@@ -847,6 +850,11 @@ input:checked + .slider:before { transform: translateX(16px); }
 }
 
 .metric-card:hover { transform: translateY(-4px); box-shadow: var(--glass-shadow-hover); }
+
+/* Only the 4 Dashboard metrics-grid cards are clickable filters (see filterFromDashboardCard
+   in app.js) — scoped here rather than on the shared .metric-card base so the unrelated
+   split-accuracy-grid cards above them don't falsely look interactive. */
+.metrics-grid .metric-card { cursor: pointer; }
 
 .card-p1 { border-left: 4px solid var(--gold); background: linear-gradient(180deg, var(--gold-bg) 0%, var(--glass-bg) 55%); }
 .card-winrate { border-left: 4px solid var(--gold); background: linear-gradient(180deg, var(--gold-bg) 0%, var(--glass-bg) 55%); }
@@ -947,7 +955,8 @@ input:checked + .slider:before { transform: translateX(16px); }
 }
 
 .search-box input::placeholder { color: var(--ink-muted); font-weight: 400; }
-.sort-box select { cursor: pointer; }
+.sort-box select { cursor: pointer; color-scheme: dark; }
+.sort-box select option { background: #1a1a1a; color: var(--ink-primary); }
 
 /* ==========================================
    DATA TABLE
@@ -1269,13 +1278,6 @@ input:checked + .slider:before { transform: translateX(16px); }
 }
 
 @media (max-width: 560px) {
-
-    .priority-toggle-box,
-    .auto-refresh-toggle {
-        flex-wrap: wrap;
-        padding: 8px 12px;
-        justify-content: center;
-    }
 
     .tab-btn {
         padding: 8px 12px;
@@ -1849,11 +1851,6 @@ input:checked + .slider:before { transform: translateX(16px); }
 
     .header-actions .btn {
         padding: 8px 12px;
-        font-size: 11px;
-    }
-
-    .priority-toggle-box, .auto-refresh-toggle {
-        padding: 4px 10px;
         font-size: 11px;
     }
 }

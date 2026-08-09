@@ -41,20 +41,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const scanBtnMobile = document.getElementById("scanBtnMobile");
     const winRateBtnMobile = document.getElementById("winRateBtnMobile");
     const exportCsvBtnMobile = document.getElementById("exportCsvBtnMobile");
-    const priorityOnlyToggleMobile = document.getElementById("priorityOnlyToggleMobile");
-    const autoRefreshToggleMobile = document.getElementById("autoRefreshToggleMobile");
 
     // DOM Elements
     const scanBtn = document.getElementById("scanBtn");
     const guideBtn = document.getElementById("guideBtn");
     const winRateBtn = document.getElementById("winRateBtn");
     const exportCsvBtn = document.getElementById("exportCsvBtn");
-    const autoRefreshToggle = document.getElementById("autoRefreshToggle");
-    const priorityOnlyToggle = document.getElementById("priorityOnlyToggle");
     const searchInput = document.getElementById("searchInput");
     const sortSelect = document.getElementById("sortSelect");
-    const filterTabs = document.getElementById("filterTabs");
-    
+    const metricCardTotalScanned = document.getElementById("metricCardTotalScanned");
+    const metricCardPriority1 = document.getElementById("metricCardPriority1");
+    const metricCardBtst = document.getElementById("metricCardBtst");
+    const metricCardStbt = document.getElementById("metricCardStbt");
+
     const stocksTableBody = document.getElementById("stocksTableBody");
     const emptyState = document.getElementById("emptyState");
     const scanProgressBar = document.getElementById("scanProgressBar");
@@ -155,6 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Indices & Strategies Section DOM
     const indicesSection = document.getElementById("indicesSection");
     const indexGrid = document.getElementById("indexGrid");
+    const indexTickerTrack = document.getElementById("indexTickerTrack");
     const indexVerdictGrid = document.getElementById("indexVerdictGrid");
     const indexVerdictEmptyState = document.getElementById("indexVerdictEmptyState");
     const indexVerdictMeta = document.getElementById("indexVerdictMeta");
@@ -221,6 +221,8 @@ document.addEventListener("DOMContentLoaded", () => {
     populatePillarCheckboxes();
     refreshStrategiesNavBadge();
     initNotifications();
+    fetchTickerIndices();
+    setInterval(fetchTickerIndices, 30000);
 
     // Event Listeners
     
@@ -390,25 +392,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (exportCsvBtnGuide) exportCsvBtnGuide.addEventListener("click", exportWatchlistCsv);
     if (winRateBtnGuide) winRateBtnGuide.addEventListener("click", openWinRateModal);
 
-    // Sync Priority & AutoRefresh toggles across Desktop Top Bar and Mobile Drawer
-    function syncPriorityToggle(checked) {
-        if (priorityOnlyToggle) priorityOnlyToggle.checked = checked;
-        if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.checked = checked;
-        filterAndRenderTable();
-    }
-
-    function syncAutoRefreshToggle(checked) {
-        if (autoRefreshToggle) autoRefreshToggle.checked = checked;
-        if (autoRefreshToggleMobile) autoRefreshToggleMobile.checked = checked;
-        setupAutoRefresh();
-    }
-
-    if (priorityOnlyToggleMobile) priorityOnlyToggleMobile.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
-    if (priorityOnlyToggle) priorityOnlyToggle.addEventListener("change", (e) => syncPriorityToggle(e.target.checked));
-
-    if (autoRefreshToggleMobile) autoRefreshToggleMobile.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
-    if (autoRefreshToggle) autoRefreshToggle.addEventListener("change", (e) => syncAutoRefreshToggle(e.target.checked));
-
     if (scanBtn) scanBtn.addEventListener("click", () => fetchScanResults(true));
     if (guideBtn) guideBtn.addEventListener("click", () => switchSection("rules"));
 
@@ -419,21 +402,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if (evaluatePicksBtn) evaluatePicksBtn.addEventListener("click", evaluatePicksAction);
 
     if (exportCsvBtn) exportCsvBtn.addEventListener("click", exportWatchlistCsv);
-    if (autoRefreshToggle) autoRefreshToggle.addEventListener("change", setupAutoRefresh);
-    if (priorityOnlyToggle) priorityOnlyToggle.addEventListener("change", filterAndRenderTable);
-    if (filterTabs) {
-        filterTabs.addEventListener("click", (e) => {
-            const btn = e.target.closest(".tab-btn");
-            if (!btn) return;
-            filterTabs.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            currentFilter = btn.dataset.filter || "ALL";
-            filterAndRenderTable();
-        });
-    }
+    if (metricCardTotalScanned) metricCardTotalScanned.addEventListener("click", () => filterFromDashboardCard("ALL"));
+    if (metricCardPriority1) metricCardPriority1.addEventListener("click", () => filterFromDashboardCard("PRIORITY1"));
+    if (metricCardBtst) metricCardBtst.addEventListener("click", () => filterFromDashboardCard("BTST"));
+    if (metricCardStbt) metricCardStbt.addEventListener("click", () => filterFromDashboardCard("STBT"));
     if (searchInput) searchInput.addEventListener("input", filterAndRenderTable);
     if (sortSelect) sortSelect.addEventListener("change", filterAndRenderTable);
     if (closeModalBtn) closeModalBtn.addEventListener("click", hideModal);
+
+    // Mobile card collapse/expand — one delegated listener for every row's chevron, rather
+    // than a per-row listener re-registered on every filterAndRenderTable() re-render.
+    if (stocksTableBody) {
+        stocksTableBody.addEventListener("click", (e) => {
+            const toggle = e.target.closest(".row-expand-toggle");
+            if (!toggle) return;
+            const tr = toggle.closest("tr");
+            const key = tr.dataset.rowKey;
+            const expanding = !tr.classList.contains("expanded");
+            document.querySelectorAll(`#stocksTableBody [data-row-key="${CSS.escape(key)}"]`)
+                .forEach(el => el.classList.toggle("expanded", expanding));
+            toggle.setAttribute("aria-expanded", String(expanding));
+            toggle.querySelector("i").classList.toggle("fa-chevron-up", expanding);
+            toggle.querySelector("i").classList.toggle("fa-chevron-down", !expanding);
+        });
+    }
 
     if (addStrategyBtn) addStrategyBtn.addEventListener("click", () => openStrategyForm(null));
     if (closeStrategyFormBtn) closeStrategyFormBtn.addEventListener("click", () => strategyFormModal.classList.add("hidden"));
@@ -454,19 +446,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (clarificationResubmitBtn) clarificationResubmitBtn.classList.remove("hidden");
     });
     if (clarificationResubmitBtn) clarificationResubmitBtn.addEventListener("click", resubmitClarification);
-
-    if (filterTabs) {
-        filterTabs.addEventListener("click", (e) => {
-            const btn = e.target.closest(".tab-btn");
-            if (!btn) return;
-
-            filterTabs.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            currentFilter = btn.dataset.filter;
-            filterAndRenderTable();
-        });
-    }
 
     if (newsVerdictFilters) {
         newsVerdictFilters.addEventListener("click", (e) => {
@@ -587,12 +566,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function setupAutoRefresh() {
         if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-        
-        if (autoRefreshToggle && autoRefreshToggle.checked) {
-            autoRefreshInterval = setInterval(() => {
-                fetchScanResults(false);
-            }, 30000);
-        }
+
+        autoRefreshInterval = setInterval(() => {
+            fetchScanResults(false);
+        }, 30000);
     }
 
     // -------------------------------------------------------------
@@ -746,23 +723,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // -------------------------------------------------------------
     // 5. FILTERING, SORTING & TABLE RENDERING (EXACT 12 COLUMNS)
     // -------------------------------------------------------------
+    // Dashboard metric cards (Total Scanned / Priority 1 / BTST / STBT) drive the same
+    // filtering the old filter-tabs bar used to — clicking a card jumps to the Scanner table
+    // (dashboard+scanner are shown as one merged page, see isMergedDashboard in
+    // switchSection() above) and applies the corresponding filter.
+    function filterFromDashboardCard(filterValue) {
+        currentFilter = filterValue;
+        switchSection("scanner");
+        filterAndRenderTable();
+    }
+
     function filterAndRenderTable() {
         if (!stocksTableBody) return;
 
         const searchTerm = searchInput ? searchInput.value.trim().toUpperCase() : "";
         const sortKey = sortSelect ? sortSelect.value : "RANK_ASC";
-        const priorityOnly = priorityOnlyToggle ? priorityOnlyToggle.checked : false;
 
-        let filtered = allStocks;
-        if (priorityOnly) {
-            filtered = filtered.filter(stock => stock.priority_level === "P1_HIGH");
-        }
-
-        filtered = filtered.filter(stock => {
+        let filtered = allStocks.filter(stock => {
             if (currentFilter === "BTST") return stock.signal && stock.signal.includes("BTST");
             if (currentFilter === "STBT") return stock.signal && stock.signal.includes("STBT");
             if (currentFilter === "HIGH_VOL") return (stock.volume_spike || 0) >= 2.0;
-            if (currentFilter === "WATCHLIST") return stock.signal === "WATCHLIST";
+            if (currentFilter === "PRIORITY1") return stock.priority_level === "P1_HIGH";
             return true;
         });
 
@@ -810,6 +791,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const sigText = stock.signal || 'NEUTRAL';
             const pillarWeight = stock.confirmed_pillars_weight !== undefined ? stock.confirmed_pillars_weight : 0.0;
             const reqPillars = stock.required_pillars || 3;
+            const rowKey = `${stock.symbol}-${stock.rank_position || 0}`;
+            tr.dataset.rowKey = rowKey;
             const flowDetailId = `flow-detail-${stock.symbol}-${stock.rank_position || 0}`;
             const flowChipHtml = buildInstitutionalFlowChipHTML(stock.institutional_flow, flowDetailId);
             const flowDetailRowHtml = buildInstitutionalFlowDetailRowHTML(stock, flowDetailId);
@@ -859,7 +842,7 @@ document.addEventListener("DOMContentLoaded", () => {
                        <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">EST. LIKELY: ${maxLabel}</span>`;
 
                 bucketHtml = `
-                    <tr class="gap-distribution-row" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
+                    <tr class="gap-distribution-row" data-row-key="${rowKey}" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
                         <td colspan="12" style="padding:8px 16px;">
                             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                                 <div style="font-size:10px;font-weight:800;color:var(--ink-primary);white-space:nowrap;">
@@ -889,6 +872,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             ${escapeHtml(sigText)}
                         </span>
                         <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
+                        <button class="row-expand-toggle" aria-label="Expand details" aria-expanded="false">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
                     </div>
                 </td>
                 <td data-label="SIGNAL">
@@ -995,8 +981,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const flow = stock.institutional_flow;
         if (!flow || (!flow.buy_value_cr && !flow.sell_value_cr)) return "";
         const netClass = flow.dominant_side === "BUY" ? "text-bullish" : (flow.dominant_side === "SELL" ? "text-bearish" : "text-sub");
+        const rowKey = `${stock.symbol}-${stock.rank_position || 0}`;
         return `
-            <tr class="flow-detail-row hidden" id="${detailId}" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
+            <tr class="flow-detail-row hidden" id="${detailId}" data-row-key="${rowKey}" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
                 <td colspan="12" style="padding:8px 16px;">
                     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:11px;">
                         <div><i class="fa-solid fa-building-columns text-gold"></i> <strong>Institutional Flow</strong>
@@ -1891,6 +1878,52 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!indexGrid) return;
         indexGrid.innerHTML = "";
         indices.forEach(idx => indexGrid.appendChild(buildIndexCard(idx)));
+    }
+
+    // -------------------------------------------------------------
+    // Global index ticker tape (Nifty 50 / Bank Nifty / Sensex + Gift Nifty placeholder) —
+    // shown below the topbar on every section, not scoped to one page. GIFT NIFTY has no
+    // backend data source today (no ticker mapping, no fetch path — see app.py's
+    // INDEX_TICKER_MAP) so it renders as "--" here rather than a fabricated reading; wiring
+    // up a real Gift Nifty feed is a separate backend task. TODO: replace the placeholder
+    // once GIFT NIFTY has a real data source.
+    // -------------------------------------------------------------
+    function buildTickerItemHTML(idx) {
+        const name = escapeHtml(idx.index_name || "");
+        const ltp = (idx.ltp !== undefined && idx.ltp !== null) ? idx.ltp.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "--";
+        const changePts = (idx.change_pts !== undefined && idx.change_pts !== null) ? idx.change_pts : null;
+        const pctChange = (idx.pct_change !== undefined && idx.pct_change !== null) ? idx.pct_change : null;
+        const isUp = changePts !== null && changePts >= 0;
+        const cls = changePts === null ? "text-sub" : (isUp ? "text-bullish" : "text-bearish");
+        const sign = changePts === null ? "" : (isUp ? "+" : "");
+        const ptsText = changePts !== null ? changePts.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "--";
+        const pctText = pctChange !== null ? (typeof pctChange === "number" ? pctChange.toFixed(2) : pctChange) : "--";
+
+        return `
+            <span class="index-ticker-item">
+                <strong>${name}</strong>
+                <span>${ltp}</span>
+                <span class="${cls}">${sign}${ptsText} (${sign}${pctText}%)</span>
+            </span>
+        `;
+    }
+
+    async function fetchTickerIndices() {
+        if (!indexTickerTrack) return;
+        try {
+            const response = await apiFetch("/api/indices");
+            if (!response.ok) throw new Error("Indices API error");
+            const data = await response.json();
+            const indices = data.indices || [];
+
+            const itemsHtml = indices.map(buildTickerItemHTML).join("")
+                + buildTickerItemHTML({index_name: "GIFT NIFTY", ltp: null, change_pts: null, pct_change: null});
+
+            // Duplicate the item list once so the marquee (translateX 0 -> -50%) loops seamlessly.
+            indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
+        } catch (error) {
+            console.error("Failed to fetch ticker indices:", error);
+        }
     }
 
     function buildIndexFlowValueHTML(flow) {
