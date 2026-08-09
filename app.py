@@ -2246,8 +2246,26 @@ def start_strategy_engine_on_startup():
 
 
 @app.get("/", response_class=HTMLResponse)
+@app.get("/scanner", response_class=HTMLResponse)
+@app.get("/signals", response_class=HTMLResponse)
+@app.get("/stocks-news", response_class=HTMLResponse)
+@app.get("/global-news", response_class=HTMLResponse)
+@app.get("/institutional-flow", response_class=HTMLResponse)
+@app.get("/index-intelligence", response_class=HTMLResponse)
+@app.get("/history", response_class=HTMLResponse)
+@app.get("/strategies", response_class=HTMLResponse)
+@app.get("/guide", response_class=HTMLResponse)
+@app.get("/rules", response_class=HTMLResponse)
 def serve_dashboard():
     return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
+
+@app.get("/{full_path:path}", response_class=HTMLResponse)
+def serve_spa_fallback(full_path: str):
+    if full_path.startswith("api/") or full_path.startswith("static/"):
+        raise HTTPException(status_code=404, detail="Not Found")
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
 
 
 if __name__ == "__main__":

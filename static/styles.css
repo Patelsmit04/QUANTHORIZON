@@ -727,28 +727,36 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     }
 }
 
-/* Mobile: keep CSV + SCAN NOW on one row instead of wrapping (point 2 refinement) */
-@media (max-width: 480px) {
-    .dashboard-heading-actions {
-        flex-wrap: nowrap;
-        gap: 6px;
-    }
-    .dashboard-heading-actions .btn {
-        padding: 8px 10px;
-        font-size: 12px;
-        min-width: 0;
-    }
-    .dashboard-heading-actions .btn span {
-        display: none;
-    }
+.dashboard-heading-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: nowrap !important;
+}
+.dashboard-heading-actions .btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+    min-width: 140px !important;
+    padding: 12px 28px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    border-radius: 40px !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+}
+.dashboard-heading-actions .btn span {
+    display: inline !important;
 }
 
 .scan-hero-btn {
-    background: linear-gradient(135deg, var(--gold-bright), var(--gold)) !important;
-    color: #ffffff !important;
+    background: linear-gradient(135deg, var(--gold-bright, #e5c158), var(--gold, #d4af37)) !important;
+    color: #111111 !important;
     font-weight: 800 !important;
     box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35) !important;
-    padding: 9px 20px !important;
 }
 
 .scan-hero-btn:hover {
@@ -842,6 +850,16 @@ input:checked + .slider:before { transform: translateX(16px); }
    table/toolbar inside wider than the viewport, silently grew this to the content's width
    instead of the viewport's. An explicit width forces it back to the container's size. */
 .main-content { width: 100%; min-width: 0; max-width: 1680px; margin: 24px auto 0; padding: 0 24px; box-sizing: border-box; }
+
+.section-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+    width: 100%;
+}
 
 /* Split Accuracy Grid (4 columns on Desktop, 2x2 grid on Mobile) */
 .split-accuracy-grid {
@@ -1038,7 +1056,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 .mini-table td { padding: 10px 12px; font-size: 12px; border-bottom: 1px solid var(--gridline); white-space: nowrap; }
 
 .ticker-cell { display: flex; flex-direction: column; gap: 3px; }
-.symbol-name { font-family: var(--font-heading); font-weight: 700; font-size: 12px; }
+.symbol-name { font-family: var(--font-heading); font-weight: 700; font-size: 11px; }
 
 /* PRIORITY crown renders on its own line so its presence never shifts where the signal
    badge / confidence pill start in the row (point 3 fix). */
@@ -2154,7 +2172,7 @@ input:checked + .slider:before { transform: translateX(16px); }
         box-shadow: 0 8px 28px rgba(212, 175, 55, 0.16), var(--glass-shadow);
         padding: 18px 16px;
     }
-    #stocksTableBody tr.top-choice-row td:nth-child(2) .symbol-name { font-size: 18px; }
+    #stocksTableBody tr.top-choice-row td:nth-child(2) .symbol-name { font-size: 14px; }
     #stocksTableBody tr.top-choice-row td:nth-child(6) .score-pill { font-size: 16px; padding: 7px 14px; }
 
     /* The gap-probability-distribution and institutional-flow-detail sub-rows are already
@@ -2196,7 +2214,7 @@ input:checked + .slider:before { transform: translateX(16px); }
     /* Header line: Rank (small) + Ticker (prominent, grows) + Confidence (prominent, right) */
     #stocksTableBody td:nth-child(1) { order: 1; flex: 0 0 auto; }
     #stocksTableBody td:nth-child(2) { order: 2; flex: 1 1 auto; min-width: 100px; }
-    #stocksTableBody td:nth-child(2) .symbol-name { font-size: 16px; }
+    #stocksTableBody td:nth-child(2) .symbol-name { font-size: 13px; }
     #stocksTableBody td:nth-child(6) { order: 3; flex: 0 0 auto; text-align: right; }
     #stocksTableBody td:nth-child(6) .score-pill { font-size: 14px; padding: 6px 12px; }
     #stocksTableBody td:nth-child(1)::before,

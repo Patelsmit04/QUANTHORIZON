@@ -562,9 +562,12 @@
         border: none;
         border-bottom: 1px solid var(--glass-border);
         border-radius: 0;
-        font-size: 1.05rem;
+        font-size: 0.85rem;
         font-weight: 800;
         padding: 4px 0 8px 0;
+    }
+    #scannerDataTable > tbody > tr > td[data-label="TICKER"] .symbol-name {
+        font-size: 13px !important;
     }
     #scannerDataTable > tbody > tr > td[data-label="TICKER"] .ticker-header-flex {
         display: flex !important;

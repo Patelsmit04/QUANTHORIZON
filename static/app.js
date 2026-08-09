@@ -289,36 +289,43 @@ document.addEventListener("DOMContentLoaded", () => {
         indices: "index-intelligence", strategies: "strategies", history: "history",
         guide: "guide", rules: "rules"
     };
-    const HASH_TO_SECTION = Object.fromEntries(Object.entries(SECTION_HASHES).map(([k, v]) => [v, k]));
+    const HASH_TO_SECTION = {};
+    Object.entries(SECTION_HASHES).forEach(([secKey, hashVal]) => {
+        HASH_TO_SECTION[hashVal] = secKey;
+        HASH_TO_SECTION[secKey] = secKey;
+        HASH_TO_SECTION[secKey.toLowerCase()] = secKey;
+    });
     let suppressHashUpdate = false;
 
     // Unified Section Switcher — #sidebarNav is the single nav source for both the desktop
     // rail and the mobile drawer (see appSidebar above), so only one active-state loop is needed.
     function switchSection(section, opts = {}) {
         if (!section) return;
+
+        // Dynamic fallback lookup for section DOM nodes
+        const sections = {
+            dashboard: dashboardSection || document.getElementById("dashboardSection"),
+            scanner: scannerSection || document.getElementById("scannerSection"),
+            stocksNews: stocksNewsSection || document.getElementById("stocksNewsSection"),
+            globalNews: globalNewsSection || document.getElementById("globalNewsSection"),
+            institutionalFlow: institutionalFlowSection || document.getElementById("institutionalFlowSection"),
+            indices: indicesSection || document.getElementById("indicesSection"),
+            strategies: strategiesSection || document.getElementById("strategiesSection"),
+            history: historySection || document.getElementById("historySection"),
+            guide: guideSection || document.getElementById("guideSection"),
+            rules: rulesSection || document.getElementById("rulesSection")
+        };
+
         if (sidebarNav) {
             sidebarNav.querySelectorAll(".sidebar-nav-item").forEach(b => {
                 b.classList.toggle("active", b.dataset.section === section);
             });
         }
 
-        const sections = {
-            dashboard: dashboardSection,
-            scanner: scannerSection,
-            stocksNews: stocksNewsSection,
-            globalNews: globalNewsSection,
-            institutionalFlow: institutionalFlowSection,
-            indices: indicesSection,
-            strategies: strategiesSection,
-            history: historySection,
-            guide: guideSection,
-            rules: rulesSection
-        };
         Object.entries(sections).forEach(([key, el]) => {
             if (!el) return;
             const isMergedDashboard = (section === "dashboard" || section === "scanner") && (key === "dashboard" || key === "scanner");
             const shouldShow = key === section || isMergedDashboard;
-            // Use BOTH class toggle AND inline style to guarantee visibility
             if (shouldShow) {
                 el.classList.remove("hidden");
                 el.style.display = "block";
@@ -328,8 +335,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        if (section === "scanner" && scannerSection) {
-            scannerSection.scrollIntoView({ behavior: "smooth" });
+        if (section === "scanner" && (scannerSection || sections.scanner)) {
+            const sc = scannerSection || sections.scanner;
+            if (sc) sc.scrollIntoView({ behavior: "smooth" });
         } else {
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
@@ -365,23 +373,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Secondary links that jump straight to a section (e.g. "View Full Quantitative Rules")
+    // Global listener for buttons or links jumping to sections (e.g. data-section, data-section-link)
     document.addEventListener("click", (e) => {
-        const jumpBtn = e.target.closest("[data-section-link]");
-        if (!jumpBtn) return;
-        switchSection(jumpBtn.dataset.sectionLink);
+        const jumpBtn = e.target.closest("[data-section-link], [data-section]");
+        if (!jumpBtn || jumpBtn.closest("#sidebarNav")) return;
+        const targetSection = jumpBtn.dataset.sectionLink || jumpBtn.dataset.section;
+        if (targetSection && HASH_TO_SECTION[targetSection]) {
+            switchSection(targetSection);
+            closeMobileDrawer();
+        }
     });
 
     function routeFromHash() {
-        const raw = (window.location.hash || "").replace(/^#\/?/, "");
-        const section = HASH_TO_SECTION[raw] || "scanner";
+        let raw = (window.location.hash || "").replace(/^#\/?/, "").trim();
+        if (!raw) {
+            const pathname = (window.location.pathname || "").replace(/^\//, "").trim();
+            if (pathname) raw = pathname;
+        }
+        const section = HASH_TO_SECTION[raw] || HASH_TO_SECTION[raw.toLowerCase()] || "scanner";
         switchSection(section, { fromHash: true });
     }
     window.addEventListener("hashchange", () => {
         if (suppressHashUpdate) return;
         routeFromHash();
     });
+    window.addEventListener("popstate", () => {
+        if (suppressHashUpdate) return;
+        routeFromHash();
+    });
     routeFromHash();
+
 
     // Mobile Action Buttons
     if (scanBtnMobile) scanBtnMobile.addEventListener("click", () => {
