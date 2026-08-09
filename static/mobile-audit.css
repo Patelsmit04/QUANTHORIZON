@@ -406,29 +406,38 @@
 /* --- C) SIGNALS ENGINE PAGE (<= 767px) --- */
 @media (max-width: 767px) {
     /* C1. Filter Chips 2x2 Grid Layout (Request 2) */
+    .toolbar-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
     .filter-tabs {
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
         gap: 8px !important;
         width: 100% !important;
-        overflow-x: visible !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow-x: hidden !important;
         padding-bottom: 0 !important;
     }
 
     .filter-tabs .tab-btn {
         width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
         min-height: 40px !important;
         justify-content: center !important;
         font-size: 0.8rem !important;
-        padding: 8px 10px !important;
+        padding: 8px 6px !important;
         border-radius: 10px !important;
         white-space: nowrap !important;
-    }
-
-    .toolbar-container {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
 
     .toolbar-actions {

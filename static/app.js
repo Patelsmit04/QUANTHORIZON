@@ -2577,16 +2577,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function initNotifications() {
-        if (notifBell) notifBell.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
-        if (notifBellMobileTop) notifBellMobileTop.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
-        if (notifBellMobile) notifBellMobile.addEventListener("click", () => {
+        if (typeof notifBell !== "undefined" && notifBell) notifBell.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
+        if (typeof notifBellMobileTop !== "undefined" && notifBellMobileTop) notifBellMobileTop.addEventListener("click", (e) => { e.stopPropagation(); toggleNotifPanel(); });
+        if (typeof notifBellMobile !== "undefined" && notifBellMobile) notifBellMobile.addEventListener("click", () => {
             if (appSidebar) appSidebar.classList.remove("active");
             if (mobileMenuToggle) mobileMenuToggle.classList.remove("active");
             if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add("hidden");
             document.body.style.overflow = "";
             if (notifPanel) { notifPanel.classList.remove("hidden"); onNotifPanelOpened(); }
         });
-        if (notifMarkAllBtn) notifMarkAllBtn.addEventListener("click", async (e) => {
+        if (typeof notifMarkAllBtn !== "undefined" && notifMarkAllBtn) notifMarkAllBtn.addEventListener("click", async (e) => {
             e.stopPropagation();
             await apiFetch("/api/notifications/read_all", { method: "POST" });
             notifUnreadCount = 0;
@@ -2595,7 +2595,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         document.addEventListener("click", (e) => {
             if (!notifPanel || notifPanel.classList.contains("hidden")) return;
-            if (notifPanel.contains(e.target) || (notifBell && notifBell.contains(e.target)) || (notifBellMobile && notifBellMobile.contains(e.target)) || (notifBellMobileTop && notifBellMobileTop.contains(e.target))) return;
+            const b1 = typeof notifBell !== "undefined" && notifBell && notifBell.contains(e.target);
+            const b2 = typeof notifBellMobile !== "undefined" && notifBellMobile && notifBellMobile.contains(e.target);
+            const b3 = typeof notifBellMobileTop !== "undefined" && notifBellMobileTop && notifBellMobileTop.contains(e.target);
+            if (notifPanel.contains(e.target) || b1 || b2 || b3) return;
             notifPanel.classList.add("hidden");
         });
 
