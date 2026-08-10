@@ -308,18 +308,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Dynamic fallback lookup for section DOM nodes
         const sections = {
-            dashboard: dashboardSection || document.getElementById("dashboardSection"),
-            scanner: scannerSection || document.getElementById("scannerSection"),
-            stocksNews: stocksNewsSection || document.getElementById("stocksNewsSection"),
-            globalNews: globalNewsSection || document.getElementById("globalNewsSection"),
-            institutionalFlow: institutionalFlowSection || document.getElementById("institutionalFlowSection"),
+            dashboard: document.getElementById("dashboardSection"),
+            scanner: document.getElementById("scannerSection"),
+            stocksNews: document.getElementById("stocksNewsSection"),
+            globalNews: document.getElementById("globalNewsSection"),
+            institutionalFlow: document.getElementById("institutionalFlowSection"),
             orderFlow: document.getElementById("orderFlowSection"),
             accuracy: document.getElementById("accuracySection"),
-            indices: indicesSection || document.getElementById("indicesSection"),
-            strategies: strategiesSection || document.getElementById("strategiesSection"),
-            history: historySection || document.getElementById("historySection"),
-            guide: guideSection || document.getElementById("guideSection"),
-            rules: rulesSection || document.getElementById("rulesSection")
+            indices: document.getElementById("indicesSection"),
+            strategies: document.getElementById("strategiesSection"),
+            history: document.getElementById("historySection"),
+            guide: document.getElementById("guideSection"),
+            rules: document.getElementById("rulesSection")
         };
 
         if (sidebarNav) {

@@ -2036,7 +2036,7 @@ def get_closing_sequence_status():
 
 
 @app.get("/api/order_basket")
-def get_order_basket(risk_per_trade: float = Query(100000.0, description="Capital allocated per trade in INR")):
+def get_order_basket(risk_per_trade: float = 100000.0):
     """
     Generates structured, zero-slippage broker order slips for all active/locked BTST candidates.
     Outputs Symbol, Transaction Type (BUY/SELL), Option Strike Type (CE/PE), Entry LTP,
