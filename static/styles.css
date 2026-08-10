@@ -275,7 +275,9 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     transition: width 0.22s ease;
 }
 
-.app-sidebar.collapsed { width: var(--sidebar-width-collapsed); flex-basis: var(--sidebar-width-collapsed); }
+@media (min-width: 1024px) {
+    .app-sidebar.collapsed { width: var(--sidebar-width-collapsed); flex-basis: var(--sidebar-width-collapsed); }
+}
 
 .sidebar-header {
     display: flex;
