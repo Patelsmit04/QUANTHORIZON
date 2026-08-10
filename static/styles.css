@@ -3311,7 +3311,17 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     .toast {
         min-width: 0 !important;
         width: 100% !important;
-    }
 }
 
+/* Index Ticker Bar Clickable Hover Styles */
+.index-ticker-item {
+    cursor: pointer !important;
+    transition: background 0.2s ease, transform 0.15s ease;
+    border-radius: var(--radius-sm);
+    padding: 2px 6px;
+}
 
+.index-ticker-item:hover {
+    background: rgba(212, 175, 55, 0.15);
+    transform: scale(1.03);
+}

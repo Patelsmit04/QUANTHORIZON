@@ -563,6 +563,8 @@ def evaluate_5_pillar_matrix(
         "confidence_score": confidence_score,
         "predicted_gap_pct": predicted_gap_pct,
         "ltp": round(ltp, 2),
+        "prev_close": round(prev_close, 2),
+        "change_pts": round(ltp - prev_close, 2),
         "day_high": round(daily_high, 2),
         "day_low": round(daily_low, 2),
         "range_position_pct": range_position_pct,

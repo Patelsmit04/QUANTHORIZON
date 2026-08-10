@@ -537,24 +537,46 @@ def load_last_market_scan() -> Optional[Dict[str, Any]]:
 
 
 def fetch_index_ohlc_dict() -> Dict[str, Optional[pd.DataFrame]]:
-    """Fetch OHLCV for every tracked index, with robust fallback to daily candles when intraday 5m is sparse."""
+    """Fetch OHLCV for every tracked index, with robust fallback to daily candles when intraday 5m is sparse.
+    Also fetches the actual previous trading day's close for accurate +/- change display."""
     index_dfs: Dict[str, Optional[pd.DataFrame]] = {}
+    prev_closes: Dict[str, Optional[float]] = {}
     for name, ticker in INDEX_TICKERS.items():
+        # Fetch daily data first to get the real previous day's close
+        daily_df = call_with_retry(
+            lambda t=ticker: yf.download(t, period="5d", interval="1d", progress=False),
+            label=f"index daily close [{name}]",
+        )
+        if daily_df is not None and not daily_df.empty:
+            if isinstance(daily_df.columns, pd.MultiIndex):
+                daily_df.columns = daily_df.columns.get_level_values(0)
+            daily_df = daily_df.dropna()
+            if len(daily_df) >= 2:
+                prev_closes[name] = float(daily_df["Close"].iloc[-2])
+            elif len(daily_df) == 1:
+                prev_closes[name] = float(daily_df["Close"].iloc[-1])
+            else:
+                prev_closes[name] = None
+        else:
+            prev_closes[name] = None
+
+        # Fetch intraday data
         df = call_with_retry(
             lambda t=ticker: yf.download(t, period="1d", interval="5m", progress=False),
             label=f"index OHLC fetch [{name}]",
         )
         if df is None or df.empty or len(df.dropna()) < 2:
-            df = call_with_retry(
-                lambda t=ticker: yf.download(t, period="5d", interval="1d", progress=False),
-                label=f"index OHLC daily fallback [{name}]",
-            )
+            # Fall back to daily candles for the OHLC data
+            df = daily_df  # reuse the already-fetched daily data
         if df is None or df.empty:
             index_dfs[name] = None
             continue
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.get_level_values(0)
         index_dfs[name] = df.dropna()
+
+    # Store prev_closes alongside the dfs — accessed via cache_store
+    cache_store["index_prev_closes"] = prev_closes
     return index_dfs
 
 
@@ -712,8 +734,12 @@ def fetch_raw_index_universe() -> Dict[str, Any]:
             logger.warning(f"Intraday option chain fetch warning for {idx_name}: {e}")
             option_chains[idx_name] = None
 
+    # Retrieve prev_closes stored by fetch_index_ohlc_dict
+    prev_closes = cache_store.get("index_prev_closes", {})
+
     return {
         "index_dfs": index_dfs,
+        "prev_closes": prev_closes,
         "global_cues": global_cues_classified,
         "news_classification": news_classification,
         "option_chains": option_chains,
@@ -736,6 +762,7 @@ def score_index_universe(raw: Dict[str, Any], strategy: Dict[str, Any]) -> List[
         df_nifty = raw["index_dfs"].get("NIFTY50") if index_name != "NIFTY50" else None
         news_read = raw["news_classification"] if use_news_gate else None
         opt_chain = raw.get("option_chains", {}).get(index_name)
+        prev_close_val = raw.get("prev_closes", {}).get(index_name)
         try:
             processed = evaluate_index_signal(
                 index_name=index_name,
@@ -746,6 +773,7 @@ def score_index_universe(raw: Dict[str, Any], strategy: Dict[str, Any]) -> List[
                 option_chain=opt_chain,
                 pillar_weight_multipliers=effective_multipliers,
                 required_weight_override=required_override,
+                prev_close_override=prev_close_val,
             )
             processed["strategy_id"] = strategy["id"]
             processed["strategy_name"] = strategy["name"]
@@ -821,6 +849,7 @@ def run_index_btst_intelligence() -> Dict[str, Any]:
             option_chain = get_nearest_expiry_chain(raw_chain) if raw_chain else None
 
         try:
+            prev_close_val = cache_store.get("index_prev_closes", {}).get(index_name)
             index_results[index_name] = evaluate_index_signal(
                 index_name=index_name,
                 df_index=index_dfs.get(index_name),
@@ -830,6 +859,7 @@ def run_index_btst_intelligence() -> Dict[str, Any]:
                 option_chain=option_chain,
                 pillar_weight_multipliers=effective_multipliers,
                 required_weight_override=default_strategy.get("required_weight_override"),
+                prev_close_override=prev_close_val,
             )
         except Exception as e:
             logger.warning(f"[Index Intelligence] Scoring failed for {index_name}: {e}")
@@ -1653,8 +1683,72 @@ def get_index_signals():
             if gift_live:
                 index_data.append(gift_live)
 
-    return sanitize_json_data({"indices": index_data or [], "tickers": INDEX_TICKERS})
+    # Determine BTST display status based on current IST time
+    ist_now = get_ist_now()
+    time_in_mins = ist_now.hour * 60 + ist_now.minute
+    is_weekday = ist_now.weekday() not in [5, 6]
+    if not is_weekday or time_in_mins < 14 * 60 + 40:  # Before 2:40 PM
+        btst_status = "pre_btst"
+    elif time_in_mins < 15 * 60 + 30:  # 2:40 PM - 3:30 PM
+        btst_status = "preliminary"
+    else:  # After 3:30 PM
+        btst_status = "confirmed"
 
+    return sanitize_json_data({
+        "indices": index_data or [],
+        "tickers": INDEX_TICKERS,
+        "btst_status": btst_status,
+    })
+
+
+@app.get("/api/live_prices")
+def get_live_prices():
+    """Lightweight endpoint for 10-second polling — returns only LTP, change_pts, pct_change
+    for all cached indices and stocks from the in-memory cache. No yfinance calls, no scoring —
+    purely a cache read so it can be called every 10 seconds without load."""
+    # Index prices from cache
+    index_data = cache_store.get("index_data") or []
+    index_prices = []
+    for idx in index_data:
+        if isinstance(idx, dict):
+            index_prices.append({
+                "index_name": idx.get("index_name", ""),
+                "ltp": idx.get("ltp"),
+                "change_pts": idx.get("change_pts"),
+                "pct_change": idx.get("pct_change"),
+                "prev_close": idx.get("prev_close"),
+            })
+
+    # Stock prices from cache
+    stock_data = cache_store.get("data") or []
+    stock_prices = []
+    for s in stock_data:
+        if isinstance(s, dict):
+            stock_prices.append({
+                "symbol": s.get("symbol", ""),
+                "ltp": s.get("ltp"),
+                "change_pts": s.get("change_pts"),
+                "pct_change": s.get("pct_change"),
+                "prev_close": s.get("prev_close"),
+            })
+
+    # BTST status
+    ist_now = get_ist_now()
+    time_in_mins = ist_now.hour * 60 + ist_now.minute
+    is_weekday = ist_now.weekday() not in [5, 6]
+    if not is_weekday or time_in_mins < 14 * 60 + 40:
+        btst_status = "pre_btst"
+    elif time_in_mins < 15 * 60 + 30:
+        btst_status = "preliminary"
+    else:
+        btst_status = "confirmed"
+
+    return sanitize_json_data({
+        "indices": index_prices,
+        "stocks": stock_prices,
+        "btst_status": btst_status,
+        "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST"),
+    })
 
 @app.get("/api/indices/verdict")
 def get_index_btst_verdict():

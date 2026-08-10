@@ -228,7 +228,10 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshStrategiesNavBadge();
     initNotifications();
     fetchTickerIndices();
-    setInterval(fetchTickerIndices, 30000);
+    setInterval(fetchTickerIndices, 10000); // 10-sec ticker refresh
+    setInterval(fetchLivePrices, 10000); // 10-sec live number updater
+    scheduleMarketOpenRefresh();
+    maybeForceAccuracyRefresh();
 
     // Event Listeners
     
@@ -614,9 +617,134 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupAutoRefresh() {
         if (autoRefreshInterval) clearInterval(autoRefreshInterval);
 
+        // Time-aware refresh intervals:
+        // 9:15-10:00 AM IST: 60-sec (opening volatility)
+        // 10:00-15:30 IST: 30-sec (regular market)
+        // Off-market: 60-sec
+        const now = new Date();
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const istNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
+        const istMins = istNow.getHours() * 60 + istNow.getMinutes();
+
+        let refreshMs = 60000; // default 60s
+        if (istMins >= 555 && istMins < 600) {
+            refreshMs = 60000; // 9:15-10:00 AM: 1 min
+        } else if (istMins >= 600 && istMins < 930) {
+            refreshMs = 30000; // 10:00-15:30: 30 sec
+        }
+
         autoRefreshInterval = setInterval(() => {
             fetchScanResults(false);
-        }, 30000);
+        }, refreshMs);
+    }
+
+    // Schedule a hard page reload at exactly 9:15 AM IST for fresh market data
+    function scheduleMarketOpenRefresh() {
+        const now = new Date();
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const istNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
+        const day = istNow.getDay(); // 0=Sun, 6=Sat
+        if (day === 0 || day === 6) return; // Skip weekends
+
+        const istMins = istNow.getHours() * 60 + istNow.getMinutes();
+        const targetMins = 9 * 60 + 15; // 9:15 AM
+
+        if (istMins < targetMins) {
+            // Schedule reload for 9:15 AM today
+            const msUntil915 = (targetMins - istMins) * 60000 - (istNow.getSeconds() * 1000);
+            setTimeout(() => {
+                console.log('[QuantHorizon] 9:15 AM IST — hard refreshing for new market day...');
+                location.reload();
+            }, Math.max(0, msUntil915));
+        }
+    }
+
+    // At 9:15-9:20 AM IST, force-fetch accuracy data repeatedly to catch the backend evaluation
+    function maybeForceAccuracyRefresh() {
+        const now = new Date();
+        const istOffset = 5.5 * 60 * 60 * 1000;
+        const istNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
+        const istMins = istNow.getHours() * 60 + istNow.getMinutes();
+        const day = istNow.getDay();
+
+        if (day !== 0 && day !== 6 && istMins >= 555 && istMins <= 560) {
+            // 9:15-9:20 AM: force refresh accuracy every 30 sec
+            console.log('[QuantHorizon] 9:15 AM window — forcing accuracy refresh...');
+            fetchScanResults(true);
+            fetchWinRatePerformance();
+            fetchSplitAccuracy();
+            const accInterval = setInterval(() => {
+                fetchWinRatePerformance();
+                fetchSplitAccuracy();
+            }, 30000);
+            // Stop after 5 minutes
+            setTimeout(() => clearInterval(accInterval), 5 * 60000);
+        }
+    }
+
+    // Lightweight 10-sec live price updater — updates numbers in-place without re-rendering
+    let lastBtstStatus = 'pre_btst';
+    async function fetchLivePrices() {
+        try {
+            const response = await apiFetch('/api/live_prices');
+            if (!response.ok) return;
+            const data = await response.json();
+
+            // Update BTST status
+            if (data.btst_status) lastBtstStatus = data.btst_status;
+
+            // Update index ticker bar numbers in-place
+            if (data.indices && indexTickerTrack) {
+                const items = indexTickerTrack.querySelectorAll('.index-ticker-item');
+                const indexMap = {};
+                (data.indices || []).forEach(idx => { indexMap[idx.index_name] = idx; });
+                items.forEach(item => {
+                    const nameEl = item.querySelector('strong');
+                    if (!nameEl) return;
+                    const name = nameEl.textContent.trim();
+                    const idx = indexMap[name];
+                    if (!idx) return;
+                    const spans = item.querySelectorAll('span');
+                    if (spans.length >= 2) {
+                        const ltp = idx.ltp != null ? idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '--';
+                        spans[0].textContent = ltp;
+                        if (spans.length >= 3 && idx.change_pts != null) {
+                            const isUp = idx.change_pts >= 0;
+                            const sign = isUp ? '+' : '';
+                            const pts = idx.change_pts.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            const pct = typeof idx.pct_change === 'number' ? idx.pct_change.toFixed(2) : (idx.pct_change || '--');
+                            spans[2].textContent = `${sign}${pts} (${sign}${pct}%)`;
+                            spans[2].className = isUp ? 'text-bullish' : 'text-bearish';
+                        }
+                    }
+                });
+            }
+
+            // Update stock LTP/change in scanner table in-place
+            if (data.stocks && stocksTableBody) {
+                const stockMap = {};
+                (data.stocks || []).forEach(s => { stockMap[s.symbol] = s; });
+                stocksTableBody.querySelectorAll('tr[data-row-key]').forEach(tr => {
+                    const key = tr.dataset.rowKey || '';
+                    const sym = key.split('-')[0];
+                    const s = stockMap[sym];
+                    if (!s) return;
+                    const ltpCell = tr.querySelector('[data-label="LTP"]');
+                    if (ltpCell && s.ltp != null) {
+                        ltpCell.innerHTML = `<strong>\u20B9${s.ltp.toLocaleString('en-IN')}</strong>`;
+                    }
+                    const changeCell = tr.querySelector('[data-label="CHANGE"]');
+                    if (changeCell && s.change_pts != null && s.pct_change != null) {
+                        const isUp = s.change_pts >= 0;
+                        const sign = isUp ? '+' : '';
+                        const cls = isUp ? 'text-bullish' : 'text-bearish';
+                        changeCell.innerHTML = `<span class="${cls}" style="font-weight:700;font-size:12px;">${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)</span>`;
+                    }
+                });
+            }
+        } catch (e) {
+            // Silent — this is a background poll
+        }
     }
 
     // -------------------------------------------------------------
@@ -940,6 +1068,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     </span>
                 </td>
                 <td data-label="LTP"><strong>₹${ltpVal}</strong></td>
+                <td data-label="CHANGE">
+                    <span class="${(stock.change_pts || 0) >= 0 ? 'text-bullish' : 'text-bearish'}" style="font-weight:700;font-size:12px;">
+                        ${(stock.change_pts || 0) >= 0 ? '+' : ''}${(stock.change_pts || 0).toFixed(2)} (${(stock.pct_change || 0) >= 0 ? '+' : ''}${(stock.pct_change || 0).toFixed(2)}%)
+                    </span>
+                </td>
                 <td data-label="VOL SURGE">
                     <div class="vol-surge-container">
                         <span class="vol-surge-text ${(stock.volume_spike || 0) >= 3.0 ? 'text-amber font-weight-800' : 'text-sub'}">
@@ -1959,12 +2092,39 @@ document.addEventListener("DOMContentLoaded", () => {
         const pctText = pctChange !== null ? (typeof pctChange === "number" ? pctChange.toFixed(2) : pctChange) : "--";
 
         return `
-            <span class="index-ticker-item">
+            <span class="index-ticker-item" data-index-name="${escapeAttr(idx.index_name || '')}" style="cursor:pointer;" title="Click to view ${name} chart">
                 <strong>${name}</strong>
                 <span>${ltp}</span>
                 <span class="${cls}">${sign}${ptsText} (${sign}${pctText}%)</span>
             </span>
         `;
+    }
+
+    // Open a chart modal when clicking an index in the ticker bar
+    function openIndexChartModal(indexName) {
+        // Reuse the existing stock modal but with index data
+        const modalSymbol = document.getElementById('modalSymbol');
+        const modalSignalBadge = document.getElementById('modalSignalBadge');
+        const modalScoreVal = document.getElementById('modalScoreVal');
+        const modalRankTier = document.getElementById('modalRankTier');
+        const modalOptionType = document.getElementById('modalOptionType');
+        const modalEstGap = document.getElementById('modalEstGap');
+        const modalLtp = document.getElementById('modalLtp');
+        const modalChecklist = document.getElementById('modalChecklist');
+
+        if (modalSymbol) modalSymbol.textContent = indexName;
+        if (modalSignalBadge) { modalSignalBadge.textContent = 'INDEX CHART'; modalSignalBadge.className = 'badge badge-gold'; }
+        if (modalScoreVal) modalScoreVal.textContent = '--';
+        if (modalRankTier) modalRankTier.textContent = 'INDEX';
+        if (modalOptionType) modalOptionType.textContent = '--';
+        if (modalEstGap) modalEstGap.textContent = '--';
+        if (modalLtp) modalLtp.textContent = '--';
+        if (modalChecklist) modalChecklist.innerHTML = '<div style="padding:12px;color:var(--ink-muted);">Index pillar data shown in Index Intelligence section.</div>';
+
+        if (stockModal) stockModal.classList.remove('hidden');
+
+        // Load the chart for this index
+        loadChartForSymbol(indexName, '5m');
     }
 
     async function fetchTickerIndices() {
@@ -1975,10 +2135,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
             const indices = data.indices || [];
 
+            // Update BTST status
+            if (data.btst_status) lastBtstStatus = data.btst_status;
+
             const itemsHtml = indices.map(buildTickerItemHTML).join("");
 
             // Duplicate the item list once so the marquee (translateX 0 -> -50%) loops seamlessly.
             indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
+
+            // Attach click handlers to ticker items
+            indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const idxName = item.dataset.indexName;
+                    if (idxName) openIndexChartModal(idxName);
+                });
+            });
         } catch (error) {
             console.error("Failed to fetch ticker indices:", error);
         }
@@ -2602,6 +2773,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (notifBadgeMobileTop) { notifBadgeMobileTop.textContent = text; notifBadgeMobileTop.classList.toggle("hidden", !show); }
     }
 
+    function getNotifIcon(type) {
+        if (type === 'institutional_flow') return '<i class="fa-solid fa-building-columns text-gold" style="margin-right:6px;"></i>';
+        if (type === 'index_verdict') return '<i class="fa-solid fa-chart-column text-cyan" style="margin-right:6px;"></i>';
+        if (type === 'smc_setup') return '<i class="fa-solid fa-crosshairs text-bullish" style="margin-right:6px;"></i>';
+        if (type === 'lock') return '<i class="fa-solid fa-lock text-gold" style="margin-right:6px;"></i>';
+        if (type === 'btst_signal') return '<i class="fa-solid fa-bolt text-gold" style="margin-right:6px;"></i>';
+        return '<i class="fa-solid fa-bell text-gold" style="margin-right:6px;"></i>';
+    }
+
     function renderNotifList(notifications) {
         if (!notifList) return;
         if (!notifications || notifications.length === 0) {
@@ -2610,18 +2790,48 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         notifList.innerHTML = notifications.map((n) => `
             <div class="notif-item ${n.read ? "" : "unread"}">
-                <div class="notif-title">${escapeHtmlLocal(n.title)}</div>
-                <div>${escapeHtmlLocal(n.message)}</div>
+                <div class="notif-title">${getNotifIcon(n.type || '')}${escapeHtmlLocal(n.title)}</div>
+                <div style="font-size:12px;color:var(--ink-secondary);">${escapeHtmlLocal(n.message)}</div>
                 <div class="notif-meta">${formatNotifTime(n.timestamp)}</div>
             </div>
         `).join("");
     }
 
+    // Notification sound using Web Audio API — no external file needed
+    function playNotificationSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            // First tone (higher)
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(880, ctx.currentTime);
+            gain1.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc1.connect(gain1).connect(ctx.destination);
+            osc1.start(ctx.currentTime);
+            osc1.stop(ctx.currentTime + 0.3);
+            // Second tone (even higher, slight delay)
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.15);
+            gain2.gain.setValueAtTime(0.12, ctx.currentTime + 0.15);
+            gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+            osc2.connect(gain2).connect(ctx.destination);
+            osc2.start(ctx.currentTime + 0.15);
+            osc2.stop(ctx.currentTime + 0.5);
+            // Clean up
+            setTimeout(() => ctx.close(), 600);
+        } catch (e) { /* Audio not available */ }
+    }
+
     function showToast(title, body) {
         if (!toastContainer) return;
+        playNotificationSound();
         const el = document.createElement("div");
         el.className = "toast";
-        el.innerHTML = `<div class="toast-title">${escapeHtmlLocal(title)}</div><div class="toast-body">${escapeHtmlLocal(body)}</div>`;
+        el.innerHTML = `<div class="toast-title"><i class="fa-solid fa-bell" style="color:var(--gold);margin-right:6px;"></i>${escapeHtmlLocal(title)}</div><div class="toast-body">${escapeHtmlLocal(body)}</div>`;
         toastContainer.appendChild(el);
         setTimeout(() => el.remove(), 7000);
     }

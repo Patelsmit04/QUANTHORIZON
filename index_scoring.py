@@ -213,6 +213,7 @@ def evaluate_index_signal(
     option_chain: Optional[Dict[str, Any]] = None,
     pillar_weight_multipliers: Optional[Dict[str, float]] = None,
     required_weight_override: Optional[float] = None,
+    prev_close_override: Optional[float] = None,
 ) -> Dict[str, Any]:
     """
     Evaluate one index (NIFTY50 / BANKNIFTY / SENSEX / GIFTNIFTY) against the 6-pillar index model.
@@ -231,6 +232,10 @@ def evaluate_index_signal(
     the derivatives/Greeks analysis runs internally, below, right after bias is computed.
     required_weight_override: replaces REQUIRED_INDEX_WEIGHT — lets strategy_manager define a
     strategy-specific confirmation bar for indices, same mechanism as the stock matrix.
+    prev_close_override: the ACTUAL previous trading day's closing price, fetched from daily
+    data by the caller. When provided, used for accurate change_pts/pct_change instead of
+    the intraday candle approximation (which gave the previous 5m candle's close, not
+    yesterday's close — the root cause of incorrect +/- values).
     """
     weight_mult = pillar_weight_multipliers or {}
 
@@ -254,7 +259,9 @@ def evaluate_index_signal(
     df_index = df_index.dropna(subset=["Close", "Open", "High", "Low"]).copy()
     latest = df_index.iloc[-1]
     session_open = float(df_index.iloc[0]["Open"])
-    prev_close = float(df_index.iloc[-2]["Close"]) if len(df_index) >= 2 else session_open
+    # Use the actual previous day's close when available (from daily data), otherwise
+    # fall back to session open which is a better proxy than the previous 5m candle.
+    prev_close = prev_close_override if prev_close_override is not None else session_open
     daily_high = float(df_index["High"].max())
     daily_low = float(df_index["Low"].min())
     ltp = float(latest["Close"])
