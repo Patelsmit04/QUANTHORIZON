@@ -141,6 +141,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Prevent stale browser caches on HTML / CSS / JS assets — force revalidation every load.
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+
+class NoCacheStaticMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: StarletteRequest, call_next):
+        response = await call_next(request)
+        path = request.url.path
+        if path.endswith((".html", ".css", ".js")) or path == "/":
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+        return response
+
+app.add_middleware(NoCacheStaticMiddleware)
+
 # M9 audit fix: every mutating endpoint (strategy CRUD, lock/evaluate picks, execute, run index
 # intelligence, mark notifications read) previously had zero authentication — anyone with the
 # URL (or any third-party webpage's own JS, given the open CORS above) could call them. Gated
