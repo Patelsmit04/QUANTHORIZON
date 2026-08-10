@@ -3049,6 +3049,10 @@ document.addEventListener("DOMContentLoaded", () => {
                         notifUnreadCount += 1;
                         renderNotifBadge();
                         if (notifPanel && !notifPanel.classList.contains("hidden")) onNotifPanelOpened();
+                    } else if (msg.type === "market_lock" || msg.type === "auto_lock_325_picks" || msg.type === "closing_sequence_progress") {
+                        if (msg.btst_status) lastBtstStatus = msg.btst_status;
+                        fetchScanResults(true);
+                        fetchLivePrices();
                     }
                 } catch (e) { console.error("Bad /ws/live message:", e); }
             };

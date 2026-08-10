@@ -82,6 +82,10 @@ async def lifespan(app_instance: FastAPI):
         eval_thread.start()
         live_ticker_thread = threading.Thread(target=live_price_ticker_worker, daemon=True)
         live_ticker_thread.start()
+        closing_thread = threading.Thread(target=closing_sequence_worker, daemon=True)
+        closing_thread.start()
+        premarket_thread = threading.Thread(target=premarket_scheduler_worker, daemon=True)
+        premarket_thread.start()
     yield
     shutdown_event.set()
 
@@ -1422,6 +1426,76 @@ def evaluation_scheduler_worker():
         except Exception as e:
             logger.error(f"Error in evaluation scheduler worker: {e}")
             time.sleep(15)
+
+
+# -------------------------------------------------------------
+# DEDICATED HIGH-PRECISION 1-SECOND CLOSING CLOCK WORKER THREAD
+# -------------------------------------------------------------
+def closing_sequence_worker():
+    """
+    Dedicated 1-second high-precision worker thread for the 3:14 PM -> 3:40 PM market closing sequence.
+    Ensures exact, non-blocking step executions:
+    - 3:14 PM IST: Pre-close snapshot
+    - 3:25:00 PM IST: AUTO-LOCK 3:25 PM BTST PICKS
+    - 3:30:00 PM IST: SHARP 3:30 PM FINAL CONFIRMED MARKET BELL LOCK
+    - 3:35 PM IST: CAS Settlement Reconciliation
+    - 3:40 PM IST: Final Pick Journal Lock
+    """
+    logger.info("Starting Dedicated High-Precision Closing Sequence Worker Thread...")
+    while not shutdown_event.is_set():
+        try:
+            ist_now = get_ist_now()
+            today_date = ist_now.strftime("%Y-%m-%d")
+            time_in_mins = ist_now.hour * 60 + ist_now.minute
+            if ist_now.weekday() not in [5, 6]:
+                step_ran = closing_sequence.run_step_if_due(
+                    time_in_mins=time_in_mins,
+                    today_date=today_date,
+                    get_current_stocks=lambda: _snapshot_ready_stocks(today_date),
+                    lock_picks=_run_closing_lock_sequence,
+                    broadcast=ws_broadcast.broadcast_sync,
+                )
+                if step_ran:
+                    logger.info(f"[Closing Sequence Worker] Executed step: {step_ran}")
+            time.sleep(1)
+        except Exception as e:
+            logger.error(f"Error in closing_sequence_worker: {e}")
+            time.sleep(1)
+
+
+# -------------------------------------------------------------
+# DEDICATED 08:30 AM PRE-MARKET INITIALIZATION SCHEDULER THREAD
+# -------------------------------------------------------------
+def premarket_scheduler_worker():
+    """
+    Dedicated pre-market initialization thread (08:30 - 09:00 AM IST).
+    Scrapes GIFT Nifty live quotes and S&P 500 futures, warming up index cache before 09:15 AM market open.
+    """
+    logger.info("Starting Dedicated 08:30 AM Pre-Market Scheduler Thread...")
+    last_premarket_date = None
+    PREMARKET_START = 8 * 60 + 30  # 08:30 AM IST
+    PREMARKET_END = 9 * 60         # 09:00 AM IST
+    while not shutdown_event.is_set():
+        try:
+            ist_now = get_ist_now()
+            today_date = ist_now.strftime("%Y-%m-%d")
+            time_in_mins = ist_now.hour * 60 + ist_now.minute
+            if ist_now.weekday() not in [5, 6] and last_premarket_date != today_date:
+                if PREMARKET_START <= time_in_mins <= PREMARKET_END:
+                    logger.info("08:30-09:00 AM Pre-Market Window — warming up GIFT Nifty & global index cues...")
+                    gift_live = fetch_gift_nifty_live()
+                    raw_idx = fetch_raw_index_universe()
+                    scored_idx = score_index_universe(raw_idx)
+                    if gift_live and scored_idx:
+                        if not any(idx.get("index_name") == "GIFTNIFTY" for idx in scored_idx):
+                            scored_idx.append(gift_live)
+                        cache_store["index_data"] = scored_idx
+                    last_premarket_date = today_date
+                    logger.info("Pre-Market Initialization complete.")
+            time.sleep(30)
+        except Exception as e:
+            logger.error(f"Error in premarket_scheduler_worker: {e}")
+            time.sleep(30)
 
 
 

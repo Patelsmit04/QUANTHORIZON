@@ -51,13 +51,14 @@ logger = logging.getLogger("ClosingSequence")
 
 STATE_FILE = os.path.join(DATA_DIR, "closing_sequence_state.json")
 
-# Trigger times, minutes since midnight IST — same representation as every other schedule
-# constant in this codebase (get_market_schedule_info, evaluation_scheduler_worker).
-SNAPSHOT_MINS = 15 * 60 + 14   # 3:14 PM
-CAS_CLOSE_MINS = 15 * 60 + 35  # 3:35 PM
-SCORING_MINS = 15 * 60 + 36    # 3:36 PM
-BROADCAST_MINS = 15 * 60 + 38  # 3:38 PM
-LOCK_MINS = 15 * 60 + 40       # 3:40 PM
+# Trigger times, minutes since midnight IST
+SNAPSHOT_MINS = 15 * 60 + 14          # 3:14 PM (Pre-close snapshot)
+AUTO_LOCK_PICKS_MINS = 15 * 60 + 25  # 3:25 PM (Auto-lock 3:25 PM picks snapshot)
+FINAL_BELL_LOCK_MINS = 15 * 60 + 30  # 3:30 PM (Sharp 3:30 PM market bell lock)
+CAS_CLOSE_MINS = 15 * 60 + 35        # 3:35 PM (CAS Settlement Reconciliation)
+SCORING_MINS = 15 * 60 + 36          # 3:36 PM
+BROADCAST_MINS = 15 * 60 + 38        # 3:38 PM
+LOCK_MINS = 15 * 60 + 40             # 3:40 PM
 
 NSE_TRADING_HOLIDAYS_2026 = {
     "2026-01-26", "2026-03-06", "2026-03-25", "2026-04-03", "2026-04-14",
@@ -69,8 +70,8 @@ def is_trading_holiday(today_date_str: str) -> bool:
     return today_date_str in NSE_TRADING_HOLIDAYS_2026
 
 _EMPTY_STATE = {
-    "date": None, "snapshot_done": False, "cas_close_done": False,
-    "scoring_done": False, "broadcast_done": False, "lock_done": False,
+    "date": None, "snapshot_done": False, "auto_lock_25_done": False, "final_bell_30_done": False,
+    "cas_close_done": False, "scoring_done": False, "broadcast_done": False, "lock_done": False,
     "snapshot_picks": [], "cas_close_prices": {}, "lock_result": None,
     "lock_timestamp": None,
 }
@@ -253,7 +254,23 @@ def run_step_if_due(
         _notify("snapshot")
         return "snapshot"
 
-    if state["snapshot_done"] and not state["cas_close_done"] and time_in_mins >= CAS_CLOSE_MINS:
+    if state["snapshot_done"] and not state.get("auto_lock_25_done") and time_in_mins >= AUTO_LOCK_PICKS_MINS:
+        state["auto_lock_25_done"] = True
+        _save_state(state)
+        if broadcast is not None:
+            broadcast({"type": "auto_lock_325_picks", "date": today_date, "status": "LOCKED_325"})
+        logger.info("[Closing Sequence] 3:25:00 PM IST: AUTO-LOCK 3:25 PM BTST PICKS complete.")
+        return "auto_lock_325"
+
+    if state.get("auto_lock_25_done") and not state.get("final_bell_30_done") and time_in_mins >= FINAL_BELL_LOCK_MINS:
+        state["final_bell_30_done"] = True
+        _save_state(state)
+        if broadcast is not None:
+            broadcast({"type": "market_lock", "btst_status": "confirmed", "date": today_date})
+        logger.info("[Closing Sequence] 3:30:00 PM IST: FINAL CONFIRMED MARKET BELL LOCK complete.")
+        return "market_lock_330"
+
+    if state.get("final_bell_30_done") and not state["cas_close_done"] and time_in_mins >= CAS_CLOSE_MINS:
         _step_cas_close(state)
         _save_state(state)
         _notify("cas_close")
