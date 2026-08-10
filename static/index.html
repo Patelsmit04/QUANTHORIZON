@@ -323,12 +323,20 @@
                             <i class="fa-solid fa-sort"></i>
                             <select id="sortSelect" aria-label="Sort stocks">
                                 <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
+                                <option value="GAINERS_DESC">Sort: Top Gainers (+% Change)</option>
+                                <option value="LOSERS_ASC">Sort: Top Losers (-% Change)</option>
                                 <option value="SCORE_DESC">Sort: Highest Confidence %</option>
                                 <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
                                 <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
                                 <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="live-quick-filters" id="liveQuickFilters" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+                        <button class="filter-pill-btn active" data-filter="ALL" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(212,175,55,0.2);color:var(--gold);border:1px solid rgba(212,175,55,0.4);cursor:pointer;"><i class="fa-solid fa-layer-group"></i> ALL STOCKS</button>
+                        <button class="filter-pill-btn" data-filter="GAINERS" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(16,185,129,0.12);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.3);cursor:pointer;"><i class="fa-solid fa-arrow-trend-up"></i> TOP GAINERS</button>
+                        <button class="filter-pill-btn" data-filter="LOSERS" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(239,68,68,0.12);color:var(--bearish-red);border:1px solid rgba(239,68,68,0.3);cursor:pointer;"><i class="fa-solid fa-arrow-trend-down"></i> TOP LOSERS</button>
+                        <button class="filter-pill-btn" data-filter="HIGH_VOL" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.3);cursor:pointer;"><i class="fa-solid fa-fire"></i> HIGH VOL SURGE</button>
                     </div>
                 </section>
 

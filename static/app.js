@@ -493,6 +493,24 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const liveQuickFilters = document.getElementById("liveQuickFilters");
+    if (liveQuickFilters) {
+        liveQuickFilters.addEventListener("click", (e) => {
+            const btn = e.target.closest(".filter-pill-btn");
+            if (!btn) return;
+            liveQuickFilters.querySelectorAll(".filter-pill-btn").forEach(b => {
+                b.classList.remove("active");
+                b.style.background = "rgba(11,11,11,0.1)";
+            });
+            btn.classList.add("active");
+            btn.style.background = "rgba(212,175,55,0.25)";
+            currentFilter = btn.dataset.filter || "ALL";
+            if (currentFilter === "GAINERS" && sortSelect) sortSelect.value = "GAINERS_DESC";
+            if (currentFilter === "LOSERS" && sortSelect) sortSelect.value = "LOSERS_ASC";
+            filterAndRenderTable();
+        });
+    }
+
     if (addStrategyBtn) addStrategyBtn.addEventListener("click", () => openStrategyForm(null));
     if (closeStrategyFormBtn) closeStrategyFormBtn.addEventListener("click", () => strategyFormModal.classList.add("hidden"));
     if (strategyForm) strategyForm.addEventListener("submit", submitStrategyForm);
@@ -973,6 +991,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (currentFilter === "STBT") return stock.signal && stock.signal.includes("STBT");
                 if (currentFilter === "HIGH_VOL") return (stock.volume_spike || 0) >= 2.0;
                 if (currentFilter === "PRIORITY1") return stock.priority_level === "P1_HIGH";
+                if (currentFilter === "GAINERS") return (stock.pct_change || 0) > 0;
+                if (currentFilter === "LOSERS") return (stock.pct_change || 0) < 0;
                 // Show High Conviction (P1/P2) + Active Signals in Intelligence View
                 return stock.priority_level === "P1_HIGH" || stock.priority_level === "P2_MEDIUM" || (stock.signal && stock.signal !== "WATCHLIST");
             } else {
@@ -981,6 +1001,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (currentFilter === "STBT") return stock.signal && stock.signal.includes("STBT");
                 if (currentFilter === "HIGH_VOL") return (stock.volume_spike || 0) >= 2.0;
                 if (currentFilter === "PRIORITY1") return stock.priority_level === "P1_HIGH";
+                if (currentFilter === "GAINERS") return (stock.pct_change || 0) > 0;
+                if (currentFilter === "LOSERS") return (stock.pct_change || 0) < 0;
                 return true;
             }
         });
@@ -993,6 +1015,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         filtered.sort((a, b) => {
+            if (sortKey === "GAINERS_DESC") return (b.pct_change || 0) - (a.pct_change || 0);
+            if (sortKey === "LOSERS_ASC") return (a.pct_change || 0) - (b.pct_change || 0);
             if (sortKey === "SCORE_DESC") return (b.confidence_score || 0) - (a.confidence_score || 0);
             if (sortKey === "VOL_DESC") return (b.volume_spike || 0) - (a.volume_spike || 0);
             if (sortKey === "RSI_DESC") return (b.rsi || 0) - (a.rsi || 0);

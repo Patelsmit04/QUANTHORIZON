@@ -426,8 +426,8 @@ class TradeHistoryManager:
         today_date_str = ist_now.strftime("%Y-%m-%d")
 
         for trade in pending_trades:
-            # Skip trades locked today if market is still running before 9:15 AM
-            if trade.get("lock_date") == today_date_str and (ist_now.hour < 9 or (ist_now.hour == 9 and ist_now.minute < 15)):
+            # Skip trade evaluation before 9:15 AM IST on any trading day
+            if ist_now.hour < 9 or (ist_now.hour == 9 and ist_now.minute < 15):
                 continue
 
             ticker = trade["raw_ticker"]
@@ -549,13 +549,22 @@ def fetch_index_ohlc_dict() -> Dict[str, Optional[pd.DataFrame]]:
             lambda t=ticker: yf.download(t, period="5d", interval="1d", progress=False),
             label=f"index daily close [{name}]",
         )
+        today_str = get_ist_now().strftime("%Y-%m-%d")
         if daily_df is not None and not daily_df.empty:
             if isinstance(daily_df.columns, pd.MultiIndex):
                 daily_df.columns = daily_df.columns.get_level_values(0)
             daily_df = daily_df.dropna()
-            if len(daily_df) >= 2:
+            
+            if isinstance(daily_df.index, pd.DatetimeIndex):
+                d_dates = [d.strftime("%Y-%m-%d") for d in daily_df.index]
+            else:
+                d_dates = [str(d)[:10] for d in daily_df.index]
+
+            if d_dates and d_dates[-1] == today_str and len(daily_df) >= 2:
+                # Today's daily bar is present (market live open), so yesterday's close is iloc[-2]
                 prev_closes[name] = float(daily_df["Close"].iloc[-2])
-            elif len(daily_df) == 1:
+            elif len(daily_df) >= 1:
+                # Today's daily bar hasn't formed yet or off-market, so previous trading day's close is iloc[-1]
                 prev_closes[name] = float(daily_df["Close"].iloc[-1])
             else:
                 prev_closes[name] = None
