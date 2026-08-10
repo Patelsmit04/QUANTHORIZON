@@ -3331,21 +3331,21 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
    ========================================================================== */
 
 .live-stocks-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     padding: 12px 0;
 }
 
 .live-stock-card {
-    display: flex;
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
     background: var(--glass-bg-strong);
     border: 1px solid var(--glass-border);
-    border-radius: 10px;
-    padding: 14px 16px;
+    border-radius: 8px;
+    padding: 13px 20px 13px 18px;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
@@ -3359,7 +3359,7 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     top: 0;
     bottom: 0;
     width: 3px;
-    border-radius: 10px 0 0 10px;
+    border-radius: 8px 0 0 8px;
 }
 
 .live-stock-card.live-card-up::before {
@@ -3373,7 +3373,7 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
 .live-stock-card:hover {
     border-color: rgba(212, 175, 55, 0.35);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .live-card-name {
@@ -3382,15 +3382,24 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     color: var(--ink-primary);
     letter-spacing: 0.5px;
     white-space: nowrap;
-    min-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .live-card-ltp {
     font-size: 14px;
     font-weight: 700;
-    color: var(--ink-primary);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.live-card-up .live-card-ltp {
+    color: var(--bullish-green);
+}
+
+.live-card-down .live-card-ltp {
+    color: var(--bearish-red);
 }
 
 .live-card-change {
@@ -3400,6 +3409,7 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     font-variant-numeric: tabular-nums;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 4px;
 }
 
@@ -3411,14 +3421,10 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     color: var(--bearish-red);
 }
 
-/* Responsive: smaller screens get 2 columns, mobile gets 1 */
-@media (max-width: 768px) {
-    .live-stocks-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 8px;
-    }
+@media (max-width: 480px) {
     .live-stock-card {
-        padding: 10px 12px;
+        grid-template-columns: 90px 1fr 1fr;
+        padding: 10px 14px 10px 14px;
     }
     .live-card-name {
         font-size: 11px;
@@ -3428,11 +3434,5 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     }
     .live-card-change {
         font-size: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .live-stocks-grid {
-        grid-template-columns: 1fr;
     }
 }
