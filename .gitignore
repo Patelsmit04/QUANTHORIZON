@@ -5,7 +5,9 @@ data/*.json
 !data/stock_news_cache.json
 !data/last_market_scan.json
 !data/event_calendar.json
+!data/trade_history.json
 data/*.db
+!data/signal_journal.db
 data/*.lock
 .env
 .env.*

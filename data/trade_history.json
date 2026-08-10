@@ -1,0 +1,82 @@
+{
+  "trades": [
+    {
+      "id": "2026-08-07_GRASIM",
+      "lock_date": "2026-08-07",
+      "lock_time": "17:54:31",
+      "symbol": "GRASIM",
+      "raw_ticker": "GRASIM.NS",
+      "liquidity_tier": "TIER_1",
+      "confirmed_pillars_count": 3,
+      "confirmed_pillars": [
+        "Pillar 3: RS vs Nifty (Outperforming +2.97%)",
+        "Pillar 4: Vol Spike (1.85x)",
+        "Pillar 5: Marubozu Close (Range Pos: 99.07%)"
+      ],
+      "oi_magnitude": {
+        "actual_oi_pct": 0.0,
+        "avg_10d_oi_pct": 0.0,
+        "multiplier_used": 1.5,
+        "threshold": 0.0,
+        "is_above_threshold": false,
+        "data_status": "DATA_UNAVAILABLE"
+      },
+      "expiry_discount_applied": false,
+      "delivery_t1_validation": {
+        "delivery_pct": 51.98,
+        "avg_10d_delivery_pct": 55.12,
+        "delivery_t1_confirmed": false,
+        "data_status": "HISTORY_FILE"
+      },
+      "fundamental_quality": {
+        "verdict": "UNAVAILABLE",
+        "gate_applied": null,
+        "sector": null,
+        "trailing_pe": null,
+        "return_on_equity": null,
+        "debt_to_equity": null,
+        "earnings_growth": null,
+        "red_flags": [],
+        "yellow_flags": [],
+        "data_status": "DATA_UNAVAILABLE"
+      },
+      "news_signal": {
+        "verdict": "NEUTRAL",
+        "red_hits": [],
+        "green_hits": [],
+        "headline_count": 5,
+        "lookback_hours": 72,
+        "gate_applied": null
+      },
+      "depth_analysis": "GRASIM (TIER_1) — BTST (BUY) CALL (CE), MODERATE conviction, confidence 90/100. Price Rs.3323.00 is trading above VWAP (Rs.3260.15) with RSI at 66.2 (bullish momentum), on a 1.85x volume surge vs the session baseline. 3 of 5 technical pillars confirmed (weight 3.0/3 required for TIER_1): Pillar 3: RS vs Nifty (Outperforming +2.97%); Pillar 4: Vol Spike (1.85x); Pillar 5: Marubozu Close (Range Pos: 99.07%). Estimated next-day open gap: +2.4%. Futures OI data was unavailable for this scan — Pillar 1 excluded, not assumed. Fundamentals: unavailable for this stock (not yet cached or fetch failed) — no fundamental gate applied. Stock-specific news: 5 recent headline(s), verdict NEUTRAL. Broader market backdrop: not fetched for this scan. This is a probability-ranked read from the data available at lock time, not a guaranteed outcome — treat confidence/priority as relative conviction, not certainty.",
+      "signal": "BTST (BUY)",
+      "option_type": "CALL (CE)",
+      "priority_level": "P2_MEDIUM",
+      "confidence_score": 90,
+      "close_price_325": 3323.0,
+      "predicted_gap_pct": 2.4,
+      "day_high": 3311.8,
+      "day_low": 3183.0,
+      "vwap": 3260.15,
+      "volume_spike": 1.85,
+      "rsi": 66.2,
+      "rank_reason": "Confirmed 3.0/3 Pillar Weight [TIER_1]",
+      "status": "COMPLETED",
+      "open_price_915": 3293.1,
+      "gap_pct": -0.9,
+      "variance_error_pct": 3.3,
+      "accuracy_score_pct": 50.5,
+      "outcome": "LOSS",
+      "evaluated_at": "2026-08-10 10:30:22 IST"
+    }
+  ],
+  "total_trades": 1,
+  "wins": 0,
+  "losses": 1,
+  "neutrals": 0,
+  "win_rate_pct": 0.0,
+  "avg_gap_pct": -0.9,
+  "prediction_accuracy_pct": 50.5,
+  "avg_variance_error_pct": 3.3,
+  "last_updated": "2026-08-10 10:30:22 IST"
+}
