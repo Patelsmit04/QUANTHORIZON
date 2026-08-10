@@ -736,16 +736,21 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
    section). Speed (40s per loop) is tuned for the "slow, like Zerodha/Groww" request; if the
    item count grows a lot, lengthen the duration to keep the per-item scroll speed constant. */
 .index-ticker-bar {
-    width: 100%;
-    overflow: hidden;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    position: relative !important;
     white-space: nowrap;
     background: var(--glass-bg-soft);
     border-bottom: 1px solid var(--glass-border);
     padding: 8px 0;
+    contain: paint !important;
 }
 
 .index-ticker-track {
-    display: inline-flex;
+    display: flex !important;
+    width: max-content !important;
     gap: 32px;
     animation: index-ticker-scroll 40s linear infinite;
 }

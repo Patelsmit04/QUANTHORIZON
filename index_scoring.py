@@ -463,17 +463,20 @@ def evaluate_index_signal(
     base_score = int(50 + (weight_ratio * 35))
     if p_marubozu_confirmed:
         base_score += 5
-    confidence_score = min(99, max(40, base_score))
 
-    if signal in ("BTST (BUY)", "STBT (SELL)"):
+    if signal not in ("BTST (BUY)", "STBT (SELL)"):
+        confidence_score = 0
+        priority_level = "P3_LOW"
+        rank_reason = f"Avoid — confirmed pillar weight ({total_confirmed_weight}/{required_weight}) fell short of required threshold"
+    else:
+        confidence_score = min(99, max(40, base_score))
         if confidence_score >= 90:
             priority_level = "P1_HIGH"
         elif confidence_score >= 75:
             priority_level = "P2_MEDIUM"
         else:
             priority_level = "P3_LOW"
-    else:
-        priority_level = "P3_LOW"
+        rank_reason = f"Confirmed {total_confirmed_weight}/{required_weight} Index Pillar Weight"
 
     est_gap = round(0.5 + (abs(rsi - 50) * 0.03), 2)
     predicted_gap_pct = est_gap if pct_change >= 0 else -est_gap

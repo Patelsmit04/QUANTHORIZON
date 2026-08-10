@@ -1201,10 +1201,15 @@ def get_split_accuracy_metrics() -> Dict[str, Any]:
             return {"total_setups": 0, "win_rate_pct": default_win, "accuracy_pct": default_acc, "is_baseline": True}
         corr = sum(1 for r in rows if r.get("is_direction_correct") == 1)
         wins = sum(1 for r in rows if r.get("is_trade_win") == 1)
+        acc_scores = [
+            max(0.0, min(100.0, 100.0 - abs(float(r.get("actual_gap_pct", 0.0) or 0.0) - float(r.get("predicted_gap_pct", 0.0) or 0.0)) * 15.0))
+            for r in rows if r.get("actual_gap_pct") is not None
+        ]
+        avg_acc = round(sum(acc_scores) / len(acc_scores), 1) if acc_scores else round((corr / len(rows)) * 100, 1)
         return {
             "total_setups": len(rows),
             "win_rate_pct": round((wins / len(rows)) * 100, 1),
-            "accuracy_pct": round((corr / len(rows)) * 100, 1),
+            "accuracy_pct": avg_acc,
             "is_baseline": False
         }
 

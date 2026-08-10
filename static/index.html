@@ -28,8 +28,8 @@
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=26.0.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=26.0.0">
+    <link rel="stylesheet" href="/static/styles.css?v=31.0.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=31.0.0">
 
 </head>
 <body>
@@ -726,7 +726,7 @@
 
                 <div class="paper-trade-notice">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span>All strategy execution is PAPER/SIMULATED only — no real broker is connected and no real money ever moves through this system.</span>
+                    <span>All strategy execution is PAPER/SIMULATED only — no real broker order placement is executed (Kite Connect is used read-only for market data & tick-rule order flow analysis).</span>
                 </div>
 
                 <section class="strategy-grid" id="strategyGrid">
@@ -846,7 +846,7 @@
 
                     <div class="guide-step-box">
                         <h4><i class="fa-solid fa-circle-info text-gold"></i> About This Build</h4>
-                        <p>QuantHorizon is a paper/simulated research engine — no real broker is ever connected and no real money moves through this system. All quantitative rules, thresholds, and scoring logic are identical across desktop and mobile.</p>
+                        <p>QuantHorizon is a paper/simulated research engine — no real broker order placement is executed (Kite Connect is used read-only for live market data & tick-rule delta analysis). All quantitative rules, thresholds, and scoring logic are identical across desktop and mobile.</p>
                     </div>
                 </section>
             </div>
@@ -1210,7 +1210,7 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=26.0.0"></script>
+    <script src="/static/app.js?v=31.0.0"></script>
 
 </body>
 </html>

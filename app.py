@@ -1766,6 +1766,10 @@ def get_all_order_flow():
     from zerodha_order_flow_provider import get_order_flow_data, check_kite_token_validity
     from order_flow_analyzer import check_closing_aggression
 
+    token_status = check_kite_token_validity()
+    is_feed_expired = (not token_status.get("valid", False)) and (token_status.get("status") == "EXPIRED_OR_INVALID")
+    is_simulated = token_status.get("status") == "PLACEHOLDER"
+
     scan_data = cache_store.get("scan_summary") or load_last_market_scan() or {}
     stocks = scan_data.get("stocks", [])
 
@@ -1775,7 +1779,23 @@ def get_all_order_flow():
         if not sym:
             continue
         of_data = get_order_flow_data(sym)
-        veto_eval = check_closing_aggression(sym, of_data)
+        if is_feed_expired:
+            veto_eval = {
+                "verdict": "insufficient_data",
+                "reason": f"Kite Access Token expired or invalid — feed down ({token_status.get('message', '')}).",
+                "directional_bars_count": 0,
+                "depth_confirms": False,
+                "breadth_ok": False,
+                "confirms_day_trend": False
+            }
+        else:
+            veto_eval = check_closing_aggression(sym, of_data)
+
+        of_dict = of_data.to_dict()
+        if is_simulated:
+            of_dict["data_source"] = "INFERRED_SIMULATOR"
+            of_dict["is_simulated"] = True
+
         results.append({
             "symbol": sym,
             "signal": s.get("signal", "NEUTRAL"),
@@ -1785,16 +1805,21 @@ def get_all_order_flow():
             "pct_change": s.get("pct_change", 0.0),
             "volume_spike": s.get("volume_spike", 1.0),
             "veto_evaluation": veto_eval,
-            "order_flow_data": of_data.to_dict()
+            "order_flow_data": of_dict
         })
 
-    token_status = check_kite_token_validity()
+    confirmed_cnt = 0 if is_feed_expired else sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed")
+    vetoed_cnt = 0 if is_feed_expired else sum(1 for r in results if r["veto_evaluation"].get("verdict") == "vetoed")
+    against_trend_cnt = 0 if is_feed_expired else sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed_against_trend")
+    insufficient_cnt = len(results) if is_feed_expired else sum(1 for r in results if r["veto_evaluation"].get("verdict") == "insufficient_data")
+
     return sanitize_json_data({
         "feed_health": token_status,
         "total_evaluated": len(results),
-        "confirmed_count": sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed"),
-        "vetoed_count": sum(1 for r in results if r["veto_evaluation"].get("verdict") == "vetoed"),
-        "against_trend_count": sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed_against_trend"),
+        "confirmed_count": confirmed_cnt,
+        "vetoed_count": vetoed_cnt,
+        "against_trend_count": against_trend_cnt,
+        "insufficient_data_count": insufficient_cnt,
         "items": results
     })
 

@@ -342,11 +342,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        window.scrollTo(0, 0);
+        document.body.scrollLeft = 0;
+        document.documentElement.scrollLeft = 0;
+        const appMainNode = document.querySelector(".app-main");
+        if (appMainNode) appMainNode.scrollLeft = 0;
+        const mainContentNode = document.querySelector(".main-content");
+        if (mainContentNode) mainContentNode.scrollLeft = 0;
+
         if (section === "scanner" && (scannerSection || sections.scanner)) {
             const sc = scannerSection || sections.scanner;
             if (sc) sc.scrollIntoView({ behavior: "smooth" });
-        } else {
-            window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
         }
 
         if (section === "stocksNews" || section === "globalNews") {
@@ -741,25 +747,52 @@ document.addEventListener("DOMContentLoaded", () => {
             const splitIntraIndicesVal = document.getElementById("splitIntraIndicesVal");
             const splitIntraIndicesSub = document.getElementById("splitIntraIndicesSub");
 
+            const formatWinRateText = (item) => {
+                const total = item.total_setups || item.total_evaluated || 0;
+                const wr = item.win_rate_pct || 0;
+                if (total === 0) return "N/A — No trades yet";
+                if (total < 10) return `${wr}% Win Rate (${total}/${total} - N<10 sample)`;
+                return `${wr}% Win Rate`;
+            };
+
+            const formatAccBadge = (item) => {
+                const total = item.total_setups || item.total_evaluated || 0;
+                const acc = item.accuracy_pct || 0;
+                if (total === 0) return "N/A ACC";
+                return `${acc}% Gap Acc`;
+            };
+
             if (data.btst_stocks) {
-                if (splitBtstStocksBadge) splitBtstStocksBadge.textContent = `${data.btst_stocks.win_rate_pct.toFixed(1)}% ACC`;
-                if (splitBtstStocksVal) splitBtstStocksVal.textContent = `${data.btst_stocks.win_rate_pct.toFixed(1)}% Win Rate`;
-                if (splitBtstStocksSub) splitBtstStocksSub.textContent = `N=${data.btst_stocks.total_evaluated} evaluated picks`;
+                if (splitBtstStocksBadge) {
+                    splitBtstStocksBadge.textContent = formatAccBadge(data.btst_stocks);
+                    splitBtstStocksBadge.title = "Gap Magnitude Accuracy (formula: max(0, 100 - |Gap% - PredictedGap%| * 15.0))";
+                }
+                if (splitBtstStocksVal) splitBtstStocksVal.textContent = formatWinRateText(data.btst_stocks);
+                if (splitBtstStocksSub) splitBtstStocksSub.textContent = `N=${data.btst_stocks.total_setups || data.btst_stocks.total_evaluated || 0} evaluated picks`;
             }
             if (data.btst_indices) {
-                if (splitBtstIndicesBadge) splitBtstIndicesBadge.textContent = `${data.btst_indices.win_rate_pct.toFixed(1)}% ACC`;
-                if (splitBtstIndicesVal) splitBtstIndicesVal.textContent = `${data.btst_indices.win_rate_pct.toFixed(1)}% Win Rate`;
-                if (splitBtstIndicesSub) splitBtstIndicesSub.textContent = `N=${data.btst_indices.total_evaluated} index verdicts`;
+                if (splitBtstIndicesBadge) {
+                    splitBtstIndicesBadge.textContent = formatAccBadge(data.btst_indices);
+                    splitBtstIndicesBadge.title = "Gap Magnitude Accuracy (formula: max(0, 100 - |Gap% - PredictedGap%| * 15.0))";
+                }
+                if (splitBtstIndicesVal) splitBtstIndicesVal.textContent = formatWinRateText(data.btst_indices);
+                if (splitBtstIndicesSub) splitBtstIndicesSub.textContent = `N=${data.btst_indices.total_setups || data.btst_indices.total_evaluated || 0} index verdicts`;
             }
             if (data.intraday_stocks) {
-                if (splitIntraStocksBadge) splitIntraStocksBadge.textContent = `${data.intraday_stocks.win_rate_pct.toFixed(1)}% ACC`;
-                if (splitIntraStocksVal) splitIntraStocksVal.textContent = `${data.intraday_stocks.win_rate_pct.toFixed(1)}% Win Rate`;
-                if (splitIntraStocksSub) splitIntraStocksSub.textContent = `N=${data.intraday_stocks.total_evaluated} SMC & Algo Setups`;
+                if (splitIntraStocksBadge) {
+                    splitIntraStocksBadge.textContent = formatAccBadge(data.intraday_stocks);
+                    splitIntraStocksBadge.title = "Gap Magnitude Accuracy (formula: max(0, 100 - |Gap% - PredictedGap%| * 15.0))";
+                }
+                if (splitIntraStocksVal) splitIntraStocksVal.textContent = formatWinRateText(data.intraday_stocks);
+                if (splitIntraStocksSub) splitIntraStocksSub.textContent = `N=${data.intraday_stocks.total_setups || data.intraday_stocks.total_evaluated || 0} SMC & Algo Setups`;
             }
             if (data.intraday_indices) {
-                if (splitIntraIndicesBadge) splitIntraIndicesBadge.textContent = `${data.intraday_indices.win_rate_pct.toFixed(1)}% ACC`;
-                if (splitIntraIndicesVal) splitIntraIndicesVal.textContent = `${data.intraday_indices.win_rate_pct.toFixed(1)}% Win Rate`;
-                if (splitIntraIndicesSub) splitIntraIndicesSub.textContent = `N=${data.intraday_indices.total_evaluated} Scalps`;
+                if (splitIntraIndicesBadge) {
+                    splitIntraIndicesBadge.textContent = formatAccBadge(data.intraday_indices);
+                    splitIntraIndicesBadge.title = "Gap Magnitude Accuracy (formula: max(0, 100 - |Gap% - PredictedGap%| * 15.0))";
+                }
+                if (splitIntraIndicesVal) splitIntraIndicesVal.textContent = formatWinRateText(data.intraday_indices);
+                if (splitIntraIndicesSub) splitIntraIndicesSub.textContent = `N=${data.intraday_indices.total_setups || data.intraday_indices.total_evaluated || 0} Scalps`;
             }
         } catch (e) {
             console.error("fetchSplitAccuracy error:", e);
@@ -2257,20 +2290,26 @@ document.addEventListener("DOMContentLoaded", () => {
             badgeStyle = "background:rgba(239,68,68,0.2);color:var(--bearish-red);border:1px solid rgba(239,68,68,0.4);";
         } else if (verdict === "CONFIRMED_AGAINST_TREND") {
             badgeStyle = "background:rgba(245,158,11,0.2);color:var(--gold);border:1px solid rgba(245,158,11,0.4);";
+        } else if (verdict === "INSUFFICIENT_DATA") {
+            badgeStyle = "background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);";
+            badgeText = "DATA DOWN";
         }
+
+        const isSimulated = ofData.is_simulated || ofData.data_source === "INFERRED_SIMULATOR";
+        const simBadgeHtml = isSimulated ? `<span class="badge" style="font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(245,158,11,0.18);color:var(--gold);border:1px solid rgba(245,158,11,0.35);" title="Operating in Fallback Inferred Simulator Mode">SIMULATED DATA</span>` : "";
 
         const maxAbsDelta = Math.max(...bars.map(b => Math.abs(b.net_delta || 1)), 1);
         const barsHtml = bars.length === 0
-            ? `<div style="font-size:11px;color:var(--ink-muted);">No 3:15-3:25 PM bars available.</div>`
+            ? `<div style="font-size:11px;color:var(--ink-muted);padding:8px 0;">No 3:15-3:25 PM tick-rule delta bars available.</div>`
             : bars.map(b => {
                 const net = b.net_delta || 0;
                 const isPos = net >= 0;
-                const barHeight = Math.max(10, Math.round((Math.abs(net) / maxAbsDelta) * 32));
+                const barHeight = Math.max(12, Math.round((Math.abs(net) / maxAbsDelta) * 36));
                 const color = isPos ? 'var(--bullish-green)' : 'var(--bearish-red)';
                 return `
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;" title="${b.minute}: ${net >= 0 ? '+' : ''}${net} delta (${b.tick_count} ticks)">
-                        <div style="width:100%;height:${barHeight}px;background:${color};border-radius:2px;opacity:0.9;"></div>
-                        <span style="font-size:8px;font-weight:700;color:var(--ink-muted);margin-top:2px;">${b.minute ? b.minute.split(':')[1] : ''}</span>
+                    <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;" title="${b.minute || ''}: ${net >= 0 ? '+' : ''}${net} net delta (${b.tick_count || 0} ticks)">
+                        <div style="width:100%;height:${barHeight}px;background:${color};border-radius:2px;opacity:0.9;min-height:6px;"></div>
+                        <span style="font-size:8px;font-weight:700;color:var(--ink-muted);margin-top:2px;line-height:1;">${b.minute ? b.minute.split(':')[1] : ''}</span>
                     </div>
                 `;
             }).join("");
@@ -2278,9 +2317,10 @@ document.addEventListener("DOMContentLoaded", () => {
         card.innerHTML = `
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
                 <div>
-                    <div style="font-size:18px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:6px;">
+                    <div style="font-size:18px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                         ${escapeHtml(item.symbol)}
                         <span class="badge" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;${badgeStyle}">${badgeText}</span>
+                        ${simBadgeHtml}
                     </div>
                     <div style="font-size:12px;color:var(--ink-secondary);margin-top:2px;">
                         LTP: <strong>₹${(item.ltp || 0).toFixed(2)}</strong> (${item.pct_change >= 0 ? '+' : ''}${(item.pct_change || 0).toFixed(2)}%)
@@ -2309,7 +2349,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <div>
                 <div style="font-size:9px;font-weight:800;color:var(--ink-muted);margin-bottom:4px;letter-spacing:0.3px;">3:15-3:25 PM INFERRED DELTA BARS:</div>
-                <div style="display:flex;gap:4px;height:40px;align-items:flex-end;">
+                <div style="display:flex;gap:4px;height:44px;align-items:flex-end;width:100%;box-sizing:border-box;">
                     ${barsHtml}
                 </div>
             </div>
@@ -2367,22 +2407,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const banner = document.createElement("div");
         banner.className = "index-performance-banner";
+        const hasEvaluatedData = (perf.total_evaluated_verdicts || 0) > 0;
+
+        const fmtVal = (val, colorClass) => {
+            if (!hasEvaluatedData) return `<span class="val" style="color:var(--ink-muted);font-size:0.95rem;">N/A <small style="font-size:0.68rem;display:block;">(No evaluated data yet)</small></span>`;
+            return `<span class="val ${colorClass}">${val}%</span>`;
+        };
+
         banner.innerHTML = `
             <div class="index-perf-stat">
                 <span class="lbl"><i class="fa-solid fa-bullseye"></i> DIRECTIONAL ACCURACY</span>
-                <span class="val text-gold">${perf.directional_accuracy_pct ?? 78.5}%</span>
+                ${fmtVal(perf.directional_accuracy_pct ?? 0, "text-gold")}
             </div>
             <div class="index-perf-stat">
                 <span class="lbl"><i class="fa-solid fa-trophy"></i> WIN RATE</span>
-                <span class="val text-green">${perf.win_rate_pct ?? 75.0}%</span>
+                ${fmtVal(perf.win_rate_pct ?? 0, "text-green")}
             </div>
             <div class="index-perf-stat">
                 <span class="lbl"><i class="fa-solid fa-chart-area"></i> STRADDLE RANGE HIT RATE</span>
-                <span class="val text-cyan">${perf.expected_range_hit_rate_pct ?? 82.0}%</span>
+                ${fmtVal(perf.expected_range_hit_rate_pct ?? 0, "text-cyan")}
             </div>
             <div class="index-perf-stat">
                 <span class="lbl"><i class="fa-solid fa-award"></i> AVG FINAL ACCURACY</span>
-                <span class="val text-gold">${perf.avg_final_accuracy_pct ?? 78.5}%</span>
+                ${fmtVal(perf.avg_final_accuracy_pct ?? 0, "text-gold")}
             </div>
         `;
         indexVerdictGrid.appendChild(banner);
@@ -3447,37 +3494,64 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!response.ok) return;
             const data = await response.json();
 
+            const formatWinRateText = (item) => {
+                const total = item.total_setups || item.total_evaluated || 0;
+                const wr = item.win_rate_pct || 0;
+                if (total === 0) return "N/A — No trades yet";
+                if (total < 10) return `${wr}% Win Rate (${total}/${total} - N<10 sample)`;
+                return `${wr}% Win Rate`;
+            };
+
+            const formatAccBadge = (item) => {
+                const total = item.total_setups || item.total_evaluated || 0;
+                const acc = item.accuracy_pct || 0;
+                if (total === 0) return "N/A ACC";
+                return `${acc}% Gap Acc`;
+            };
+
             if (data.btst_stocks) {
                 const b = document.getElementById("splitBtstStocksBadge");
                 const v = document.getElementById("splitBtstStocksVal");
                 const s = document.getElementById("splitBtstStocksSub");
-                if (b) b.textContent = `${data.btst_stocks.accuracy_pct}% ACC`;
-                if (v) v.textContent = `${data.btst_stocks.win_rate_pct}% Win Rate`;
-                if (s) s.textContent = `N=${data.btst_stocks.total_setups} evaluated picks`;
+                if (b) {
+                    b.textContent = formatAccBadge(data.btst_stocks);
+                    b.title = "Gap Magnitude Accuracy (formula: max(0, 100 - |Gap% - PredictedGap%| * 15.0))";
+                }
+                if (v) v.textContent = formatWinRateText(data.btst_stocks);
+                if (s) s.textContent = `N=${data.btst_stocks.total_setups || data.btst_stocks.total_evaluated || 0} evaluated picks`;
             }
             if (data.btst_indices) {
                 const b = document.getElementById("splitBtstIndicesBadge");
                 const v = document.getElementById("splitBtstIndicesVal");
                 const s = document.getElementById("splitBtstIndicesSub");
-                if (b) b.textContent = `${data.btst_indices.accuracy_pct}% ACC`;
-                if (v) v.textContent = `${data.btst_indices.win_rate_pct}% Win Rate`;
-                if (s) s.textContent = `N=${data.btst_indices.total_setups} index verdicts`;
+                if (b) {
+                    b.textContent = formatAccBadge(data.btst_indices);
+                    b.title = "Gap Magnitude Accuracy (formula: max(0, 100 - |Gap% - PredictedGap%| * 15.0))";
+                }
+                if (v) v.textContent = formatWinRateText(data.btst_indices);
+                if (s) s.textContent = `N=${data.btst_indices.total_setups || data.btst_indices.total_evaluated || 0} index verdicts`;
             }
             if (data.intraday_stocks) {
                 const b = document.getElementById("splitIntraStocksBadge");
                 const v = document.getElementById("splitIntraStocksVal");
                 const s = document.getElementById("splitIntraStocksSub");
-                if (b) b.textContent = `${data.intraday_stocks.accuracy_pct}% ACC`;
-                if (v) v.textContent = `${data.intraday_stocks.win_rate_pct}% Win Rate`;
-                if (s) s.textContent = `N=${data.intraday_stocks.total_setups} SMC & Algo Setups`;
+                if (b) {
+                    b.textContent = formatAccBadge(data.intraday_stocks);
+                    b.title = "Gap Magnitude Accuracy (formula: max(0, 100 - |Gap% - PredictedGap%| * 15.0))";
+                }
+                if (v) v.textContent = formatWinRateText(data.intraday_stocks);
+                if (s) s.textContent = `N=${data.intraday_stocks.total_setups || data.intraday_stocks.total_evaluated || 0} SMC & Algo Setups`;
             }
             if (data.intraday_indices) {
                 const b = document.getElementById("splitIntraIndicesBadge");
                 const v = document.getElementById("splitIntraIndicesVal");
                 const s = document.getElementById("splitIntraIndicesSub");
-                if (b) b.textContent = `${data.intraday_indices.accuracy_pct}% ACC`;
-                if (v) v.textContent = `${data.intraday_indices.win_rate_pct}% Win Rate`;
-                if (s) s.textContent = `N=${data.intraday_indices.total_setups} Nifty/Bank Nifty Scalps`;
+                if (b) {
+                    b.textContent = formatAccBadge(data.intraday_indices);
+                    b.title = "Gap Magnitude Accuracy (formula: max(0, 100 - |Gap% - PredictedGap%| * 15.0))";
+                }
+                if (v) v.textContent = formatWinRateText(data.intraday_indices);
+                if (s) s.textContent = `N=${data.intraday_indices.total_setups || data.intraday_indices.total_evaluated || 0} Scalps`;
             }
         } catch (e) {
             console.warn("Split accuracy fetch error:", e);
