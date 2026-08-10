@@ -486,6 +486,9 @@ document.addEventListener("DOMContentLoaded", () => {
             stockSectionSwitcher.querySelectorAll(".index-tab-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
             currentStockView = btn.dataset.stockView || "intelligence";
+            if (currentStockView === "live") {
+                currentFilter = "ALL"; // Reset toolbar filter to ALL when switching to LIVE Stocks view
+            }
             filterAndRenderTable();
         });
     }
@@ -733,27 +736,64 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
 
-            // Update stock LTP/change in scanner table in-place
-            if (data.stocks && stocksTableBody) {
+            // Update stock LTP/change in scanner table in-place or merge into allStocks
+            if (data.stocks && Array.isArray(data.stocks) && data.stocks.length > 0) {
                 const stockMap = {};
-                (data.stocks || []).forEach(s => { stockMap[s.symbol] = s; });
-                stocksTableBody.querySelectorAll('tr[data-row-key]').forEach(tr => {
-                    const key = tr.dataset.rowKey || '';
-                    const sym = key.split('-')[0];
-                    const s = stockMap[sym];
-                    if (!s) return;
-                    const ltpCell = tr.querySelector('[data-label="LTP"]');
-                    if (ltpCell && s.ltp != null) {
-                        ltpCell.innerHTML = `<strong>\u20B9${s.ltp.toLocaleString('en-IN')}</strong>`;
+                data.stocks.forEach(s => { stockMap[s.symbol] = s; });
+
+                if (allStocks.length === 0) {
+                    // Cold-start fallback: populate allStocks from 10-sec live prices endpoint
+                    allStocks = data.stocks.map((s, idx) => ({
+                        symbol: s.symbol,
+                        raw_ticker: `${s.symbol}.NS`,
+                        rank_position: idx + 1,
+                        priority_level: "P3_LOW",
+                        signal: "WATCHLIST",
+                        confidence_score: 50,
+                        predicted_gap_pct: 0.0,
+                        ltp: s.ltp || 0.0,
+                        prev_close: s.prev_close || 0.0,
+                        change_pts: s.change_pts || 0.0,
+                        pct_change: s.pct_change || 0.0,
+                        volume_spike: 1.0,
+                        rsi: 50.0,
+                        confirmed_pillars_weight: 0.0,
+                        required_pillars: 3,
+                    }));
+                    filterAndRenderTable();
+                } else {
+                    // Update existing allStocks in memory
+                    allStocks.forEach(s => {
+                        const live = stockMap[s.symbol];
+                        if (live) {
+                            if (live.ltp != null) s.ltp = live.ltp;
+                            if (live.prev_close != null) s.prev_close = live.prev_close;
+                            if (live.change_pts != null) s.change_pts = live.change_pts;
+                            if (live.pct_change != null) s.pct_change = live.pct_change;
+                        }
+                    });
+
+                    // Update DOM table cells in-place
+                    if (stocksTableBody) {
+                        stocksTableBody.querySelectorAll('tr[data-row-key]').forEach(tr => {
+                            const key = tr.dataset.rowKey || '';
+                            const sym = key.split('-')[0];
+                            const s = stockMap[sym];
+                            if (!s) return;
+                            const ltpCell = tr.querySelector('[data-label="LTP"]');
+                            if (ltpCell && s.ltp != null) {
+                                ltpCell.innerHTML = `<strong>\u20B9${s.ltp.toLocaleString('en-IN')}</strong>`;
+                            }
+                            const changeCell = tr.querySelector('[data-label="CHANGE"]');
+                            if (changeCell && s.change_pts != null && s.pct_change != null) {
+                                const isUp = s.change_pts >= 0;
+                                const sign = isUp ? '+' : '';
+                                const cls = isUp ? 'text-bullish' : 'text-bearish';
+                                changeCell.innerHTML = `<span class="${cls}" style="font-weight:700;font-size:12px;">${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)</span>`;
+                            }
+                        });
                     }
-                    const changeCell = tr.querySelector('[data-label="CHANGE"]');
-                    if (changeCell && s.change_pts != null && s.pct_change != null) {
-                        const isUp = s.change_pts >= 0;
-                        const sign = isUp ? '+' : '';
-                        const cls = isUp ? 'text-bullish' : 'text-bearish';
-                        changeCell.innerHTML = `<span class="${cls}" style="font-weight:700;font-size:12px;">${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)</span>`;
-                    }
-                });
+                }
             }
         } catch (e) {
             // Silent — this is a background poll
