@@ -3343,8 +3343,8 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     grid-template-columns: minmax(100px, 160px) minmax(80px, 1fr) minmax(120px, 1fr) !important;
     align-items: center !important;
     gap: 12px !important;
-    background: rgba(22, 25, 31, 0.92) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
     border-radius: 8px !important;
     padding: 14px 24px 14px 20px !important;
     cursor: pointer !important;
@@ -3353,6 +3353,7 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     overflow: hidden !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
 }
 
 .live-stock-card::before {
@@ -3375,20 +3376,32 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
 }
 
 .live-stock-card:hover {
-    border-color: rgba(212, 175, 55, 0.35) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(212, 175, 55, 0.45) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
     transform: translateY(-1px) !important;
 }
 
 .live-card-name {
     font-size: 13px !important;
     font-weight: 800 !important;
-    color: #f3f4f6 !important;
+    color: #111827 !important;
     letter-spacing: 0.5px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     padding-left: 4px !important;
+}
+
+/* Dark mode fallback if dark mode active */
+[data-theme="dark"] .live-stock-card,
+body.dark-mode .live-stock-card {
+    background: rgba(22, 25, 31, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .live-card-name,
+body.dark-mode .live-card-name {
+    color: #f3f4f6 !important;
 }
 
 .live-card-ltp {
