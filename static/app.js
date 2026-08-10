@@ -313,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
             stocksNews: stocksNewsSection || document.getElementById("stocksNewsSection"),
             globalNews: globalNewsSection || document.getElementById("globalNewsSection"),
             institutionalFlow: institutionalFlowSection || document.getElementById("institutionalFlowSection"),
-            orderFlow: orderFlowSection || document.getElementById("orderFlowSection"),
+            orderFlow: document.getElementById("orderFlowSection"),
             indices: indicesSection || document.getElementById("indicesSection"),
             strategies: strategiesSection || document.getElementById("strategiesSection"),
             history: historySection || document.getElementById("historySection"),
@@ -2549,20 +2549,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function buildTickerItemHTML(idx) {
-        const name = idx.display_name || idx.index_name || "";
-        const ltp = idx.ltp !== undefined && idx.ltp !== null ? idx.ltp.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "--";
-        const changePts = idx.change_pts !== undefined && idx.change_pts !== null ? idx.change_pts : 0;
-        const pctChange = idx.pct_change !== undefined && idx.pct_change !== null ? idx.pct_change : 0;
-        const isUp = changePts >= 0;
-        const colorClass = isUp ? "text-bullish" : "text-bearish";
-        const sign = isUp ? "+" : "";
+        const name = escapeHtml(idx.display_name || idx.index_name || "");
+        const ltp = (idx.ltp !== undefined && idx.ltp !== null) ? idx.ltp.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "--";
+        const changePts = (idx.change_pts !== undefined && idx.change_pts !== null) ? idx.change_pts : null;
+        const pctChange = (idx.pct_change !== undefined && idx.pct_change !== null) ? idx.pct_change : null;
+        const isUp = changePts !== null && changePts >= 0;
+        const cls = changePts === null ? "text-sub" : (isUp ? "text-bullish" : "text-bearish");
+        const sign = changePts === null ? "" : (isUp ? "+" : "");
+        const ptsText = changePts !== null ? Math.abs(changePts).toFixed(2) : "--";
+        const pctText = pctChange !== null ? (typeof pctChange === "number" ? Math.abs(pctChange).toFixed(2) : pctChange) : "--";
 
         return `
-            <div class="index-ticker-item" data-index-name="${escapeAttr(idx.index_name || '')}" style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;">
-                <span style="font-weight:800;font-size:12px;color:var(--ink-primary);">${escapeHtml(name)}</span>
-                <span style="font-weight:700;font-size:12px;color:var(--ink-primary);">${ltp}</span>
-                <span class="${colorClass}" style="font-weight:700;font-size:11px;">${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)</span>
-            </div>
+            <span class="index-ticker-item" data-index-name="${escapeAttr(idx.index_name || '')}" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view ${name} chart">
+                <strong>${name}</strong>
+                <span>${ltp}</span>
+                <span class="${cls}">${sign}${ptsText} (${sign}${pctText}%)</span>
+            </span>
         `;
     }
 
