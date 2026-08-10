@@ -660,20 +660,48 @@
    SYSTEMIC MOBILE SECTION AUDIT HARDENING — ALL PAGES (< 1024px)
    =========================================================================== */
 @media (max-width: 1023px) {
-    /* 1. Prevent main content left cutoff on mobile */
+    /* 1. Kill horizontal page overflow globally on mobile */
+    html, body {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+        width: 100vw !important;
+        position: relative !important;
+    }
+
+    .app-shell {
+        max-width: 100vw !important;
+        width: 100vw !important;
+        overflow-x: hidden !important;
+    }
+
     .app-main {
-        width: 100% !important;
+        width: 100vw !important;
         min-width: 0 !important;
         max-width: 100vw !important;
         overflow-x: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .content-topbar,
+    .index-ticker-bar {
+        max-width: 100vw !important;
+        width: 100vw !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    .index-ticker-track {
+        max-width: 100vw !important;
     }
 
     .main-content {
         padding: 12px 14px 28px !important;
-        width: 100% !important;
+        width: 100vw !important;
         max-width: 100vw !important;
         box-sizing: border-box !important;
-        margin-top: 0 !important;
+        margin: 0 !important;
+        overflow-x: hidden !important;
     }
 
     /* 2. Section Heading Row spacing under sticky header */
@@ -768,5 +796,57 @@
         grid-template-columns: 1fr !important;
         gap: 12px !important;
         width: 100% !important;
+    }
+
+    /* 4. Strategies, Guide, Rules, Index & History Sections Mobile Card Grid Fixes */
+    .strategy-grid,
+    .guide-settings-grid,
+    .index-verdict-grid,
+    .index-grid,
+    .rules-grid,
+    .accuracy-analytics-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .strategy-card,
+    .guide-step-box,
+    .index-card,
+    .index-verdict-card,
+    .rule-card,
+    .accuracy-analytics-card {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+    }
+
+    /* History & Table Container Mobile Scroll Rails */
+    .history-controls-row,
+    .toolbar-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .history-controls-row select,
+    .history-controls-row input {
+        width: 100% !important;
+        min-height: 42px !important;
+    }
+
+    .table-scroll-wrapper,
+    .table-container {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 }
