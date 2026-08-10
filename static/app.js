@@ -795,10 +795,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             if (live.prev_close != null) s.prev_close = live.prev_close;
                             if (live.change_pts != null) s.change_pts = live.change_pts;
                             if (live.pct_change != null) s.pct_change = live.pct_change;
-                        }
-                    });
-
-                    // Update DOM table cells in-place
+                                    // Update DOM table cells in-place
                     if (stocksTableBody) {
                         stocksTableBody.querySelectorAll('tr[data-row-key]').forEach(tr => {
                             const key = tr.dataset.rowKey || '';
@@ -819,27 +816,27 @@ document.addEventListener("DOMContentLoaded", () => {
                         });
                     }
 
-                    // Update live-stock-card elements in live stock grid in-place
-                    const liveStockGridContainer = document.getElementById("liveStockGridContainer");
-                    if (liveStockGridContainer && !liveStockGridContainer.classList.contains("hidden")) {
-                        const cards = liveStockGridContainer.querySelectorAll(".live-stock-card");
-                        cards.forEach(card => {
-                            const sym = card.dataset.symbol;
+                    // Update live stock boxes in-place if LIVE Stocks view is active
+                    const liveStocksGrid = document.getElementById("liveStocksGrid");
+                    if (liveStocksGrid && currentStockView === "live") {
+                        liveStocksGrid.querySelectorAll('.live-stock-box').forEach(box => {
+                            const sym = box.dataset.symbol;
                             const s = stockMap[sym];
                             if (!s) return;
-                            const ltpEl = card.querySelector(".stock-ltp");
-                            const changeEl = card.querySelector(".stock-change");
-                            if (ltpEl && s.ltp != null) {
-                                ltpEl.textContent = `\u20B9${s.ltp.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                            }
+                            const ltpEl = box.querySelector('.ltp');
+                            if (ltpEl && s.ltp != null) ltpEl.textContent = s.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            const changeEl = box.querySelector('.change');
                             if (changeEl && s.change_pts != null && s.pct_change != null) {
                                 const isUp = s.change_pts >= 0;
-                                const sign = isUp ? "+" : "";
-                                changeEl.className = `stock-change ${isUp ? 'text-bullish' : 'text-bearish'}`;
+                                const sign = isUp ? '+' : '';
+                                const cls = isUp ? 'text-bullish' : 'text-bearish';
                                 changeEl.textContent = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                                changeEl.className = `${cls} change`;
                             }
                         });
                     }
+                }
+            }   }
                 }
             }
         } catch (e) {
@@ -1055,25 +1052,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (visibleCount) visibleCount.textContent = filtered.length;
 
-        const scannerTableContainer = document.getElementById("scannerTableContainer");
-        const liveStockGridContainer = document.getElementById("liveStockGridContainer");
+        const btstStocksTableView = document.getElementById("btstStocksTableView");
+        const liveStocksGridView = document.getElementById("liveStocksGridView");
+        const liveStocksGrid = document.getElementById("liveStocksGrid");
 
         if (currentStockView === "live") {
-            if (scannerTableContainer) scannerTableContainer.classList.add("hidden");
-            if (liveStockGridContainer) liveStockGridContainer.classList.remove("hidden");
-            if (emptyState) emptyState.classList.add("hidden");
-            renderLiveStockGrid(filtered);
+            if (btstStocksTableView) btstStocksTableView.classList.add("hidden");
+            if (liveStocksGridView) liveStocksGridView.classList.remove("hidden");
+
+            if (liveStocksGrid) {
+                liveStocksGrid.innerHTML = "";
+                if (filtered.length === 0) {
+                    liveStocksGrid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--ink-muted);">Loading 211 Live F&O Stock Prices...</div>`;
+                    return;
+                }
+
+                filtered.forEach(stock => {
+                    const sym = escapeHtml(stock.symbol || "");
+                    const ltpVal = stock.ltp != null ? stock.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "--";
+                    const changePts = stock.change_pts != null ? stock.change_pts : 0;
+                    const pctChange = stock.pct_change != null ? stock.pct_change : 0;
+                    const isUp = changePts >= 0;
+                    const cls = isUp ? "text-bullish" : "text-bearish";
+                    const sign = isUp ? "+" : "";
+                    const ptsText = changePts.toFixed(2);
+                    const pctText = pctChange.toFixed(2);
+
+                    const box = document.createElement("div");
+                    box.className = "live-stock-box";
+                    box.dataset.symbol = stock.symbol;
+                    box.innerHTML = `
+                        <div style="display:flex;align-items:center;gap:6px;">
+                            <strong class="sym">${sym}</strong>
+                            <span class="ltp">${ltpVal}</span>
+                        </div>
+                        <span class="${cls} change">${sign}${ptsText} (${sign}${pctText}%)</span>
+                    `;
+                    box.addEventListener("click", () => openIndexChartModal(stock.symbol));
+                    liveStocksGrid.appendChild(box);
+                });
+            }
             return;
         } else {
-            if (scannerTableContainer) scannerTableContainer.classList.remove("hidden");
-            if (liveStockGridContainer) liveStockGridContainer.classList.add("hidden");
+            // BTST Stocks Mode: Show Table
+            if (btstStocksTableView) btstStocksTableView.classList.remove("hidden");
+            if (liveStocksGridView) liveStocksGridView.classList.add("hidden");
         }
 
         stocksTableBody.innerHTML = "";
         
         if (filtered.length === 0) {
-            // Always reset to the default "no results" copy — undoes any fetch-error message
-            // fetchScanResults() may have set on a previous failed attempt (see there).
             setEmptyStateMessage(EMPTY_STATE_DEFAULT_TITLE, EMPTY_STATE_DEFAULT_TEXT);
             if (emptyState) emptyState.classList.remove("hidden");
             return;
@@ -1168,10 +1196,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     </span>
                 </td>
                 <td data-label="TICKER">
-                    <span class="symbol-name">
-                        ${escapeHtml(stock.symbol)}
-                        ${stock.rank_position <= 2 ? '<span class="text-gold priority-crown-badge"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
-                    </span>
+                    <div class="ticker-header-flex">
+                        <span class="symbol-name">
+                            ${escapeHtml(stock.symbol)}
+                            ${stock.rank_position <= 2 ? '<span class="text-gold priority-crown-badge"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
+                        </span>
+                        <span class="signal-badge-header ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
+                            ${escapeHtml(sigText)}
+                        </span>
+                        <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
+                        <button class="row-expand-toggle" aria-label="Expand details" aria-expanded="false">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </button>
+                    </div>
                 </td>
                 <td data-label="SIGNAL">
                     <span class="signal-badge ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
@@ -1211,8 +1248,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${flowChipHtml}
                 </td>
                 <td data-label="ACTION">
-                    <button type="button" class="btn btn-sm btn-ghost view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="View Deep Analysis for ${stock.symbol}">
+                    <button class="btn btn-pill btn-secondary view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
                         <i class="fa-solid fa-chart-line"></i>
+                        <span>VIEW DETAILS</span>
                     </button>
                 </td>
             `;
