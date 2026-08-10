@@ -3395,11 +3395,11 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
 }
 
 .live-card-up .live-card-ltp {
-    color: var(--bullish-green);
+    color: var(--bullish-green) !important;
 }
 
 .live-card-down .live-card-ltp {
-    color: var(--bearish-red);
+    color: var(--bearish-red) !important;
 }
 
 .live-card-change {
@@ -3414,11 +3414,11 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
 }
 
 .live-card-up .live-card-change {
-    color: var(--bullish-green);
+    color: var(--bullish-green) !important;
 }
 
 .live-card-down .live-card-change {
-    color: var(--bearish-red);
+    color: var(--bearish-red) !important;
 }
 
 @media (max-width: 480px) {
