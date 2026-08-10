@@ -478,6 +478,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const liveQuickFilters = document.getElementById("liveQuickFilters");
+
     const stockSectionSwitcher = document.getElementById("stockSectionSwitcher");
     if (stockSectionSwitcher) {
         stockSectionSwitcher.addEventListener("click", (e) => {
@@ -487,24 +489,29 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add("active");
             currentStockView = btn.dataset.stockView || "intelligence";
             if (currentStockView === "live") {
-                currentFilter = "ALL"; // Reset toolbar filter to ALL when switching to LIVE Stocks view
+                if (liveQuickFilters) liveQuickFilters.classList.remove("hidden");
+                currentFilter = "GAINERS";
+                if (sortSelect) sortSelect.value = "GAINERS_DESC";
+            } else {
+                if (liveQuickFilters) liveQuickFilters.classList.add("hidden");
+                currentFilter = "ALL";
+                if (sortSelect) sortSelect.value = "RANK_ASC";
             }
             filterAndRenderTable();
         });
     }
 
-    const liveQuickFilters = document.getElementById("liveQuickFilters");
     if (liveQuickFilters) {
         liveQuickFilters.addEventListener("click", (e) => {
             const btn = e.target.closest(".filter-pill-btn");
             if (!btn) return;
             liveQuickFilters.querySelectorAll(".filter-pill-btn").forEach(b => {
                 b.classList.remove("active");
-                b.style.background = "rgba(11,11,11,0.1)";
+                b.style.background = b.dataset.filter === "GAINERS" ? "rgba(16,185,129,0.12)" : "rgba(239,68,68,0.12)";
             });
             btn.classList.add("active");
-            btn.style.background = "rgba(212,175,55,0.25)";
-            currentFilter = btn.dataset.filter || "ALL";
+            btn.style.background = btn.dataset.filter === "GAINERS" ? "rgba(16,185,129,0.28)" : "rgba(239,68,68,0.28)";
+            currentFilter = btn.dataset.filter || "GAINERS";
             if (currentFilter === "GAINERS" && sortSelect) sortSelect.value = "GAINERS_DESC";
             if (currentFilter === "LOSERS" && sortSelect) sortSelect.value = "LOSERS_ASC";
             filterAndRenderTable();
