@@ -512,21 +512,21 @@ def evaluate_5_pillar_matrix(
             option_type = "PUT (PE)"
             conviction_level = "HIGH_CONVICTION" if total_confirmed_weight >= high_conviction_bar else "MODERATE"
 
-    # Confidence Score Calculation — normalized by each tier's own required_pillars so a TIER_1
-    # stock at its minimum (3.0) and a TIER_2 stock at its minimum (4.0) start from the same base,
-    # and the volume-spike term is capped so one outsized spike alone can't max out the score.
-    weight_ratio = total_confirmed_weight / required_pillars
+    # Decoupled Confidence Score Calculation — combines pillar weight ratio, volume surge,
+    # intraday Marubozu close, and relative strength trend alignment.
+    weight_ratio = total_confirmed_weight / required_pillars if required_pillars > 0 else 0.0
     capped_vol_spike = min(vol_spike_ratio, 3.0)
-    base_score = int(50 + (weight_ratio * 27) + (capped_vol_spike * 2.5))
+    rs_slope_bonus = 5 if (p3_confirmed and rs_slope_positive) else 0
+    base_score = int(50 + (weight_ratio * 22) + (capped_vol_spike * 2.6) + rs_slope_bonus)
     if p5_confirmed:
         base_score += 5
     confidence_score = min(99, max(40, base_score))
 
-    # Priority Level Determination (Score-Based & Signal-Driven)
+    # Priority Level Determination (P1_HIGH requires Weight >= required_pillars AND Confidence >= 85%)
     if signal in ["BTST (BUY)", "STBT (SELL)"]:
-        if confidence_score >= 90:
+        if total_confirmed_weight >= required_pillars and confidence_score >= 85:
             priority_level = "P1_HIGH"
-        elif confidence_score >= 75:
+        elif confidence_score >= 70 or total_confirmed_weight >= (required_pillars - 0.5):
             priority_level = "P2_MEDIUM"
         else:
             priority_level = "P3_LOW"
@@ -569,8 +569,9 @@ def evaluate_5_pillar_matrix(
             priority_level = "P2_MEDIUM"
             conviction_level = "MODERATE"
 
-    # Estimated Gap % Calculation
-    est_gap = round(0.8 + (vol_spike_ratio * 0.5) + (abs(rsi - 50) * 0.04), 1)
+    # Estimated Gap % Calculation — clamped strictly between 0.5% and 3.5%
+    raw_gap = 0.5 + (capped_vol_spike * 0.4) + (abs(rsi - 50) * 0.03)
+    est_gap = round(min(3.5, max(0.5, raw_gap)), 1)
     predicted_gap_pct = est_gap if (ltp >= vwap) else -est_gap
 
     reason_str = f"Confirmed {total_confirmed_weight}/{required_pillars} Pillar Weight [{liquidity_tier}]"

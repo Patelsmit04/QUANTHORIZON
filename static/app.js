@@ -1246,7 +1246,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="rsi-badge ${getRsiColorClass(stock.rsi || 50)}">${stock.rsi || 50}</span>
                 </td>
                 <td data-label="PILLAR WEIGHT">
-                    <span class="pillar-weight-badge text-gold">
+                    <span class="pillar-weight-badge text-gold" title="Confirmed Weight: ${pillarWeight} / Required Bar: ${reqPillars}">
                         ${pillarWeight}/${reqPillars} Wt
                     </span>
                     ${flowChipHtml}
