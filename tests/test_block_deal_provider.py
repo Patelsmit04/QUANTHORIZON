@@ -133,7 +133,7 @@ def test_aggregate_symbol_flows_nets_buy_and_sell_and_picks_dominant_side():
 
 
 def test_aggregate_symbol_flows_excludes_symbols_below_threshold():
-    records = [{"symbol": "SMALLCO", "side": "BUY", "value_cr": 10.0, "deal_type": "bulk"}]
+    records = [{"symbol": "SMALLCO", "side": "BUY", "value_cr": 5.0, "deal_type": "bulk"}]
     agg = bdp.aggregate_symbol_flows(records)
     assert "SMALLCO" not in agg
 

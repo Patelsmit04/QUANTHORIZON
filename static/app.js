@@ -1236,9 +1236,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 </td>
                 <td data-label="VOL SURGE">
                     <div class="vol-surge-container">
-                        <span class="vol-surge-text ${(stock.volume_spike || 0) >= 3.0 ? 'text-amber font-weight-800' : 'text-sub'}">
-                            ${stock.volume_spike || 1.0}x
-                        </span>
+                        ${(stock.volume_spike || 0) >= 3.0 ? 
+                            `<span class="badge-amber-vol"><i class="fa-solid fa-fire"></i> ${stock.volume_spike}x HIGH VOL</span>` :
+                            `<span class="vol-surge-text text-sub">${stock.volume_spike || 1.0}x</span>`
+                        }
                     </div>
                 </td>
                 <td data-label="RSI">

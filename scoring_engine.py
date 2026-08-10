@@ -207,6 +207,15 @@ def evaluate_5_pillar_matrix(
             "required_pillars": required_pillars,
             "confirmed_pillars_count": 0,
             "confirmed_pillars_weight": 0.0,
+            "confirmed_pillars": [],
+            "pillar_weights": {
+                "Pillar 1: Futures OI": 0.0,
+                "Pillar 2: Vol Persistence": 0.0,
+                "Pillar 3: Relative Strength": 0.0,
+                "Pillar 4: Volume Spike": 0.0,
+                "Pillar 5: Marubozu Close": 0.0,
+                "Pillar 6: Institutional Flow": 0.0,
+            },
             "signal": "NEUTRAL",
             "option_type": "NONE",
             "conviction_level": "WATCHLIST",
@@ -231,10 +240,10 @@ def evaluate_5_pillar_matrix(
     latest_date = unique_dates[-1] if unique_dates else None
 
     if latest_date:
-        df_today = df_stock[date_strs == latest_date].copy()
+        df_today = df_stock[date_strs.values == latest_date].copy()
         if len(unique_dates) >= 2:
             prev_date = unique_dates[-2]
-            df_prev = df_stock[date_strs == prev_date]
+            df_prev = df_stock[date_strs.values == prev_date]
             prev_close = float(df_prev.iloc[-1]['Close']) if not df_prev.empty else float(df_today.iloc[0]['Open'])
         else:
             prev_close = float(df_today.iloc[0]['Open'])
@@ -261,12 +270,12 @@ def evaluate_5_pillar_matrix(
     vol_sma_20 = float(_baseline_candles['Volume'].tail(20).mean()) if not _baseline_candles.empty else float(df_today['Volume'].mean())
     vol_sma_20 = max(1.0, vol_sma_20)
 
-    # Calculate RSI (14) on session candles
+    # Calculate RSI (14) using Wilder's Exponential Moving Average smoothing
     delta = df_today['Close'].diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+    gain = (delta.where(delta > 0, 0.0)).ewm(alpha=1/14, adjust=False).mean()
+    loss = (-delta.where(delta < 0, 0.0)).ewm(alpha=1/14, adjust=False).mean()
     rs = gain / loss.replace(0, np.nan)
-    rsi_series = 100 - (100 / (1 + rs))
+    rsi_series = 100.0 - (100.0 / (1.0 + rs))
     rsi = float(rsi_series.fillna(50.0).iloc[-1])
 
     # Trailing candles for volume spike
@@ -318,10 +327,12 @@ def evaluate_5_pillar_matrix(
             p1_confirmed = True
             p1_weight = (0.5 if expiry_discounted else 1.0) * _mult("Pillar 1: Futures OI")
             confirmed_pillars.append(f"Pillar 1: OI Long Buildup (Weight: {p1_weight:.2f})")
-        elif ltp < vwap and oi_pct_change < 0 and is_oi_above_threshold:
+        elif ltp < vwap and oi_pct_change > 0 and is_oi_above_threshold:
             p1_confirmed = True
             p1_weight = (0.5 if expiry_discounted else 1.0) * _mult("Pillar 1: Futures OI")
             confirmed_pillars.append(f"Pillar 1: OI Short Buildup (Weight: {p1_weight:.2f})")
+        elif (ltp > vwap and oi_pct_change < 0) or (ltp < vwap and oi_pct_change < 0):
+            logger.info(f"[{clean_sym}] Derivative liquidation detected (OI change {oi_pct_change}%) — Short Covering / Long Unwinding rejected")
     else:
         # FAIL LOUD: No OI data — pillar excluded from scoring entirely
         logger.warning(f"[{clean_sym}] Pillar 1 OI: DATA_UNAVAILABLE — excluded from pillar count")
@@ -388,16 +399,28 @@ def evaluate_5_pillar_matrix(
         nifty_pct_change = round(((n_ltp - n_prev_close) / n_prev_close) * 100, 2)
 
     rs_diff = round(stock_pct_change - nifty_pct_change, 2)
-    # Require the RS divergence to point the SAME way as the tentative bias, not just be large —
-    # a stock underperforming Nifty by >0.4% must not count as "confirmation" toward a bullish call.
-    if bullish_bias and rs_diff >= 0.4:
+    rs_slope = 0.0
+    if df_nifty is not None and not df_nifty.empty and len(df_today) >= 3:
+        min_len = min(9, len(df_today), len(df_nifty))
+        stock_closes = df_today['Close'].iloc[-min_len:].values
+        nifty_closes = df_nifty['Close'].iloc[-min_len:].values
+        if len(stock_closes) == len(nifty_closes) and np.all(nifty_closes > 0):
+            rs_series = stock_closes / nifty_closes
+            x = np.arange(len(rs_series))
+            rs_slope = float(np.polyfit(x, rs_series, 1)[0])
+
+    rs_slope_positive = rs_slope >= -1e-6
+    rs_slope_negative = rs_slope <= 1e-6
+
+    # Require the RS divergence to point the SAME way as the tentative bias, supported by final 45-min RS trend
+    if bullish_bias and rs_diff >= 0.4 and rs_slope_positive:
         p3_confirmed = True
         p3_weight = 1.0 * _mult("Pillar 3: Relative Strength")
-        confirmed_pillars.append(f"Pillar 3: RS vs Nifty (Outperforming +{rs_diff}%)")
-    elif bearish_bias and rs_diff <= -0.4:
+        confirmed_pillars.append(f"Pillar 3: RS vs Nifty (Outperforming +{rs_diff}%, RS Slope Up)")
+    elif bearish_bias and rs_diff <= -0.4 and rs_slope_negative:
         p3_confirmed = True
         p3_weight = 1.0 * _mult("Pillar 3: Relative Strength")
-        confirmed_pillars.append(f"Pillar 3: RS vs Nifty (Underperforming {rs_diff}%)")
+        confirmed_pillars.append(f"Pillar 3: RS vs Nifty (Underperforming {rs_diff}%, RS Slope Down)")
 
     pillar_weights["Pillar 3: Relative Strength"] = p3_weight
 

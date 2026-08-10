@@ -355,23 +355,24 @@ def _dedupe_records(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return deduped
 
 
-def _classify_tier(value_cr: float) -> str:
+def _classify_tier(value_cr: float, deal_type: str = "block") -> str:
     if value_cr >= TIER_STRONG_CR:
         return "STRONG"
     if value_cr >= TIER_MODERATE_CR:
         return "MODERATE"
-    if value_cr >= MIN_VALUE_CR:
+    min_floor = 10.0 if deal_type == "bulk" else MIN_VALUE_CR
+    if value_cr >= min_floor:
         return "WEAK"
     return "BELOW_THRESHOLD"
 
 
 def aggregate_symbol_flows(records: List[Dict[str, Any]], as_of: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
-    """Aggregates same-day, same-symbol deals into net buy/sell value + tier. Only symbols with
-    at least one qualifying (>= MIN_VALUE_CR) deal are included — a single sub-threshold deal
-    from a smaller player shouldn't surface as an institutional-flow entry at all."""
+    """Aggregates same-day, same-symbol deals into net buy/sell value + tier. Bulk deals
+    trigger WEAK tier from Rs 10cr; block deals enforce Rs 25cr SEBI floor."""
     out: Dict[str, Dict[str, Any]] = {}
     for rec in records:
-        if rec["value_cr"] < MIN_VALUE_CR:
+        min_thresh = 10.0 if rec.get("deal_type") == "bulk" else MIN_VALUE_CR
+        if rec["value_cr"] < min_thresh:
             continue
         sym = rec["symbol"]
         bucket = out.setdefault(sym, {
@@ -394,7 +395,8 @@ def aggregate_symbol_flows(records: List[Dict[str, Any]], as_of: Optional[str] =
         bucket["sell_value_cr"] = round(bucket["sell_value_cr"], 2)
         bucket["net_value_cr"] = net
         bucket["dominant_side"] = dominant_side
-        bucket["tier"] = _classify_tier(abs(net))
+        primary_deal_type = list(bucket["deal_types"])[0] if bucket["deal_types"] else "block"
+        bucket["tier"] = _classify_tier(abs(net), primary_deal_type)
         bucket["deal_types"] = sorted(bucket["deal_types"])
         bucket["as_of"] = resolved_as_of
     return out
