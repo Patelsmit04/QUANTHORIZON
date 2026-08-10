@@ -83,6 +83,11 @@
                     <span class="nav-label">Order Flow Veto</span>
                     <span class="nav-badge" id="orderFlowNavBadge">KITE</span>
                 </button>
+                <button class="sidebar-nav-item" data-section="accuracy" title="Accuracy & Win Rate">
+                    <i class="fa-solid fa-bullseye text-gold"></i>
+                    <span class="nav-label">Accuracy &amp; Win Rate</span>
+                    <span class="nav-badge badge-green" id="accuracyNavBadge">100%</span>
+                </button>
                 <button class="sidebar-nav-item" data-section="indices" title="Index Intelligence">
                     <i class="fa-solid fa-chart-column"></i>
                     <span class="nav-label">Index Intelligence</span>
@@ -188,55 +193,14 @@
                         <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
                             <i class="fa-solid fa-file-csv"></i><span>CSV</span>
                         </button>
+                        <button id="btnOrderBasket" class="btn btn-pill btn-gold" title="Copy BTST/STBT Order Slips">
+                            <i class="fa-solid fa-basket-shopping"></i><span>ORDER BASKET</span>
+                        </button>
                         <button id="scanBtn" class="btn btn-pill btn-primary scan-hero-btn">
                             <i class="fa-solid fa-bolt"></i><span>SCAN NOW</span>
                         </button>
                     </div>
                 </div>
-
-                <!-- Split Live-Updating Accuracy Dashboard (4 Independent Horizon & Scope Categories) -->
-                <section class="split-accuracy-grid">
-                    <div class="metric-card" style="border-top:3px solid var(--gold);">
-                        <div class="metric-header">
-                            <span class="metric-title"><i class="fa-solid fa-bolt text-gold"></i> BTST — STOCKS</span>
-                            <span class="badge badge-gold" id="splitBtstStocksBadge">0.0% ACC</span>
-                        </div>
-                        <div class="metric-body" style="margin-top:6px;">
-                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitBtstStocksVal">0.0% Win Rate</div>
-                            <span class="metric-subtext" id="splitBtstStocksSub">N=0 evaluated picks</span>
-                        </div>
-                    </div>
-                    <div class="metric-card" style="border-top:3px solid #3b82f6;">
-                        <div class="metric-header">
-                            <span class="metric-title"><i class="fa-solid fa-chart-column text-cyan"></i> BTST — INDICES</span>
-                            <span class="badge badge-cyan" id="splitBtstIndicesBadge">0.0% ACC</span>
-                        </div>
-                        <div class="metric-body" style="margin-top:6px;">
-                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitBtstIndicesVal">0.0% Win Rate</div>
-                            <span class="metric-subtext" id="splitBtstIndicesSub">N=0 index verdicts</span>
-                        </div>
-                    </div>
-                    <div class="metric-card" style="border-top:3px solid #10b981;">
-                        <div class="metric-header">
-                            <span class="metric-title"><i class="fa-solid fa-microchip text-bullish"></i> INTRADAY — STOCKS</span>
-                            <span class="badge badge-bullish" id="splitIntraStocksBadge">0.0% ACC</span>
-                        </div>
-                        <div class="metric-body" style="margin-top:6px;">
-                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitIntraStocksVal">0.0% Win Rate</div>
-                            <span class="metric-subtext" id="splitIntraStocksSub">SMC &amp; Algo Setups</span>
-                        </div>
-                    </div>
-                    <div class="metric-card" style="border-top:3px solid #8b5cf6;">
-                        <div class="metric-header">
-                            <span class="metric-title"><i class="fa-solid fa-sliders text-amber"></i> INTRADAY — INDICES</span>
-                            <span class="badge badge-amber" id="splitIntraIndicesBadge">0.0% ACC</span>
-                        </div>
-                        <div class="metric-body" style="margin-top:6px;">
-                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitIntraIndicesVal">0.0% Win Rate</div>
-                            <span class="metric-subtext" id="splitIntraIndicesSub">Nifty/Bank Nifty Scalps</span>
-                        </div>
-                    </div>
-                </section>
 
                 <!-- Metrics Overview Section -->
                 <section class="metrics-grid">
@@ -351,12 +315,7 @@
                                 <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
                                 <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
                                 <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
-                            </select>
                         </div>
-
-                        <button class="action-btn" id="btnOrderBasket" style="font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;background:rgba(212,175,55,0.15);color:var(--accent-gold);border:1px solid rgba(212,175,55,0.4);cursor:pointer;display:flex;align-items:center;gap:6px;">
-                            <i class="fa-solid fa-basket-shopping"></i> Order Basket
-                        </button>
                     </div>
                     <div class="live-quick-filters hidden" id="liveQuickFilters" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
                         <button class="filter-pill-btn active" data-filter="GAINERS" style="font-size:12px;font-weight:800;padding:5px 16px;border-radius:20px;background:rgba(16,185,129,0.18);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.4);cursor:pointer;"><i class="fa-solid fa-arrow-trend-up"></i> TOP GAINERS</button>
@@ -600,6 +559,120 @@
                 </div>
             </div>
             <!-- ============================== END ORDER FLOW SECTION ============================== -->
+
+            <!-- ============================== ACCURACY & PERFORMANCE SECTION ============================== -->
+            <div id="accuracySection" class="hidden">
+
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-bullseye text-gold"></i> ACCURACY &amp; PERFORMANCE
+                        <span class="section-page-subtitle">Real-Time Win Rate, Horizon Breakdown &amp; Historical Signal Verification</span>
+                    </h2>
+                    <div class="dashboard-heading-actions">
+                        <button id="btnRefreshAccuracy" class="btn btn-pill btn-secondary" title="Refresh Accuracy Metrics">
+                            <i class="fa-solid fa-rotate"></i><span>REFRESH</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 Split Accuracy Metric Cards (Moved here from Dashboard) -->
+                <section class="split-accuracy-grid" style="margin-top:16px;margin-bottom:24px;">
+                    <div class="metric-card" style="border-top:3px solid var(--gold);">
+                        <div class="metric-header">
+                            <span class="metric-title"><i class="fa-solid fa-bolt text-gold"></i> BTST — STOCKS</span>
+                            <span class="badge badge-gold" id="splitBtstStocksBadge">0.0% ACC</span>
+                        </div>
+                        <div class="metric-body" style="margin-top:6px;">
+                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitBtstStocksVal">0.0% Win Rate</div>
+                            <span class="metric-subtext" id="splitBtstStocksSub">N=0 evaluated picks</span>
+                        </div>
+                    </div>
+                    <div class="metric-card" style="border-top:3px solid #3b82f6;">
+                        <div class="metric-header">
+                            <span class="metric-title"><i class="fa-solid fa-chart-column text-cyan"></i> BTST — INDICES</span>
+                            <span class="badge badge-cyan" id="splitBtstIndicesBadge">0.0% ACC</span>
+                        </div>
+                        <div class="metric-body" style="margin-top:6px;">
+                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitBtstIndicesVal">0.0% Win Rate</div>
+                            <span class="metric-subtext" id="splitBtstIndicesSub">N=0 index verdicts</span>
+                        </div>
+                    </div>
+                    <div class="metric-card" style="border-top:3px solid #10b981;">
+                        <div class="metric-header">
+                            <span class="metric-title"><i class="fa-solid fa-microchip text-bullish"></i> INTRADAY — STOCKS</span>
+                            <span class="badge badge-bullish" id="splitIntraStocksBadge">0.0% ACC</span>
+                        </div>
+                        <div class="metric-body" style="margin-top:6px;">
+                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitIntraStocksVal">0.0% Win Rate</div>
+                            <span class="metric-subtext" id="splitIntraStocksSub">SMC &amp; Algo Setups</span>
+                        </div>
+                    </div>
+                    <div class="metric-card" style="border-top:3px solid #8b5cf6;">
+                        <div class="metric-header">
+                            <span class="metric-title"><i class="fa-solid fa-sliders text-amber"></i> INTRADAY — INDICES</span>
+                            <span class="badge badge-amber" id="splitIntraIndicesBadge">0.0% ACC</span>
+                        </div>
+                        <div class="metric-body" style="margin-top:6px;">
+                            <div style="font-size:20px;font-weight:800;color:var(--ink-primary);" id="splitIntraIndicesVal">0.0% Win Rate</div>
+                            <span class="metric-subtext" id="splitIntraIndicesSub">Nifty/Bank Nifty Scalps</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Detailed Analytics Grid -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;margin-bottom:24px;">
+                    <!-- Analytics Card 1: BTST Stock Performance Detail -->
+                    <div class="stock-card" style="padding:20px;">
+                        <div style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                            <i class="fa-solid fa-bolt text-gold"></i> BTST Stock Signal Verification
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">
+                            <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
+                                <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">WIN RATE</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--bullish-green);" id="accBtstStockWinRate">100.0%</div>
+                            </div>
+                            <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
+                                <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">TOTAL EVALUATED</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--ink-primary);" id="accBtstStockTotal">N=2</div>
+                            </div>
+                            <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
+                                <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">AVG OVERNIGHT GAP</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--gold);" id="accBtstStockAvgGap">+1.85%</div>
+                            </div>
+                            <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
+                                <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">PROFIT FACTOR</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--bullish-green);" id="accBtstStockPF">2.4x</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Card 2: Intraday Stock Performance Detail -->
+                    <div class="stock-card" style="padding:20px;">
+                        <div style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                            <i class="fa-solid fa-microchip text-bullish"></i> Intraday SMC &amp; Algo Setups
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">
+                            <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
+                                <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">WIN RATE</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--bullish-green);" id="accIntraStockWinRate">100.0%</div>
+                            </div>
+                            <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
+                                <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">TOTAL EVALUATED</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--ink-primary);" id="accIntraStockTotal">N=1</div>
+                            </div>
+                            <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
+                                <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">TARGET HIT %</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--bullish-green);" id="accIntraTargetHit">100.0%</div>
+                            </div>
+                            <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
+                                <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">STOP LOSS HIT %</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--bearish-red);" id="accIntraSLHit">0.0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- ============================== END ACCURACY SECTION ============================== -->
 
             <!-- ============================== INDICES SECTION ============================== -->
             <div id="indicesSection" class="hidden">

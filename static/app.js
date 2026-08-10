@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const SECTION_HASHES = {
         dashboard: "dashboard", scanner: "signals", stocksNews: "stocks-news",
         globalNews: "global-news", institutionalFlow: "institutional-flow",
-        orderFlow: "order-flow", indices: "index-intelligence", strategies: "strategies", history: "history",
+        orderFlow: "order-flow", accuracy: "accuracy", indices: "index-intelligence", strategies: "strategies", history: "history",
         guide: "guide", rules: "rules"
     };
     const HASH_TO_SECTION = {};
@@ -314,6 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
             globalNews: globalNewsSection || document.getElementById("globalNewsSection"),
             institutionalFlow: institutionalFlowSection || document.getElementById("institutionalFlowSection"),
             orderFlow: document.getElementById("orderFlowSection"),
+            accuracy: document.getElementById("accuracySection"),
             indices: indicesSection || document.getElementById("indicesSection"),
             strategies: strategiesSection || document.getElementById("strategiesSection"),
             history: historySection || document.getElementById("historySection"),
