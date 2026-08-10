@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const SECTION_HASHES = {
         dashboard: "dashboard", scanner: "signals", stocksNews: "stocks-news",
         globalNews: "global-news", institutionalFlow: "institutional-flow",
-        indices: "index-intelligence", strategies: "strategies", history: "history",
+        orderFlow: "order-flow", indices: "index-intelligence", strategies: "strategies", history: "history",
         guide: "guide", rules: "rules"
     };
     const HASH_TO_SECTION = {};
@@ -313,6 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
             stocksNews: stocksNewsSection || document.getElementById("stocksNewsSection"),
             globalNews: globalNewsSection || document.getElementById("globalNewsSection"),
             institutionalFlow: institutionalFlowSection || document.getElementById("institutionalFlowSection"),
+            orderFlow: orderFlowSection || document.getElementById("orderFlowSection"),
             indices: indicesSection || document.getElementById("indicesSection"),
             strategies: strategiesSection || document.getElementById("strategiesSection"),
             history: historySection || document.getElementById("historySection"),
@@ -358,6 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (section === "strategies") fetchStrategies();
         if (section === "history") fetchHistorySection();
         if (section === "institutionalFlow") fetchInstitutionalFlowSection();
+        if (section === "orderFlow") fetchOrderFlowSection();
 
         if (!opts.fromHash && SECTION_HASHES[section]) {
             suppressHashUpdate = true;
@@ -2090,6 +2092,178 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (institutionalFlowSearchInput) institutionalFlowSearchInput.addEventListener("input", filterAndRenderInstitutionalFlowTable);
     if (btnRefreshInstitutionalFlow) btnRefreshInstitutionalFlow.addEventListener("click", fetchInstitutionalFlowSection);
+
+    // -------------------------------------------------------------
+    // DEDICATED ORDER FLOW VETO PAGE (Zerodha Kite Connect 3:15-3:25 PM)
+    // -------------------------------------------------------------
+    const orderFlowSection = document.getElementById("orderFlowSection");
+    const orderFlowNavBadge = document.getElementById("orderFlowNavBadge");
+    const orderFlowGrid = document.getElementById("orderFlowGrid");
+    const orderFlowEmptyState = document.getElementById("orderFlowEmptyState");
+    const orderFlowSearchInput = document.getElementById("orderFlowSearchInput");
+    const ofFilterGroup = document.getElementById("ofFilterGroup");
+
+    let allOrderFlowItems = [];
+    let currentOfFilter = "ALL";
+
+    async function fetchOrderFlowSection() {
+        if (!orderFlowGrid) return;
+        try {
+            orderFlowGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><div style="margin-top:10px;">Fetching 3:15-3:25 PM Order Flow & 5L Depth...</div></div>`;
+            const res = await apiFetch("/api/order_flow_all");
+            if (!res.ok) throw new Error("Order Flow API error");
+            const data = await res.json();
+
+            allOrderFlowItems = data.items || [];
+            
+            const ofPageFeedStatus = document.getElementById("ofPageFeedStatus");
+            const ofPageFeedDetail = document.getElementById("ofPageFeedDetail");
+            const ofPageTotalEvaluated = document.getElementById("ofPageTotalEvaluated");
+            const ofPageConfirmedCount = document.getElementById("ofPageConfirmedCount");
+            const ofPageVetoedCount = document.getElementById("ofPageVetoedCount");
+
+            if (ofPageFeedStatus) ofPageFeedStatus.textContent = (data.feed_health && data.feed_health.feed_mode || "KITE CONNECT").toUpperCase();
+            if (ofPageFeedDetail) ofPageFeedDetail.textContent = data.feed_health && data.feed_health.message ? data.feed_health.message : "5-Level Depth WebSocket Stream";
+            if (ofPageTotalEvaluated) ofPageTotalEvaluated.textContent = data.total_evaluated || 0;
+            if (ofPageConfirmedCount) ofPageConfirmedCount.textContent = data.confirmed_count || 0;
+            if (ofPageVetoedCount) ofPageVetoedCount.textContent = data.vetoed_count || 0;
+
+            if (orderFlowNavBadge) orderFlowNavBadge.textContent = `${data.confirmed_count || 0} PASS`;
+
+            renderOrderFlowGrid();
+        } catch (err) {
+            console.error("Order Flow section fetch error:", err);
+            orderFlowGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-muted);">Failed to load Order Flow analysis.</div>`;
+        }
+    }
+
+    function renderOrderFlowGrid() {
+        if (!orderFlowGrid) return;
+        const search = orderFlowSearchInput ? orderFlowSearchInput.value.trim().toUpperCase() : "";
+
+        let filtered = allOrderFlowItems;
+        if (currentOfFilter === "CONFIRMED") {
+            filtered = filtered.filter(i => (i.veto_evaluation && i.veto_evaluation.verdict) === "confirmed");
+        } else if (currentOfFilter === "VETOED") {
+            filtered = filtered.filter(i => (i.veto_evaluation && i.veto_evaluation.verdict) === "vetoed");
+        } else if (currentOfFilter === "AGAINST_TREND") {
+            filtered = filtered.filter(i => (i.veto_evaluation && i.veto_evaluation.verdict) === "confirmed_against_trend");
+        }
+
+        if (search) {
+            filtered = filtered.filter(i => i.symbol && i.symbol.toUpperCase().includes(search));
+        }
+
+        const chips = ofFilterGroup ? ofFilterGroup.querySelectorAll(".filter-chip") : [];
+        chips.forEach(c => {
+            if (c.dataset.ofFilter === "ALL") c.textContent = `ALL (${allOrderFlowItems.length})`;
+            c.classList.toggle("active", c.dataset.ofFilter === currentOfFilter);
+        });
+
+        orderFlowGrid.innerHTML = "";
+
+        if (filtered.length === 0) {
+            if (orderFlowEmptyState) orderFlowEmptyState.classList.remove("hidden");
+            return;
+        } else {
+            if (orderFlowEmptyState) orderFlowEmptyState.classList.add("hidden");
+        }
+
+        filtered.forEach(item => {
+            orderFlowGrid.appendChild(buildOrderFlowCard(item));
+        });
+    }
+
+    function buildOrderFlowCard(item) {
+        const card = document.createElement("div");
+        card.className = "stock-card";
+        card.style.cursor = "pointer";
+
+        const veto = item.veto_evaluation || {};
+        const ofData = item.order_flow_data || {};
+        const depth = ofData.depth_imbalance || {};
+        const bars = ofData.minute_bars || [];
+
+        const verdict = (veto.verdict || "insufficient_data").toUpperCase();
+        let badgeStyle = "background:rgba(255,255,255,0.08);color:var(--ink-muted);";
+        let badgeText = verdict.replace(/_/g, " ");
+        if (verdict === "CONFIRMED") {
+            badgeStyle = "background:rgba(16,185,129,0.2);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.4);";
+        } else if (verdict === "VETOED") {
+            badgeStyle = "background:rgba(239,68,68,0.2);color:var(--bearish-red);border:1px solid rgba(239,68,68,0.4);";
+        } else if (verdict === "CONFIRMED_AGAINST_TREND") {
+            badgeStyle = "background:rgba(245,158,11,0.2);color:var(--gold);border:1px solid rgba(245,158,11,0.4);";
+        }
+
+        const maxAbsDelta = Math.max(...bars.map(b => Math.abs(b.net_delta || 1)), 1);
+        const barsHtml = bars.length === 0
+            ? `<div style="font-size:11px;color:var(--ink-muted);">No 3:15-3:25 PM bars available.</div>`
+            : bars.map(b => {
+                const net = b.net_delta || 0;
+                const isPos = net >= 0;
+                const barHeight = Math.max(10, Math.round((Math.abs(net) / maxAbsDelta) * 32));
+                const color = isPos ? 'var(--bullish-green)' : 'var(--bearish-red)';
+                return `
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;" title="${b.minute}: ${net >= 0 ? '+' : ''}${net} delta (${b.tick_count} ticks)">
+                        <div style="width:100%;height:${barHeight}px;background:${color};border-radius:2px;opacity:0.9;"></div>
+                        <span style="font-size:8px;font-weight:700;color:var(--ink-muted);margin-top:2px;">${b.minute ? b.minute.split(':')[1] : ''}</span>
+                    </div>
+                `;
+            }).join("");
+
+        card.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+                <div>
+                    <div style="font-size:18px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:6px;">
+                        ${escapeHtml(item.symbol)}
+                        <span class="badge" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;${badgeStyle}">${badgeText}</span>
+                    </div>
+                    <div style="font-size:12px;color:var(--ink-secondary);margin-top:2px;">
+                        LTP: <strong>₹${(item.ltp || 0).toFixed(2)}</strong> (${item.pct_change >= 0 ? '+' : ''}${(item.pct_change || 0).toFixed(2)}%)
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:11px;font-weight:800;color:${item.signal.includes('BTST') ? 'var(--bullish-green)' : 'var(--bearish-red)'}">${escapeHtml(item.signal)}</div>
+                    <div style="font-size:10px;font-weight:700;color:var(--ink-muted);">Score: ${item.confidence_score}%</div>
+                </div>
+            </div>
+
+            <div style="font-size:11px;color:var(--ink-secondary);margin-bottom:12px;background:var(--glass-bg-soft);padding:8px 10px;border-radius:6px;border:1px solid var(--gridline);">
+                <i class="fa-solid fa-circle-info text-gold"></i> ${escapeHtml(veto.reason || "Closing aggression analysis complete.")}
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800;margin-bottom:4px;">
+                    <span style="color:var(--bullish-green);">BIDS: ${depth.bid_pct || 50.0}%</span>
+                    <span style="color:var(--gold);">5L RATIO: ${depth.depth_ratio || 1.0}x</span>
+                    <span style="color:var(--bearish-red);">ASKS: ${depth.ask_pct || 50.0}%</span>
+                </div>
+                <div style="height:8px;background:rgba(239,68,68,0.3);border-radius:4px;overflow:hidden;display:flex;">
+                    <div style="height:100%;width:${depth.bid_pct || 50.0}%;background:var(--bullish-green);transition:width 0.3s ease;"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="font-size:9px;font-weight:800;color:var(--ink-muted);margin-bottom:4px;letter-spacing:0.3px;">3:15-3:25 PM INFERRED DELTA BARS:</div>
+                <div style="display:flex;gap:4px;height:40px;align-items:flex-end;">
+                    ${barsHtml}
+                </div>
+            </div>
+        `;
+
+        card.addEventListener("click", () => openStockModal(item.symbol));
+        return card;
+    }
+
+    if (orderFlowSearchInput) orderFlowSearchInput.addEventListener("input", renderOrderFlowGrid);
+    if (ofFilterGroup) {
+        ofFilterGroup.querySelectorAll(".filter-chip").forEach(btn => {
+            btn.addEventListener("click", () => {
+                currentOfFilter = btn.dataset.ofFilter || "ALL";
+                renderOrderFlowGrid();
+            });
+        });
+    }
 
     // -------------------------------------------------------------
     // 10. INDICES SECTION (Nifty 50 / Bank Nifty / Sensex)

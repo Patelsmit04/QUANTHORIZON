@@ -1629,14 +1629,12 @@ def get_scan_results(
 
     if scan_response is None:
         with _cache_lock:
-            if cache_store.get("scan_summary") is None:
-                cache_store["scan_summary"] = load_last_market_scan()
+            disk_scan = load_last_market_scan()
+            if disk_scan and disk_scan.get("stocks"):
+                cache_store["scan_summary"] = disk_scan
+                if disk_scan.get("indices"):
+                    cache_store["index_data"] = disk_scan.get("indices")
             cached = cache_store.get("scan_summary")
-            # deepcopy, not a shallow .copy() — the shallow copy left scan_response["stocks"]
-            # pointing at the SAME list/dicts as cache_store's, so annotate_bestest_5() below
-            # was mutating the shared cache on every single /api/scan read (Phase-1 audit
-            # finding #29). Held under _cache_lock so this snapshot can't be read mid-write
-            # by a concurrent scan.
             scan_response = copy.deepcopy(cached) if cached is not None else None
 
         if scan_response is not None and len(scan_response.get("stocks", [])) > 0:
@@ -1744,6 +1742,45 @@ def get_symbol_order_flow(symbol: str):
         "symbol": clean_sym,
         "veto_evaluation": veto_eval,
         "order_flow_data": of_data.to_dict()
+    })
+
+
+@app.get("/api/order_flow_all")
+def get_all_order_flow():
+    """Returns 3:15-3:25 PM order flow evaluation, 5-level depth imbalance, and mini-bars for all scanned stocks."""
+    from zerodha_order_flow_provider import get_order_flow_data, check_kite_token_validity
+    from order_flow_analyzer import check_closing_aggression
+
+    scan_data = cache_store.get("scan_summary") or load_last_market_scan() or {}
+    stocks = scan_data.get("stocks", [])
+
+    results = []
+    for s in stocks:
+        sym = s.get("symbol", "").replace(".NS", "").upper()
+        if not sym:
+            continue
+        of_data = get_order_flow_data(sym)
+        veto_eval = check_closing_aggression(sym, of_data)
+        results.append({
+            "symbol": sym,
+            "signal": s.get("signal", "NEUTRAL"),
+            "priority_level": s.get("priority_level", "P3_LOW"),
+            "confidence_score": s.get("confidence_score", 0),
+            "ltp": s.get("ltp", 0.0),
+            "pct_change": s.get("pct_change", 0.0),
+            "volume_spike": s.get("volume_spike", 1.0),
+            "veto_evaluation": veto_eval,
+            "order_flow_data": of_data.to_dict()
+        })
+
+    token_status = check_kite_token_validity()
+    return sanitize_json_data({
+        "feed_health": token_status,
+        "total_evaluated": len(results),
+        "confirmed_count": sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed"),
+        "vetoed_count": sum(1 for r in results if r["veto_evaluation"].get("verdict") == "vetoed"),
+        "against_trend_count": sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed_against_trend"),
+        "items": results
     })
 
 

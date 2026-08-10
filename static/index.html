@@ -78,6 +78,11 @@
                     <span class="nav-label">Institutional Flow</span>
                     <span class="nav-badge" id="institutionalFlowNavBadge">--</span>
                 </button>
+                <button class="sidebar-nav-item" data-section="orderFlow" title="Order Flow Veto">
+                    <i class="fa-solid fa-bolt text-gold"></i>
+                    <span class="nav-label">Order Flow Veto</span>
+                    <span class="nav-badge" id="orderFlowNavBadge">KITE</span>
+                </button>
                 <button class="sidebar-nav-item" data-section="indices" title="Index Intelligence">
                     <i class="fa-solid fa-chart-column"></i>
                     <span class="nav-label">Index Intelligence</span>
@@ -535,8 +540,66 @@
                     <h3>No Qualifying Deals Yet Today</h3>
                     <p>The live snapshot is checked shortly after the confirmed 2:20 PM afternoon block-deal window closes, with a final check before the 3:30 PM lock. Check back after those windows, or after market hours for the reconciled end-of-day figures.</p>
                 </div>
-            </div>
             <!-- ============================== END INSTITUTIONAL FLOW SECTION ============================== -->
+
+            <!-- ============================== ORDER FLOW SECTION ============================== -->
+            <div id="orderFlowSection" class="hidden">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW VETO INTELLIGENCE
+                        <span class="section-page-subtitle">Zerodha Kite Connect 3:15–3:25 PM Closing Aggression &amp; 5-Level Depth Analysis</span>
+                    </h2>
+                </div>
+
+                <!-- Health & Summary Stats Cards -->
+                <div class="stats-overview-grid" style="margin-top:16px;margin-bottom:16px;">
+                    <div class="stat-card">
+                        <div class="stat-card-title"><i class="fa-solid fa-plug"></i> FEED STATUS</div>
+                        <div class="stat-card-value text-gold" id="ofPageFeedStatus">KITE CONNECT</div>
+                        <div class="stat-card-footer" id="ofPageFeedDetail">5-Level Depth WebSocket Stream</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title"><i class="fa-solid fa-shield-halved"></i> TOTAL EVALUATED</div>
+                        <div class="stat-card-value" id="ofPageTotalEvaluated">0</div>
+                        <div class="stat-card-footer">Scanned F&amp;O Candidates</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title"><i class="fa-solid fa-circle-check text-bullish"></i> CONFIRMED SETUPS</div>
+                        <div class="stat-card-value text-bullish" id="ofPageConfirmedCount">0</div>
+                        <div class="stat-card-footer">Passed Closing Aggression Gate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title"><i class="fa-solid fa-ban text-bearish"></i> VETOED SETUPS</div>
+                        <div class="stat-card-value text-bearish" id="ofPageVetoedCount">0</div>
+                        <div class="stat-card-footer">Capped to P3 LOW Conviction</div>
+                    </div>
+                </div>
+
+                <!-- Toolbar Filters -->
+                <div class="toolbar-container" style="margin-bottom:16px;">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="orderFlowSearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
+                    </div>
+                    <div class="filter-group" id="ofFilterGroup">
+                        <button class="filter-chip active" data-of-filter="ALL">ALL (0)</button>
+                        <button class="filter-chip" data-of-filter="CONFIRMED">CONFIRMED</button>
+                        <button class="filter-chip" data-of-filter="VETOED">VETOED</button>
+                        <button class="filter-chip" data-of-filter="AGAINST_TREND">AGAINST TREND</button>
+                    </div>
+                </div>
+
+                <!-- Order Flow Grid -->
+                <div id="orderFlowGrid" class="order-flow-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(360px, 1fr));gap:16px;">
+                    <!-- Dynamic Order Flow Cards Injected by JS -->
+                </div>
+
+                <div id="orderFlowEmptyState" class="empty-state hidden">
+                    <i class="fa-solid fa-bolt-lightning fa-3x text-gold"></i>
+                    <h3>No Order Flow Setups Found</h3>
+                    <p>No scanned candidate matches the selected filter. Run a scan or adjust your search filter above.</p>
+                </div>
+            </div>
+            <!-- ============================== END ORDER FLOW SECTION ============================== -->
 
             <!-- ============================== INDICES SECTION ============================== -->
             <div id="indicesSection" class="hidden">
