@@ -2710,6 +2710,8 @@ def get_icon_512():
 @app.get("/stocks-news", response_class=HTMLResponse)
 @app.get("/global-news", response_class=HTMLResponse)
 @app.get("/institutional-flow", response_class=HTMLResponse)
+@app.get("/order-flow", response_class=HTMLResponse)
+@app.get("/accuracy", response_class=HTMLResponse)
 @app.get("/index-intelligence", response_class=HTMLResponse)
 @app.get("/history", response_class=HTMLResponse)
 @app.get("/strategies", response_class=HTMLResponse)

@@ -1,6 +1,7 @@
 /**
  * BTST SCANNER — DASHBOARD JAVASCRIPT APPLICATION ENGINE (AUTONOMOUS BACKGROUND SCANNER)
  */
+var lastBtstStatus = "pre_btst";
 
 // M9 audit fix: native fetch() has no timeout, and nothing in this file attached one to any
 // of its ~18 call sites — a hung backend left "SCANNING..." (or an equivalent stuck state) up
@@ -715,6 +716,53 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log('[QuantHorizon] 9:15 AM IST — hard refreshing for new market day...');
                 location.reload();
             }, Math.max(0, msUntil915));
+        }
+    }
+
+    async function fetchSplitAccuracy() {
+        try {
+            const res = await apiFetch("/api/accuracy/split");
+            if (!res.ok) return;
+            const data = await res.json();
+
+            const splitBtstStocksBadge = document.getElementById("splitBtstStocksBadge");
+            const splitBtstStocksVal = document.getElementById("splitBtstStocksVal");
+            const splitBtstStocksSub = document.getElementById("splitBtstStocksSub");
+
+            const splitBtstIndicesBadge = document.getElementById("splitBtstIndicesBadge");
+            const splitBtstIndicesVal = document.getElementById("splitBtstIndicesVal");
+            const splitBtstIndicesSub = document.getElementById("splitBtstIndicesSub");
+
+            const splitIntraStocksBadge = document.getElementById("splitIntraStocksBadge");
+            const splitIntraStocksVal = document.getElementById("splitIntraStocksVal");
+            const splitIntraStocksSub = document.getElementById("splitIntraStocksSub");
+
+            const splitIntraIndicesBadge = document.getElementById("splitIntraIndicesBadge");
+            const splitIntraIndicesVal = document.getElementById("splitIntraIndicesVal");
+            const splitIntraIndicesSub = document.getElementById("splitIntraIndicesSub");
+
+            if (data.btst_stocks) {
+                if (splitBtstStocksBadge) splitBtstStocksBadge.textContent = `${data.btst_stocks.win_rate_pct.toFixed(1)}% ACC`;
+                if (splitBtstStocksVal) splitBtstStocksVal.textContent = `${data.btst_stocks.win_rate_pct.toFixed(1)}% Win Rate`;
+                if (splitBtstStocksSub) splitBtstStocksSub.textContent = `N=${data.btst_stocks.total_evaluated} evaluated picks`;
+            }
+            if (data.btst_indices) {
+                if (splitBtstIndicesBadge) splitBtstIndicesBadge.textContent = `${data.btst_indices.win_rate_pct.toFixed(1)}% ACC`;
+                if (splitBtstIndicesVal) splitBtstIndicesVal.textContent = `${data.btst_indices.win_rate_pct.toFixed(1)}% Win Rate`;
+                if (splitBtstIndicesSub) splitBtstIndicesSub.textContent = `N=${data.btst_indices.total_evaluated} index verdicts`;
+            }
+            if (data.intraday_stocks) {
+                if (splitIntraStocksBadge) splitIntraStocksBadge.textContent = `${data.intraday_stocks.win_rate_pct.toFixed(1)}% ACC`;
+                if (splitIntraStocksVal) splitIntraStocksVal.textContent = `${data.intraday_stocks.win_rate_pct.toFixed(1)}% Win Rate`;
+                if (splitIntraStocksSub) splitIntraStocksSub.textContent = `N=${data.intraday_stocks.total_evaluated} SMC & Algo Setups`;
+            }
+            if (data.intraday_indices) {
+                if (splitIntraIndicesBadge) splitIntraIndicesBadge.textContent = `${data.intraday_indices.win_rate_pct.toFixed(1)}% ACC`;
+                if (splitIntraIndicesVal) splitIntraIndicesVal.textContent = `${data.intraday_indices.win_rate_pct.toFixed(1)}% Win Rate`;
+                if (splitIntraIndicesSub) splitIntraIndicesSub.textContent = `N=${data.intraday_indices.total_evaluated} Scalps`;
+            }
+        } catch (e) {
+            console.error("fetchSplitAccuracy error:", e);
         }
     }
 
@@ -3597,10 +3645,12 @@ document.addEventListener("DOMContentLoaded", () => {
         btnOrderBasket.addEventListener("click", async () => {
             try {
                 const res = await apiFetch("/api/order_basket");
-                if (res && res.orders && res.orders.length > 0) {
-                    const textToCopy = res.orders.map(o => o.order_text).join("\n");
+                if (!res.ok) throw new Error("Order Basket API error");
+                const data = await res.json();
+                if (data && data.orders && data.orders.length > 0) {
+                    const textToCopy = data.orders.map(o => o.order_text).join("\n");
                     await navigator.clipboard.writeText(textToCopy);
-                    showToast(`Copied ${res.orders.length} BTST Order Slip(s) to Clipboard!`, "success");
+                    showToast(`Copied ${data.orders.length} BTST Order Slip(s) to Clipboard!`, "success");
                 } else {
                     showToast("No active Priority 1/2 BTST candidates in basket", "info");
                 }
