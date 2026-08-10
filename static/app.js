@@ -437,6 +437,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (lockPicksBtn) lockPicksBtn.addEventListener("click", lockPicksAction);
     if (evaluatePicksBtn) evaluatePicksBtn.addEventListener("click", evaluatePicksAction);
 
+    function filterFromDashboardCard(filterType) {
+        switchSection("scanner");
+        currentFilter = filterType;
+        const chips = document.querySelectorAll(".filter-chip");
+        chips.forEach(chip => {
+            if (chip.dataset.filter === filterType) {
+                chip.classList.add("active");
+            } else {
+                chip.classList.remove("active");
+            }
+        });
+        filterAndRenderTable();
+    }
+
     if (exportCsvBtn) exportCsvBtn.addEventListener("click", exportWatchlistCsv);
     if (metricCardTotalScanned) metricCardTotalScanned.addEventListener("click", () => filterFromDashboardCard("ALL"));
     if (metricCardPriority1) metricCardPriority1.addEventListener("click", () => filterFromDashboardCard("PRIORITY1"));
@@ -2534,6 +2548,24 @@ document.addEventListener("DOMContentLoaded", () => {
         loadChartForSymbol(indexName, '5m');
     }
 
+    function buildTickerItemHTML(idx) {
+        const name = idx.display_name || idx.index_name || "";
+        const ltp = idx.ltp !== undefined && idx.ltp !== null ? idx.ltp.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "--";
+        const changePts = idx.change_pts !== undefined && idx.change_pts !== null ? idx.change_pts : 0;
+        const pctChange = idx.pct_change !== undefined && idx.pct_change !== null ? idx.pct_change : 0;
+        const isUp = changePts >= 0;
+        const colorClass = isUp ? "text-bullish" : "text-bearish";
+        const sign = isUp ? "+" : "";
+
+        return `
+            <div class="index-ticker-item" data-index-name="${escapeAttr(idx.index_name || '')}" style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;">
+                <span style="font-weight:800;font-size:12px;color:var(--ink-primary);">${escapeHtml(name)}</span>
+                <span style="font-weight:700;font-size:12px;color:var(--ink-primary);">${ltp}</span>
+                <span class="${colorClass}" style="font-weight:700;font-size:11px;">${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)</span>
+            </div>
+        `;
+    }
+
     async function fetchTickerIndices() {
         if (!indexTickerTrack) return;
         try {
@@ -3632,5 +3664,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(updateClosingSequenceStepper, 10000);
     updateClosingSequenceStepper();
 
+    fetchTickerIndices();
+    setInterval(fetchTickerIndices, 15000);
     fetchSplitAccuracy();
 });
