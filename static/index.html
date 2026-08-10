@@ -339,8 +339,8 @@
                 </section>
 
                 <!-- Dynamic Stocks Data Table -->
-                <section class="table-container" id="btstStocksTableView">
-                    <div class="table-scroll">
+                <section class="table-container">
+                    <div class="table-scroll" id="btstTableWrapper">
                         <table class="data-table" id="scannerDataTable">
                             <thead>
                                 <tr>
@@ -364,14 +364,10 @@
                             </tbody>
                         </table>
                     </div>
-                </section>
-
-                <!-- Live Stock Boxes Grid Container (LIVE Stocks Mode) -->
-                <section id="liveStocksGridView" class="hidden" style="margin-top:16px;">
-                    <div class="live-stocks-grid" id="liveStocksGrid">
-                        <!-- Dynamic Stock Boxes Injected by JS matching user image format -->
+                    <!-- Live Stocks Card Grid (shown only for LIVE Stocks view) -->
+                    <div class="live-stocks-grid hidden" id="liveStocksGrid">
+                        <!-- Dynamic stock cards injected by JS -->
                     </div>
-                </section>
 
                     <!-- Scan Progress Bar -->
                     <div id="scanProgressBar" class="progress-bar-container hidden">

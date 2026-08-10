@@ -795,48 +795,54 @@ document.addEventListener("DOMContentLoaded", () => {
                             if (live.prev_close != null) s.prev_close = live.prev_close;
                             if (live.change_pts != null) s.change_pts = live.change_pts;
                             if (live.pct_change != null) s.pct_change = live.pct_change;
-                                    // Update DOM table cells in-place
-                    if (stocksTableBody) {
-                        stocksTableBody.querySelectorAll('tr[data-row-key]').forEach(tr => {
-                            const key = tr.dataset.rowKey || '';
-                            const sym = key.split('-')[0];
-                            const s = stockMap[sym];
-                            if (!s) return;
-                            const ltpCell = tr.querySelector('[data-label="LTP"]');
-                            if (ltpCell && s.ltp != null) {
-                                ltpCell.innerHTML = `<strong>\u20B9${s.ltp.toLocaleString('en-IN')}</strong>`;
-                            }
-                            const changeCell = tr.querySelector('[data-label="CHANGE"]');
-                            if (changeCell && s.change_pts != null && s.pct_change != null) {
-                                const isUp = s.change_pts >= 0;
-                                const sign = isUp ? '+' : '';
-                                const cls = isUp ? 'text-bullish' : 'text-bearish';
-                                changeCell.innerHTML = `<span class="${cls}" style="font-weight:700;font-size:12px;">${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)</span>`;
-                            }
-                        });
-                    }
+                        }
+                    });
 
-                    // Update live stock boxes in-place if LIVE Stocks view is active
-                    const liveStocksGrid = document.getElementById("liveStocksGrid");
-                    if (liveStocksGrid && currentStockView === "live") {
-                        liveStocksGrid.querySelectorAll('.live-stock-box').forEach(box => {
-                            const sym = box.dataset.symbol;
-                            const s = stockMap[sym];
-                            if (!s) return;
-                            const ltpEl = box.querySelector('.ltp');
-                            if (ltpEl && s.ltp != null) ltpEl.textContent = s.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            const changeEl = box.querySelector('.change');
-                            if (changeEl && s.change_pts != null && s.pct_change != null) {
-                                const isUp = s.change_pts >= 0;
+                    // Update DOM in-place depending on current view
+                    if (currentStockView === "live") {
+                        // Update live stock cards in-place
+                        const liveGrid = document.getElementById("liveStocksGrid");
+                        if (liveGrid) {
+                            liveGrid.querySelectorAll('.live-stock-card').forEach(card => {
+                                const sym = card.dataset.symbol;
+                                const s = stockMap[sym];
+                                if (!s) return;
+                                const isUp = (s.change_pts || 0) >= 0;
                                 const sign = isUp ? '+' : '';
-                                const cls = isUp ? 'text-bullish' : 'text-bearish';
-                                changeEl.textContent = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
-                                changeEl.className = `${cls} change`;
-                            }
-                        });
+                                card.className = `live-stock-card ${isUp ? 'live-card-up' : 'live-card-down'}`;
+                                const ltpEl = card.querySelector('.live-card-ltp');
+                                if (ltpEl && s.ltp != null) {
+                                    ltpEl.textContent = `\u20B9${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                                }
+                                const changeEl = card.querySelector('.live-card-change');
+                                if (changeEl && s.change_pts != null && s.pct_change != null) {
+                                    const arrowIcon = isUp ? 'fa-caret-up' : 'fa-caret-down';
+                                    changeEl.innerHTML = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                                }
+                            });
+                        }
+                    } else {
+                        // Update BTST table cells in-place
+                        if (stocksTableBody) {
+                            stocksTableBody.querySelectorAll('tr[data-row-key]').forEach(tr => {
+                                const key = tr.dataset.rowKey || '';
+                                const sym = key.split('-')[0];
+                                const s = stockMap[sym];
+                                if (!s) return;
+                                const ltpCell = tr.querySelector('[data-label="LTP"]');
+                                if (ltpCell && s.ltp != null) {
+                                    ltpCell.innerHTML = `<strong>\u20B9${s.ltp.toLocaleString('en-IN')}</strong>`;
+                                }
+                                const changeCell = tr.querySelector('[data-label="CHANGE"]');
+                                if (changeCell && s.change_pts != null && s.pct_change != null) {
+                                    const isUp = s.change_pts >= 0;
+                                    const sign = isUp ? '+' : '';
+                                    const cls = isUp ? 'text-bullish' : 'text-bearish';
+                                    changeCell.innerHTML = `<span class="${cls}" style="font-weight:700;font-size:12px;">${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)</span>`;
+                                }
+                            });
+                        }
                     }
-                }
-            }   }
                 }
             }
         } catch (e) {
@@ -1010,6 +1016,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const searchTerm = searchInput ? searchInput.value.trim().toUpperCase() : "";
         const sortKey = sortSelect ? sortSelect.value : "RANK_ASC";
+        const btstTableWrapper = document.getElementById("btstTableWrapper");
+        const liveStocksGrid = document.getElementById("liveStocksGrid");
 
         let filtered = allStocks.filter(stock => {
             if (currentStockView === "intelligence") {
@@ -1019,14 +1027,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (currentFilter === "PRIORITY1") return stock.priority_level === "P1_HIGH";
                 if (currentFilter === "GAINERS") return (stock.pct_change || 0) > 0;
                 if (currentFilter === "LOSERS") return (stock.pct_change || 0) < 0;
-                // Show High Conviction (P1/P2) + Active Signals in Intelligence View
                 return stock.priority_level === "P1_HIGH" || stock.priority_level === "P2_MEDIUM" || (stock.signal && stock.signal !== "WATCHLIST");
             } else {
-                // Live View: show ALL 210 F&O live stocks, filtered by toolbar if user selected one
-                if (currentFilter === "BTST") return stock.signal && stock.signal.includes("BTST");
-                if (currentFilter === "STBT") return stock.signal && stock.signal.includes("STBT");
-                if (currentFilter === "HIGH_VOL") return (stock.volume_spike || 0) >= 2.0;
-                if (currentFilter === "PRIORITY1") return stock.priority_level === "P1_HIGH";
                 if (currentFilter === "GAINERS") return (stock.pct_change || 0) > 0;
                 if (currentFilter === "LOSERS") return (stock.pct_change || 0) < 0;
                 return true;
@@ -1052,52 +1054,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (visibleCount) visibleCount.textContent = filtered.length;
 
-        const btstStocksTableView = document.getElementById("btstStocksTableView");
-        const liveStocksGridView = document.getElementById("liveStocksGridView");
-        const liveStocksGrid = document.getElementById("liveStocksGrid");
-
+        // ── LIVE STOCKS VIEW: Render card grid instead of table ──
         if (currentStockView === "live") {
-            if (btstStocksTableView) btstStocksTableView.classList.add("hidden");
-            if (liveStocksGridView) liveStocksGridView.classList.remove("hidden");
+            if (btstTableWrapper) btstTableWrapper.classList.add("hidden");
+            if (liveStocksGrid) liveStocksGrid.classList.remove("hidden");
+            stocksTableBody.innerHTML = "";
+            if (emptyState) emptyState.classList.add("hidden");
 
-            if (liveStocksGrid) {
-                liveStocksGrid.innerHTML = "";
-                if (filtered.length === 0) {
-                    liveStocksGrid.innerHTML = `<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--ink-muted);">Loading 211 Live F&O Stock Prices...</div>`;
-                    return;
-                }
+            if (!liveStocksGrid) return;
 
-                filtered.forEach(stock => {
-                    const sym = escapeHtml(stock.symbol || "");
-                    const ltpVal = stock.ltp != null ? stock.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "--";
-                    const changePts = stock.change_pts != null ? stock.change_pts : 0;
-                    const pctChange = stock.pct_change != null ? stock.pct_change : 0;
-                    const isUp = changePts >= 0;
-                    const cls = isUp ? "text-bullish" : "text-bearish";
-                    const sign = isUp ? "+" : "";
-                    const ptsText = changePts.toFixed(2);
-                    const pctText = pctChange.toFixed(2);
-
-                    const box = document.createElement("div");
-                    box.className = "live-stock-box";
-                    box.dataset.symbol = stock.symbol;
-                    box.innerHTML = `
-                        <div style="display:flex;align-items:center;gap:6px;">
-                            <strong class="sym">${sym}</strong>
-                            <span class="ltp">${ltpVal}</span>
-                        </div>
-                        <span class="${cls} change">${sign}${ptsText} (${sign}${pctText}%)</span>
-                    `;
-                    box.addEventListener("click", () => openIndexChartModal(stock.symbol));
-                    liveStocksGrid.appendChild(box);
-                });
+            if (filtered.length === 0) {
+                liveStocksGrid.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--ink-muted);font-size:14px;">
+                    <i class="fa-solid fa-chart-line" style="font-size:32px;margin-bottom:12px;display:block;opacity:0.4;"></i>
+                    No stocks match the current filter.
+                </div>`;
+                return;
             }
+
+            liveStocksGrid.innerHTML = "";
+            filtered.forEach(stock => {
+                const changePts = stock.change_pts || 0;
+                const pctChange = stock.pct_change || 0;
+                const ltp = stock.ltp || 0;
+                const isUp = changePts >= 0;
+                const sign = isUp ? "+" : "";
+                const colorClass = isUp ? "live-card-up" : "live-card-down";
+                const arrowIcon = isUp ? "fa-caret-up" : "fa-caret-down";
+
+                const card = document.createElement("div");
+                card.className = `live-stock-card ${colorClass}`;
+                card.dataset.symbol = stock.symbol || "";
+                card.innerHTML = `
+                    <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
+                    <div class="live-card-ltp">\u20B9${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+                    <div class="live-card-change">
+                        <i class="fa-solid ${arrowIcon}"></i>
+                        ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
+                    </div>
+                `;
+                card.addEventListener("click", () => openStockModal(stock.symbol));
+                liveStocksGrid.appendChild(card);
+            });
             return;
-        } else {
-            // BTST Stocks Mode: Show Table
-            if (btstStocksTableView) btstStocksTableView.classList.remove("hidden");
-            if (liveStocksGridView) liveStocksGridView.classList.add("hidden");
         }
+
+        // ── BTST STOCKS VIEW: Table rendering (unchanged) ──
+        if (btstTableWrapper) btstTableWrapper.classList.remove("hidden");
+        if (liveStocksGrid) liveStocksGrid.classList.add("hidden");
 
         stocksTableBody.innerHTML = "";
         
