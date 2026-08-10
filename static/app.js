@@ -1453,6 +1453,77 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
             }
 
+            // Render Order Flow Veto Panel
+            const ofVeto = summary.order_flow_veto || {};
+            const ofData = summary.order_flow_data || {};
+
+            const modalOfVetoBadge = document.getElementById("modalOfVetoBadge");
+            if (modalOfVetoBadge) {
+                const verdict = (ofVeto.verdict || "insufficient_data").toUpperCase();
+                modalOfVetoBadge.textContent = verdict.replace(/_/g, " ");
+                if (verdict === "CONFIRMED") {
+                    modalOfVetoBadge.className = "badge badge-gold";
+                } else if (verdict === "CONFIRMED_AGAINST_TREND") {
+                    modalOfVetoBadge.className = "badge";
+                    modalOfVetoBadge.style.cssText = "font-size:11px;font-weight:800;padding:4px 10px;background:rgba(245,158,11,0.2);color:var(--gold);border:1px solid rgba(245,158,11,0.4);";
+                } else if (verdict === "VETOED") {
+                    modalOfVetoBadge.className = "badge badge-bearish";
+                } else {
+                    modalOfVetoBadge.className = "badge";
+                    modalOfVetoBadge.style.cssText = "font-size:11px;font-weight:800;padding:4px 10px;background:rgba(255,255,255,0.08);color:var(--ink-muted);";
+                }
+            }
+
+            const modalOfHealthBadge = document.getElementById("modalOfHealthBadge");
+            if (modalOfHealthBadge) {
+                const hadGap = ofData.had_data_gap === true;
+                modalOfHealthBadge.innerHTML = hadGap
+                    ? `<i class="fa-solid fa-triangle-exclamation" style="color:var(--bearish-red);"></i> Data Gap`
+                    : `<i class="fa-solid fa-circle" style="font-size:8px;"></i> Ticker Live`;
+                modalOfHealthBadge.style.color = hadGap ? "var(--bearish-red)" : "var(--bullish-green)";
+            }
+
+            const modalOfSource = document.getElementById("modalOfSource");
+            if (modalOfSource) modalOfSource.textContent = `Source: ${ofData.data_source || 'Zerodha Kite Connect (5L Depth)'}`;
+
+            const modalOfReason = document.getElementById("modalOfReason");
+            if (modalOfReason) modalOfReason.textContent = ofVeto.reason || "3:15-3:25 PM order flow evaluation complete.";
+
+            const depth = ofData.depth_imbalance || {};
+            const modalOfBidPct = document.getElementById("modalOfBidPct");
+            if (modalOfBidPct) modalOfBidPct.textContent = `BIDS: ${depth.bid_pct || 50.0}%`;
+
+            const modalOfAskPct = document.getElementById("modalOfAskPct");
+            if (modalOfAskPct) modalOfAskPct.textContent = `ASKS: ${depth.ask_pct || 50.0}%`;
+
+            const modalOfDepthRatio = document.getElementById("modalOfDepthRatio");
+            if (modalOfDepthRatio) modalOfDepthRatio.textContent = `5L DEPTH RATIO: ${depth.depth_ratio || 1.0}x`;
+
+            const modalOfBidBar = document.getElementById("modalOfBidBar");
+            if (modalOfBidBar) modalOfBidBar.style.width = `${depth.bid_pct || 50.0}%`;
+
+            const barsContainer = document.getElementById("modalOfBarsContainer");
+            if (barsContainer) {
+                const bars = ofData.minute_bars || [];
+                if (bars.length === 0) {
+                    barsContainer.innerHTML = `<div style="font-size:11px;color:var(--ink-muted);">No 3:15-3:25 PM mini-bars available yet.</div>`;
+                } else {
+                    const maxAbsDelta = Math.max(...bars.map(b => Math.abs(b.net_delta || 1)), 1);
+                    barsContainer.innerHTML = bars.map(b => {
+                        const net = b.net_delta || 0;
+                        const isPos = net >= 0;
+                        const barHeight = Math.max(12, Math.round((Math.abs(net) / maxAbsDelta) * 38));
+                        const color = isPos ? 'var(--bullish-green)' : 'var(--bearish-red)';
+                        return `
+                            <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;" title="${b.minute}: ${net >= 0 ? '+' : ''}${net} net delta (${b.tick_count} ticks)">
+                                <div style="width:100%;height:${barHeight}px;background:${color};border-radius:3px;opacity:0.85;"></div>
+                                <span style="font-size:8px;font-weight:700;color:var(--ink-muted);margin-top:2px;">${b.minute ? b.minute.split(':')[1] : ''}</span>
+                            </div>
+                        `;
+                    }).join("");
+                }
+            }
+
             renderModalCandleChart(data.recent_candles || [], summary.vwap);
 
         } catch (error) {

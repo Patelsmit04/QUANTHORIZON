@@ -569,6 +569,18 @@ def evaluate_5_pillar_matrix(
             priority_level = "P2_MEDIUM"
             conviction_level = "MODERATE"
 
+    # ORDER FLOW VETO LAYER (3:15-3:25 PM Closing Aggression)
+    from zerodha_order_flow_provider import get_order_flow_data
+    from order_flow_analyzer import check_closing_aggression
+    
+    order_flow_data = get_order_flow_data(clean_sym, signal_type=signal)
+    day_cvd_trend = "BULLISH" if ltp >= vwap else "BEARISH"
+    order_flow_veto = check_closing_aggression(clean_sym, order_flow_data, signal_type=signal, day_cvd_trend=day_cvd_trend)
+    
+    if order_flow_veto.get("verdict") == "vetoed" and priority_level in ["P1_HIGH", "P2_MEDIUM"]:
+        priority_level = "P3_LOW"
+        conviction_level = "MODERATE"
+
     # Estimated Gap % Calculation — clamped strictly between 0.5% and 3.5%
     raw_gap = 0.5 + (capped_vol_spike * 0.4) + (abs(rsi - 50) * 0.03)
     est_gap = round(min(3.5, max(0.5, raw_gap)), 1)
@@ -628,6 +640,8 @@ def evaluate_5_pillar_matrix(
             "yellow_flags": fundamental_data.get("quality", {}).get("yellow_flags", []) if fundamental_data else [],
             "data_status": "STALE_CACHE" if (fundamental_data and fundamental_data.get("stale")) else ("AVAILABLE" if fundamental_data else "DATA_UNAVAILABLE")
         },
+        "order_flow_veto": order_flow_veto,
+        "order_flow_data": order_flow_data.to_dict() if order_flow_data else None,
         "signal": signal,
         "option_type": option_type,
         "conviction_level": conviction_level,

@@ -1013,6 +1013,43 @@
                     <!-- Dynamic Checklist Injected by JS -->
                 </div>
 
+                <!-- Order Flow Veto Panel (3:15-3:25 PM Closing Aggression) -->
+                <h4 class="section-heading mt-4"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW VETO LAYER (3:15-3:25 PM KITE CONNECT)</h4>
+                <div id="modalOrderFlowPanel" class="order-flow-panel-box" style="background:var(--glass-bg-soft);border:1px solid var(--gridline);border-radius:12px;padding:14px;margin-bottom:16px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span id="modalOfVetoBadge" class="badge badge-gold" style="font-size:11px;font-weight:800;padding:4px 10px;">CONFIRMED</span>
+                            <span id="modalOfHealthBadge" style="font-size:11px;font-weight:700;color:var(--bullish-green);"><i class="fa-solid fa-circle" style="font-size:8px;"></i> Ticker Live</span>
+                        </div>
+                        <div style="font-size:10px;font-weight:700;color:var(--ink-secondary);" id="modalOfSource">
+                            Source: Zerodha Kite Connect (5-Level Depth)
+                        </div>
+                    </div>
+                    <div style="font-size:12px;color:var(--ink-secondary);margin-bottom:12px;" id="modalOfReason">
+                        Loading 3:15-3:25 PM order flow evaluation...
+                    </div>
+                    <!-- 5-Level Depth Imbalance Bar -->
+                    <div style="margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800;margin-bottom:4px;">
+                            <span style="color:var(--bullish-green);" id="modalOfBidPct">BIDS: 50.0%</span>
+                            <span style="color:var(--ink-muted);" id="modalOfDepthRatio">5L DEPTH RATIO: 1.0x</span>
+                            <span style="color:var(--bearish-red);" id="modalOfAskPct">ASKS: 50.0%</span>
+                        </div>
+                        <div style="height:10px;background:rgba(239,68,68,0.3);border-radius:6px;overflow:hidden;display:flex;">
+                            <div id="modalOfBidBar" style="height:100%;width:50%;background:var(--bullish-green);transition:width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    <!-- 10-Bar Inferred Delta Mini Chart -->
+                    <div>
+                        <div style="font-size:10px;font-weight:800;color:var(--ink-muted);margin-bottom:6px;">
+                            10-MINUTE INFERRED DELTA BARS (3:15-3:25 PM — TICK-RULE):
+                        </div>
+                        <div id="modalOfBarsContainer" style="display:flex;gap:6px;height:45px;align-items:flex-end;">
+                            <!-- Mini delta bars injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Candle Chart with TradingView Timeframe Selector -->
                 <div class="chart-header-row mt-4">
                     <h4 class="section-heading" style="margin-bottom:0;"><i class="fa-solid fa-chart-candlestick"></i> INTERACTIVE CANDLE CHART</h4>

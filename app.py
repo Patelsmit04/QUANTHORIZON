@@ -1725,6 +1725,28 @@ def get_smc_backtest_report():
     return sanitize_json_data(validate_smc_strategy_out_of_sample())
 
 
+@app.get("/api/order_flow/health")
+def get_order_flow_health():
+    """Returns pre-market token validity & health status for Zerodha Kite Connect API integration."""
+    from zerodha_order_flow_provider import check_kite_token_validity
+    return sanitize_json_data(check_kite_token_validity())
+
+
+@app.get("/api/order_flow/{symbol}")
+def get_symbol_order_flow(symbol: str):
+    """Returns 3:15-3:25 PM order flow mini-bars, 5-level depth imbalance, and veto evaluation for a symbol."""
+    from zerodha_order_flow_provider import get_order_flow_data
+    from order_flow_analyzer import check_closing_aggression
+    clean_sym = symbol.replace(".NS", "").upper()
+    of_data = get_order_flow_data(clean_sym)
+    veto_eval = check_closing_aggression(clean_sym, of_data)
+    return sanitize_json_data({
+        "symbol": clean_sym,
+        "veto_evaluation": veto_eval,
+        "order_flow_data": of_data.to_dict()
+    })
+
+
 @app.get("/api/news")
 def get_news_section(
     verdict: Optional[str] = Query(None, description="Filter: POSITIVE, NEGATIVE, CAUTION, NEUTRAL, NO_RECENT_NEWS"),
