@@ -2959,32 +2959,49 @@ document.addEventListener("DOMContentLoaded", () => {
         `).join("");
     }
 
-    // Notification sound using Web Audio API — no external file needed
+    // Web Audio API AudioContext & First-Click Autoplay Policy Unlock
+    let globalAudioCtx = null;
+    function getAudioContext() {
+        if (!globalAudioCtx) {
+            globalAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (globalAudioCtx.state === 'suspended') {
+            globalAudioCtx.resume().catch(() => {});
+        }
+        return globalAudioCtx;
+    }
+
+    document.addEventListener('click', () => {
+        try { getAudioContext(); } catch (e) {}
+    }, { once: true });
+
+    // Notification sound using Web Audio API — 587.33 Hz (D5) to 880.00 Hz (A5) 0.25s sweep
     function playNotificationSound() {
         try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            // First tone (higher)
+            const ctx = getAudioContext();
+            const now = ctx.currentTime;
+
+            // Tone 1: 587.33 Hz (D5)
             const osc1 = ctx.createOscillator();
             const gain1 = ctx.createGain();
             osc1.type = 'sine';
-            osc1.frequency.setValueAtTime(880, ctx.currentTime);
-            gain1.gain.setValueAtTime(0.15, ctx.currentTime);
-            gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc1.frequency.setValueAtTime(587.33, now);
+            gain1.gain.setValueAtTime(0.18, now);
+            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
             osc1.connect(gain1).connect(ctx.destination);
-            osc1.start(ctx.currentTime);
-            osc1.stop(ctx.currentTime + 0.3);
-            // Second tone (even higher, slight delay)
+            osc1.start(now);
+            osc1.stop(now + 0.25);
+
+            // Tone 2: 880.00 Hz (A5)
             const osc2 = ctx.createOscillator();
             const gain2 = ctx.createGain();
             osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.15);
-            gain2.gain.setValueAtTime(0.12, ctx.currentTime + 0.15);
-            gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+            osc2.frequency.setValueAtTime(880.00, now + 0.08);
+            gain2.gain.setValueAtTime(0.15, now + 0.08);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
             osc2.connect(gain2).connect(ctx.destination);
-            osc2.start(ctx.currentTime + 0.15);
-            osc2.stop(ctx.currentTime + 0.5);
-            // Clean up
-            setTimeout(() => ctx.close(), 600);
+            osc2.start(now + 0.08);
+            osc2.stop(now + 0.25);
         } catch (e) { /* Audio not available */ }
     }
 
