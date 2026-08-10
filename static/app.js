@@ -361,6 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (section === "history") fetchHistorySection();
         if (section === "institutionalFlow") fetchInstitutionalFlowSection();
         if (section === "orderFlow") fetchOrderFlowSection();
+        if (section === "accuracy") fetchSplitAccuracy();
 
         if (!opts.fromHash && SECTION_HASHES[section]) {
             suppressHashUpdate = true;

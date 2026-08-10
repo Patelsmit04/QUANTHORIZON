@@ -2042,10 +2042,14 @@ def get_order_basket(risk_per_trade: float = Query(100000.0, description="Capita
     Outputs Symbol, Transaction Type (BUY/SELL), Option Strike Type (CE/PE), Entry LTP,
     Target Price (+1.5%), Stop Loss (-0.75%), and calculated Qty.
     """
-    scan_data = cache_store.get("scan_summary") or load_last_market_scan()
+    scan_data = cache_store.get("scan_summary")
+    if not scan_data or not scan_data.get("stocks"):
+        scan_data = load_last_market_scan() or {}
     stocks = (scan_data.get("stocks") or []) if isinstance(scan_data, dict) else []
 
     btst_candidates = [s for s in stocks if (s.get("priority_level") in ["P1_HIGH", "P2_MEDIUM"]) and ("BTST" in s.get("signal", "") or "STBT" in s.get("signal", ""))]
+    if not btst_candidates:
+        btst_candidates = [s for s in stocks if ("BTST" in s.get("signal", "") or "STBT" in s.get("signal", ""))][:5]
 
     baskets = []
     for s in btst_candidates:
