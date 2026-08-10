@@ -59,5 +59,5 @@ def test_scheduler_threads_started_on_persistent_host(monkeypatch):
 
     _drive_lifespan_startup()
 
-    assert len(started_threads) == 2
+    assert len(started_threads) == 3
     capture_spy.assert_called_once()

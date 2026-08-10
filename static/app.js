@@ -3286,5 +3286,84 @@ document.addEventListener("DOMContentLoaded", () => {
     if (historyOutcomeFilter) historyOutcomeFilter.addEventListener("change", filterAndRenderHistoryTable);
     if (historyInstitutionalFlowFilter) historyInstitutionalFlowFilter.addEventListener("change", filterAndRenderHistoryTable);
 
+    // -------------------------------------------------------------
+    // Order Basket Execution Assistant (Item 1.1d)
+    // -------------------------------------------------------------
+    const btnOrderBasket = document.getElementById("btnOrderBasket");
+    if (btnOrderBasket) {
+        btnOrderBasket.addEventListener("click", async () => {
+            try {
+                const res = await apiFetch("/api/order_basket");
+                if (res && res.orders && res.orders.length > 0) {
+                    const textToCopy = res.orders.map(o => o.order_text).join("\n");
+                    await navigator.clipboard.writeText(textToCopy);
+                    showToast(`Copied ${res.orders.length} BTST Order Slip(s) to Clipboard!`, "success");
+                } else {
+                    showToast("No active Priority 1/2 BTST candidates in basket", "info");
+                }
+            } catch (err) {
+                console.error("Order Basket error:", err);
+                showToast("Failed to fetch order basket", "error");
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // Closing Sequence Progress Stepper Widget (3:14 PM - 3:40 PM IST)
+    // -------------------------------------------------------------
+    async function updateClosingSequenceStepper() {
+        const stepper = document.getElementById("closingSequenceStepper");
+        const statusText = document.getElementById("closingSequenceStatusText");
+        if (!stepper) return;
+
+        try {
+            const state = await apiFetch("/api/closing_sequence/status");
+            if (!state) return;
+
+            const now = new Date();
+            const istHours = (now.getUTCHours() + 5 + Math.floor((now.getUTCMinutes() + 30) / 60)) % 24;
+            const istMins = (now.getUTCMinutes() + 30) % 60;
+            const timeInMins = istHours * 60 + istMins;
+            const isClosingWindow = timeInMins >= (15 * 60 + 10) && timeInMins <= (16 * 60);
+
+            if (isClosingWindow || state.snapshot_done || state.lock_done) {
+                stepper.classList.remove("hidden");
+            } else {
+                stepper.classList.add("hidden");
+                return;
+            }
+
+            const stepSnapshot = document.getElementById("stepSnapshot");
+            const stepCas = document.getElementById("stepCas");
+            const stepScoring = document.getElementById("stepScoring");
+            const stepLock = document.getElementById("stepLock");
+
+            if (state.snapshot_done && stepSnapshot) {
+                stepSnapshot.style.background = "rgba(16,185,129,0.25)";
+                stepSnapshot.style.color = "var(--bullish-green)";
+            }
+            if (state.cas_close_done && stepCas) {
+                stepCas.style.background = "rgba(16,185,129,0.25)";
+                stepCas.style.color = "var(--bullish-green)";
+            }
+            if (state.scoring_done && stepScoring) {
+                stepScoring.style.background = "rgba(16,185,129,0.25)";
+                stepScoring.style.color = "var(--bullish-green)";
+            }
+            if (state.lock_done && stepLock) {
+                stepLock.style.background = "rgba(16,185,129,0.25)";
+                stepLock.style.color = "var(--bullish-green)";
+                if (statusText) statusText.textContent = "3:40 PM LOCK COMPLETE";
+            } else if (statusText) {
+                statusText.textContent = "SEQUENCE IN PROGRESS";
+            }
+        } catch (e) {
+            console.error("Closing sequence stepper update error:", e);
+        }
+    }
+
+    setInterval(updateClosingSequenceStepper, 10000);
+    updateClosingSequenceStepper();
+
     fetchSplitAccuracy();
 });

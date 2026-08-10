@@ -129,7 +129,8 @@ def evaluate_5_pillar_matrix(
     pillar_weight_multipliers: Optional[Dict[str, float]] = None,
     required_weight_override: Optional[float] = None,
     institutional_flow_data: Optional[Dict[str, Any]] = None,
-    institutional_flow_shadow_mode: bool = True
+    institutional_flow_shadow_mode: bool = True,
+    macro_status: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
     Evaluates stock against the Refactored 5-Pillar Matrix (now 6, with Institutional Flow —
@@ -221,8 +222,10 @@ def evaluate_5_pillar_matrix(
         date_strs = pd.to_datetime(df_stock["Datetime"]).dt.strftime("%Y-%m-%d")
     elif "Date" in df_stock.columns:
         date_strs = pd.to_datetime(df_stock["Date"]).dt.strftime("%Y-%m-%d")
+    elif isinstance(df_stock.index, pd.RangeIndex) or str(df_stock.index.dtype).startswith("int"):
+        date_strs = pd.Series(["SESSION_1"] * len(df_stock), index=df_stock.index)
     else:
-        date_strs = pd.Series([str(i)[:10] for i in df_stock.index])
+        date_strs = pd.Series([str(i)[:10] for i in df_stock.index], index=df_stock.index)
 
     unique_dates = list(dict.fromkeys(date_strs))
     latest_date = unique_dates[-1] if unique_dates else None
@@ -284,8 +287,8 @@ def evaluate_5_pillar_matrix(
 
     # Tentative directional bias from VWAP + RSI, computed up front so direction-sensitive
     # pillars (3) only get credit when they agree with it, instead of confirming on magnitude alone.
-    bullish_bias = ltp > vwap and rsi >= 55
-    bearish_bias = ltp < vwap and rsi <= 45
+    bullish_bias = ltp > vwap and rsi >= 50
+    bearish_bias = ltp < vwap and rsi <= 50
 
     confirmed_pillars = []
     pillar_weights = {}
@@ -399,12 +402,18 @@ def evaluate_5_pillar_matrix(
     pillar_weights["Pillar 3: Relative Strength"] = p3_weight
 
     # =========================================================================
-    # PILLAR 4: Volume Spike vs 10-Day Average (5-min Surge)
+    # PILLAR 4: Volume Spike vs 10-Day Average (5-min Surge + MOC Persistence Check)
     # =========================================================================
-    p4_confirmed = vol_spike_ratio >= 1.8
+    # Discard single-bar MOC rebalancing spikes unless volume persistence >= 2 bars or surge >= 2.5x
+    vol_persistence_count = int((recent_candles['Volume'] >= (1.2 * vol_sma_20)).sum()) if 'Volume' in recent_candles.columns else 0
+    is_moc_single_spike = (vol_persistence_count < 2) and (vol_spike_ratio < 2.5)
+    
+    p4_confirmed = (vol_spike_ratio >= 1.8) and (not is_moc_single_spike)
     p4_weight = (1.0 * _mult("Pillar 4: Volume Spike")) if p4_confirmed else 0.0
     if p4_confirmed:
-        confirmed_pillars.append(f"Pillar 4: Vol Spike ({vol_spike_ratio}x)")
+        confirmed_pillars.append(f"Pillar 4: Vol Spike ({vol_spike_ratio}x, Persistence: {vol_persistence_count} bars)")
+    elif vol_spike_ratio >= 1.8 and is_moc_single_spike:
+        logger.info(f"[{clean_sym}] Single-bar MOC volume rebalancing spike detected ({vol_spike_ratio}x) — Pillar 4 rejected")
 
     pillar_weights["Pillar 4: Volume Spike"] = p4_weight
 
@@ -520,6 +529,23 @@ def evaluate_5_pillar_matrix(
             priority_level = "P2_MEDIUM"
             conviction_level = "MODERATE"
 
+    # =========================================================================
+    # GLOBAL MACRO RISK GATE: caps conviction when S&P 500 futures or India VIX spike
+    # =========================================================================
+    macro_gate_applied = None
+    if macro_status is not None:
+        vix_ok = macro_status.get("vix_ok", True)
+        sp500_green = macro_status.get("sp500_green", True)
+        if (not vix_ok or not sp500_green) and priority_level == "P1_HIGH":
+            reasons = []
+            if not vix_ok:
+                reasons.append("India VIX spiking > 5%")
+            if not sp500_green:
+                reasons.append("S&P 500 futures red")
+            macro_gate_applied = f"Capped P1_HIGH -> P2_MEDIUM (Global Macro Risk: {', '.join(reasons)})"
+            priority_level = "P2_MEDIUM"
+            conviction_level = "MODERATE"
+
     # Estimated Gap % Calculation
     est_gap = round(0.8 + (vol_spike_ratio * 0.5) + (abs(rsi - 50) * 0.04), 1)
     predicted_gap_pct = est_gap if (ltp >= vwap) else -est_gap
@@ -568,6 +594,7 @@ def evaluate_5_pillar_matrix(
         "fundamental_quality": {
             "verdict": fundamental_verdict,
             "gate_applied": fundamental_gate_applied,
+            "macro_gate_applied": macro_gate_applied,
             "sector": fundamental_data.get("sector") if fundamental_data else None,
             "trailing_pe": fundamental_data.get("trailingPE") if fundamental_data else None,
             "return_on_equity": fundamental_data.get("returnOnEquity") if fundamental_data else None,

@@ -28,8 +28,8 @@
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=17.0.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=17.0.0">
+    <link rel="stylesheet" href="/static/styles.css?v=18.0.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=18.0.0">
 
 </head>
 <body>
@@ -310,10 +310,27 @@
                     </button>
                 </div>
 
+                <!-- 3:14 - 3:40 PM Closing Sequence Progress Stepper Widget -->
+                <div class="closing-sequence-stepper hidden" id="closingSequenceStepper" style="background:rgba(22,25,31,0.85);border:1px solid rgba(212,175,55,0.3);border-radius:10px;padding:12px 18px;margin-bottom:14px;">
+                    <div style="font-size:12px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+                        <span><i class="fa-solid fa-clock-rotate-left"></i> 3:14 – 3:40 PM CLOSING LOCK SEQUENCE</span>
+                        <span id="closingSequenceStatusText" style="color:var(--ink-secondary);font-size:11px;">Monitoring...</span>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11px;font-weight:600;flex-wrap:wrap;">
+                        <span class="step-badge" id="stepSnapshot" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-camera"></i> 3:14 PM Snapshot</span>
+                        <i class="fa-solid fa-chevron-right text-muted"></i>
+                        <span class="step-badge" id="stepCas" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-calculator"></i> 3:35 PM CAS Close</span>
+                        <i class="fa-solid fa-chevron-right text-muted"></i>
+                        <span class="step-badge" id="stepScoring" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-award"></i> 3:36 PM Scoring</span>
+                        <i class="fa-solid fa-chevron-right text-muted"></i>
+                        <span class="step-badge" id="stepLock" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-lock"></i> 3:40 PM Lock</span>
+                    </div>
+                </div>
+
                 <!-- Controls & Filter Toolbar -->
                 <section class="toolbar-container">
-                    <!-- Toolbar Actions (Search & Sort) -->
-                    <div class="toolbar-actions">
+                    <!-- Toolbar Actions (Search & Sort & Order Basket) -->
+                    <div class="toolbar-actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                         <div class="search-box">
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <input type="text" id="searchInput" placeholder="Search Ticker (e.g. RELIANCE)...">
@@ -331,6 +348,10 @@
                                 <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
                             </select>
                         </div>
+
+                        <button class="action-btn" id="btnOrderBasket" style="font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;background:rgba(212,175,55,0.15);color:var(--accent-gold);border:1px solid rgba(212,175,55,0.4);cursor:pointer;display:flex;align-items:center;gap:6px;">
+                            <i class="fa-solid fa-basket-shopping"></i> Order Basket
+                        </button>
                     </div>
                     <div class="live-quick-filters hidden" id="liveQuickFilters" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
                         <button class="filter-pill-btn active" data-filter="GAINERS" style="font-size:12px;font-weight:800;padding:5px 16px;border-radius:20px;background:rgba(16,185,129,0.18);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.4);cursor:pointer;"><i class="fa-solid fa-arrow-trend-up"></i> TOP GAINERS</button>
@@ -1018,7 +1039,7 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=16.0.0"></script>
+    <script src="/static/app.js?v=18.0.0"></script>
 
 </body>
 </html>

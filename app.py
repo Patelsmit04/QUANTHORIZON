@@ -23,6 +23,7 @@ from net_utils import call_with_retry
 from candle_utils import fetch_post_lock_candles
 import closing_sequence
 import ws_broadcast
+from btst_engine import check_macro_guard
 from json_utils import atomic_write_json, read_json, json_file_lock
 from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json, pg_key_lock
 from scoring_engine import evaluate_5_pillar_matrix, get_liquidity_tier
@@ -679,6 +680,7 @@ def score_stock_universe(raw: Dict[str, Any], strategy: Dict[str, Any], oi_mult:
     effective_multipliers = compute_effective_pillar_multipliers(strategy, raw["dynamic_pillar_weights"])
     required_override = strategy.get("required_weight_override")
     use_fundamentals_gate = strategy.get("fundamentals_gate_enabled", True)
+    macro_status = raw.get("macro_status") or check_macro_guard()
 
     results = []
     for ticker in FO_STOCKS:
@@ -702,7 +704,8 @@ def score_stock_universe(raw: Dict[str, Any], strategy: Dict[str, Any], oi_mult:
                 pillar_weight_multipliers=effective_multipliers,
                 required_weight_override=required_override,
                 institutional_flow_data=institutional_flow,
-                institutional_flow_shadow_mode=INSTITUTIONAL_FLOW_SHADOW_MODE
+                institutional_flow_shadow_mode=INSTITUTIONAL_FLOW_SHADOW_MODE,
+                macro_status=macro_status
             )
             if processed and "confidence_score" in processed:
                 processed["strategy_id"] = strategy["id"]
@@ -1882,6 +1885,63 @@ def get_live_prices():
         "indices": index_prices,
         "btst_status": btst_status,
         "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
+    })
+
+
+@app.get("/api/closing_sequence/status")
+def get_closing_sequence_status():
+    """Returns the live status of the 5-step 3:14 PM -> 3:40 PM closing sequence."""
+    today_date = get_ist_now().strftime("%Y-%m-%d")
+    state = closing_sequence.get_today_state(today_date)
+    return sanitize_json_data(state)
+
+
+@app.get("/api/order_basket")
+def get_order_basket(risk_per_trade: float = Query(100000.0, description="Capital allocated per trade in INR")):
+    """
+    Generates structured, zero-slippage broker order slips for all active/locked BTST candidates.
+    Outputs Symbol, Transaction Type (BUY/SELL), Option Strike Type (CE/PE), Entry LTP,
+    Target Price (+1.5%), Stop Loss (-0.75%), and calculated Qty.
+    """
+    scan_data = cache_store.get("scan_summary") or load_last_market_scan()
+    stocks = (scan_data.get("stocks") or []) if isinstance(scan_data, dict) else []
+
+    btst_candidates = [s for s in stocks if (s.get("priority_level") in ["P1_HIGH", "P2_MEDIUM"]) and ("BTST" in s.get("signal", "") or "STBT" in s.get("signal", ""))]
+
+    baskets = []
+    for s in btst_candidates:
+        ltp = float(s.get("ltp", 0.0))
+        if ltp <= 0:
+            continue
+        signal = s.get("signal", "BTST (BUY)")
+        action = "BUY" if "BTST" in signal else "SELL"
+        option_type = s.get("option_type", "CALL (CE)")
+
+        target_price = round(ltp * 1.015, 2) if action == "BUY" else round(ltp * 0.985, 2)
+        stop_loss = round(ltp * 0.9925, 2) if action == "BUY" else round(ltp * 1.0075, 2)
+        qty = max(1, int(risk_per_trade / ltp))
+
+        baskets.append({
+            "symbol": s.get("symbol"),
+            "raw_ticker": s.get("raw_ticker", f"{s.get('symbol')}.NS"),
+            "priority_level": s.get("priority_level"),
+            "confidence_score": s.get("confidence_score"),
+            "signal": signal,
+            "action": action,
+            "option_type": option_type,
+            "entry_ltp": ltp,
+            "target_price": target_price,
+            "stop_loss": stop_loss,
+            "qty": qty,
+            "order_type": "LIMIT",
+            "validity": "DAY",
+            "order_text": f"{action} {qty} QTY {s.get('symbol')} @ ₹{ltp} | TP: ₹{target_price} (+1.5%) | SL: ₹{stop_loss} (-0.75%) [{option_type}]"
+        })
+
+    return sanitize_json_data({
+        "timestamp": get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST"),
+        "total_basket_orders": len(baskets),
+        "orders": baskets
     })
 
 @app.get("/api/indices/verdict")
