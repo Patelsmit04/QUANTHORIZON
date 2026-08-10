@@ -3325,3 +3325,59 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     background: rgba(212, 175, 55, 0.15);
     transform: scale(1.03);
 }
+
+/* Live Stock Boxes Grid — exact match to index ticker format */
+.live-stock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.live-stock-card {
+    background: rgba(18, 18, 20, 0.85);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    user-select: none;
+}
+
+.live-stock-card:hover {
+    transform: translateY(-2px);
+    background: rgba(26, 26, 30, 0.95);
+    border-color: rgba(212, 175, 55, 0.45);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.live-stock-card .symbol-name {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--ink-primary);
+    letter-spacing: 0.5px;
+}
+
+.live-stock-card .stock-price-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-heading);
+}
+
+.live-stock-card .stock-ltp {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink-primary);
+}
+
+.live-stock-card .stock-change {
+    font-weight: 700;
+    font-size: 13px;
+}
+

@@ -818,6 +818,28 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         });
                     }
+
+                    // Update live-stock-card elements in live stock grid in-place
+                    const liveStockGridContainer = document.getElementById("liveStockGridContainer");
+                    if (liveStockGridContainer && !liveStockGridContainer.classList.contains("hidden")) {
+                        const cards = liveStockGridContainer.querySelectorAll(".live-stock-card");
+                        cards.forEach(card => {
+                            const sym = card.dataset.symbol;
+                            const s = stockMap[sym];
+                            if (!s) return;
+                            const ltpEl = card.querySelector(".stock-ltp");
+                            const changeEl = card.querySelector(".stock-change");
+                            if (ltpEl && s.ltp != null) {
+                                ltpEl.textContent = `\u20B9${s.ltp.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                            }
+                            if (changeEl && s.change_pts != null && s.pct_change != null) {
+                                const isUp = s.change_pts >= 0;
+                                const sign = isUp ? "+" : "";
+                                changeEl.className = `stock-change ${isUp ? 'text-bullish' : 'text-bearish'}`;
+                                changeEl.textContent = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                            }
+                        });
+                    }
                 }
             }
         } catch (e) {
@@ -1033,6 +1055,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (visibleCount) visibleCount.textContent = filtered.length;
 
+        const scannerTableContainer = document.getElementById("scannerTableContainer");
+        const liveStockGridContainer = document.getElementById("liveStockGridContainer");
+
+        if (currentStockView === "live") {
+            if (scannerTableContainer) scannerTableContainer.classList.add("hidden");
+            if (liveStockGridContainer) liveStockGridContainer.classList.remove("hidden");
+            if (emptyState) emptyState.classList.add("hidden");
+            renderLiveStockGrid(filtered);
+            return;
+        } else {
+            if (scannerTableContainer) scannerTableContainer.classList.remove("hidden");
+            if (liveStockGridContainer) liveStockGridContainer.classList.add("hidden");
+        }
+
         stocksTableBody.innerHTML = "";
         
         if (filtered.length === 0) {
@@ -1132,19 +1168,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     </span>
                 </td>
                 <td data-label="TICKER">
-                    <div class="ticker-header-flex">
-                        <span class="symbol-name">
-                            ${escapeHtml(stock.symbol)}
-                            ${stock.rank_position <= 2 ? '<span class="text-gold priority-crown-badge"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
-                        </span>
-                        <span class="signal-badge-header ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
-                            ${escapeHtml(sigText)}
-                        </span>
-                        <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
-                        <button class="row-expand-toggle" aria-label="Expand details" aria-expanded="false">
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </button>
-                    </div>
+                    <span class="symbol-name">
+                        ${escapeHtml(stock.symbol)}
+                        ${stock.rank_position <= 2 ? '<span class="text-gold priority-crown-badge"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
+                    </span>
                 </td>
                 <td data-label="SIGNAL">
                     <span class="signal-badge ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
@@ -1184,9 +1211,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${flowChipHtml}
                 </td>
                 <td data-label="ACTION">
-                    <button class="btn btn-pill btn-secondary view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
+                    <button type="button" class="btn btn-sm btn-ghost view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="View Deep Analysis for ${stock.symbol}">
                         <i class="fa-solid fa-chart-line"></i>
-                        <span>VIEW DETAILS</span>
                     </button>
                 </td>
             `;
