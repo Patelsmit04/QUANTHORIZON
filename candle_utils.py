@@ -27,12 +27,17 @@ def fetch_post_lock_candles(ticker: str, lock_date: str, label: str, period: str
         lambda: yf.download(ticker, period=period, interval=interval, progress=False),
         label=label,
     )
+    
+    # Fallback to 1m interval right at 9:15 AM market open when 5m candle hasn't completed yet
+    if df is None or df.empty or len(df.dropna()) < 1:
+        df = call_with_retry(
+            lambda: yf.download(ticker, period="2d", interval="1m", progress=False),
+            label=f"{label} [1m fallback]",
+        )
+
     if df is None or df.empty:
         return None
 
-    # This yfinance version returns MultiIndex columns like ('Close', 'TICKER.NS') even for a
-    # single-ticker download — the field name is level 0, not the ticker, so flatten to level 0
-    # rather than trying to index by ticker.
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
 
@@ -45,4 +50,21 @@ def fetch_post_lock_candles(ticker: str, lock_date: str, label: str, period: str
     df["DateStr"] = df[time_col].astype(str).str.slice(0, 10)
 
     post_lock_df = df[df["DateStr"] > lock_date]
+
+    # If post_lock_df is empty with 5m interval, try 1m fallback
+    if post_lock_df.empty and interval != "1m":
+        df_1m = call_with_retry(
+            lambda: yf.download(ticker, period="2d", interval="1m", progress=False),
+            label=f"{label} [1m post-lock fallback]",
+        )
+        if df_1m is not None and not df_1m.empty:
+            if isinstance(df_1m.columns, pd.MultiIndex):
+                df_1m.columns = df_1m.columns.get_level_values(0)
+            df_1m = df_1m.dropna().copy()
+            if not df_1m.empty:
+                df_1m.reset_index(inplace=True)
+                tc = "Datetime" if "Datetime" in df_1m.columns else ("Date" if "Date" in df_1m.columns else df_1m.columns[0])
+                df_1m["DateStr"] = df_1m[tc].astype(str).str.slice(0, 10)
+                post_lock_df = df_1m[df_1m["DateStr"] > lock_date]
+
     return post_lock_df if not post_lock_df.empty else None

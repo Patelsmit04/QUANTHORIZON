@@ -214,45 +214,66 @@ def evaluate_5_pillar_matrix(
             "reason": "Insufficient intraday data"
         }
 
-    latest = df_stock.iloc[-1]
-    prev_close = float(df_stock.iloc[0]['Open'])
-    daily_high = float(df_stock['High'].max())
-    daily_low = float(df_stock['Low'].min())
+    # Split df_stock into trading sessions to isolate today's intraday bar
+    if isinstance(df_stock.index, pd.DatetimeIndex):
+        date_strs = df_stock.index.strftime("%Y-%m-%d")
+    elif "Datetime" in df_stock.columns:
+        date_strs = pd.to_datetime(df_stock["Datetime"]).dt.strftime("%Y-%m-%d")
+    elif "Date" in df_stock.columns:
+        date_strs = pd.to_datetime(df_stock["Date"]).dt.strftime("%Y-%m-%d")
+    else:
+        date_strs = pd.Series([str(i)[:10] for i in df_stock.index])
+
+    unique_dates = list(dict.fromkeys(date_strs))
+    latest_date = unique_dates[-1] if unique_dates else None
+
+    if latest_date:
+        df_today = df_stock[date_strs == latest_date].copy()
+        if len(unique_dates) >= 2:
+            prev_date = unique_dates[-2]
+            df_prev = df_stock[date_strs == prev_date]
+            prev_close = float(df_prev.iloc[-1]['Close']) if not df_prev.empty else float(df_today.iloc[0]['Open'])
+        else:
+            prev_close = float(df_today.iloc[0]['Open'])
+    else:
+        df_today = df_stock
+        prev_close = float(df_stock.iloc[0]['Open'])
+
+    if df_today.empty:
+        df_today = df_stock
+
+    latest = df_today.iloc[-1]
+    daily_high = float(df_today['High'].max())
+    daily_low = float(df_today['Low'].min())
     ltp = float(latest['Close'])
     
-    # Intraday Indicators
-    df_stock['Cum_Vol'] = df_stock['Volume'].cumsum()
-    df_stock['Cum_Vol_Price'] = (df_stock['Close'] * df_stock['Volume']).cumsum()
-    vwap = float(np.where(df_stock['Cum_Vol'] > 0, df_stock['Cum_Vol_Price'] / df_stock['Cum_Vol'], df_stock['Close'])[-1])
+    # Intraday VWAP (strictly for today's session)
+    df_today['Cum_Vol'] = df_today['Volume'].cumsum()
+    df_today['Cum_Vol_Price'] = (df_today['Close'] * df_today['Volume']).cumsum()
+    vwap = float(np.where(df_today['Cum_Vol'] > 0, df_today['Cum_Vol_Price'] / df_today['Cum_Vol'], df_today['Close'])[-1])
     
-    # Baseline EXCLUDES the trailing 6-candle window used by the spike/persistence checks below —
-    # otherwise the "spike" is counted inside its own baseline average, which mechanically damps
-    # the computed ratio. This is an intraday same-session baseline (NOT a true cross-day 10-day
-    # average — no multi-day intraday volume history is fetched here).
-    _recent_window_size = min(6, len(df_stock))
-    _baseline_candles = df_stock.iloc[:-_recent_window_size] if len(df_stock) > _recent_window_size else df_stock
-    vol_sma_20 = float(_baseline_candles['Volume'].tail(20).mean()) if not _baseline_candles.empty else float(df_stock['Volume'].mean())
+    # Baseline EXCLUDES trailing candles
+    _recent_window_size = min(6, len(df_today))
+    _baseline_candles = df_today.iloc[:-_recent_window_size] if len(df_today) > _recent_window_size else df_today
+    vol_sma_20 = float(_baseline_candles['Volume'].tail(20).mean()) if not _baseline_candles.empty else float(df_today['Volume'].mean())
     vol_sma_20 = max(1.0, vol_sma_20)
 
-    # Calculate RSI (14)
-    delta = df_stock['Close'].diff()
+    # Calculate RSI (14) on session candles
+    delta = df_today['Close'].diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
     rs = gain / loss.replace(0, np.nan)
     rsi_series = 100 - (100 / (1 + rs))
     rsi = float(rsi_series.fillna(50.0).iloc[-1])
 
-    # Trailing candles as of whenever this scan runs (near close during the 3:30 PM lock window,
-    # but this same function also runs on every intraday 5-min/1-min scan tick).
-    recent_candles = df_stock.iloc[-min(4, len(df_stock)):]
+    # Trailing candles for volume spike
+    recent_candles = df_today.iloc[-min(4, len(df_today)):]
     max_recent_vol = float(recent_candles['Volume'].max())
     vol_spike_ratio = round(max_recent_vol / vol_sma_20, 2)
 
-    stock_pct_change = round(((ltp - prev_close) / prev_close) * 100, 2)
+    stock_pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
     
-    # =========================================================================
-    # FIX FOR ISSUE #3: MARUBOZU RANGE POSITION PERCENTAGE (0% to 100%)
-    # =========================================================================
+    # Marubozu Range Position (0% to 100% on today's High/Low)
     day_range = daily_high - daily_low
     if day_range > 0:
         range_position_pct = round(max(0.0, min(100.0, ((ltp - daily_low) / day_range) * 100.0)), 2)

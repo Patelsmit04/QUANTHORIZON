@@ -79,6 +79,8 @@ async def lifespan(app_instance: FastAPI):
         thread.start()
         eval_thread = threading.Thread(target=evaluation_scheduler_worker, daemon=True)
         eval_thread.start()
+        live_ticker_thread = threading.Thread(target=live_price_ticker_worker, daemon=True)
+        live_ticker_thread.start()
     yield
     shutdown_event.set()
 
@@ -1264,6 +1266,62 @@ def background_scheduler_worker():
         except Exception as e:
             logger.error(f"Error in background scheduler worker: {e}")
             time.sleep(15)
+
+
+# -------------------------------------------------------------
+# DEDICATED 10-SECOND LIVE PRICE TICKER WORKER THREAD
+# -------------------------------------------------------------
+def live_price_ticker_worker():
+    """
+    Lightweight 10-second background ticker worker that runs continuously during market hours
+    to update live LTP, change_pts, and pct_change for all 210 F&O stocks and indices in memory.
+    Ensures the UI live feed and marquee tape receive accurate, real-time tick updates every 10 seconds.
+    """
+    logger.info("Starting Dedicated 10-Second Live Price Ticker Worker Thread...")
+    while not shutdown_event.is_set():
+        try:
+            sched_info = get_market_schedule_info()
+            if sched_info["is_open"]:
+                # Fast 1m quote download for F&O stock universe
+                try:
+                    tickers = [f"{s}.NS" if not s.endswith(".NS") else s for s in FO_STOCKS]
+                    download_df = call_with_retry(
+                        lambda: yf.download(tickers=tickers, period="2d", interval="1m", group_by="ticker", progress=False, threads=True),
+                        label="live 10s ticker fast download",
+                        timeout=10.0,
+                    )
+                    if download_df is not None and not download_df.empty:
+                        existing_stocks = cache_store.get("data") or []
+                        stock_map = {s["symbol"]: s for s in existing_stocks if isinstance(s, dict)}
+
+                        for sym in FO_STOCKS:
+                            raw_t = f"{sym}.NS"
+                            sub_df = None
+                            if isinstance(download_df.columns, pd.MultiIndex):
+                                if raw_t in download_df.columns.levels[0]:
+                                    sub_df = download_df[raw_t].dropna()
+                            elif raw_t in download_df.columns:
+                                sub_df = download_df.dropna()
+
+                            if sub_df is not None and not sub_df.empty:
+                                ltp = float(sub_df.iloc[-1]["Close"])
+                                prev_close = float(sub_df.iloc[0]["Open"])
+                                change_pts = round(ltp - prev_close, 2)
+                                pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
+                                if sym in stock_map:
+                                    stock_map[sym]["ltp"] = round(ltp, 2)
+                                    stock_map[sym]["prev_close"] = round(prev_close, 2)
+                                    stock_map[sym]["change_pts"] = change_pts
+                                    stock_map[sym]["pct_change"] = pct_change
+
+                        cache_store["live_prices_timestamp"] = time.time()
+                except Exception as e:
+                    logger.warning(f"[LiveTickerWorker] Fast stock price tick warning: {e}")
+
+            time.sleep(10)
+        except Exception as e:
+            logger.error(f"Error in live_price_ticker_worker: {e}")
+            time.sleep(10)
 
 
 # -------------------------------------------------------------

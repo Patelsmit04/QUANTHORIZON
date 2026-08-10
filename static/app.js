@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Application State
     let allStocks = [];
     let currentFilter = "ALL";
+    let currentStockView = "intelligence"; // "intelligence" or "live"
     let autoRefreshInterval = null;
     let newsRefreshInterval = null;
     // Strategy cards rebuild #strategyGrid from scratch on every toggle/edit action, so
@@ -477,6 +478,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const stockSectionSwitcher = document.getElementById("stockSectionSwitcher");
+    if (stockSectionSwitcher) {
+        stockSectionSwitcher.addEventListener("click", (e) => {
+            const btn = e.target.closest(".index-tab-btn");
+            if (!btn) return;
+            stockSectionSwitcher.querySelectorAll(".index-tab-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentStockView = btn.dataset.stockView || "intelligence";
+            filterAndRenderTable();
+        });
+    }
+
     if (addStrategyBtn) addStrategyBtn.addEventListener("click", () => openStrategyForm(null));
     if (closeStrategyFormBtn) closeStrategyFormBtn.addEventListener("click", () => strategyFormModal.classList.add("hidden"));
     if (strategyForm) strategyForm.addEventListener("submit", submitStrategyForm);
@@ -915,11 +928,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const sortKey = sortSelect ? sortSelect.value : "RANK_ASC";
 
         let filtered = allStocks.filter(stock => {
-            if (currentFilter === "BTST") return stock.signal && stock.signal.includes("BTST");
-            if (currentFilter === "STBT") return stock.signal && stock.signal.includes("STBT");
-            if (currentFilter === "HIGH_VOL") return (stock.volume_spike || 0) >= 2.0;
-            if (currentFilter === "PRIORITY1") return stock.priority_level === "P1_HIGH";
-            return true;
+            if (currentStockView === "intelligence") {
+                if (currentFilter === "BTST") return stock.signal && stock.signal.includes("BTST");
+                if (currentFilter === "STBT") return stock.signal && stock.signal.includes("STBT");
+                if (currentFilter === "HIGH_VOL") return (stock.volume_spike || 0) >= 2.0;
+                if (currentFilter === "PRIORITY1") return stock.priority_level === "P1_HIGH";
+                // Show High Conviction (P1/P2) + Active Signals in Intelligence View
+                return stock.priority_level === "P1_HIGH" || stock.priority_level === "P2_MEDIUM" || (stock.signal && stock.signal !== "WATCHLIST");
+            } else {
+                // Live View: show ALL 210 F&O live stocks, filtered by toolbar if user selected one
+                if (currentFilter === "BTST") return stock.signal && stock.signal.includes("BTST");
+                if (currentFilter === "STBT") return stock.signal && stock.signal.includes("STBT");
+                if (currentFilter === "HIGH_VOL") return (stock.volume_spike || 0) >= 2.0;
+                if (currentFilter === "PRIORITY1") return stock.priority_level === "P1_HIGH";
+                return true;
+            }
         });
 
         if (searchTerm) {
