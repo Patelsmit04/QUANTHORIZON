@@ -502,7 +502,8 @@ class TradeHistoryManager:
         neutrals = sum(1 for t in completed if t.get("outcome") == "NEUTRAL")
         
         total_completed = len(completed)
-        win_rate = round((wins / total_completed * 100), 1) if total_completed > 0 else 75.0
+        decisive_trades = wins + losses
+        win_rate = round((wins / decisive_trades * 100), 1) if decisive_trades > 0 else 75.0
         
         gaps = [t["gap_pct"] for t in completed if t.get("gap_pct") is not None]
         avg_gap = round(sum(gaps) / len(gaps), 2) if gaps else 0.0
