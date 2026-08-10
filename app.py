@@ -1884,6 +1884,11 @@ def get_live_prices():
         "stocks": stock_prices,
         "indices": index_prices,
         "btst_status": btst_status,
+        "data_feed_info": {
+            "primary_provider": "Yahoo Finance / NSE Live Proxy",
+            "feed_type": "15-Min Delayed Free Tier (Equities)",
+            "disclaimer": "Free tier data operates under 15-minute delay policies. For zero-latency 3:29 PM execution, wire a direct broker API."
+        },
         "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
     })
 

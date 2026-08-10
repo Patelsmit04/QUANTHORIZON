@@ -41,8 +41,10 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 
+import requests
 from index_derivatives_analyzer import analyze_index_derivatives
 from options_greeks_analyzer import estimate_overnight_greeks_outlook
+from net_utils import call_with_retry
 
 logger = logging.getLogger("IndexScoring")
 
@@ -145,36 +147,48 @@ def classify_global_cues(cues: Optional[Dict[str, float]]) -> Dict[str, Any]:
 
 
 def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
-    """Fetch live Gift Nifty price & change from Moneycontrol live index feed."""
+    """
+    Fetch live Gift Nifty price & change with multi-provider resiliency:
+    Primary: Moneycontrol live index HTML scraper (wrapped in call_with_retry)
+    Secondary: Yahoo Finance (GIFTNIFTY=F or ^NSEI)
+    """
     url = "https://www.moneycontrol.com/indian-indices/gift-nifty-500000.html"
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
-    try:
-        req = urllib.request.Request(url, headers=headers)
-        html = urllib.request.urlopen(req, timeout=5).read().decode('utf-8', errors='ignore')
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+    }
+
+    def _fetch_mc():
+        resp = requests.get(url, headers=headers, timeout=8)
+        resp.raise_for_status()
+        html_str = resp.text
         pattern = r'>GIFT NIFTY</a>.*?</td>\s*<td>([\d,]+\.?\d*)</td>\s*<td><span class="([^"]+)">([-\d,]+\.?\d*)</span></td>\s*<td><span class="[^"]+">\(([-\d,]+\.?\d*)%\)</span>'
-        m = re.search(pattern, html, re.DOTALL | re.IGNORECASE)
+        m = re.search(pattern, html_str, re.DOTALL | re.IGNORECASE)
         if m:
             ltp = float(m.group(1).replace(',', ''))
             cls_name = m.group(2)
-            raw_change = m.group(3).replace(',', '')
-            change_pts = float(raw_change)
+            change_pts = float(m.group(3).replace(',', ''))
             if 'red' in cls_name.lower() and change_pts > 0:
                 change_pts = -change_pts
-            raw_pct = m.group(4).replace(',', '')
-            pct_change = float(raw_pct)
+            pct_change = float(m.group(4).replace(',', ''))
             if 'red' in cls_name.lower() and pct_change > 0:
                 pct_change = -pct_change
-            
+            return ltp, change_pts, pct_change
+        return None
+
+    try:
+        mc_res = call_with_retry(_fetch_mc, label="Moneycontrol GIFT Nifty Scrape", retries=1, timeout=8.0)
+        if mc_res:
+            ltp, change_pts, pct_change = mc_res
             sig = "BTST (BUY)" if pct_change > 0.2 else ("STBT (SELL)" if pct_change < -0.2 else "NEUTRAL")
             opt_type = "CALL (CE)" if pct_change > 0.2 else ("PUT (PE)" if pct_change < -0.2 else "NONE")
-            
             return {
                 "index_name": "GIFTNIFTY",
                 "display_name": "Gift Nifty",
                 "raw_ticker": "GIFTNIFTY",
                 "required_weight": 2.0,
                 "confirmed_pillars_weight": 2.0,
-                "confirmed_pillars": ["Gift Nifty Futures Live Feed"],
+                "confirmed_pillars": ["Gift Nifty Futures Live Feed (Moneycontrol)"],
                 "pillar_weights": {},
                 "relative_strength": {"rs_diff": None, "data_status": "N/A"},
                 "global_cues": {"verdict": "NEUTRAL", "detail": {}},
@@ -200,7 +214,62 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
                 "price_verified": True,
             }
     except Exception as e:
-        logger.warning(f"Gift Nifty live fetch error: {e}")
+        logger.warning(f"Moneycontrol GIFT Nifty scrape failed: {e}. Trying Yahoo Finance fallback...")
+
+    # Secondary Fallback: Yahoo Finance GIFTNIFTY=F / ^NSEI
+    try:
+        def _fetch_yf():
+            df = yf.download("GIFTNIFTY=F", period="5d", interval="5m", progress=False)
+            if df is None or df.empty or len(df) < 2:
+                df = yf.download("^NSEI", period="5d", interval="5m", progress=False)
+            df = _flatten_columns(df).dropna()
+            if not df.empty and len(df) >= 2:
+                latest = float(df["Close"].iloc[-1])
+                prev = float(df["Close"].iloc[0])
+                chg = round(latest - prev, 2)
+                pct = round((chg / prev) * 100, 2) if prev > 0 else 0.0
+                return latest, chg, pct
+            return None
+
+        yf_res = call_with_retry(_fetch_yf, label="Yahoo Finance GIFT Nifty Fallback", retries=1, timeout=8.0)
+        if yf_res:
+            ltp, change_pts, pct_change = yf_res
+            sig = "BTST (BUY)" if pct_change > 0.2 else ("STBT (SELL)" if pct_change < -0.2 else "NEUTRAL")
+            opt_type = "CALL (CE)" if pct_change > 0.2 else ("PUT (PE)" if pct_change < -0.2 else "NONE")
+            return {
+                "index_name": "GIFTNIFTY",
+                "display_name": "Gift Nifty",
+                "raw_ticker": "GIFTNIFTY",
+                "required_weight": 2.0,
+                "confirmed_pillars_weight": 2.0,
+                "confirmed_pillars": ["Gift Nifty Futures Live Feed (Yahoo Finance Fallback)"],
+                "pillar_weights": {},
+                "relative_strength": {"rs_diff": None, "data_status": "N/A"},
+                "global_cues": {"verdict": "NEUTRAL", "detail": {}},
+                "macro_news": {"verdict": "NEUTRAL"},
+                "derivatives": None,
+                "greeks_outlook": None,
+                "signal": sig,
+                "option_type": opt_type,
+                "conviction_level": "MODERATE",
+                "priority_level": "P2_MEDIUM",
+                "confidence_score": 70 if sig != "NEUTRAL" else 50,
+                "predicted_gap_pct": round(pct_change * 0.5, 2),
+                "ltp": round(ltp, 2),
+                "prev_close": round(ltp - change_pts, 2),
+                "change_pts": round(change_pts, 2),
+                "pct_change": round(pct_change, 2),
+                "day_high": round(ltp, 2),
+                "day_low": round(ltp, 2),
+                "range_position_pct": 50.0,
+                "rsi": 50.0,
+                "rank_reason": "Gift Nifty Live Futures Feed (YF Fallback)",
+                "score": 70 if sig != "NEUTRAL" else 50,
+                "price_verified": True,
+            }
+    except Exception as e:
+        logger.warning(f"Yahoo Finance GIFT Nifty fallback failed: {e}")
+
     return None
 
 

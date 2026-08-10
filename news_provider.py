@@ -36,6 +36,7 @@ from json_utils import atomic_write_json, read_json
 from env_utils import load_env_with_fallback, DATA_DIR
 from lock_utils import file_lock
 from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json
+from net_utils import call_with_retry
 
 BASE_DIR = Path(__file__).resolve().parent
 load_env_with_fallback(str(BASE_DIR))
@@ -96,11 +97,12 @@ def _api_available() -> bool:
 
 
 def _search(keywords: str, max_results: int = 8) -> Optional[List[Dict[str, Any]]]:
-    """Raw CurrentsAPI search call. Returns None on any failure — FAIL LOUD, never fabricated."""
+    """Raw CurrentsAPI search call wrapped in call_with_retry. Returns None on failure — FAIL LOUD."""
     key = get_api_key()
     if not key:
         return None
-    try:
+
+    def _do_fetch():
         resp = requests.get(
             f"{CURRENTS_API_BASE}/search",
             params={"keywords": keywords, "language": "en", "apiKey": key},
@@ -116,6 +118,9 @@ def _search(keywords: str, max_results: int = 8) -> Optional[List[Dict[str, Any]
             logger.warning(f"CurrentsAPI returned non-ok status for '{keywords}': {data.get('status')}")
             return None
         return data.get("news", [])[:max_results]
+
+    try:
+        return call_with_retry(_do_fetch, label=f"CurrentsAPI [{keywords}]", retries=2, timeout=15.0)
     except Exception as e:
         logger.warning(f"CurrentsAPI search failed for '{keywords}': {e}")
         return None
