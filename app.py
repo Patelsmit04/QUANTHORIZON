@@ -1785,10 +1785,19 @@ def get_index_signals():
 @app.get("/api/live_prices")
 def get_live_prices():
     """Lightweight endpoint for 10-second polling — returns only LTP, change_pts, pct_change
-    for all cached indices and stocks from the in-memory cache. No yfinance calls, no scoring —
-    purely a cache read so it can be called every 10 seconds without load."""
-    # Index prices from cache
+    for all cached indices and stocks. If cache is empty (e.g. on serverless/cold restart),
+    fetches live quotes on-demand so live numbers are NEVER empty or stuck on remote deployments."""
+    # 1. Index prices from cache or fallback
     index_data = cache_store.get("index_data") or []
+    if not index_data:
+        try:
+            raw_idx = fetch_raw_index_universe()
+            scored_idx = score_index_universe(raw_idx)
+            index_data = scored_idx
+            cache_store["index_data"] = scored_idx
+        except Exception as e:
+            logger.warning(f"On-demand index fetch warning in /api/live_prices: {e}")
+
     index_prices = []
     for idx in index_data:
         if isinstance(idx, dict):
@@ -1800,9 +1809,47 @@ def get_live_prices():
                 "prev_close": idx.get("prev_close"),
             })
 
-    # Stock prices from cache
+    # 2. Stock prices from cache or on-demand fetch
     stock_data = cache_store.get("data") or []
     live_map = cache_store.get("live_prices_map") or {}
+
+    # If both cache sources are empty (e.g. Vercel serverless cold start), fetch 1m quotes on demand!
+    if not stock_data and not live_map:
+        try:
+            tickers = [f"{s}.NS" if not s.endswith(".NS") else s for s in FO_STOCKS]
+            download_df = call_with_retry(
+                lambda: yf.download(tickers=tickers, period="2d", interval="1m", group_by="ticker", progress=False, threads=True),
+                label="on-demand live_prices fetch",
+                timeout=10.0,
+            )
+            if download_df is not None and not download_df.empty:
+                new_map = {}
+                for sym in FO_STOCKS:
+                    raw_t = f"{sym}.NS"
+                    sub_df = None
+                    if isinstance(download_df.columns, pd.MultiIndex):
+                        if raw_t in download_df.columns.levels[0]:
+                            sub_df = download_df[raw_t].dropna()
+                    elif raw_t in download_df.columns:
+                        sub_df = download_df.dropna()
+
+                    if sub_df is not None and not sub_df.empty:
+                        ltp = float(sub_df.iloc[-1]["Close"])
+                        prev_close = float(sub_df.iloc[0]["Open"])
+                        change_pts = round(ltp - prev_close, 2)
+                        pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
+                        new_map[sym] = {
+                            "symbol": sym,
+                            "ltp": round(ltp, 2),
+                            "prev_close": round(prev_close, 2),
+                            "change_pts": change_pts,
+                            "pct_change": pct_change,
+                        }
+                cache_store["live_prices_map"] = new_map
+                live_map = new_map
+        except Exception as e:
+            logger.warning(f"On-demand stock fetch in /api/live_prices failed: {e}")
+
     stock_prices = []
     if stock_data:
         for s in stock_data:
@@ -1819,7 +1866,7 @@ def get_live_prices():
             if isinstance(s, dict):
                 stock_prices.append(s)
 
-    # BTST status
+    # 3. BTST status
     ist_now = get_ist_now()
     time_in_mins = ist_now.hour * 60 + ist_now.minute
     is_weekday = ist_now.weekday() not in [5, 6]
@@ -1831,10 +1878,10 @@ def get_live_prices():
         btst_status = "confirmed"
 
     return sanitize_json_data({
-        "indices": index_prices,
         "stocks": stock_prices,
+        "indices": index_prices,
         "btst_status": btst_status,
-        "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST"),
+        "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
     })
 
 @app.get("/api/indices/verdict")
