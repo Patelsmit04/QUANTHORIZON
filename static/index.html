@@ -78,9 +78,9 @@
                     <span class="nav-label">Institutional Flow</span>
                     <span class="nav-badge" id="institutionalFlowNavBadge">--</span>
                 </button>
-                <button class="sidebar-nav-item" data-section="orderFlow" title="Order Flow Veto">
+                <button class="sidebar-nav-item" data-section="orderFlow" title="Order Flow">
                     <i class="fa-solid fa-bolt text-gold"></i>
-                    <span class="nav-label">Order Flow Veto</span>
+                    <span class="nav-label">Order Flow</span>
                     <span class="nav-badge" id="orderFlowNavBadge">0 PASS</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="accuracy" title="Accuracy & Win Rate">
@@ -495,16 +495,14 @@
                         </table>
                     </div>
                 </div>
-
-                </div>
             </div>
             <!-- ============================== END INSTITUTIONAL FLOW SECTION ============================== -->
 
-            <!-- ============================== ORDER FLOW VETO INTELLIGENCE SECTION ============================== -->
+            <!-- ============================== ORDER FLOW SECTION ============================== -->
             <div id="orderFlowSection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW VETO INTELLIGENCE
-                        <span class="section-page-subtitle">Zerodha Kite Connect 3:15–3:25 PM Closing Aggression &amp; 5-Level Depth Analysis</span>
+                    <h2 class="section-page-title"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW
+                        <span class="section-page-subtitle">Zerodha Kite 3:15–3:25 PM Closing Aggression &amp; 5-Level Depth Analysis</span>
                     </h2>
                 </div>
 
@@ -551,10 +549,22 @@
                     <!-- Dynamic Cards Injected by JS -->
                 </div>
 
-                <div id="orderFlowEmptyState" class="empty-state hidden">
-                    <i class="fa-solid fa-shield-halved fa-3x text-gold"></i>
-                    <h3>No Active Order Flow Setups</h3>
-                    <p>Zerodha Kite 5-Level Depth closing aggression monitoring runs during 3:15–3:25 PM IST. Outside this window or prior to close, setups build dynamically.</p>
+                <div id="orderFlowEmptyState" class="empty-state hidden" style="padding: 50px 24px; border-radius: var(--radius-lg); background: var(--glass-bg); border: 1px solid var(--glass-border); margin-top: 16px;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--gold-bg); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                        <i class="fa-solid fa-bolt fa-2x text-gold"></i>
+                    </div>
+                    <h3 style="font-family: var(--font-heading); font-size: 18px; font-weight: 800; color: var(--ink-primary); margin-bottom: 6px;">No Active Order Flow Setups Found</h3>
+                    <p style="font-size: 12px; color: var(--ink-secondary); max-width: 480px; line-height: 1.6; margin-bottom: 16px;">
+                        Zerodha Kite 5-Level Depth closing aggression &amp; tick-rule delta monitoring active window is <strong>3:15 PM – 3:25 PM IST</strong>. Outside the closing window, candidates build dynamically.
+                    </p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--bullish); border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">
+                            <i class="fa-solid fa-circle-check" style="margin-right: 4px;"></i> WebSocket Stream Ready
+                        </span>
+                        <span class="badge" style="background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(212, 175, 55, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">
+                            <i class="fa-solid fa-clock" style="margin-right: 4px;"></i> 3:15 PM Power Hour Trigger
+                        </span>
+                    </div>
                 </div>
             </div>
             <!-- ============================== END ORDER FLOW SECTION ============================== -->

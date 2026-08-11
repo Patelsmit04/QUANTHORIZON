@@ -42,9 +42,27 @@ def test_bulk_deal_10cr_threshold_triggers_weak_tier():
         "symbol": "RELIANCE",
         "side": "BUY",
         "value_cr": 12.5,
-        "deal_type": "bulk"
+        "deal_type": "block"
     }]
     aggregated = aggregate_symbol_flows(records)
     assert "RELIANCE" in aggregated
     assert aggregated["RELIANCE"]["tier"] == "WEAK"
     assert aggregated["RELIANCE"]["net_value_cr"] == 12.5
+
+
+def test_marubozu_85_pct_threshold():
+    dates = pd.date_range("2026-08-10 09:15", periods=50, freq="5min")
+    date_strings = [d.strftime("%Y-%m-%d") for d in dates]
+    closes = np.linspace(100, 108.5, 50)  # Range position ~85%
+    df_stock = pd.DataFrame({
+        "Date": date_strings,
+        "Open": closes - 0.1,
+        "High": [110.0] * 50,
+        "Low": [100.0] * 50,
+        "Close": closes,
+        "Volume": [1000] * 50
+    }, index=dates)
+
+    res = evaluate_5_pillar_matrix("RELIANCE", df_stock)
+    assert res["pillar_weights"]["Pillar 5: Marubozu Close"] > 0
+    assert any("Marubozu Close" in p for p in res["confirmed_pillars"])

@@ -236,7 +236,7 @@ def get_per_stock_oi_data(symbol: str, fetch_online: bool = False) -> Optional[D
             return {
                 "oi_pct_change": latest_oi_proxy,
                 "avg_10d_oi_pct": avg_10d,
-                "source": "VOLUME_PROXY_HISTORY",
+                "source": "VOLUME_PROXY_HISTORY_FALLBACK",
                 "history_depth": len(past_10),
                 "age_days": age_days,
                 "stale": age_days > 1,
@@ -294,7 +294,7 @@ def get_per_stock_oi_data(symbol: str, fetch_online: bool = False) -> Optional[D
     return {
         "oi_pct_change": oi_pct_proxy,
         "avg_10d_oi_pct": avg_10d_oi_pct,
-        "source": "VOLUME_PROXY",
+        "source": "VOLUME_PROXY_FALLBACK",
         "history_depth": min(10, len(volumes)),
         "age_days": 0,
         "stale": False,

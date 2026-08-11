@@ -162,8 +162,8 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
         resp = requests.get(url, headers=headers, timeout=8)
         resp.raise_for_status()
         html_str = resp.text
-        pattern = r'>GIFT NIFTY</a>.*?</td>\s*<td>([\d,]+\.?\d*)</td>\s*<td><span class="([^"]+)">([-\d,]+\.?\d*)</span></td>\s*<td><span class="[^"]+">\(([-\d,]+\.?\d*)%\)</span>'
-        m = re.search(pattern, html_str, re.DOTALL | re.IGNORECASE)
+        p1 = r'>GIFT NIFTY</a>.*?</td>\s*<td>([\d,]+\.?\d*)</td>\s*<td><span class="([^"]+)">([-\d,]+\.?\d*)</span></td>\s*<td><span class="[^"]+">\(([-\d,]+\.?\d*)%\)</span>'
+        m = re.search(p1, html_str, re.DOTALL | re.IGNORECASE)
         if m:
             ltp = float(m.group(1).replace(',', ''))
             cls_name = m.group(2)
@@ -174,6 +174,15 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
             if 'red' in cls_name.lower() and pct_change > 0:
                 pct_change = -pct_change
             return ltp, change_pts, pct_change
+        
+        p2 = r'GIFT\s*NIFTY.*?([\d,]+\.\d{2}).*?([+-]?[\d,]+\.\d{2}).*?\(([+-]?[\d,]+\.\d{2})%\)'
+        m2 = re.search(p2, html_str, re.DOTALL | re.IGNORECASE)
+        if m2:
+            ltp = float(m2.group(1).replace(',', ''))
+            change_pts = float(m2.group(2).replace(',', ''))
+            pct_change = float(m2.group(3).replace(',', ''))
+            return ltp, change_pts, pct_change
+
         return None
 
     try:

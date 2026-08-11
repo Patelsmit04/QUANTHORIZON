@@ -817,7 +817,7 @@
     .filter-group .filter-chip,
     #ofFilterGroup .filter-chip {
         min-height: 36px !important;
-        padding: 6px 12px !important;
+        padding: 6px 14px !important;
         border-radius: 20px !important;
         font-size: 11px !important;
         font-weight: 700 !important;
@@ -832,8 +832,42 @@
     .filter-group .filter-chip.active,
     #ofFilterGroup .filter-chip.active {
         background: var(--gold-bg) !important;
-        color: var(--gold) !important;
+        color: var(--gold-bright) !important;
         border-color: var(--gold) !important;
+        box-shadow: 0 0 12px rgba(212, 175, 55, 0.25) !important;
+    }
+
+    /* Light Theme Mobile Audit Overrides */
+    [data-theme="light"] .filter-group .filter-chip,
+    [data-theme="light"] #ofFilterGroup .filter-chip {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
+    }
+
+    [data-theme="light"] .filter-group .filter-chip.active,
+    [data-theme="light"] #ofFilterGroup .filter-chip.active {
+        background: #0f172a !important;
+        color: #ffffff !important;
+        border-color: #0f172a !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+    }
+
+    [data-theme="light"] .stat-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+    }
+
+    [data-theme="light"] .stock-card {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    [data-theme="light"] .content-topbar {
+        background: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
     }
 
     .order-flow-cards-grid {

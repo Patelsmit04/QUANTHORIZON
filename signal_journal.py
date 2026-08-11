@@ -19,8 +19,8 @@ from typing import Dict, List, Any, Optional, Tuple
 import pandas as pd
 import yfinance as yf
 try:
-    from psycopg.rows import dict_row
-except ImportError:
+    from psycopg.rows import dict_row  # type: ignore
+except (ImportError, ModuleNotFoundError):
     dict_row = None
 
 from strategy_manager import DEFAULT_STRATEGY_ID
@@ -916,6 +916,16 @@ def evaluate_pending_signals() -> Dict[str, Any]:
             try:
                 post_lock_df = fetch_post_lock_candles(ticker, sig["signal_date"], label=f"evaluate_pending_signals [{ticker}]")
                 if post_lock_df is None:
+                    # If signal is from a prior date but no post-lock candle data exists (halted/delisted),
+                    # record an evaluation row to prevent orphan pending status.
+                    cursor.execute(upsert_signal_eval_sql, (
+                        sig["id"],
+                        today_date_str,
+                        time.strftime("%Y-%m-%d %H:%M:%S IST"),
+                        0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0, 0.0, 0.0, 3.0, 0.0, 0.0, 0
+                    ))
+                    evaluated_count += 1
+                    logger.warning(f"[Evaluation] Signal {sig['id']} ({ticker}): No post-lock market data available — recorded as EVAL_SKIPPED_NO_DATA.")
                     continue
 
                 open_915 = float(post_lock_df.iloc[0]['Open'])
@@ -928,6 +938,13 @@ def evaluate_pending_signals() -> Dict[str, Any]:
                 low_day = float(post_lock_df['Low'].min())
 
                 if close_325 <= 0 or open_915 <= 0:
+                    cursor.execute(upsert_signal_eval_sql, (
+                        sig["id"],
+                        today_date_str,
+                        time.strftime("%Y-%m-%d %H:%M:%S IST"),
+                        0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0, 0.0, 0.0, 3.0, 0.0, 0.0, 0
+                    ))
+                    evaluated_count += 1
                     continue
 
                 actual_gap = round(((open_915 - close_325) / close_325) * 100, 2)
@@ -964,11 +981,12 @@ def evaluate_pending_signals() -> Dict[str, Any]:
                 net_pnl = round(gross_pnl - (2 * spread_haircut), 2)
                 is_win = 1 if net_pnl > 0 else 0
 
-                postmortem_reason = (
-                    f"WIN: {pred_direction} gap {actual_gap}% matched predicted direction."
-                    if is_win else
-                    f"LOSS: {pred_direction} gap {actual_gap}% contradicted direction."
-                )
+                if pred_direction == "BULLISH":
+                    outcome_grade = "JACKPOT WIN" if actual_gap >= 1.5 else ("WIN" if actual_gap >= 0.5 else ("NEUTRAL" if -0.3 <= actual_gap < 0.5 else "LOSS"))
+                else:
+                    outcome_grade = "JACKPOT WIN" if actual_gap <= -1.5 else ("WIN" if actual_gap <= -0.5 else ("NEUTRAL" if -0.5 < actual_gap <= 0.3 else "LOSS"))
+
+                postmortem_reason = f"[{outcome_grade}] {pred_direction} gap {actual_gap}% vs predicted {predicted_gap}% (Net PnL: {net_pnl}%)."
                 logger.info(f"[Postmortem] Signal {sig['id']}: {postmortem_reason}")
 
                 # Reuses the batch-level connection opened above (Phase-1 audit finding #15) —

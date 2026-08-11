@@ -256,14 +256,25 @@ def run_step_if_due(
 
     if state["snapshot_done"] and not state.get("auto_lock_25_done") and time_in_mins >= AUTO_LOCK_PICKS_MINS:
         state["auto_lock_25_done"] = True
+        if lock_picks is not None and state.get("snapshot_picks"):
+            try:
+                lock_picks(state["snapshot_picks"])
+            except Exception as ex:
+                logger.warning(f"[Closing Sequence] 3:25 PM provisional lock callback error: {ex}")
         _save_state(state)
         if broadcast is not None:
-            broadcast({"type": "auto_lock_325_picks", "date": today_date, "status": "LOCKED_325"})
-        logger.info("[Closing Sequence] 3:25:00 PM IST: AUTO-LOCK 3:25 PM BTST PICKS complete.")
+            broadcast({"type": "auto_lock_325_picks", "date": today_date, "status": "LOCKED_325", "picks": state.get("snapshot_picks", [])})
+        logger.info(f"[Closing Sequence] 3:25:00 PM IST: AUTO-LOCK 3:25 PM BTST PICKS complete ({len(state.get('snapshot_picks', []))} picks).")
         return "auto_lock_325"
 
     if state.get("auto_lock_25_done") and not state.get("final_bell_30_done") and time_in_mins >= FINAL_BELL_LOCK_MINS:
         state["final_bell_30_done"] = True
+        state["btst_status"] = "confirmed"
+        if lock_picks is not None and state.get("snapshot_picks"):
+            try:
+                lock_picks(state["snapshot_picks"])
+            except Exception as ex:
+                logger.warning(f"[Closing Sequence] 3:30 PM market lock callback error: {ex}")
         _save_state(state)
         if broadcast is not None:
             broadcast({"type": "market_lock", "btst_status": "confirmed", "date": today_date})

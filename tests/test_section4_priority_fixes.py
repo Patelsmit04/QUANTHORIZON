@@ -30,6 +30,8 @@ def test_priority1_assigned_when_confidence_clears_85_and_weight_clears_required
     assert res["confirmed_pillars_weight"] >= res["required_pillars"]
     assert res["confidence_score"] >= 85
     assert res["priority_level"] == "P1_HIGH"
+    assert "priority_reason" in res
+    assert "Priority 1" in res["priority_reason"]
 
 
 def test_estimated_gap_is_clamped_to_max_3_5_pct():

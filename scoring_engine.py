@@ -323,15 +323,15 @@ def evaluate_5_pillar_matrix(
         # STRICT MAGNITUDE REQUIREMENT: Must exceed multiplier threshold
         is_oi_above_threshold = abs(oi_pct_change) >= oi_threshold if oi_threshold > 0 else False
 
-        if ltp > vwap and oi_pct_change > 0 and is_oi_above_threshold:
+        if (ltp > vwap or stock_pct_change > 0) and oi_pct_change > 0 and is_oi_above_threshold:
             p1_confirmed = True
             p1_weight = (0.5 if expiry_discounted else 1.0) * _mult("Pillar 1: Futures OI")
             confirmed_pillars.append(f"Pillar 1: OI Long Buildup (Weight: {p1_weight:.2f})")
-        elif ltp < vwap and oi_pct_change > 0 and is_oi_above_threshold:
+        elif (ltp < vwap or stock_pct_change < 0) and oi_pct_change > 0 and is_oi_above_threshold:
             p1_confirmed = True
             p1_weight = (0.5 if expiry_discounted else 1.0) * _mult("Pillar 1: Futures OI")
             confirmed_pillars.append(f"Pillar 1: OI Short Buildup (Weight: {p1_weight:.2f})")
-        elif (ltp > vwap and oi_pct_change < 0) or (ltp < vwap and oi_pct_change < 0):
+        elif oi_pct_change < 0:
             logger.info(f"[{clean_sym}] Derivative liquidation detected (OI change {oi_pct_change}%) — Short Covering / Long Unwinding rejected")
     else:
         # FAIL LOUD: No OI data — pillar excluded from scoring entirely
@@ -401,13 +401,25 @@ def evaluate_5_pillar_matrix(
     rs_diff = round(stock_pct_change - nifty_pct_change, 2)
     rs_slope = 0.0
     if df_nifty is not None and not df_nifty.empty and len(df_today) >= 3:
-        min_len = min(9, len(df_today), len(df_nifty))
-        stock_closes = df_today['Close'].iloc[-min_len:].values
-        nifty_closes = df_nifty['Close'].iloc[-min_len:].values
-        if len(stock_closes) == len(nifty_closes) and np.all(nifty_closes > 0):
-            rs_series = stock_closes / nifty_closes
-            x = np.arange(len(rs_series))
-            rs_slope = float(np.polyfit(x, rs_series, 1)[0])
+        try:
+            # Timestamp alignment: inner join intraday closes
+            if isinstance(df_today.index, pd.DatetimeIndex) and isinstance(df_nifty.index, pd.DatetimeIndex):
+                merged_rs = pd.DataFrame({"stock": df_today['Close'], "nifty": df_nifty['Close']}).dropna()
+                tail_rs = merged_rs.tail(9)
+                if len(tail_rs) >= 3 and np.all(tail_rs["nifty"].values > 0):
+                    rs_series = tail_rs["stock"].values / tail_rs["nifty"].values
+                    x = np.arange(len(rs_series))
+                    rs_slope = float(np.polyfit(x, rs_series, 1)[0])
+            else:
+                min_len = min(9, len(df_today), len(df_nifty))
+                stock_closes = df_today['Close'].iloc[-min_len:].values
+                nifty_closes = df_nifty['Close'].iloc[-min_len:].values
+                if len(stock_closes) == len(nifty_closes) and np.all(nifty_closes > 0):
+                    rs_series = stock_closes / nifty_closes
+                    x = np.arange(len(rs_series))
+                    rs_slope = float(np.polyfit(x, rs_series, 1)[0])
+        except Exception as ex:
+            logger.warning(f"RS slope calculation fallback: {ex}")
 
     rs_slope_positive = rs_slope >= -1e-6
     rs_slope_negative = rs_slope <= 1e-6
@@ -443,8 +455,14 @@ def evaluate_5_pillar_matrix(
     # =========================================================================
     # PILLAR 5: Final 15-20 Min Price Close (Normalized Marubozu Range Position)
     # =========================================================================
-    # Range Position >= 98% (Bullish Close near High) or <= 2% (Bearish Close near Low)
-    p5_confirmed = (range_position_pct >= 98.0) or (range_position_pct <= 2.0)
+    # Range Position >= 85% (Bullish Close near High) or <= 15% (Bearish Close near Low) per Section 3 spec
+    if bullish_bias and range_position_pct >= 85.0:
+        p5_confirmed = True
+    elif bearish_bias and range_position_pct <= 15.0:
+        p5_confirmed = True
+    else:
+        p5_confirmed = (range_position_pct >= 85.0) or (range_position_pct <= 15.0)
+
     p5_weight = (1.0 * _mult("Pillar 5: Marubozu Close")) if p5_confirmed else 0.0
     if p5_confirmed:
         confirmed_pillars.append(f"Pillar 5: Marubozu Close (Range Pos: {range_position_pct}%)")
@@ -553,18 +571,21 @@ def evaluate_5_pillar_matrix(
             conviction_level = "MODERATE"
 
     # =========================================================================
-    # GLOBAL MACRO RISK GATE: caps conviction when S&P 500 futures or India VIX spike
+    # GLOBAL MACRO RISK GATE: caps conviction when S&P 500 futures, India VIX, or GIFT Nifty risk triggers
     # =========================================================================
     macro_gate_applied = None
     if macro_status is not None:
         vix_ok = macro_status.get("vix_ok", True)
         sp500_green = macro_status.get("sp500_green", True)
-        if (not vix_ok or not sp500_green) and priority_level == "P1_HIGH":
+        gift_nifty_ok = macro_status.get("gift_nifty_ok", True)
+        if (not vix_ok or not sp500_green or not gift_nifty_ok) and priority_level == "P1_HIGH":
             reasons = []
             if not vix_ok:
                 reasons.append("India VIX spiking > 5%")
             if not sp500_green:
                 reasons.append("S&P 500 futures red")
+            if not gift_nifty_ok:
+                reasons.append("GIFT Nifty pullback < -0.3%")
             macro_gate_applied = f"Capped P1_HIGH -> P2_MEDIUM (Global Macro Risk: {', '.join(reasons)})"
             priority_level = "P2_MEDIUM"
             conviction_level = "MODERATE"
@@ -586,6 +607,18 @@ def evaluate_5_pillar_matrix(
     est_gap = round(min(3.5, max(0.5, raw_gap)), 1)
     predicted_gap_pct = est_gap if (ltp >= vwap) else -est_gap
 
+    # Explicit Priority Reason Metadata for UI & Debugging
+    if priority_level == "P1_HIGH":
+        priority_reason = f"Priority 1 High Conviction (Weight {total_confirmed_weight:.1f} >= {required_pillars:.1f} & Conf {confidence_score}% >= 85%)"
+    elif fundamental_gate_applied:
+        priority_reason = fundamental_gate_applied
+    elif macro_gate_applied:
+        priority_reason = macro_gate_applied
+    elif priority_level == "P2_MEDIUM":
+        priority_reason = f"Priority 2 Medium (Weight {total_confirmed_weight:.1f} / Req {required_pillars:.1f} [{liquidity_tier}])"
+    else:
+        priority_reason = "Priority 3 Watchlist"
+
     reason_str = f"Confirmed {total_confirmed_weight}/{required_pillars} Pillar Weight [{liquidity_tier}]"
     if expiry_discounted:
         reason_str += " (Expiry OI Halving Discount Applied)"
@@ -595,6 +628,7 @@ def evaluate_5_pillar_matrix(
         "raw_ticker": symbol,
         "liquidity_tier": liquidity_tier,
         "required_pillars": required_pillars,
+        "priority_reason": priority_reason,
         "confirmed_pillars_count": total_confirmed_count,
         "confirmed_pillars_weight": round(total_confirmed_weight, 1),
         "confirmed_pillars": confirmed_pillars,

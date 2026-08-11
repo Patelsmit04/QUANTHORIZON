@@ -349,8 +349,13 @@ def classify_news_signal(headlines: Optional[List[Dict[str, Any]]]) -> Dict[str,
     else:
         verdict = "NEUTRAL"
 
+    raw_sentiment = (green_count * 0.35) - (red_count * 0.5)
+    sentiment_score = max(-1.0, min(1.0, round(raw_sentiment, 2)))
+
     return {
         "verdict": verdict,
+        "sentiment_score": sentiment_score,
+        "nlp_method": "KEYWORD_WEIGHTED_SENTIMENT",
         "red_hits": red_hits,
         "green_hits": green_hits,
         "headline_count": len(headlines),

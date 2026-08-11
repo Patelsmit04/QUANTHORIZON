@@ -272,3 +272,46 @@ def get_paper_performance(strategy_id: Optional[str] = None) -> Dict[str, Any]:
         "index_scope": _calc_scope_stats(index_trades),
         "aggregate": _calc_scope_stats(trades),
     }
+
+
+def stage_order_payload(signal: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Constructs a standardized pre-market order staging payload for a candidate pick.
+    Prepares actionable parameters (Symbol, Action, Option Contract Type, Target %, SL %)
+    so users can pre-stage orders before 9:15 AM open to eliminate execution slippage.
+    """
+    symbol = signal.get("symbol") or signal.get("index_name") or "UNKNOWN"
+    signal_text = signal.get("signal", "NEUTRAL")
+    ltp = float(signal.get("ltp") or signal.get("close_price_325") or 0.0)
+    option_type = signal.get("option_type", "CALL (CE)" if "BTST" in signal_text else "PUT (PE)")
+    predicted_gap = float(signal.get("predicted_gap_pct", 1.5))
+
+    target_pct = round(abs(predicted_gap) * 1.5, 2)
+    stop_loss_pct = round(abs(predicted_gap) * 0.75, 2)
+    entry_window = "3:25 PM - 3:30 PM (Pre-Market / Overnight Lock)"
+
+    return {
+        "symbol": symbol,
+        "raw_ticker": signal.get("raw_ticker", f"{symbol}.NS"),
+        "signal": signal_text,
+        "priority_level": signal.get("priority_level", "P1_HIGH"),
+        "conviction_level": signal.get("conviction_level", "HIGH_CONVICTION"),
+        "action": "BUY",
+        "option_type": option_type,
+        "spot_reference_price": ltp,
+        "target_profit_pct": target_pct,
+        "stop_loss_pct": stop_loss_pct,
+        "entry_window": entry_window,
+        "order_type": "AMO_LIMIT / PRE_MARKET",
+        "confidence_score": signal.get("confidence_score", 85),
+    }
+
+
+def get_staged_orders(picks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Generates order staging payloads for all active P1/P2 recommendations."""
+    staged = []
+    for p in picks:
+        if p.get("priority_level") in ["P1_HIGH", "P2_MEDIUM"] or "BTST" in p.get("signal", "") or "STBT" in p.get("signal", ""):
+            staged.append(stage_order_payload(p))
+    return staged
+

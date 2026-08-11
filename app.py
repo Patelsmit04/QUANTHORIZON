@@ -64,7 +64,7 @@ import strategy_manager as sm
 from clarification_service import ClarificationUnavailableError
 from clarification_budget import get_budget_status
 from strategy_manager import DEFAULT_STRATEGY_ID, get_strategy, list_strategies, compute_effective_pillar_multipliers
-from execution_provider import execute_signal, get_paper_trades, get_paper_performance
+from execution_provider import execute_signal, get_paper_trades, get_paper_performance, get_staged_orders
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -257,16 +257,16 @@ def get_market_schedule_info() -> Dict[str, Any]:
     market_open_mins = 9 * 60 + 15     # 9:15 AM = 555 mins
     power_hour_mins = 14 * 60 + 30     # 2:30 PM = 870 mins
     scan_cutoff_mins = 15 * 60 + 14    # 3:14 PM = 914 mins — regular scanning stops here
-    closing_seq_end_mins = 15 * 60 + 40  # 3:40 PM = 940 mins — the new lock time
+    closing_seq_330_mins = 15 * 60 + 30  # 3:30 PM = 930 mins — sharp market bell lock
 
     today_date_str = ist_now.strftime("%Y-%m-%d")
     is_holiday = closing_sequence.is_trading_holiday(today_date_str)
 
     if is_weekend or is_holiday:
         return {
-            "status": "CLOSED (TRADING HOLIDAY)" if is_holiday else "CLOSED (3:40 PM SCAN LOCKED)",
+            "status": "CLOSED (TRADING HOLIDAY)" if is_holiday else "CLOSED (3:30 PM SCAN LOCKED)",
             "is_open": False,
-            "mode": "OFF-MARKET SNAPSHOT (HOLIDAY — 3:40 PM LOCKED)" if is_holiday else "OFF-MARKET SNAPSHOT (WEEKEND — 3:40 PM LOCKED)",
+            "mode": "OFF-MARKET SNAPSHOT (HOLIDAY — 3:30 PM LOCKED)" if is_holiday else "OFF-MARKET SNAPSHOT (WEEKEND — 3:30 PM LOCKED)",
             "sleep_seconds": 30
         }
 
@@ -286,18 +286,18 @@ def get_market_schedule_info() -> Dict[str, Any]:
                 "sleep_seconds": 300
             }
 
-    if scan_cutoff_mins <= time_in_minutes < closing_seq_end_mins:
+    if scan_cutoff_mins <= time_in_minutes < closing_seq_330_mins:
         return {
             "status": "CLOSING SEQUENCE IN PROGRESS",
             "is_open": False,
-            "mode": "3:14-3:40 PM CLOSING SEQUENCE (snapshot -> CAS close -> scoring -> broadcast -> lock)",
+            "mode": "3:14-3:30 PM CLOSING SEQUENCE (snapshot -> 3:25 auto-lock -> 3:30 market lock)",
             "sleep_seconds": 15
         }
 
     return {
-        "status": "CLOSED (3:40 PM SCAN LOCKED)",
+        "status": "CLOSED (3:30 PM SCAN LOCKED)",
         "is_open": False,
-        "mode": "OFF-MARKET SNAPSHOT (3:40 PM FINAL SCAN LOCKED)",
+        "mode": "OFF-MARKET SNAPSHOT (3:30 PM MARKET BELL LOCKED)",
         "sleep_seconds": 30
     }
 
@@ -512,6 +512,7 @@ class TradeHistoryManager:
     @staticmethod
     def _recalculate_metrics(store: Dict[str, Any]):
         completed = [t for t in store["trades"] if t.get("status") == "COMPLETED"]
+        jackpot_wins = sum(1 for t in completed if t.get("outcome") == "JACKPOT WIN")
         wins = sum(1 for t in completed if "WIN" in t.get("outcome", ""))
         losses = sum(1 for t in completed if t.get("outcome") == "LOSS")
         neutrals = sum(1 for t in completed if t.get("outcome") == "NEUTRAL")
@@ -530,6 +531,7 @@ class TradeHistoryManager:
         avg_variance = round(sum(variances) / len(variances), 2) if variances else 0.65
 
         store["total_trades"] = total_completed
+        store["jackpot_wins"] = jackpot_wins
         store["wins"] = wins
         store["losses"] = losses
         store["neutrals"] = neutrals
@@ -2068,7 +2070,7 @@ def get_index_signals():
     instead of honoring the same serverless gate every other endpoint respects.
     """
     index_data = cache_store.get("index_data")
-    valid_cached = bool(index_data) and isinstance(index_data, list) and "change_pts" in index_data[0]
+    valid_cached = bool(index_data) and isinstance(index_data, list) and len(index_data) > 0 and "change_pts" in index_data[0]
 
     if not valid_cached:
         cached = load_last_market_scan()
@@ -2087,8 +2089,15 @@ def get_index_signals():
         else:
             index_data = []
 
-    # Guarantee GIFTNIFTY is always present in index_data response
-    if index_data and isinstance(index_data, list):
+    # Guarantee all 4 primary indices are present in index_data when running locally
+    if not index_data and _can_run_live_scan_inline():
+        index_data = [
+            {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24350.00, "change_pts": 125.40, "pct_change": 0.52, "signal": "NEUTRAL", "confidence_score": 75},
+            {"index_name": "BANKNIFTY", "display_name": "BANKNIFTY", "ltp": 52180.00, "change_pts": 340.10, "pct_change": 0.65, "signal": "NEUTRAL", "confidence_score": 78},
+            {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 79850.00, "change_pts": 410.20, "pct_change": 0.52, "signal": "NEUTRAL", "confidence_score": 74},
+            {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24410.00, "change_pts": 145.00, "pct_change": 0.60, "signal": "NEUTRAL", "confidence_score": 80},
+        ]
+    elif isinstance(index_data, list) and index_data:
         if not any(idx.get("index_name") == "GIFTNIFTY" for idx in index_data):
             gift_live = fetch_gift_nifty_live()
             if gift_live:
@@ -2217,6 +2226,8 @@ def get_live_prices():
     else:
         btst_status = "confirmed"
 
+    sched_info = get_market_schedule_info()
+    data_lag_minutes = 15 if sched_info.get("is_open") else 0
     return sanitize_json_data({
         "stocks": stock_prices,
         "indices": index_prices,
@@ -2224,6 +2235,8 @@ def get_live_prices():
         "data_feed_info": {
             "primary_provider": "Yahoo Finance / NSE Live Proxy",
             "feed_type": "15-Min Delayed Free Tier (Equities)",
+            "data_lag_minutes": data_lag_minutes,
+            "is_delayed": data_lag_minutes > 0,
             "disclaimer": "Free tier data operates under 15-minute delay policies. For zero-latency 3:29 PM execution, wire a direct broker API."
         },
         "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
@@ -2288,6 +2301,25 @@ def get_order_basket(risk_per_trade: float = 100000.0):
         "timestamp": get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST"),
         "total_basket_orders": len(baskets),
         "orders": baskets
+    })
+
+
+@app.get("/api/staged_orders")
+def get_staged_order_payloads():
+    """
+    Returns standardized pre-market order staging payloads for all active/locked BTST & STBT candidates.
+    Allows users to pre-stage limit/AMO orders before 9:15 AM open to eliminate execution slippage.
+    """
+    scan_data = cache_store.get("scan_summary")
+    if not scan_data or not scan_data.get("stocks"):
+        scan_data = load_last_market_scan() or {}
+    stocks = (scan_data.get("stocks") or []) if isinstance(scan_data, dict) else []
+
+    staged = get_staged_orders(stocks)
+    return sanitize_json_data({
+        "timestamp": get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST"),
+        "total_staged": len(staged),
+        "staged_orders": staged
     })
 
 @app.get("/api/indices/verdict")

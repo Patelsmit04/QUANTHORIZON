@@ -105,9 +105,9 @@ def _env_bool(name: str, default: bool) -> bool:
     return val.strip().lower() in ("1", "true", "yes", "on")
 
 
-MIN_VALUE_CR = _env_float("INSTITUTIONAL_FLOW_MIN_VALUE_CR", 25.0)       # SEBI's current block-deal floor
-TIER_MODERATE_CR = _env_float("INSTITUTIONAL_FLOW_MODERATE_CR", 50.0)
-TIER_STRONG_CR = _env_float("INSTITUTIONAL_FLOW_STRONG_CR", 150.0)
+MIN_VALUE_CR = _env_float("INSTITUTIONAL_FLOW_MIN_VALUE_CR", 10.0)       # Section 3 blueprint threshold (Rs 10cr)
+TIER_MODERATE_CR = _env_float("INSTITUTIONAL_FLOW_MODERATE_CR", 25.0)
+TIER_STRONG_CR = _env_float("INSTITUTIONAL_FLOW_STRONG_CR", 100.0)
 
 # 10 min of margin past the confirmed 2:20 PM afternoon block-window close, and a final check
 # before the 3:30 PM lock. See run_eod_reconciliation() — if the reconciliation log shows this

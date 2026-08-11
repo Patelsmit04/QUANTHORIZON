@@ -32,10 +32,12 @@ def check_macro_guard() -> Dict[str, Any]:
     Pillar 4: Macro Guard (15 pts)
     - S&P 500 futures (^GSPC) green
     - India VIX (^VIX) not spiking (>5% 1-hour rise)
+    - GIFT Nifty live futures not pulling back (< -0.3%)
     """
     score = 0
     sp500_green = False
     vix_ok = True
+    gift_nifty_ok = True
     details = []
 
     try:
@@ -83,9 +85,23 @@ def check_macro_guard() -> Dict[str, Any]:
         logger.warning(f"Macro Guard VIX fetch failed: {e}")
         vix_ok = True
 
-    if sp500_green and vix_ok:
+    try:
+        from index_scoring import fetch_gift_nifty_live
+        gift_live = fetch_gift_nifty_live()
+        if gift_live and isinstance(gift_live, dict):
+            gift_pct = float(gift_live.get("pct_change", 0.0))
+            if gift_pct < -0.3:
+                gift_nifty_ok = False
+                details.append(f"GIFT Nifty Pullback ({round(gift_pct, 2)}%)")
+            else:
+                details.append(f"GIFT Nifty Stable ({round(gift_pct, 2)}%)")
+    except Exception as e:
+        logger.warning(f"Macro Guard GIFT Nifty fetch failed: {e}")
+        gift_nifty_ok = True
+
+    if sp500_green and vix_ok and gift_nifty_ok:
         score = 15
-    elif sp500_green or vix_ok:
+    elif sp500_green and (vix_ok or gift_nifty_ok):
         score = 8
 
     return {
@@ -93,6 +109,7 @@ def check_macro_guard() -> Dict[str, Any]:
         "max_score": 15,
         "sp500_green": sp500_green,
         "vix_ok": vix_ok,
+        "gift_nifty_ok": gift_nifty_ok,
         "details": details
     }
 
