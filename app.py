@@ -1345,7 +1345,6 @@ def run_scheduler_tick() -> Dict[str, Any]:
             run_index_btst_intelligence()
 
     return sched_info
->>>>>>> origin/main
 
 
 # -------------------------------------------------------------
