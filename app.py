@@ -1206,94 +1206,8 @@ def background_scheduler_worker():
 
     while True:
         try:
-            sched_info = get_market_schedule_info()
-            ist_now = get_ist_now()
-            today_date = ist_now.strftime("%Y-%m-%d")
-            time_in_mins = ist_now.hour * 60 + ist_now.minute
-
-            # Budget-capped universe news refresh (checked every tick, only does real work
-            # when should_refresh_universe_news() says a pass is due — see news_provider.py).
-            # Runs regardless of open/closed so its up-to-3 daily passes spread across the day.
-            maybe_refresh_universe_news()
-
-            # Institutional Flow (bulk/block deal) checkpoints — same "call every tick, no-op
-            # outside its own trigger windows" idiom as the news refresh above. Runs regardless
-            # of open/closed because its "live_trigger"/"final_check" windows (~2:30/3:15 PM
-            # IST) fall DURING market hours (the is_open branch below), while "eod_archive"
-            # (~7:30 PM) falls after close — see block_deal_provider.py.
-            flow_checkpoint_ran = maybe_run_institutional_flow_checkpoints()
-            if flow_checkpoint_ran:
-                _notify_new_institutional_flows(flow_checkpoint_ran)
-
-            # Market Schedule Scanning Engine. Regular scanning runs through 3:14 PM; from
-            # 3:14 PM the closing_sequence module's own snapshot -> CAS close -> scoring ->
-            # broadcast -> lock steps take over (see below) instead of continuing to scan.
-            # (Prior-day prediction evaluation runs on its own dedicated thread —
-            # see evaluation_scheduler_worker — targeted at the 9:15-9:17 AM window.)
-            if sched_info["is_open"]:
-                logger.info(f"[{sched_info['mode']}] Running 5-Pillar background scanner pipeline...")
-                scan_res = run_full_scan_pipeline()
-                ws_broadcast.broadcast_sync({
-                    "type": "scan_update",
-                    "timestamp": scan_res.get("timestamp"),
-                    "total_scanned": scan_res.get("total_scanned"),
-                    "btst_count": scan_res.get("btst_count"),
-                    "stbt_count": scan_res.get("stbt_count"),
-                })
-                time.sleep(sched_info["sleep_seconds"])
-
-            else:
-                # Not scanning right now — this covers both the 3:14-3:40 PM closing sequence
-                # window and genuinely closed hours. run_step_if_due() is a no-op outside its
-                # own trigger windows and idempotent per step, so calling it unconditionally
-                # here (rather than trying to distinguish the two cases) is deliberate — it's
-                # also what makes a late restart "catch up" automatically: every trigger time
-                # has already passed, so every remaining step runs back-to-back in one tick.
-                if ist_now.weekday() not in [5, 6]:
-                    step_ran = closing_sequence.run_step_if_due(
-                        time_in_mins=time_in_mins,
-                        today_date=today_date,
-                        get_current_stocks=lambda: _snapshot_ready_stocks(today_date),
-                        lock_picks=_run_closing_lock_sequence,
-                        broadcast=ws_broadcast.broadcast_sync,
-                    )
-                    if step_ran:
-                        logger.info(f"[Closing Sequence] Ran step: {step_ran}")
-
-                if cache_store["scan_summary"] is None:
-                    logger.info("Initial off-market startup with empty cache. Running single snapshot scan...")
-                    run_full_scan_pipeline()
-
-                # Once-daily fundamentals refresh (off-market hours only — fundamentals don't
-                # move intraday, and this avoids competing with the live scan for time/requests).
-                # Freshness is checked against the cache's own persisted state, not an in-memory
-                # flag — an in-memory flag resets on every process restart (e.g. `--reload`
-                # picking up a code change), which was silently forcing a full re-fetch on every
-                # restart instead of once/day.
-                if not was_refresh_completed_today():
-                    logger.info("Running once-daily fundamentals cache refresh...")
-                    refresh_fundamentals_cache(FO_STOCKS)
-
-                # Once-daily OI/delivery history refresh (M7 audit fix) — without this, the
-                # rolling history in nse_data_provider.py never advances past a symbol's very
-                # first-ever lookup; get_per_stock_oi_data/get_per_stock_delivery_data stay
-                # local-store-only and fast on every scan tick (fetch_online=False), same as
-                # fundamentals above.
-                if not was_nse_refresh_completed_today():
-                    logger.info("Running once-daily NSE OI/delivery cache refresh...")
-                    refresh_nse_data_cache(FO_STOCKS)
-
-                # Once-daily post-close Index BTST Intelligence run (default 3:45 PM IST,
-                # configurable via INDEX_INTELLIGENCE_RUN_HOUR/MINUTE env vars) — deliberately
-                # separate from the 3:40 PM stock lock above; see run_index_btst_intelligence()
-                # for why this is the only place the live option chain gets fetched.
-                index_intel_ready_mins = INDEX_INTELLIGENCE_RUN_HOUR * 60 + INDEX_INTELLIGENCE_RUN_MINUTE
-                if (ist_now.weekday() not in [5, 6] and (ist_now.hour * 60 + ist_now.minute) >= index_intel_ready_mins
-                        and not was_index_intelligence_completed_today()):
-                    logger.info(f"Running post-close Index BTST Intelligence ({INDEX_INTELLIGENCE_RUN_HOUR:02d}:{INDEX_INTELLIGENCE_RUN_MINUTE:02d} IST window reached)...")
-                    run_index_btst_intelligence()
-
-                time.sleep(sched_info["sleep_seconds"])
+            sched_info = run_scheduler_tick()
+            time.sleep(sched_info["sleep_seconds"])
 
         except Exception as e:
             logger.error(f"Error in background scheduler worker: {e}")
@@ -1332,6 +1246,106 @@ def _get_daily_prev_closes(tickers: List[str]) -> Dict[str, float]:
     except Exception as e:
         logger.warning(f"Error fetching daily prev_closes: {e}")
     return prev_map
+def run_scheduler_tick() -> Dict[str, Any]:
+    """
+    One iteration of the autonomous scheduler's decision tree: run the live scan while the
+    market's open, or the closing-sequence/once-daily-refresh steps otherwise. Shared by
+    background_scheduler_worker's persistent while-loop (local/persistent-host runs, which just
+    calls this then sleeps `sleep_seconds`) and the /api/cron/scan endpoint (serverless — one
+    external trigger = one tick, no sleep). Every step here is already individually idempotent
+    / no-op-outside-its-own-window (was_refresh_completed_today(), run_step_if_due(), etc.), so
+    calling this once from a 5-minute external cron is behaviorally equivalent to one iteration
+    of the local loop landing at that same moment — see /api/cron/scan's docstring for why
+    serverless can't just run this loop directly.
+    """
+    sched_info = get_market_schedule_info()
+    ist_now = get_ist_now()
+    today_date = ist_now.strftime("%Y-%m-%d")
+    time_in_mins = ist_now.hour * 60 + ist_now.minute
+
+    # Budget-capped universe news refresh (checked every tick, only does real work
+    # when should_refresh_universe_news() says a pass is due — see news_provider.py).
+    # Runs regardless of open/closed so its up-to-3 daily passes spread across the day.
+    maybe_refresh_universe_news()
+
+    # Institutional Flow (bulk/block deal) checkpoints — same "call every tick, no-op
+    # outside its own trigger windows" idiom as the news refresh above. Runs regardless
+    # of open/closed because its "live_trigger"/"final_check" windows (~2:30/3:15 PM
+    # IST) fall DURING market hours (the is_open branch below), while "eod_archive"
+    # (~7:30 PM) falls after close — see block_deal_provider.py.
+    flow_checkpoint_ran = maybe_run_institutional_flow_checkpoints()
+    if flow_checkpoint_ran:
+        _notify_new_institutional_flows(flow_checkpoint_ran)
+
+    # Market Schedule Scanning Engine. Regular scanning runs through 3:14 PM; from
+    # 3:14 PM the closing_sequence module's own snapshot -> CAS close -> scoring ->
+    # broadcast -> lock steps take over (see below) instead of continuing to scan.
+    # (Prior-day prediction evaluation runs on its own dedicated thread —
+    # see evaluation_scheduler_worker — targeted at the 9:15-9:17 AM window.)
+    if sched_info["is_open"]:
+        logger.info(f"[{sched_info['mode']}] Running 5-Pillar background scanner pipeline...")
+        scan_res = run_full_scan_pipeline()
+        ws_broadcast.broadcast_sync({
+            "type": "scan_update",
+            "timestamp": scan_res.get("timestamp"),
+            "total_scanned": scan_res.get("total_scanned"),
+            "btst_count": scan_res.get("btst_count"),
+            "stbt_count": scan_res.get("stbt_count"),
+        })
+
+    else:
+        # Not scanning right now — this covers both the 3:14-3:40 PM closing sequence
+        # window and genuinely closed hours. run_step_if_due() is a no-op outside its
+        # own trigger windows and idempotent per step, so calling it unconditionally
+        # here (rather than trying to distinguish the two cases) is deliberate — it's
+        # also what makes a late restart "catch up" automatically: every trigger time
+        # has already passed, so every remaining step runs back-to-back in one tick.
+        if ist_now.weekday() not in [5, 6]:
+            step_ran = closing_sequence.run_step_if_due(
+                time_in_mins=time_in_mins,
+                today_date=today_date,
+                get_current_stocks=lambda: _snapshot_ready_stocks(today_date),
+                lock_picks=_run_closing_lock_sequence,
+                broadcast=ws_broadcast.broadcast_sync,
+            )
+            if step_ran:
+                logger.info(f"[Closing Sequence] Ran step: {step_ran}")
+
+        if cache_store["scan_summary"] is None:
+            logger.info("Initial off-market startup with empty cache. Running single snapshot scan...")
+            run_full_scan_pipeline()
+
+        # Once-daily fundamentals refresh (off-market hours only — fundamentals don't
+        # move intraday, and this avoids competing with the live scan for time/requests).
+        # Freshness is checked against the cache's own persisted state, not an in-memory
+        # flag — an in-memory flag resets on every process restart (e.g. `--reload`
+        # picking up a code change), which was silently forcing a full re-fetch on every
+        # restart instead of once/day.
+        if not was_refresh_completed_today():
+            logger.info("Running once-daily fundamentals cache refresh...")
+            refresh_fundamentals_cache(FO_STOCKS)
+
+        # Once-daily OI/delivery history refresh (M7 audit fix) — without this, the
+        # rolling history in nse_data_provider.py never advances past a symbol's very
+        # first-ever lookup; get_per_stock_oi_data/get_per_stock_delivery_data stay
+        # local-store-only and fast on every scan tick (fetch_online=False), same as
+        # fundamentals above.
+        if not was_nse_refresh_completed_today():
+            logger.info("Running once-daily NSE OI/delivery cache refresh...")
+            refresh_nse_data_cache(FO_STOCKS)
+
+        # Once-daily post-close Index BTST Intelligence run (default 3:45 PM IST,
+        # configurable via INDEX_INTELLIGENCE_RUN_HOUR/MINUTE env vars) — deliberately
+        # separate from the 3:40 PM stock lock above; see run_index_btst_intelligence()
+        # for why this is the only place the live option chain gets fetched.
+        index_intel_ready_mins = INDEX_INTELLIGENCE_RUN_HOUR * 60 + INDEX_INTELLIGENCE_RUN_MINUTE
+        if (ist_now.weekday() not in [5, 6] and (ist_now.hour * 60 + ist_now.minute) >= index_intel_ready_mins
+                and not was_index_intelligence_completed_today()):
+            logger.info(f"Running post-close Index BTST Intelligence ({INDEX_INTELLIGENCE_RUN_HOUR:02d}:{INDEX_INTELLIGENCE_RUN_MINUTE:02d} IST window reached)...")
+            run_index_btst_intelligence()
+
+    return sched_info
+>>>>>>> origin/main
 
 
 # -------------------------------------------------------------
@@ -1515,69 +1529,73 @@ def evaluation_scheduler_worker():
                 missed_window_catchup = EVAL_WINDOW_END < time_in_mins <= CATCH_UP_CUTOFF
 
                 if in_target_window or missed_window_catchup:
+                    reason = "catch-up" if missed_window_catchup else "9:15-9:17 window"
                     if missed_window_catchup:
                         logger.warning(
                             f"9:15-9:17 AM evaluation window was missed today — running catch-up "
                             f"evaluation now ({ist_now.strftime('%H:%M:%S')} IST)."
                         )
-                    else:
-                        logger.info("9:15-9:17 AM Evaluation Window — checking yesterday's BTST/STBT predictions against today's open...")
-
-                    store_before = TradeHistoryManager.load_data()
-                    pending_before = [t for t in store_before.get("trades", []) if t.get("status") == "PENDING_EVALUATION"]
-
-                    eval_res = TradeHistoryManager.evaluate_pending_trades()
-                    evaluate_pending_signals()  # Evaluate SQLite Signal Journal
-                    index_verdict_eval_res = evaluate_pending_index_verdicts()  # Evaluate prior-night index BTST verdicts
-
-                    win_summary = TradeHistoryManager.load_data()
-                    if cache_store.get("scan_summary"):
-                        cache_store["scan_summary"]["win_rate_pct"] = win_summary.get("win_rate_pct", 0.0)
-                        cache_store["scan_summary"]["prediction_accuracy_pct"] = win_summary.get("prediction_accuracy_pct", 92.5)
-                        cache_store["scan_summary"]["total_tracked_trades"] = win_summary.get("total_trades", 0)
-                        cache_store["scan_summary"]["avg_gap_pct"] = win_summary.get("avg_gap_pct", 0.0)
-
-                    pending_after = [t for t in win_summary.get("trades", []) if t.get("status") == "PENDING_EVALUATION"]
-                    graded_count = eval_res.get("evaluated_count", 0)
-                    index_graded_count = index_verdict_eval_res.get("evaluated_count", 0)
-
-                    if len(pending_before) > 0 and len(pending_after) > 0 and graded_count == 0:
-                        logger.warning(
-                            f"9:15 AM evaluation attempt yielded 0 graded trades ({len(pending_after)} trade(s) still pending). "
-                            f"Market open candles may not be posted on yfinance yet. Will retry in next tick."
-                        )
-                    else:
-                        last_evaluated_date = today_date
-                        logger.info(
-                            f"Evaluation complete for {today_date}: {graded_count} trade(s) graded, "
-                            f"{index_graded_count} index verdict(s) graded. "
-                            f"Win rate now {win_summary.get('win_rate_pct', 0.0)}%, "
-                            f"accuracy {win_summary.get('prediction_accuracy_pct', 92.5)}%."
-                        )
-                        ws_broadcast.broadcast_sync({
-                            "type": "evaluation_update",
-                            "timestamp": get_ist_now().isoformat(),
-                            "evaluated_count": graded_count,
-                            "index_evaluated_count": index_graded_count,
-                            "win_rate_pct": win_summary.get("win_rate_pct", 0.0),
-                            "prediction_accuracy_pct": win_summary.get("prediction_accuracy_pct", 92.5)
-                        })
-
-                    # Auto-improvement step: now that today's fresh outcomes are in the journal,
-                    # recompute pillar hit rates and move live scoring weights toward them —
-                    # capped +/-15%/day, gated on >=30 evaluated samples. See
-                    # walk_forward_validator.apply_dynamic_pillar_weights for the safety limits.
-                    weight_res = apply_dynamic_pillar_weights()
-                    if weight_res.get("applied"):
-                        logger.info(f"Pillar weights auto-updated: {weight_res.get('changes')}")
-                    else:
-                        logger.info(f"Pillar weights unchanged: {weight_res.get('status')}")
-
+                    run_daily_evaluation(reason=reason)
+                    last_evaluated_date = today_date
             time.sleep(15)
 
         except Exception as e:
             logger.error(f"Error in evaluation scheduler worker: {e}")
             time.sleep(15)
+
+
+def run_daily_evaluation(reason: str = "manual") -> Dict[str, Any]:
+    """
+    Grades yesterday's locked BTST/STBT picks against today's open, refreshes the win-rate/
+    accuracy stats on the cached scan summary, and runs the once-daily dynamic pillar-weight
+    auto-improvement step. Shared by evaluation_scheduler_worker's 9:15-9:17 AM window (local
+    persistent-host runs) and the /api/cron/evaluate endpoint (serverless — see that route for
+    why a real scheduler thread can't run there at all).
+
+    Idempotent and safe to call more than once on the same day: evaluate_pending_trades() /
+    evaluate_pending_signals() / evaluate_pending_index_verdicts() only touch rows still marked
+    PENDING (already-graded rows are a no-op on a repeat call), and
+    apply_dynamic_pillar_weights() has its own durable once-per-day guard
+    (walk_forward_validator.py — keyed off the persisted weights file/table's date, not
+    in-memory state) — so a retried or duplicate cron hit can't double-apply a weight move.
+    """
+    logger.info(f"[{reason}] Running prediction evaluation — checking yesterday's BTST/STBT predictions against today's open...")
+
+    eval_res = TradeHistoryManager.evaluate_pending_trades()
+    evaluate_pending_signals()  # Evaluate SQLite Signal Journal
+    index_verdict_eval_res = evaluate_pending_index_verdicts()  # Evaluate prior-night index BTST verdicts
+
+    win_summary = TradeHistoryManager.load_data()
+    if cache_store["scan_summary"]:
+        cache_store["scan_summary"]["win_rate_pct"] = win_summary.get("win_rate_pct", 0.0)
+        cache_store["scan_summary"]["prediction_accuracy_pct"] = win_summary.get("prediction_accuracy_pct", 92.5)
+        cache_store["scan_summary"]["total_tracked_trades"] = win_summary.get("total_trades", 0)
+        cache_store["scan_summary"]["avg_gap_pct"] = win_summary.get("avg_gap_pct", 0.0)
+
+    logger.info(
+        f"[{reason}] Evaluation complete: {eval_res.get('evaluated_count', 0)} trade(s) graded, "
+        f"{index_verdict_eval_res.get('evaluated_count', 0)} index verdict(s) graded. "
+        f"Win rate now {win_summary.get('win_rate_pct', 0.0)}%, "
+        f"accuracy {win_summary.get('prediction_accuracy_pct', 0.0)}%."
+    )
+
+    # Auto-improvement step: now that today's fresh outcomes are in the journal, recompute
+    # pillar hit rates and move live scoring weights toward them — capped +/-15%/day, gated on
+    # >=30 evaluated samples. See walk_forward_validator.apply_dynamic_pillar_weights.
+    weight_res = apply_dynamic_pillar_weights()
+    if weight_res.get("applied"):
+        logger.info(f"[{reason}] Pillar weights auto-updated: {weight_res.get('changes')}")
+    else:
+        logger.info(f"[{reason}] Pillar weights unchanged: {weight_res.get('status')}")
+
+    return {
+        "trades_evaluated": eval_res.get("evaluated_count", 0),
+        "index_verdicts_evaluated": index_verdict_eval_res.get("evaluated_count", 0),
+        "win_rate_pct": win_summary.get("win_rate_pct", 0.0),
+        "prediction_accuracy_pct": win_summary.get("prediction_accuracy_pct", 0.0),
+        "total_tracked_trades": win_summary.get("total_trades", 0),
+        "pillar_weights": weight_res,
+    }
 
 
 # -------------------------------------------------------------
@@ -2582,6 +2600,42 @@ def evaluate_next_day_picks():
         "status": "SUCCESS",
         "message": f"Evaluated {eval_count} signal/verdict trade(s) against 9:15 AM open prices.",
         "result": {**result, "signals": eval_sig, "indices": eval_idx, "win_summary": win_summary}
+    }
+
+
+# -------------------------------------------------------------
+# EXTERNAL CRON TRIGGER ENDPOINTS (Vercel serverless has no persistent process — see
+# background_scheduler_worker/evaluation_scheduler_worker's `if not os.environ.get("VERCEL")`
+# gate. Unlike /api/live_prices, which papers over this with its own bounded on-demand fetch for
+# just a lightweight LTP snapshot, the full 5-pillar scan and the 9:15 AM evaluation genuinely
+# can't run inline in a request handler — see _can_run_live_scan_inline(). These two routes let
+# an external scheduler — a GitHub Actions workflow on a cron schedule, or Vercel Cron on a Pro
+# plan — trigger one tick of the same logic those threads run locally, over plain HTTPS. Both
+# require QUANTHORIZON_API_KEY (X-API-Key header) so a public URL can't be hit by anyone to
+# force expensive yfinance-backed scans/evaluations.
+# -------------------------------------------------------------
+@app.post("/api/cron/evaluate", dependencies=[Depends(require_api_key)])
+def cron_run_daily_evaluation():
+    """9:15 AM IST target: grade yesterday's locked picks, refresh win-rate/accuracy, run the
+    dynamic pillar-weight step. Wraps run_daily_evaluation() — see its docstring for why this
+    is safe to call more than once on the same day (a retried/duplicate cron hit is a no-op
+    past the first successful run)."""
+    result = run_daily_evaluation(reason="cron")
+    return {"status": "SUCCESS", "result": result}
+
+
+@app.post("/api/cron/scan", dependencies=[Depends(require_api_key)])
+def cron_run_scheduler_tick():
+    """One tick of the autonomous scheduler: a live scan while the market's open, or the
+    closing-sequence/once-daily-refresh steps otherwise. Wraps run_scheduler_tick() — call this
+    on a ~5 minute cadence during 9:00 AM-3:45 PM IST weekdays to keep the cache/Postgres-backed
+    scan data actually live on a deployment where no background thread can run continuously."""
+    sched_info = run_scheduler_tick()
+    return {
+        "status": "SUCCESS",
+        "mode": sched_info.get("mode"),
+        "is_open": sched_info.get("is_open"),
+        "timestamp": (cache_store.get("scan_summary") or {}).get("timestamp"),
     }
 
 

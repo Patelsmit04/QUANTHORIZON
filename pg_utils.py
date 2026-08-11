@@ -24,10 +24,18 @@ keyed by a hash of the same string key used everywhere else here, so it works be
 even exists and needs no separate unlock call (released automatically on commit/rollback).
 """
 
+import logging
 import os
 import threading
 from contextlib import contextmanager
 from typing import Any, Iterator, Optional
+
+logger = logging.getLogger("BTSTScanner")
+
+try:
+    import psycopg
+except ImportError:
+    psycopg = None
 
 try:
     from psycopg.types.json import Jsonb
@@ -39,11 +47,23 @@ except ImportError:
         def Jsonb(data):
             return json.dumps(data)
 
-USE_POSTGRES = False
+USE_POSTGRES = bool(os.environ.get("DATABASE_URL", "").strip())
 
 
 def get_pg_connection():
-    raise NotImplementedError("Postgres backend disabled — system runs exclusively on local storage.")
+    """
+    Opens a brand-new connection on every call — every caller in this module (and
+    signal_journal.py) closes what it gets back itself, so this must never return a
+    shared/pooled singleton (see tests/test_pg_utils.py's independent-connections assertion).
+    Default row_factory (tuple_row) and autocommit=False are load-bearing: pg_read_json/
+    pg_write_json index rows positionally, and every write path here commits explicitly.
+    """
+    if psycopg is None:
+        raise RuntimeError("DATABASE_URL is set but the 'psycopg' package isn't installed — run `pip install -r requirements.txt`.")
+    dsn = os.environ.get("DATABASE_URL", "").strip()
+    if not dsn:
+        raise RuntimeError("get_pg_connection() called but DATABASE_URL is not set.")
+    return psycopg.connect(dsn)
 
 
 def init_app_state_schema() -> None:
@@ -152,5 +172,14 @@ def pg_write_json(key: str, data: Any) -> None:
 # Initialize schema on module import, same pattern as signal_journal.init_journal_db() — but
 # only when actually configured, unlike that one (which crashed on Vercel before DATA_DIR was
 # fixed precisely because it ran unconditionally). No caller needs to remember to call this.
+#
+# Wrapped in try/except: this runs at import time, transitively for every module that imports
+# USE_POSTGRES (app.py, strategy_manager.py, etc.) — a bad DATABASE_URL or a transient DB
+# hiccup at cold-start must not take the whole app down with an ImportError on every route.
+# Each pg_read_json/pg_write_json call site already fails per-request (visible as a 500 on
+# that one endpoint) if the DB is genuinely unreachable, which is enough to diagnose from logs.
 if USE_POSTGRES:
-    init_app_state_schema()
+    try:
+        init_app_state_schema()
+    except Exception as e:
+        logger.error(f"Postgres app_state schema init failed at import time (DATABASE_URL set but unreachable/misconfigured?): {e}")

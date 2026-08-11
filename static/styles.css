@@ -752,7 +752,7 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     display: flex !important;
     width: max-content !important;
     gap: 32px;
-    animation: index-ticker-scroll 24s linear infinite;
+    animation: index-ticker-scroll 20s linear infinite;
 }
 
 .index-ticker-bar:hover .index-ticker-track { animation-play-state: paused; }
