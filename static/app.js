@@ -290,7 +290,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Sidebar destination -> URL hash, so every section is deep-linkable and back/forward-safe.
     const SECTION_HASHES = {
         dashboard: "dashboard", scanner: "signals", stocksNews: "stocks-news",
-        globalNews: "global-news", institutionalFlow: "institutional-flow"
+        globalNews: "global-news", institutionalFlow: "institutional-flow",
+        orderFlow: "order-flow", accuracy: "accuracy", indices: "index-intelligence", strategies: "strategies", history: "history",
+        guide: "guide", rules: "rules"
     };
     const HASH_TO_SECTION = {};
     Object.entries(SECTION_HASHES).forEach(([secKey, hashVal]) => {
@@ -311,7 +313,14 @@ document.addEventListener("DOMContentLoaded", () => {
             scanner: document.getElementById("scannerSection"),
             stocksNews: document.getElementById("stocksNewsSection"),
             globalNews: document.getElementById("globalNewsSection"),
-            institutionalFlow: document.getElementById("institutionalFlowSection")
+            institutionalFlow: document.getElementById("institutionalFlowSection"),
+            orderFlow: document.getElementById("orderFlowSection"),
+            accuracy: document.getElementById("accuracySection"),
+            indices: document.getElementById("indicesSection"),
+            strategies: document.getElementById("strategiesSection"),
+            history: document.getElementById("historySection"),
+            guide: document.getElementById("guideSection"),
+            rules: document.getElementById("rulesSection")
         };
 
         if (sidebarNav) {
@@ -354,7 +363,12 @@ document.addEventListener("DOMContentLoaded", () => {
             clearInterval(newsRefreshInterval);
             newsRefreshInterval = null;
         }
+        if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
+        if (section === "strategies") fetchStrategies();
+        if (section === "history") fetchHistorySection();
         if (section === "institutionalFlow") fetchInstitutionalFlowSection();
+        if (section === "orderFlow") fetchOrderFlowSection();
+        if (section === "accuracy") fetchSplitAccuracy();
 
         if (!opts.fromHash && SECTION_HASHES[section]) {
             suppressHashUpdate = true;
