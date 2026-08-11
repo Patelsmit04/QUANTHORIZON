@@ -457,7 +457,7 @@
             <div id="institutionalFlowSection" class="hidden">
                 <div class="section-heading-row">
                     <h2 class="section-page-title"><i class="fa-solid fa-building-columns text-gold"></i> INSTITUTIONAL FLOW
-                        <span class="section-page-subtitle">Today's NSE Bulk &amp; Block Deals, &ge; Regulatory Floor</span>
+                        <span class="section-page-subtitle">Today's NSE Bulk &amp; Block Deals, &ge; Regulatory Floor (&#8377;10Cr / 0.5% shares)</span>
                     </h2>
                     <button id="btnRefreshInstitutionalFlow" class="btn btn-pill btn-secondary">
                         <i class="fa-solid fa-rotate-right"></i> REFRESH
@@ -466,16 +466,49 @@
 
                 <div class="news-status-bar" id="institutionalFlowStatusBar">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span>Loading...</span>
+                    <span>Loading live institutional flow checkpoints...</span>
                 </div>
 
-                <div class="toolbar-container" style="margin-bottom:16px;margin-top:12px;">
+                <!-- 4x Overview Stat Cards Grid -->
+                <div class="stats-overview-grid" style="margin-top:14px;margin-bottom:16px;">
+                    <div class="stat-card" style="border-top:3px solid var(--gold);">
+                        <div class="stat-card-title"><i class="fa-solid fa-building-columns text-gold"></i> TOTAL DEALS</div>
+                        <div class="stat-card-value" id="ifTotalDealsVal">0</div>
+                        <div class="stat-card-footer" id="ifTotalDealsSub">Log &ge; &#8377;10Cr Floor</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #10b981;">
+                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-up text-bullish"></i> BUY INFLOW</div>
+                        <div class="stat-card-value text-bullish" id="ifBuyInflowVal">&#8377;0.00cr</div>
+                        <div class="stat-card-footer" id="ifBuyInflowSub">0 Buy Orders</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #ef4444;">
+                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-down text-bearish"></i> SELL OUTFLOW</div>
+                        <div class="stat-card-value text-bearish" id="ifSellOutflowVal">&#8377;0.00cr</div>
+                        <div class="stat-card-footer" id="ifSellOutflowSub">0 Sell Orders</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid var(--cat-blue);">
+                        <div class="stat-card-title"><i class="fa-solid fa-scale-balanced text-cyan"></i> NET INSTITUTIONAL FLOW</div>
+                        <div class="stat-card-value text-gold" id="ifNetFlowVal">&#8377;0.00cr</div>
+                        <div class="stat-card-footer" id="ifNetFlowSub">Net Bias Verdict</div>
+                    </div>
+                </div>
+
+                <!-- Toolbar Container (Search Box + Filter Chips Rail) -->
+                <div class="toolbar-container" style="margin-bottom:16px;">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
                         <input type="text" id="institutionalFlowSearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
                     </div>
+                    <div class="filter-group" id="instFlowFilterGroup">
+                        <button class="filter-chip active" data-flow-filter="ALL">ALL DEALS</button>
+                        <button class="filter-chip" data-flow-filter="BUY">BUY INFLOW</button>
+                        <button class="filter-chip" data-flow-filter="SELL">SELL OUTFLOW</button>
+                        <button class="filter-chip" data-flow-filter="BLOCK">BLOCK DEALS (&ge;&#8377;10Cr)</button>
+                        <button class="filter-chip" data-flow-filter="BULK">BULK DEALS (&ge;0.5%)</button>
+                    </div>
                 </div>
 
+                <!-- Table Card View -->
                 <div class="table-card">
                     <div class="table-scroll">
                         <table class="data-table" id="institutionalFlowDataTable">
@@ -484,6 +517,7 @@
                                     <th>SYMBOL</th>
                                     <th>SIDE</th>
                                     <th>DEAL TYPE</th>
+                                    <th>CLIENT / INSTITUTION</th>
                                     <th>VALUE (&#8377;CR)</th>
                                     <th>DATE</th>
                                     <th>ACTION</th>
@@ -494,6 +528,17 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Empty State -->
+                <div id="institutionalFlowEmptyState" class="empty-state hidden" style="padding: 48px 24px; border-radius: var(--radius-lg); background: var(--glass-bg); border: 1px solid var(--glass-border); margin-top: 16px; text-align: center;">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--gold-bg); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.3);">
+                        <i class="fa-solid fa-building-columns fa-2x text-gold"></i>
+                    </div>
+                    <h3 style="font-family: var(--font-heading); font-size: 17px; font-weight: 800; color: var(--ink-primary); margin-bottom: 6px;">No Institutional Bulk or Block Deals Found Today</h3>
+                    <p style="font-size: 12px; color: var(--ink-secondary); max-width: 460px; margin: 0 auto 16px auto; line-height: 1.6;">
+                        NSE Bulk &amp; Block deal snapshots are checked shortly after the <strong>2:20 PM afternoon block window</strong> and verified at market close (3:45 PM). Deals meeting the &#8377;10Cr / 0.5% share regulatory threshold populate automatically.
+                    </p>
                 </div>
             </div>
             <!-- ============================== END INSTITUTIONAL FLOW SECTION ============================== -->

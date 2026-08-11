@@ -2121,6 +2121,7 @@ document.addEventListener("DOMContentLoaded", () => {
             allInstitutionalFlowDeals = data.deals || [];
             if (institutionalFlowNavBadge) institutionalFlowNavBadge.textContent = allInstitutionalFlowDeals.length;
             updateInstitutionalFlowStatusBar(data);
+            updateInstitutionalFlowOverviewStats(data);
             filterAndRenderInstitutionalFlowTable();
         } catch (error) {
             console.error("Failed to fetch institutional flow:", error);
@@ -2132,13 +2133,63 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function updateInstitutionalFlowOverviewStats(data) {
+        const deals = data.deals || [];
+        const meta = data.meta || {};
+
+        let totalBuy = 0;
+        let totalSell = 0;
+        let buyCount = 0;
+        let sellCount = 0;
+
+        deals.forEach(d => {
+            const val = parseFloat(d.value_cr || 0);
+            if ((d.side || "").toUpperCase() === "BUY") {
+                totalBuy += val;
+                buyCount++;
+            } else if ((d.side || "").toUpperCase() === "SELL") {
+                totalSell += val;
+                sellCount++;
+            }
+        });
+
+        const netVal = totalBuy - totalSell;
+
+        const ifTotalDealsVal = document.getElementById("ifTotalDealsVal");
+        const ifTotalDealsSub = document.getElementById("ifTotalDealsSub");
+        const ifBuyInflowVal = document.getElementById("ifBuyInflowVal");
+        const ifBuyInflowSub = document.getElementById("ifBuyInflowSub");
+        const ifSellOutflowVal = document.getElementById("ifSellOutflowVal");
+        const ifSellOutflowSub = document.getElementById("ifSellOutflowSub");
+        const ifNetFlowVal = document.getElementById("ifNetFlowVal");
+        const ifNetFlowSub = document.getElementById("ifNetFlowSub");
+
+        if (ifTotalDealsVal) ifTotalDealsVal.textContent = deals.length;
+        if (ifTotalDealsSub) ifTotalDealsSub.textContent = meta.last_updated ? `Updated ${new Date(meta.last_updated).toLocaleTimeString()}` : "Log ≥ ₹10Cr Floor";
+
+        if (ifBuyInflowVal) ifBuyInflowVal.textContent = `₹${totalBuy.toFixed(2)}cr`;
+        if (ifBuyInflowSub) ifBuyInflowSub.textContent = `${buyCount} Buy Orders`;
+
+        if (ifSellOutflowVal) ifSellOutflowVal.textContent = `₹${totalSell.toFixed(2)}cr`;
+        if (ifSellOutflowSub) ifSellOutflowSub.textContent = `${sellCount} Sell Orders`;
+
+        if (ifNetFlowVal) {
+            const sign = netVal >= 0 ? "+" : "";
+            ifNetFlowVal.textContent = `${sign}₹${Math.abs(netVal).toFixed(2)}cr`;
+            ifNetFlowVal.className = `stat-card-value ${netVal >= 0 ? 'text-bullish' : 'text-bearish'}`;
+        }
+        if (ifNetFlowSub) {
+            ifNetFlowSub.textContent = netVal >= 0 ? "NET INSTITUTIONAL ACCUMULATION" : "NET INSTITUTIONAL DISTRIBUTION";
+        }
+    }
+
     function updateInstitutionalFlowStatusBar(data) {
         if (!institutionalFlowStatusBar) return;
         const meta = data.meta || {};
         const recon = data.latest_reconciliation;
 
         if (!meta.last_checkpoint) {
-            institutionalFlowStatusBar.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>Not fetched yet today — the live snapshot is checked shortly after the 2:20 PM afternoon block-deal window closes.</span>`;
+            institutionalFlowStatusBar.innerHTML = `<i class="fa-solid fa-circle-info text-gold"></i> <span>Not fetched yet today — live snapshots are checked shortly after the 2:20 PM afternoon block-deal window.</span>`;
             return;
         }
 
@@ -2153,9 +2204,6 @@ document.addEventListener("DOMContentLoaded", () => {
             reconHtml = `<span class="text-sub"><i class="fa-solid fa-hourglass-half"></i> Not yet reconciled against the official end-of-day archive</span>`;
         }
 
-        // Data currently shown is the live snapshot unless the EOD archive checkpoint itself
-        // already ran — either way, this is stated plainly rather than presenting a live
-        // snapshot as if it were the final reconciled figure (see block_deal_provider.py).
         institutionalFlowStatusBar.innerHTML = `
             <i class="fa-solid fa-circle-check text-bullish"></i>
             <span>Showing ${escapeHtml(checkpointLabel)} as of <strong>${lastUpdated}</strong></span>
@@ -2164,36 +2212,66 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
 
+    let activeInstFlowFilter = "ALL";
+
+    const instFlowFilterGroup = document.getElementById("instFlowFilterGroup");
+    if (instFlowFilterGroup) {
+        instFlowFilterGroup.querySelectorAll(".filter-chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                instFlowFilterGroup.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+                chip.classList.add("active");
+                activeInstFlowFilter = chip.dataset.flowFilter || "ALL";
+                filterAndRenderInstitutionalFlowTable();
+            });
+        });
+    }
+
     function filterAndRenderInstitutionalFlowTable() {
         if (!institutionalFlowTableBody) return;
         const searchTerm = institutionalFlowSearchInput ? institutionalFlowSearchInput.value.trim().toUpperCase() : "";
         let filtered = allInstitutionalFlowDeals;
+
+        if (activeInstFlowFilter === "BUY") {
+            filtered = filtered.filter(d => (d.side || "").toUpperCase() === "BUY");
+        } else if (activeInstFlowFilter === "SELL") {
+            filtered = filtered.filter(d => (d.side || "").toUpperCase() === "SELL");
+        } else if (activeInstFlowFilter === "BLOCK") {
+            filtered = filtered.filter(d => (d.deal_type || "").toUpperCase() === "BLOCK" || (d.value_cr || 0) >= 10.0);
+        } else if (activeInstFlowFilter === "BULK") {
+            filtered = filtered.filter(d => (d.deal_type || "").toUpperCase() === "BULK");
+        }
+
         if (searchTerm) {
-            filtered = filtered.filter(d => (d.symbol || "").toUpperCase().includes(searchTerm));
+            filtered = filtered.filter(d => (d.symbol || "").toUpperCase().includes(searchTerm) || (d.client_name || "").toUpperCase().includes(searchTerm));
         }
 
         institutionalFlowTableBody.innerHTML = "";
         if (filtered.length === 0) {
-            institutionalFlowTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--ink-muted);">No qualifying deals${searchTerm ? " match that symbol" : " yet today"}.</td></tr>`;
-            if (!searchTerm && institutionalFlowEmptyState) institutionalFlowEmptyState.classList.remove("hidden");
+            institutionalFlowTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:34px;color:var(--ink-muted);"><i class="fa-solid fa-filter" style="margin-right:6px;"></i> No qualifying deals match the active filter criteria${searchTerm ? ` ("${escapeHtml(searchTerm)}")` : ""}.</td></tr>`;
+            if (!searchTerm && activeInstFlowFilter === "ALL" && institutionalFlowEmptyState) institutionalFlowEmptyState.classList.remove("hidden");
             return;
         }
         if (institutionalFlowEmptyState) institutionalFlowEmptyState.classList.add("hidden");
 
-        // Already sorted by value descending server-side (get_deals_for_day) — re-sorting here
-        // too so a client-side symbol filter can never change the ordering.
         [...filtered].sort((a, b) => (b.value_cr || 0) - (a.value_cr || 0)).forEach(deal => {
             const tr = document.createElement("tr");
-            const sideClass = deal.side === "BUY" ? "text-bullish" : "text-bearish";
+            const sideClass = (deal.side || "").toUpperCase() === "BUY" ? "text-bullish" : "text-bearish";
+            const clientName = deal.client_name || deal.client || deal.institution || "Institutional Participant";
+            const dealType = (deal.deal_type || "BLOCK").toUpperCase();
+            const dealTypeBadge = dealType === "BLOCK"
+                ? `<span class="badge" style="background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);font-size:9.5px;">BLOCK</span>`
+                : `<span class="badge" style="background:rgba(59,130,246,0.15);color:var(--cat-blue);border:1px solid rgba(59,130,246,0.3);font-size:9.5px;">BULK</span>`;
+
             tr.innerHTML = `
-                <td data-label="SYMBOL"><strong>${escapeHtml(deal.symbol)}</strong></td>
-                <td data-label="SIDE"><span class="badge flow-chip ${sideClass}">${escapeHtml(deal.side)}</span></td>
-                <td data-label="DEAL TYPE">${escapeHtml((deal.deal_type || "").toUpperCase())}</td>
-                <td data-label="VALUE (₹CR)"><strong>₹${(deal.value_cr || 0).toFixed(2)}cr</strong></td>
-                <td data-label="DATE">${escapeHtml(deal.deal_date || "--")}</td>
+                <td data-label="SYMBOL"><strong style="font-size:13px;color:var(--ink-primary);">${escapeHtml(deal.symbol)}</strong></td>
+                <td data-label="SIDE"><span class="badge flow-chip ${sideClass}" style="font-weight:800;padding:4px 10px;">${escapeHtml((deal.side || "BUY").toUpperCase())}</span></td>
+                <td data-label="DEAL TYPE">${dealTypeBadge}</td>
+                <td data-label="CLIENT / INSTITUTION" style="font-size:11.5px;color:var(--ink-secondary);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeAttr(clientName)}">${escapeHtml(clientName)}</td>
+                <td data-label="VALUE (₹CR)"><strong style="color:var(--ink-primary);font-size:13px;">₹${(deal.value_cr || 0).toFixed(2)}cr</strong></td>
+                <td data-label="DATE" style="font-size:11px;color:var(--ink-muted);">${escapeHtml(deal.deal_date || "--")}</td>
                 <td data-label="ACTION">
-                    <button class="btn-icon flow-jump-to-scanner-btn" data-symbol="${escapeAttr(deal.symbol)}" title="Jump to ${escapeAttr(deal.symbol)} in Scanner">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    <button class="btn btn-pill btn-secondary flow-jump-to-scanner-btn" data-symbol="${escapeAttr(deal.symbol)}" title="Jump to ${escapeAttr(deal.symbol)} in Scanner" style="font-size:10.5px;padding:4px 10px;min-height:30px;">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> SCANNER
                     </button>
                 </td>
             `;
