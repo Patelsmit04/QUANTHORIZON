@@ -1,0 +1,65 @@
+name: QuantHorizon Market-Hours Cron
+
+# Vercel's serverless deployment has no persistent process, so background_scheduler_worker and
+# evaluation_scheduler_worker (app.py) never run there — see the "Deployment note" in README.md.
+# This workflow is the external trigger that replaces them: it hits the app's own
+# /api/cron/scan and /api/cron/evaluate routes (app.py) on a schedule, over plain HTTPS, so the
+# same code those threads would run locally still runs on the deployed app. Requires two repo
+# secrets: QUANTHORIZON_APP_URL (e.g. https://quanthorizon.vercel.app) and
+# QUANTHORIZON_API_KEY (same value set in the Vercel project's env vars — both endpoints are
+# gated behind it via require_api_key so a public URL can't be hit to force expensive scans).
+#
+# GitHub free-tier caveats worth knowing: scheduled runs can silently lag a few minutes behind
+# the exact cron time under GitHub's own load, and GitHub auto-disables a schedule after 60
+# days with no commits to the repo (re-enable from the Actions tab if that happens).
+
+on:
+  schedule:
+    # 9:15 AM IST prior-day BTST/STBT evaluation + accuracy/win-rate refresh (03:45 UTC), weekdays.
+    - cron: "45 3 * * 1-5"
+    # Live scan / closing-sequence tick every 5 min, ~8:30 AM-4:25 PM IST (03:00-10:55 UTC), weekdays.
+    - cron: "*/5 3-10 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      endpoint:
+        description: "Endpoint to trigger manually"
+        type: choice
+        default: scan
+        options: [scan, evaluate]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Pick endpoint for this trigger
+        id: pick
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "path=/api/cron/${{ inputs.endpoint }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "45 3 * * 1-5" ]; then
+            echo "path=/api/cron/evaluate" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=/api/cron/scan" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Call the endpoint
+        env:
+          APP_BASE_URL: ${{ secrets.QUANTHORIZON_APP_URL }}
+          API_KEY: ${{ secrets.QUANTHORIZON_API_KEY }}
+          ENDPOINT_PATH: ${{ steps.pick.outputs.path }}
+        run: |
+          if [ -z "$APP_BASE_URL" ] || [ -z "$API_KEY" ]; then
+            echo "::error::QUANTHORIZON_APP_URL and/or QUANTHORIZON_API_KEY repo secrets are not set."
+            exit 1
+          fi
+          echo "POST ${APP_BASE_URL}${ENDPOINT_PATH}"
+          http_code=$(curl -sS --max-time 180 -X POST "${APP_BASE_URL}${ENDPOINT_PATH}" \
+            -H "X-API-Key: ${API_KEY}" \
+            -o response.json -w "%{http_code}")
+          echo "HTTP ${http_code}"
+          cat response.json
+          if [ "$http_code" -ge 400 ]; then
+            echo "::error::Cron trigger failed with HTTP ${http_code}"
+            exit 1
+          fi

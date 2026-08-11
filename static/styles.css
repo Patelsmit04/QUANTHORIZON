@@ -752,7 +752,10 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     display: flex !important;
     width: max-content !important;
     gap: 32px;
-    animation: index-ticker-scroll 40s linear infinite;
+    /* 40s/loop read as sluggish with only ~4 items on the tape (a full loop took 40s to show
+       4 data points). 18s keeps it unhurried/readable but brisk — rule of thumb ~4.5s/item if
+       the item count grows a lot. */
+    animation: index-ticker-scroll 18s linear infinite;
 }
 
 .index-ticker-bar:hover .index-ticker-track { animation-play-state: paused; }

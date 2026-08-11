@@ -455,8 +455,13 @@ def init_journal_db():
     logger.info("Signal Journal DB initialized & purged of legacy seed records.")
 
 
-# Initialize schema on module import
-init_journal_db()
+# Initialize schema on module import. Wrapped in try/except once USE_POSTGRES is live: this is
+# a network call at that point (vs. a local sqlite3 file that basically never fails), and a
+# transient DB hiccup at cold-start must not take the whole app down with an ImportError.
+try:
+    init_journal_db()
+except Exception as e:
+    logger.error(f"Signal Journal DB schema init failed at import time (DATABASE_URL set but unreachable/misconfigured?): {e}")
 
 
 def derive_confidence_bucket(score: int) -> str:
