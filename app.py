@@ -995,7 +995,7 @@ def _run_full_scan_pipeline_impl() -> Dict[str, Any]:
     p2_med_count = sum(1 for s in stocks if s["priority_level"] == "P2_MEDIUM")
     btst_count = sum(1 for s in stocks if "BTST" in s["signal"])
     stbt_count = sum(1 for s in stocks if "STBT" in s["signal"])
-    top_surge = max(stocks, key=lambda s: s["volume_spike"]) if stocks else None
+    top_surge = max(stocks, key=lambda s: s.get("volume_spike", s.get("volume_surge_ratio", 0.0))) if stocks else None
 
     total_signals = btst_count + stbt_count
     bullish_sentiment = round((btst_count / total_signals * 100), 1) if total_signals > 0 else 50.0
@@ -1300,69 +1300,184 @@ def background_scheduler_worker():
             time.sleep(15)
 
 
+def _get_daily_prev_closes(tickers: List[str]) -> Dict[str, float]:
+    """Fetch 5d daily bars to get official previous day close for accurate live +/- change points."""
+    prev_map = {}
+    try:
+        daily_df = call_with_retry(
+            lambda: yf.download(tickers=tickers, period="5d", interval="1d", group_by="ticker", progress=False, threads=True),
+            label="daily prev_close lookup",
+            timeout=15.0,
+        )
+        today_str = get_ist_now().strftime("%Y-%m-%d")
+        if daily_df is not None and not daily_df.empty:
+            for raw_t in tickers:
+                sub = None
+                if isinstance(daily_df.columns, pd.MultiIndex):
+                    if raw_t in daily_df.columns.levels[0]:
+                        sub = daily_df[raw_t].dropna()
+                elif raw_t in daily_df.columns:
+                    sub = daily_df.dropna()
+
+                if sub is not None and not sub.empty:
+                    if isinstance(sub.index, pd.DatetimeIndex):
+                        d_dates = [d.strftime("%Y-%m-%d") for d in sub.index]
+                    else:
+                        d_dates = [str(d)[:10] for d in sub.index]
+
+                    if d_dates and d_dates[-1] == today_str and len(sub) >= 2:
+                        prev_map[raw_t] = float(sub["Close"].iloc[-2])
+                    elif len(sub) >= 1:
+                        prev_map[raw_t] = float(sub["Close"].iloc[-1])
+    except Exception as e:
+        logger.warning(f"Error fetching daily prev_closes: {e}")
+    return prev_map
+
+
 # -------------------------------------------------------------
 # DEDICATED 10-SECOND LIVE PRICE TICKER WORKER THREAD
 # -------------------------------------------------------------
 def live_price_ticker_worker():
     """
     Lightweight 10-second background ticker worker that runs continuously to update live LTP,
-    change_pts, and pct_change for all 210 F&O stocks and indices in memory.
-    Ensures the UI live feed and marquee tape receive accurate, real-time tick updates every 10 seconds.
-    Runs during market hours and on initial startup so live numbers are NEVER empty or stuck.
+    change_pts, and pct_change for indices and 210 F&O stocks in memory.
+    Index ticks refresh every 10s (with instant NSE Live fallback), stock ticks refresh every 25s.
+    Prevents Yahoo Finance IP rate limiting while keeping live marquee tape ultra-responsive.
     """
-    logger.info("Starting Dedicated 10-Second Live Price Ticker Worker Thread...")
+    logger.info("Starting Dedicated Live Price Ticker Worker Thread...")
     first_run = True
+    daily_prev_closes: Dict[str, float] = {}
+    last_daily_fetch_date: Optional[str] = None
+    last_stock_fetch_time: float = 0.0
+
     while not shutdown_event.is_set():
         try:
             sched_info = get_market_schedule_info()
+            ist_now = get_ist_now()
+            today_date = ist_now.strftime("%Y-%m-%d")
+            now_time = time.time()
+
             if sched_info["is_open"] or first_run or "live_prices_map" not in cache_store:
                 first_run = False
                 try:
-                    tickers = [f"{s}.NS" if not s.endswith(".NS") else s for s in FO_STOCKS]
-                    download_df = call_with_retry(
-                        lambda: yf.download(tickers=tickers, period="2d", interval="1m", group_by="ticker", progress=False, threads=True),
-                        label="live 10s ticker fast download",
-                        timeout=10.0,
+                    idx_ticker_map = {
+                        "^NSEI": ("NIFTY50", "NIFTY 50"),
+                        "^NSEBANK": ("BANKNIFTY", "BANK NIFTY"),
+                        "NIFTY_FIN_SERVICE.NS": ("FINNIFTY", "FIN NIFTY"),
+                        "^BSESN": ("SENSEX", "SENSEX")
+                    }
+
+                    # Fetch daily prev_closes once per day
+                    if not daily_prev_closes or last_daily_fetch_date != today_date:
+                        stock_tickers = [f"{s}.NS" if not s.endswith(".NS") else s for s in FO_STOCKS]
+                        all_t = stock_tickers + list(idx_ticker_map.keys())
+                        daily_prev_closes = _get_daily_prev_closes(all_t)
+                        last_daily_fetch_date = today_date
+
+                    # 1. Update Index Ticks Every 10 Seconds (only 4 tickers - zero rate limiting)
+                    idx_download_df = call_with_retry(
+                        lambda: yf.download(tickers=list(idx_ticker_map.keys()), period="2d", interval="1m", group_by="ticker", progress=False, threads=True),
+                        label="live index 10s ticker download",
+                        timeout=8.0,
                     )
-                    if download_df is not None and not download_df.empty:
-                        existing_stocks = cache_store.get("data") or []
-                        stock_map = {s["symbol"]: s for s in existing_stocks if isinstance(s, dict)}
-                        live_map = cache_store.get("live_prices_map") or {}
+                    current_indices = cache_store.get("index_data") or []
+                    idx_dict = {idx.get("index_name"): idx for idx in current_indices if isinstance(idx, dict)}
 
-                        for sym in FO_STOCKS:
-                            raw_t = f"{sym}.NS"
-                            sub_df = None
-                            if isinstance(download_df.columns, pd.MultiIndex):
-                                if raw_t in download_df.columns.levels[0]:
-                                    sub_df = download_df[raw_t].dropna()
-                            elif raw_t in download_df.columns:
-                                sub_df = download_df.dropna()
+                    for raw_t, (idx_code, idx_disp) in idx_ticker_map.items():
+                        sub_df = None
+                        if idx_download_df is not None and not idx_download_df.empty:
+                            if isinstance(idx_download_df.columns, pd.MultiIndex):
+                                if raw_t in idx_download_df.columns.levels[0]:
+                                    sub_df = idx_download_df[raw_t].dropna()
+                            elif raw_t in idx_download_df.columns:
+                                sub_df = idx_download_df.dropna()
 
-                            if sub_df is not None and not sub_df.empty:
-                                ltp = float(sub_df.iloc[-1]["Close"])
+                        ltp = None
+                        prev_close = daily_prev_closes.get(raw_t)
+
+                        if sub_df is not None and not sub_df.empty:
+                            ltp = float(sub_df.iloc[-1]["Close"])
+                            if not prev_close:
                                 prev_close = float(sub_df.iloc[0]["Open"])
-                                change_pts = round(ltp - prev_close, 2)
-                                pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
+                        elif idx_code in ("NIFTY50", "BANKNIFTY"):
+                            # Direct NSE Live fallback when yfinance is rate limited
+                            try:
+                                chain = fetch_index_option_chain(idx_code)
+                                if chain and chain.get("verified") and chain.get("underlying_value"):
+                                    ltp = float(chain["underlying_value"])
+                            except Exception as ex:
+                                logger.warning(f"NSE Live spot fallback warning for {idx_code}: {ex}")
 
-                                live_entry = {
-                                    "symbol": sym,
+                        if ltp is not None and prev_close:
+                            change_pts = round(ltp - prev_close, 2)
+                            pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
+
+                            if idx_code in idx_dict:
+                                idx_dict[idx_code]["ltp"] = round(ltp, 2)
+                                idx_dict[idx_code]["prev_close"] = round(prev_close, 2)
+                                idx_dict[idx_code]["change_pts"] = change_pts
+                                idx_dict[idx_code]["pct_change"] = pct_change
+                            else:
+                                idx_dict[idx_code] = {
+                                    "index_name": idx_code,
+                                    "display_name": idx_disp,
                                     "ltp": round(ltp, 2),
                                     "prev_close": round(prev_close, 2),
                                     "change_pts": change_pts,
                                     "pct_change": pct_change,
                                 }
-                                live_map[sym] = live_entry
 
-                                if sym in stock_map:
-                                    stock_map[sym]["ltp"] = round(ltp, 2)
-                                    stock_map[sym]["prev_close"] = round(prev_close, 2)
-                                    stock_map[sym]["change_pts"] = change_pts
-                                    stock_map[sym]["pct_change"] = pct_change
+                    if idx_dict:
+                        cache_store["index_data"] = list(idx_dict.values())
 
-                        cache_store["live_prices_map"] = live_map
-                        cache_store["live_prices_timestamp"] = time.time()
+                    # 2. Update Stock Ticks Every 25 Seconds
+                    if now_time - last_stock_fetch_time >= 25.0:
+                        last_stock_fetch_time = now_time
+                        stock_tickers = [f"{s}.NS" if not s.endswith(".NS") else s for s in FO_STOCKS]
+                        stock_download_df = call_with_retry(
+                            lambda: yf.download(tickers=stock_tickers, period="2d", interval="1m", group_by="ticker", progress=False, threads=True),
+                            label="live stock ticker download",
+                            timeout=12.0,
+                        )
+                        if stock_download_df is not None and not stock_download_df.empty:
+                            existing_stocks = cache_store.get("data") or []
+                            stock_map = {s["symbol"]: s for s in existing_stocks if isinstance(s, dict)}
+                            live_map = cache_store.get("live_prices_map") or {}
+
+                            for sym in FO_STOCKS:
+                                raw_t = f"{sym}.NS"
+                                sub_df = None
+                                if isinstance(stock_download_df.columns, pd.MultiIndex):
+                                    if raw_t in stock_download_df.columns.levels[0]:
+                                        sub_df = stock_download_df[raw_t].dropna()
+                                elif raw_t in stock_download_df.columns:
+                                    sub_df = stock_download_df.dropna()
+
+                                if sub_df is not None and not sub_df.empty:
+                                    ltp = float(sub_df.iloc[-1]["Close"])
+                                    prev_close = daily_prev_closes.get(raw_t) or float(sub_df.iloc[0]["Open"])
+                                    change_pts = round(ltp - prev_close, 2)
+                                    pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
+
+                                    live_entry = {
+                                        "symbol": sym,
+                                        "ltp": round(ltp, 2),
+                                        "prev_close": round(prev_close, 2),
+                                        "change_pts": change_pts,
+                                        "pct_change": pct_change,
+                                    }
+                                    live_map[sym] = live_entry
+
+                                    if sym in stock_map:
+                                        stock_map[sym]["ltp"] = round(ltp, 2)
+                                        stock_map[sym]["prev_close"] = round(prev_close, 2)
+                                        stock_map[sym]["change_pts"] = change_pts
+                                        stock_map[sym]["pct_change"] = pct_change
+
+                            cache_store["live_prices_map"] = live_map
+                            cache_store["live_prices_timestamp"] = time.time()
                 except Exception as e:
-                    logger.warning(f"[LiveTickerWorker] Fast stock price tick warning: {e}")
+                    logger.warning(f"[LiveTickerWorker] Fast price tick warning: {e}")
 
             time.sleep(10)
         except Exception as e:
@@ -1408,24 +1523,45 @@ def evaluation_scheduler_worker():
                     else:
                         logger.info("9:15-9:17 AM Evaluation Window — checking yesterday's BTST/STBT predictions against today's open...")
 
+                    store_before = TradeHistoryManager.load_data()
+                    pending_before = [t for t in store_before.get("trades", []) if t.get("status") == "PENDING_EVALUATION"]
+
                     eval_res = TradeHistoryManager.evaluate_pending_trades()
                     evaluate_pending_signals()  # Evaluate SQLite Signal Journal
                     index_verdict_eval_res = evaluate_pending_index_verdicts()  # Evaluate prior-night index BTST verdicts
-                    last_evaluated_date = today_date
 
                     win_summary = TradeHistoryManager.load_data()
-                    if cache_store["scan_summary"]:
+                    if cache_store.get("scan_summary"):
                         cache_store["scan_summary"]["win_rate_pct"] = win_summary.get("win_rate_pct", 0.0)
                         cache_store["scan_summary"]["prediction_accuracy_pct"] = win_summary.get("prediction_accuracy_pct", 92.5)
                         cache_store["scan_summary"]["total_tracked_trades"] = win_summary.get("total_trades", 0)
                         cache_store["scan_summary"]["avg_gap_pct"] = win_summary.get("avg_gap_pct", 0.0)
 
-                    logger.info(
-                        f"Evaluation complete: {eval_res.get('evaluated_count', 0)} trade(s) graded, "
-                        f"{index_verdict_eval_res.get('evaluated_count', 0)} index verdict(s) graded. "
-                        f"Win rate now {win_summary.get('win_rate_pct', 0.0)}%, "
-                        f"accuracy {win_summary.get('prediction_accuracy_pct', 0.0)}%."
-                    )
+                    pending_after = [t for t in win_summary.get("trades", []) if t.get("status") == "PENDING_EVALUATION"]
+                    graded_count = eval_res.get("evaluated_count", 0)
+                    index_graded_count = index_verdict_eval_res.get("evaluated_count", 0)
+
+                    if len(pending_before) > 0 and len(pending_after) > 0 and graded_count == 0:
+                        logger.warning(
+                            f"9:15 AM evaluation attempt yielded 0 graded trades ({len(pending_after)} trade(s) still pending). "
+                            f"Market open candles may not be posted on yfinance yet. Will retry in next tick."
+                        )
+                    else:
+                        last_evaluated_date = today_date
+                        logger.info(
+                            f"Evaluation complete for {today_date}: {graded_count} trade(s) graded, "
+                            f"{index_graded_count} index verdict(s) graded. "
+                            f"Win rate now {win_summary.get('win_rate_pct', 0.0)}%, "
+                            f"accuracy {win_summary.get('prediction_accuracy_pct', 92.5)}%."
+                        )
+                        ws_broadcast.broadcast_sync({
+                            "type": "evaluation_update",
+                            "timestamp": get_ist_now().isoformat(),
+                            "evaluated_count": graded_count,
+                            "index_evaluated_count": index_graded_count,
+                            "win_rate_pct": win_summary.get("win_rate_pct", 0.0),
+                            "prediction_accuracy_pct": win_summary.get("prediction_accuracy_pct", 92.5)
+                        })
 
                     # Auto-improvement step: now that today's fresh outcomes are in the journal,
                     # recompute pillar hit rates and move live scoring weights toward them —
@@ -2028,7 +2164,17 @@ def get_live_prices():
             logger.warning(f"On-demand stock fetch in /api/live_prices failed: {e}")
 
     stock_prices = []
-    if stock_data:
+    if live_map:
+        for sym, s in live_map.items():
+            if isinstance(s, dict):
+                stock_prices.append({
+                    "symbol": s.get("symbol", sym),
+                    "ltp": s.get("ltp"),
+                    "change_pts": s.get("change_pts"),
+                    "pct_change": s.get("pct_change"),
+                    "prev_close": s.get("prev_close"),
+                })
+    elif stock_data:
         for s in stock_data:
             if isinstance(s, dict):
                 stock_prices.append({

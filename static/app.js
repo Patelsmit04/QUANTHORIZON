@@ -704,25 +704,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }, refreshMs);
     }
 
-    // Schedule a hard page reload at exactly 9:15 AM IST for fresh market data
+    // Schedule a hard page reload at exactly 9:15:45 AM IST for fresh market data
     function scheduleMarketOpenRefresh() {
         const now = new Date();
         const istOffset = 5.5 * 60 * 60 * 1000;
         const istNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
-        const day = istNow.getDay(); // 0=Sun, 6=Sat
-        if (day === 0 || day === 6) return; // Skip weekends
 
-        const istMins = istNow.getHours() * 60 + istNow.getMinutes();
-        const targetMins = 9 * 60 + 15; // 9:15 AM
+        let targetDate = new Date(istNow);
+        targetDate.setHours(9, 15, 45, 0);
 
-        if (istMins < targetMins) {
-            // Schedule reload for 9:15 AM today
-            const msUntil915 = (targetMins - istMins) * 60000 - (istNow.getSeconds() * 1000);
-            setTimeout(() => {
-                console.log('[QuantHorizon] 9:15 AM IST — hard refreshing for new market day...');
-                location.reload();
-            }, Math.max(0, msUntil915));
+        if (istNow >= targetDate) {
+            targetDate.setDate(targetDate.getDate() + 1);
         }
+        while (targetDate.getDay() === 0 || targetDate.getDay() === 6) {
+            targetDate.setDate(targetDate.getDate() + 1);
+        }
+
+        const msUntilTarget = targetDate.getTime() - istNow.getTime();
+        console.log(`[QuantHorizon] 9:15:45 AM IST market open refresh scheduled in ${(msUntilTarget / 60000).toFixed(1)} minutes (at ${targetDate.toLocaleTimeString('en-IN')})`);
+
+        setTimeout(() => {
+            console.log('[QuantHorizon] 9:15:45 AM IST — hard refreshing for new market day...');
+            location.reload();
+        }, Math.max(1000, msUntilTarget));
     }
 
     async function fetchSplitAccuracy() {
@@ -837,12 +841,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.indices && indexTickerTrack) {
                 const items = indexTickerTrack.querySelectorAll('.index-ticker-item');
                 const indexMap = {};
-                (data.indices || []).forEach(idx => { indexMap[idx.index_name] = idx; });
+                (data.indices || []).forEach(idx => {
+                    if (idx.index_name) indexMap[idx.index_name] = idx;
+                    if (idx.display_name) indexMap[idx.display_name] = idx;
+                });
                 items.forEach(item => {
+                    const idxName = item.dataset.indexName;
                     const nameEl = item.querySelector('strong');
-                    if (!nameEl) return;
-                    const name = nameEl.textContent.trim();
-                    const idx = indexMap[name];
+                    const nameText = nameEl ? nameEl.textContent.trim() : '';
+                    const idx = (idxName && indexMap[idxName]) || (nameText && indexMap[nameText]);
                     if (!idx) return;
                     const spans = item.querySelectorAll('span');
                     if (spans.length >= 2) {
@@ -851,8 +858,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (spans.length >= 3 && idx.change_pts != null) {
                             const isUp = idx.change_pts >= 0;
                             const sign = isUp ? '+' : '';
-                            const pts = idx.change_pts.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            const pct = typeof idx.pct_change === 'number' ? idx.pct_change.toFixed(2) : (idx.pct_change || '--');
+                            const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
+                            const pct = pctVal.toFixed(2);
                             spans[2].textContent = `${sign}${pts} (${sign}${pct}%)`;
                             spans[2].className = isUp ? 'text-bullish' : 'text-bearish';
                         }
@@ -2472,6 +2480,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const detailId = `verdict-detail-${v.index_name || 'idx'}`;
         const detailHtml = buildPillarDetailHtml(v.pillar_breakdown || {});
 
+        const sampleQualifier = (v.evaluated_samples || 0) < 10
+            ? `<span style="font-size:9px;color:var(--gold);display:block;margin-top:2px;"><i class="fa-solid fa-circle-info"></i> N<10 sample — not yet historically validated</span>`
+            : "";
+
         card.innerHTML = `
             <div class="index-verdict-card-header">
                 <div>
@@ -2484,7 +2496,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="verdict-primary-reason">${escapeHtml(v.primary_reason || "")}</div>
 
             <div class="verdict-metrics-row">
-                <div class="verdict-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${v.confidence_level_pct !== undefined ? v.confidence_level_pct + "%" : "--"}</span></div>
+                <div class="verdict-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${v.confidence_level_pct !== undefined ? v.confidence_level_pct + "%" : "--"}</span>${sampleQualifier}</div>
                 <div class="verdict-metric-box"><span class="lbl">GAP OPEN PREDICTION</span><span class="val ${gapColorClass}">${expectedOpenText}</span></div>
             </div>
 
@@ -2676,18 +2688,49 @@ document.addEventListener("DOMContentLoaded", () => {
             // Update BTST status
             if (data.btst_status) lastBtstStatus = data.btst_status;
 
-            const itemsHtml = indices.map(buildTickerItemHTML).join("");
+            if (!indexTickerTrack.children || indexTickerTrack.children.length === 0) {
+                const itemsHtml = indices.map(buildTickerItemHTML).join("");
+                indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
 
-            // Duplicate the item list once so the marquee (translateX 0 -> -50%) loops seamlessly.
-            indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
-
-            // Attach click handlers to ticker items
-            indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const idxName = item.dataset.indexName;
-                    if (idxName) openIndexChartModal(idxName);
+                indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const idxName = item.dataset.indexName;
+                        if (idxName) openIndexChartModal(idxName);
+                    });
                 });
-            });
+            } else {
+                // Update numbers in-place without touching innerHTML (preserves CSS marquee scroll position!)
+                const indexMap = {};
+                indices.forEach(idx => {
+                    if (idx.index_name) {
+                        indexMap[idx.index_name] = idx;
+                        if (idx.index_name === "NIFTY50") indexMap["NIFTY"] = idx;
+                        if (idx.index_name === "NIFTY") indexMap["NIFTY50"] = idx;
+                    }
+                    if (idx.display_name) indexMap[idx.display_name] = idx;
+                });
+                indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                    const idxName = item.dataset.indexName;
+                    const nameEl = item.querySelector('strong');
+                    const nameText = nameEl ? nameEl.textContent.trim() : '';
+                    const idx = (idxName && indexMap[idxName]) || (nameText && indexMap[nameText]);
+                    if (!idx) return;
+                    const spans = item.querySelectorAll('span');
+                    if (spans.length >= 2) {
+                        const ltp = idx.ltp != null ? idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '--';
+                        spans[0].textContent = ltp;
+                        if (spans.length >= 3 && idx.change_pts != null) {
+                            const isUp = idx.change_pts >= 0;
+                            const sign = isUp ? '+' : '';
+                            const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
+                            const pct = pctVal.toFixed(2);
+                            spans[2].textContent = `${sign}${pts} (${sign}${pct}%)`;
+                            spans[2].className = isUp ? 'text-bullish' : 'text-bearish';
+                        }
+                    }
+                });
+            }
         } catch (error) {
             console.error("Failed to fetch ticker indices:", error);
         }
@@ -3561,7 +3604,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function fetchHistorySection() {
         if (!historyTableBody) return;
         try {
-            historyTableBody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></td></tr>`;
+            historyTableBody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x text-gold"></i><div style="margin-top:10px;">Loading evaluation history & calibration report...</div></td></tr>`;
 
             const [historyRes, validationRes] = await Promise.all([
                 apiFetch("/api/history/predictions?limit=100"),
@@ -3571,25 +3614,17 @@ document.addEventListener("DOMContentLoaded", () => {
             allHistoryRows = historyRes.ok ? await historyRes.json() : [];
             const validationData = validationRes.ok ? await validationRes.json() : {};
 
-            if (!Array.isArray(allHistoryRows) || allHistoryRows.length === 0) {
-                allHistoryRows = [
-                    { date: "09 Aug 2026", instrument: "RELIANCE", strategy_id: "default-5-pillar", strategy_name: "5-Pillar Matrix", signal: "BTST (BUY)", entry_price: "2450.00", tp_price: "2499.00", sl_price: "2425.00", predicted_gap_bucket: "GAP_UP_LARGE", realized_gap_pct: "+1.8", realized_gap_bucket: "GAP_UP_LARGE", outcome_result: "WIN (TP HIT)", institutional_flow_contributed: true },
-                    { date: "09 Aug 2026", instrument: "TCS", strategy_id: "default-5-pillar", strategy_name: "5-Pillar Matrix", signal: "BTST (BUY)", entry_price: "4120.00", tp_price: "4202.00", sl_price: "4078.00", predicted_gap_bucket: "GAP_UP_SMALL", realized_gap_pct: "+0.9", realized_gap_bucket: "GAP_UP_SMALL", outcome_result: "WIN (TP HIT)", institutional_flow_contributed: false },
-                    { date: "08 Aug 2026", instrument: "INFY", strategy_id: "smc-institutional-v1", strategy_name: "Smart Money Concepts", signal: "STBT (SELL)", entry_price: "1850.00", tp_price: "1813.00", sl_price: "1868.00", predicted_gap_bucket: "GAP_DOWN_SMALL", realized_gap_pct: "-0.7", realized_gap_bucket: "GAP_DOWN_SMALL", outcome_result: "WIN (TP HIT)", institutional_flow_contributed: true },
-                    { date: "08 Aug 2026", instrument: "HDFCBANK", strategy_id: "default-5-pillar", strategy_name: "5-Pillar Matrix", signal: "BTST (BUY)", entry_price: "1620.00", tp_price: "1652.00", sl_price: "1603.00", predicted_gap_bucket: "GAP_UP_LARGE", realized_gap_pct: "+1.4", realized_gap_bucket: "GAP_UP_LARGE", outcome_result: "WIN (TP HIT)", institutional_flow_contributed: true },
-                    { date: "07 Aug 2026", instrument: "ICICIBANK", strategy_id: "default-5-pillar", strategy_name: "5-Pillar Matrix", signal: "BTST (BUY)", entry_price: "1210.00", tp_price: "1234.00", sl_price: "1197.00", predicted_gap_bucket: "FLAT", realized_gap_pct: "+0.1", realized_gap_bucket: "FLAT", outcome_result: "NEUTRAL", institutional_flow_contributed: false },
-                    { date: "07 Aug 2026", instrument: "SBIN", strategy_id: "smc-institutional-v1", strategy_name: "Smart Money Concepts", signal: "STBT (SELL)", entry_price: "840.00", tp_price: "823.00", sl_price: "848.00", predicted_gap_bucket: "GAP_DOWN_LARGE", realized_gap_pct: "-1.5", realized_gap_bucket: "GAP_DOWN_LARGE", outcome_result: "WIN (TP HIT)", institutional_flow_contributed: true }
-                ];
+            if (!Array.isArray(allHistoryRows)) {
+                allHistoryRows = [];
             }
 
             let calibrationRows = validationData.confidence_calibration;
             if (!Array.isArray(calibrationRows) || calibrationRows.length === 0) {
                 calibrationRows = [
-                    { confidence_bucket: "90-99", total_signals: 38, sample_status: "STRONG SAMPLE", directional_accuracy_pct: 86.8, win_rate_pct: 81.6 },
-                    { confidence_bucket: "80-89", total_signals: 54, sample_status: "STRONG SAMPLE", directional_accuracy_pct: 79.6, win_rate_pct: 75.9 },
-                    { confidence_bucket: "70-79", total_signals: 62, sample_status: "STRONG SAMPLE", directional_accuracy_pct: 74.2, win_rate_pct: 71.0 },
-                    { confidence_bucket: "60-69", total_signals: 29, sample_status: "MODERATE SAMPLE", directional_accuracy_pct: 65.5, win_rate_pct: 62.1 },
-                    { confidence_bucket: "50-59", total_signals: 18, sample_status: "BUILDING SAMPLE", directional_accuracy_pct: 55.6, win_rate_pct: 50.0 }
+                    { confidence_bucket: "90-99", total_signals: 0, sample_status: "BUILDING SAMPLE", directional_accuracy_pct: 0, win_rate_pct: 0 },
+                    { confidence_bucket: "80-89", total_signals: 0, sample_status: "BUILDING SAMPLE", directional_accuracy_pct: 0, win_rate_pct: 0 },
+                    { confidence_bucket: "70-79", total_signals: 0, sample_status: "BUILDING SAMPLE", directional_accuracy_pct: 0, win_rate_pct: 0 },
+                    { confidence_bucket: "60-69", total_signals: 0, sample_status: "BUILDING SAMPLE", directional_accuracy_pct: 0, win_rate_pct: 0 }
                 ];
             }
 
@@ -3598,6 +3633,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fetchSplitAccuracy();
         } catch (e) {
             console.error("Failed to fetch history section:", e);
+            allHistoryRows = [];
             filterAndRenderHistoryTable();
         }
     }
@@ -3624,7 +3660,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (filtered.length === 0) {
-            historyTableBody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--ink-muted);">No history records match the selected filters.</td></tr>`;
+            historyTableBody.innerHTML = `
+                <tr>
+                    <td colspan="11" style="text-align:center;padding:40px 20px;">
+                        <div style="max-width:440px;margin:0 auto;color:var(--ink-muted);">
+                            <i class="fa-solid fa-clock-rotate-left fa-2x text-gold" style="margin-bottom:10px;"></i>
+                            <h4 style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:6px;">No Evaluation History Recorded Yet</h4>
+                            <p style="font-size:12px;color:var(--ink-secondary);line-height:1.5;">Locked 3:30 PM BTST picks and next-morning 9:15 AM gap evaluations will automatically populate this trade history log.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
             return;
         }
 
@@ -3792,7 +3838,34 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(updateClosingSequenceStepper, 10000);
     updateClosingSequenceStepper();
 
-    fetchTickerIndices();
-    setInterval(fetchTickerIndices, 15000);
     fetchSplitAccuracy();
+
+    function initWebSocket() {
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//${window.location.host}/ws/live`;
+        let socket = null;
+
+        function connect() {
+            try {
+                socket = new WebSocket(wsUrl);
+                socket.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === "evaluation_update") {
+                            showToast(`9:15 AM Evaluation Complete: ${data.evaluated_count || 0} setup(s) graded`, "success");
+                            fetchScanData();
+                            fetchSplitAccuracy();
+                            fetchTickerIndices();
+                        } else if (data.type === "scan_update" || data.type === "market_lock") {
+                            fetchScanData();
+                            fetchTickerIndices();
+                        }
+                    } catch (e) { console.error("WS message parse error:", e); }
+                };
+                socket.onclose = () => { setTimeout(connect, 5000); };
+            } catch (err) { console.error("WS connection error:", err); }
+        }
+        connect();
+    }
+    initWebSocket();
 });

@@ -194,7 +194,7 @@
                             <i class="fa-solid fa-file-csv"></i><span>CSV</span>
                         </button>
                         <button id="btnOrderBasket" class="btn btn-pill btn-gold" title="Copy BTST/STBT Order Slips">
-                            <i class="fa-solid fa-basket-shopping"></i><span>ORDER BASKET</span>
+                            <i class="fa-solid fa-basket-shopping"></i><span class="btn-text-full">ORDER BASKET</span><span class="btn-text-mobile">BASKET</span>
                         </button>
                         <button id="scanBtn" class="btn btn-pill btn-primary scan-hero-btn">
                             <i class="fa-solid fa-bolt"></i><span>SCAN NOW</span>
@@ -868,11 +868,15 @@
                 </div>
 
                 <div class="guide-step-box">
-                    <h4>📈 Autonomous Background Scanning Schedule &amp; Locking</h4>
+                    <h4>📈 Autonomous Background Scanning Schedule &amp; 5-Step Closing Sequence</h4>
                     <p><strong>9:15 AM – 2:30 PM</strong>: 5-minute background scanning.<br>
-                    <strong>2:30 PM – 3:30 PM (Power Hour)</strong>: 1-minute high-frequency scanning.<br>
-                    <strong>3:30 PM Final Scan Cut-Off</strong>: Scanning finishes — no further scanning — and active BTST/STBT picks are automatically locked with a full written depth-analysis.<br>
-                    <strong>3:30 PM – 9:15 AM Next Day (Off-Market)</strong>: Live scanning freezes and serves the frozen 3:30 PM BTST pick snapshot.</p>
+                    <strong>2:30 PM – 3:14 PM (Power Hour)</strong>: High-frequency scanning pass.<br>
+                    <strong>3:14 PM Candidate Snapshot</strong>: Candidate setup candidates are frozen prior to market closing auction.<br>
+                    <strong>3:15 PM – 3:35 PM CAS Pause</strong>: Scanning pauses during NSE Closing Auction Session price discovery.<br>
+                    <strong>3:35 PM – 3:38 PM CAS Re-Fetch &amp; Scoring</strong>: Settled closing prices re-fetched &amp; final 5-pillar scores compiled.<br>
+                    <strong>3:38 PM Live PUSH Broadcast</strong>: Final BTST/STBT picks broadcasted live over WebSocket.<br>
+                    <strong>3:40 PM Official Lock</strong>: Picks officially locked &amp; persisted to Signal Journal &amp; Trade History.<br>
+                    <strong>3:40 PM – 9:15 AM Next Day (Off-Market)</strong>: Scanning freezes and serves the frozen 3:40 PM BTST pick snapshot.</p>
                 </div>
 
                 <div class="guide-step-box">

@@ -718,16 +718,26 @@
         padding: 0 !important;
     }
 
-    .content-topbar,
-    .index-ticker-bar {
+    .content-topbar {
         max-width: 100vw !important;
         width: 100vw !important;
         overflow-x: hidden !important;
         box-sizing: border-box !important;
     }
 
+    .index-ticker-bar {
+        max-width: 100% !important;
+        width: 100% !important;
+        overflow: hidden !important;
+        position: relative !important;
+        clear: both !important;
+        display: block !important;
+        box-sizing: border-box !important;
+    }
+
     .index-ticker-track {
-        max-width: 100vw !important;
+        max-width: none !important;
+        width: max-content !important;
     }
 
     .main-content {
@@ -883,5 +893,306 @@
         -webkit-overflow-scrolling: touch !important;
         width: 100% !important;
         max-width: 100% !important;
+    }
+}
+
+/* ==========================================================================
+   MOBILE UI/UX RESPONSIVENESS & LAYOUT REFINEMENT PASS (375px / 390px / 428px)
+   ========================================================================== */
+
+/* Item 0: Global Live Index Ticker Containment & Header Separation */
+.index-ticker-bar {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
+    clear: both !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    z-index: 90 !important;
+}
+
+.index-ticker-track {
+    display: flex !important;
+    width: max-content !important;
+    max-width: none !important;
+    gap: 24px !important;
+    animation: index-ticker-scroll 24s linear infinite !important;
+}
+
+@media (max-width: 767px) {
+    /* Item 0: Ticker Item Font & Padding */
+    .index-ticker-bar {
+        padding: 8px 0 !important;
+    }
+    .index-ticker-item {
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        padding: 0 12px !important;
+        gap: 6px !important;
+    }
+
+    /* Item 1: Order Flow Veto Intelligence Page (#orderFlowSection) */
+    #orderFlowSection .stats-overview-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        margin-top: 12px !important;
+        margin-bottom: 12px !important;
+    }
+    #orderFlowSection .stat-card {
+        padding: 10px 12px !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+    #orderFlowSection .stat-card-title {
+        font-size: 10px !important;
+        gap: 4px !important;
+        white-space: normal !important;
+        line-height: 1.3 !important;
+    }
+    #orderFlowSection .stat-card-value {
+        font-size: 18px !important;
+        margin: 4px 0 !important;
+    }
+    #orderFlowSection .stat-card-footer {
+        font-size: 10px !important;
+        line-height: 1.25 !important;
+        word-break: break-word !important;
+    }
+    #orderFlowSection #ofFilterGroup {
+        display: flex !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+        width: 100% !important;
+        padding-bottom: 4px !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    #orderFlowSection .filter-chip {
+        flex-shrink: 0 !important;
+        min-height: 44px !important;
+        padding: 10px 14px !important;
+        font-size: 12px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    #orderFlowSection #orderFlowSearchInput {
+        width: 100% !important;
+        min-height: 44px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Item 2: Accuracy & Performance Page (#accuracySection) */
+    #accuracySection .split-accuracy-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        margin-top: 12px !important;
+        margin-bottom: 16px !important;
+    }
+    #accuracySection .split-accuracy-grid .metric-card {
+        padding: 10px 12px !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+    #accuracySection .split-accuracy-grid .metric-title {
+        font-size: 10px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    #accuracySection .split-accuracy-grid .badge {
+        font-size: 9px !important;
+        padding: 2px 6px !important;
+    }
+    #accuracySection .split-accuracy-grid .metric-body div {
+        font-size: 16px !important;
+    }
+    #accuracySection .split-accuracy-grid .metric-subtext {
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+    }
+    #accuracySection #btnRefreshAccuracy {
+        width: 100% !important;
+        min-height: 44px !important;
+        justify-content: center !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    /* Item 3: Index Intelligence Page (#indicesSection) */
+    #indicesSection #indexSectionSwitcher {
+        display: flex !important;
+        gap: 8px !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    #indicesSection .index-tab-btn {
+        flex: 1 1 0% !important;
+        min-width: 140px !important;
+        min-height: 44px !important;
+        font-size: 12px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        padding: 10px 12px !important;
+        white-space: nowrap !important;
+    }
+    .dashboard-heading-actions {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .dashboard-heading-actions .btn {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        padding: 8px 6px !important;
+        font-size: 11px !important;
+        min-height: 40px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        white-space: nowrap !important;
+    }
+
+    .dashboard-heading-actions .btn span {
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+    }
+    #indicesSection .index-verdict-card {
+        padding: 14px !important;
+    }
+    #indicesSection .index-verdict-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+        flex-wrap: wrap !important;
+    }
+    #indicesSection .index-verdict-stats-row {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        margin-top: 10px !important;
+    }
+
+    /* Item 4: History & Calibration Page (#historySection) */
+    #historySection .toolbar-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+    #historySection .search-box,
+    #historySection .sort-box,
+    #historySection .checkbox-item {
+        width: 100% !important;
+        min-height: 44px !important;
+        box-sizing: border-box !important;
+    }
+    #historySearchInput,
+    #historyStrategyFilter,
+    #historyOutcomeFilter {
+        width: 100% !important;
+        min-height: 44px !important;
+        box-sizing: border-box !important;
+    }
+    #historySection .checkbox-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        padding: 10px 14px !important;
+        background: var(--glass-bg-soft) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 8px !important;
+    }
+
+    /* Item 5: Strategies Page (#strategiesSection) */
+    .toggle-row {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 12px !important;
+        min-height: 44px !important;
+        padding: 8px 0 !important;
+    }
+    .toggle-row .lbl {
+        flex: 1 1 auto !important;
+        font-size: 13px !important;
+        line-height: 1.3 !important;
+        word-break: break-word !important;
+    }
+    .toggle-row .switch {
+        flex-shrink: 0 !important;
+    }
+    .form-textarea#strategyPythonCode,
+    .code-editor,
+    pre.strategy-code {
+        width: 100% !important;
+        overflow-x: auto !important;
+        white-space: pre !important;
+        font-family: monospace !important;
+        font-size: 13px !important;
+        padding: 12px !important;
+        box-sizing: border-box !important;
+    }
+    .strategy-stats-grid,
+    .strategy-scope-stats {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    /* Item 6: Guide / Export / Settings Page (#guideSection) */
+    #guideSection .guide-settings-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+    #guideSection .guide-step-box {
+        padding: 16px !important;
+        box-sizing: border-box !important;
+    }
+    #guideSection .guide-step-box .btn {
+        width: 100% !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-top: 12px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Item 7: Rules Page (#rulesSection) */
+    #rulesSection {
+        padding: 0 !important;
+    }
+    #rulesSection .guide-step-box {
+        padding: 16px !important;
+        margin-bottom: 14px !important;
+        border-radius: 12px !important;
+        box-sizing: border-box !important;
+    }
+    #rulesSection .guide-step-box h4 {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        margin-bottom: 8px !important;
+    }
+    #rulesSection .guide-step-box p {
+        font-size: 13px !important;
+        line-height: 1.55 !important;
     }
 }
