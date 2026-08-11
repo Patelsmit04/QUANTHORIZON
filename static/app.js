@@ -2728,25 +2728,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // up a real Gift Nifty feed is a separate backend task. TODO: replace the placeholder
     // once GIFT NIFTY has a real data source.
     // -------------------------------------------------------------
-    function buildTickerItemHTML(idx) {
-        const name = escapeHtml(idx.index_name || "");
-        const ltp = (idx.ltp !== undefined && idx.ltp !== null) ? idx.ltp.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "--";
-        const changePts = (idx.change_pts !== undefined && idx.change_pts !== null) ? idx.change_pts : null;
-        const pctChange = (idx.pct_change !== undefined && idx.pct_change !== null) ? idx.pct_change : null;
-        const isUp = changePts !== null && changePts >= 0;
-        const cls = changePts === null ? "text-sub" : (isUp ? "text-bullish" : "text-bearish");
-        const sign = changePts === null ? "" : (isUp ? "+" : "");
-        const ptsText = changePts !== null ? changePts.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "--";
-        const pctText = pctChange !== null ? (typeof pctChange === "number" ? pctChange.toFixed(2) : pctChange) : "--";
 
-        return `
-            <span class="index-ticker-item" data-index-name="${escapeAttr(idx.index_name || '')}" style="cursor:pointer;" title="Click to view ${name} chart">
-                <strong>${name}</strong>
-                <span>${ltp}</span>
-                <span class="${cls}">${sign}${ptsText} (${sign}${pctText}%)</span>
-            </span>
-        `;
-    }
 
     // Open a chart modal when clicking an index in the ticker bar
     function openIndexChartModal(indexName) {
