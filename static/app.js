@@ -1480,22 +1480,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function getPhaseBadgeHTML(stock) {
-        if (!stock) return "";
-        if (stock.eval_date || stock.graded || stock.is_direction_correct !== undefined) {
-            return `<span class="badge badge-phase-graded"><i class="fa-solid fa-check-double"></i> GRADED</span>`;
-        }
-        const now = new Date();
-        const istHours = (now.getUTCHours() + 5 + Math.floor((now.getUTCMinutes() + 30) / 60)) % 24;
-        const istMins = (now.getUTCMinutes() + 30) % 60;
-        const timeInMins = istHours * 60 + istMins;
-        const isWeekend = now.getUTCDay() === 0 || now.getUTCDay() === 6;
-
-        if (isWeekend || timeInMins >= (15 * 60 + 30) || timeInMins < (9 * 60 + 15)) {
-            return `<span class="badge badge-phase-locked"><i class="fa-solid fa-lock"></i> LOCKED 3:30 PM</span>`;
-        } else if (timeInMins >= (15 * 60 + 25) && timeInMins < (15 * 60 + 30)) {
-            return `<span class="badge badge-phase-provisional"><i class="fa-solid fa-clock"></i> PRE-CLOSE 3:25 PM</span>`;
-        }
-        return `<span class="badge badge-phase-tentative"><i class="fa-solid fa-radar"></i> TENTATIVE SCAN</span>`;
+        return "";
     }
 
     function getRsiColorClass(rsi) {
