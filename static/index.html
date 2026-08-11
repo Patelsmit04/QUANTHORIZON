@@ -500,7 +500,7 @@
             </div>
             <!-- ============================== END INSTITUTIONAL FLOW SECTION ============================== -->
 
-            <!-- ============================== ORDER FLOW VETO SECTION ============================== -->
+            <!-- ============================== ORDER FLOW VETO INTELLIGENCE SECTION ============================== -->
             <div id="orderFlowSection" class="hidden">
                 <div class="section-heading-row">
                     <h2 class="section-page-title"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW VETO INTELLIGENCE
@@ -508,6 +508,7 @@
                     </h2>
                 </div>
 
+                <!-- 2x2 Stat Overview Grid -->
                 <div class="stats-overview-grid" style="margin-top:16px;margin-bottom:16px;">
                     <div class="stat-card">
                         <div class="stat-card-title"><i class="fa-solid fa-plug"></i> FEED STATUS</div>
@@ -531,6 +532,7 @@
                     </div>
                 </div>
 
+                <!-- Search Bar & Filter Chips Rail -->
                 <div class="toolbar-container" style="margin-bottom:16px;">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -544,16 +546,18 @@
                     </div>
                 </div>
 
-                <div id="orderFlowGrid" class="order-flow-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));gap:16px;">
-                    <!-- Injected by JS -->
+                <!-- Order Flow Cards Grid -->
+                <div id="orderFlowGrid" class="order-flow-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(360px, 1fr));gap:16px;">
+                    <!-- Dynamic Cards Injected by JS -->
                 </div>
 
                 <div id="orderFlowEmptyState" class="empty-state hidden">
-                    <i class="fa-solid fa-bolt-lightning fa-3x text-gold"></i>
-                    <h3>No Order Flow Setups Found</h3>
-                    <p>No scanned candidate matches the selected filter. Run a scan or adjust your search filter above.</p>
+                    <i class="fa-solid fa-shield-halved fa-3x text-gold"></i>
+                    <h3>No Active Order Flow Setups</h3>
+                    <p>Zerodha Kite 5-Level Depth closing aggression monitoring runs during 3:15–3:25 PM IST. Outside this window or prior to close, setups build dynamically.</p>
                 </div>
             </div>
+            <!-- ============================== END ORDER FLOW SECTION ============================== -->
 
             <!-- ============================== ACCURACY & PERFORMANCE SECTION ============================== -->
             <div id="accuracySection" class="hidden">
@@ -568,6 +572,7 @@
                     </div>
                 </div>
 
+                <!-- 2x2 KPI Card Grid -->
                 <section class="split-accuracy-grid" style="margin-top:16px;margin-bottom:24px;">
                     <div class="metric-card" style="border-top:3px solid var(--gold);">
                         <div class="metric-header">
@@ -611,6 +616,7 @@
                     </div>
                 </section>
 
+                <!-- Detailed Analytics Grid -->
                 <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;margin-bottom:24px;">
                     <div class="stock-card" style="padding:20px;">
                         <div style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
@@ -623,7 +629,7 @@
                             </div>
                             <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
                                 <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">TOTAL EVALUATED</div>
-                                <div style="font-size:18px;font-weight:800;color:var(--ink-primary);" id="accBtstStockTotal">N=2</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--ink-primary);" id="accBtstStockTotal">N=0</div>
                             </div>
                             <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
                                 <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">AVG OVERNIGHT GAP</div>
@@ -647,7 +653,7 @@
                             </div>
                             <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
                                 <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">TOTAL EVALUATED</div>
-                                <div style="font-size:18px;font-weight:800;color:var(--ink-primary);" id="accIntraStockTotal">N=1</div>
+                                <div style="font-size:18px;font-weight:800;color:var(--ink-primary);" id="accIntraStockTotal">N=0</div>
                             </div>
                             <div style="background:var(--glass-bg-soft);padding:10px;border-radius:8px;border:1px solid var(--gridline);">
                                 <div style="color:var(--ink-muted);font-weight:700;font-size:10px;">TARGET HIT %</div>
@@ -661,6 +667,7 @@
                     </div>
                 </div>
             </div>
+            <!-- ============================== END ACCURACY SECTION ============================== -->
 
             <!-- ============================== INDEX INTELLIGENCE SECTION ============================== -->
             <div id="indicesSection" class="hidden">
@@ -681,21 +688,22 @@
                 <div id="indexIntelligenceView">
                     <div id="indexVerdictMeta" class="form-hint" style="margin-bottom:10px;"></div>
                     <section class="index-verdict-grid" id="indexVerdictGrid">
-                        <!-- Injected by JS -->
+                        <!-- Dynamic structured verdict cards injected by JS -->
                     </section>
                     <div id="indexVerdictEmptyState" class="empty-state hidden">
-                        <i class="fa-solid fa-chart-line fa-3x"></i>
-                        <h3>Index BTST Intelligence Hasn't Run Yet Today</h3>
-                        <p>This deeper derivatives + Greeks + macro read runs once, shortly after market close — check back after 3:45 PM IST.</p>
+                        <i class="fa-solid fa-chart-line fa-3x text-gold"></i>
+                        <h3>Index BTST Intelligence Pending Market Close</h3>
+                        <p>This deeper derivatives + Greeks + macro read runs once, shortly after market close (3:45 PM IST).</p>
                     </div>
                 </div>
 
                 <div id="indexSignalsView" class="hidden">
                     <section class="index-grid" id="indexGrid">
-                        <!-- Injected by JS -->
+                        <!-- Dynamic index cards injected by JS -->
                     </section>
                 </div>
             </div>
+            <!-- ============================== END INDICES SECTION ============================== -->
 
             <!-- ============================== STRATEGIES SECTION ============================== -->
             <div id="strategiesSection" class="hidden">
@@ -706,21 +714,22 @@
                 </div>
 
                 <section class="toolbar-container">
-                    <div class="legend-subtitle">Presets on top of existing pillars/gates — add, edit, or remove your own; built-in Default 5-Pillar strategy can be edited but not deleted.</div>
-                    <button id="addStrategyBtn" class="btn btn-pill btn-primary">
+                    <div class="legend-subtitle">Presets on top of the existing pillars/gates — add, edit, or remove any of your own; the built-in Default 5-Pillar strategy can be edited but not deleted.</div>
+                    <button id="addStrategyBtn" class="btn btn-pill btn-primary" style="min-height:44px;">
                         <i class="fa-solid fa-plus"></i> ADD STRATEGY
                     </button>
                 </section>
 
                 <div class="paper-trade-notice">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span>All strategy execution is PAPER/SIMULATED only — no real broker order placement is executed (Kite Connect is used read-only for market data & tick-rule order flow analysis).</span>
+                    <span>All strategy execution is PAPER/SIMULATED only — no real broker order placement is executed (Kite Connect is used read-only for market data &amp; tick-rule order flow analysis).</span>
                 </div>
 
                 <section class="strategy-grid" id="strategyGrid">
-                    <!-- Injected by JS -->
+                    <!-- Dynamic strategy cards injected by JS -->
                 </section>
             </div>
+            <!-- ============================== END STRATEGIES SECTION ============================== -->
 
             <!-- ============================== HISTORY & CALIBRATION SECTION ============================== -->
             <div id="historySection" class="hidden">
@@ -733,6 +742,7 @@
                     </button>
                 </div>
 
+                <!-- History Toolbar Filters -->
                 <div class="toolbar-container" style="margin-bottom:16px;">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -758,6 +768,7 @@
                     </label>
                 </div>
 
+                <!-- History Table -->
                 <div class="table-card">
                     <div class="table-scroll">
                         <table class="data-table" id="historyDataTable">
@@ -777,12 +788,13 @@
                                 </tr>
                             </thead>
                             <tbody id="historyTableBody">
-                                <!-- Injected by JS -->
+                                <!-- Dynamic history rows injected by JS -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
+                <!-- Calibration Report Sub-Section -->
                 <div style="margin-top:32px;margin-bottom:16px;">
                     <h3 style="font-size:16px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
                         <i class="fa-solid fa-bullseye text-cyan"></i> CONFIDENCE CALIBRATION &amp; BUCKET ACCURACY REPORT
@@ -790,9 +802,10 @@
                 </div>
 
                 <section id="calibrationCardGrid" class="calibration-card-grid">
-                    <!-- Injected by JS -->
+                    <!-- Dynamic calibration bar-cards injected by JS -->
                 </section>
             </div>
+            <!-- ============================== END HISTORY & CALIBRATION SECTION ============================== -->
 
             <!-- ============================== GUIDE / EXPORT / SETTINGS SECTION ============================== -->
             <div id="guideSection" class="hidden">
@@ -806,7 +819,7 @@
                     <div class="guide-step-box">
                         <h4><i class="fa-solid fa-file-csv text-gold"></i> Export Watchlist</h4>
                         <p>Download the current filtered Signals Engine view as a CSV file — same data, same filters, same sort order you're looking at right now.</p>
-                        <button id="exportCsvBtnGuide" class="btn btn-pill btn-primary" style="margin-top:10px;">
+                        <button id="exportCsvBtnGuide" class="btn btn-pill btn-primary" style="margin-top:10px;width:100%;">
                             <i class="fa-solid fa-file-csv"></i> EXPORT CSV
                         </button>
                     </div>
@@ -814,7 +827,7 @@
                     <div class="guide-step-box">
                         <h4><i class="fa-solid fa-trophy text-gold"></i> Win Rate &amp; Gap Accuracy Analytics</h4>
                         <p>Open the full historical trade log: predicted gap vs. actual gap, per-pick accuracy score, and overall BTST win rate.</p>
-                        <button id="winRateBtnGuide" class="btn btn-pill btn-secondary" style="margin-top:10px;">
+                        <button id="winRateBtnGuide" class="btn btn-pill btn-secondary" style="margin-top:10px;width:100%;">
                             <i class="fa-solid fa-trophy text-gold"></i> OPEN WIN RATE ANALYTICS
                         </button>
                     </div>
@@ -822,17 +835,18 @@
                     <div class="guide-step-box">
                         <h4><i class="fa-solid fa-scale-balanced text-gold"></i> Quantitative Rules</h4>
                         <p>Priority thresholds, the 5-Pillar matrix, scanning/locking schedule, and the fundamentals/news quality gates — all in one place, unchanged from the engine's actual scoring logic.</p>
-                        <button class="btn btn-pill btn-secondary sidebar-nav-jump" data-section-link="rules" style="margin-top:10px;">
+                        <button class="btn btn-pill btn-secondary sidebar-nav-jump" data-section-link="rules" style="margin-top:10px;width:100%;">
                             <i class="fa-solid fa-arrow-right"></i> VIEW RULES
                         </button>
                     </div>
 
                     <div class="guide-step-box">
                         <h4><i class="fa-solid fa-circle-info text-gold"></i> About This Build</h4>
-                        <p>QuantHorizon is a paper/simulated research engine — no real broker order placement is executed (Kite Connect is used read-only for live market data & tick-rule delta analysis). All quantitative rules, thresholds, and scoring logic are identical across desktop and mobile.</p>
+                        <p>QuantHorizon is a paper/simulated research engine — no real broker order placement is executed (Kite Connect is used read-only for live market data &amp; tick-rule delta analysis). All quantitative rules, thresholds, and scoring logic are identical across desktop and mobile.</p>
                     </div>
                 </section>
             </div>
+            <!-- ============================== END GUIDE / EXPORT / SETTINGS SECTION ============================== -->
 
             <!-- ============================== RULES SECTION ============================== -->
             <div id="rulesSection" class="hidden">
@@ -842,7 +856,7 @@
                     </h2>
                 </div>
 
-                <p class="mb-3">Our quantitative engine predicts overnight gap movements and ranks Indian NSE F&amp;O stocks using 5 institutional pillars:</p>
+                <p class="mb-3" style="color:var(--ink-secondary);line-height:1.5;">Our quantitative engine predicts overnight gap movements and ranks Indian NSE F&amp;O stocks using 5 institutional pillars:</p>
 
                 <div class="guide-step-box">
                     <h4>🟢 CALL (CE) vs 🔴 PUT (PE) Option Signals</h4>
@@ -881,6 +895,7 @@
                     <p>Stocks News covers every F&amp;O stock (the full option-chain universe). A background job refreshes it up to 3x/day within CurrentsAPI's daily limit — your page views never call the API directly, so any number of people can browse News at zero extra cost.</p>
                 </div>
             </div>
+            <!-- ============================== END RULES SECTION ============================== -->
 
             </main>
         </div>
