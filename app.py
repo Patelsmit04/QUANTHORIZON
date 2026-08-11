@@ -1108,7 +1108,7 @@ def _run_closing_lock_sequence(picks: List[Dict[str, Any]]) -> Dict[str, Any]:
     stbt_n = sum(1 for p in picks if "STBT" in p.get("signal", ""))
     notif = log_notification(
         notif_type="lock_complete",
-        title="3:40 PM Lock Complete",
+        title="3:30 PM Lock Complete",
         message=f"{locked_count} BTST/STBT pick(s) locked ({btst_n} BTST, {stbt_n} STBT).",
         payload={"locked_count": locked_count, "btst_count": btst_n, "stbt_count": stbt_n},
     )
@@ -1516,7 +1516,7 @@ def evaluation_scheduler_worker():
     last_evaluated_date = None
     EVAL_WINDOW_START = 9 * 60 + 15   # 9:15 AM
     EVAL_WINDOW_END = 9 * 60 + 17     # 9:17 AM
-    CATCH_UP_CUTOFF = 15 * 60 + 40    # don't bother catching up past today's 3:40 PM lock
+    CATCH_UP_CUTOFF = 15 * 60 + 30    # don't bother catching up past today's 3:30 PM lock
 
     while True:
         try:

@@ -647,7 +647,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (marketTimer) {
-                let scanText = data.scan_mode || "OFF-MARKET SNAPSHOT (3:40 PM Scan Locked)";
+                let scanText = data.scan_mode || "OFF-MARKET SNAPSHOT (3:30 PM Scan Locked)";
                 if (data.data_feed_info && data.data_feed_info.is_delayed) {
                     scanText += " • [15M DELAYED FEED]";
                 }
@@ -1490,10 +1490,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const timeInMins = istHours * 60 + istMins;
         const isWeekend = now.getUTCDay() === 0 || now.getUTCDay() === 6;
 
-        if (isWeekend || timeInMins >= (15 * 60 + 40) || timeInMins < (9 * 60 + 15)) {
-            return `<span class="badge badge-phase-locked"><i class="fa-solid fa-lock"></i> LOCKED 3:40 PM</span>`;
-        } else if (timeInMins >= (15 * 60 + 25) && timeInMins < (15 * 60 + 40)) {
-            return `<span class="badge badge-phase-provisional"><i class="fa-solid fa-clock"></i> PROVISIONAL 3:25 PM</span>`;
+        if (isWeekend || timeInMins >= (15 * 60 + 30) || timeInMins < (9 * 60 + 15)) {
+            return `<span class="badge badge-phase-locked"><i class="fa-solid fa-lock"></i> LOCKED 3:30 PM</span>`;
+        } else if (timeInMins >= (15 * 60 + 25) && timeInMins < (15 * 60 + 30)) {
+            return `<span class="badge badge-phase-provisional"><i class="fa-solid fa-clock"></i> PRE-CLOSE 3:25 PM</span>`;
         }
         return `<span class="badge badge-phase-tentative"><i class="fa-solid fa-radar"></i> TENTATIVE SCAN</span>`;
     }
@@ -3959,7 +3959,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (state.lock_done && stepLock) {
                 stepLock.style.background = "rgba(16,185,129,0.25)";
                 stepLock.style.color = "var(--bullish-green)";
-                if (statusText) statusText.textContent = "3:40 PM LOCK COMPLETE";
+                if (statusText) statusText.textContent = "3:30 PM LOCK COMPLETE";
             } else if (statusText) {
                 statusText.textContent = "SEQUENCE IN PROGRESS";
             }

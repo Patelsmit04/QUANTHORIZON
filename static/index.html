@@ -280,20 +280,18 @@
                     </button>
                 </div>
 
-                <!-- 3:14 - 3:40 PM Closing Sequence Progress Stepper Widget -->
+                <!-- 3:14 - 3:30 PM Closing Sequence Progress Stepper Widget -->
                 <div class="closing-sequence-stepper hidden" id="closingSequenceStepper" style="background:rgba(22,25,31,0.85);border:1px solid rgba(212,175,55,0.3);border-radius:10px;padding:12px 18px;margin-bottom:14px;">
                     <div style="font-size:12px;font-weight:700;color:var(--accent-gold);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
-                        <span><i class="fa-solid fa-clock-rotate-left"></i> 3:14 – 3:40 PM CLOSING LOCK SEQUENCE</span>
+                        <span><i class="fa-solid fa-clock-rotate-left"></i> 3:14 – 3:30 PM CLOSING LOCK SEQUENCE</span>
                         <span id="closingSequenceStatusText" style="color:var(--ink-secondary);font-size:11px;">Monitoring...</span>
                     </div>
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11px;font-weight:600;flex-wrap:wrap;">
                         <span class="step-badge" id="stepSnapshot" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-camera"></i> 3:14 PM Snapshot</span>
                         <i class="fa-solid fa-chevron-right text-muted"></i>
-                        <span class="step-badge" id="stepCas" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-calculator"></i> 3:35 PM CAS Close</span>
+                        <span class="step-badge" id="stepCas" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-clock"></i> 3:25 PM Auto-Lock</span>
                         <i class="fa-solid fa-chevron-right text-muted"></i>
-                        <span class="step-badge" id="stepScoring" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-award"></i> 3:36 PM Scoring</span>
-                        <i class="fa-solid fa-chevron-right text-muted"></i>
-                        <span class="step-badge" id="stepLock" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-lock"></i> 3:40 PM Lock</span>
+                        <span class="step-badge" id="stepLock" style="padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.06);"><i class="fa-solid fa-lock"></i> 3:30 PM Market Bell Lock</span>
                     </div>
                 </div>
 
@@ -922,12 +920,10 @@
                     <h4>📈 Autonomous Background Scanning Schedule &amp; 5-Step Closing Sequence</h4>
                     <p><strong>9:15 AM – 2:30 PM</strong>: 5-minute background scanning.<br>
                     <strong>2:30 PM – 3:14 PM (Power Hour)</strong>: High-frequency scanning pass.<br>
-                    <strong>3:14 PM Candidate Snapshot</strong>: Candidate setup candidates are frozen prior to market closing auction.<br>
-                    <strong>3:15 PM – 3:35 PM CAS Pause</strong>: Scanning pauses during NSE Closing Auction Session price discovery.<br>
-                    <strong>3:35 PM – 3:38 PM CAS Re-Fetch &amp; Scoring</strong>: Settled closing prices re-fetched &amp; final 5-pillar scores compiled.<br>
-                    <strong>3:38 PM Live PUSH Broadcast</strong>: Final BTST/STBT picks broadcasted live over WebSocket.<br>
-                    <strong>3:40 PM Official Lock</strong>: Picks officially locked &amp; persisted to Signal Journal &amp; Trade History.<br>
-                    <strong>3:40 PM – 9:15 AM Next Day (Off-Market)</strong>: Scanning freezes and serves the frozen 3:40 PM BTST pick snapshot.</p>
+                    <strong>3:14 PM Candidate Snapshot</strong>: Candidate setup candidates are frozen prior to market closing sequence.<br>
+                    <strong>3:25 PM Auto-Lock Snapshot</strong>: 3:25 PM candidate setup snapshot automatically compiled.<br>
+                    <strong>3:30 PM Official Market Bell Lock</strong>: Picks officially locked at market close &amp; persisted to Signal Journal &amp; Trade History.<br>
+                    <strong>3:30 PM – 9:15 AM Next Day (Off-Market)</strong>: Scanning freezes and serves the frozen 3:30 PM BTST pick snapshot.</p>
                 </div>
 
                 <div class="guide-step-box">

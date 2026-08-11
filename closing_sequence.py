@@ -55,10 +55,10 @@ STATE_FILE = os.path.join(DATA_DIR, "closing_sequence_state.json")
 SNAPSHOT_MINS = 15 * 60 + 14          # 3:14 PM (Pre-close snapshot)
 AUTO_LOCK_PICKS_MINS = 15 * 60 + 25  # 3:25 PM (Auto-lock 3:25 PM picks snapshot)
 FINAL_BELL_LOCK_MINS = 15 * 60 + 30  # 3:30 PM (Sharp 3:30 PM market bell lock)
-CAS_CLOSE_MINS = 15 * 60 + 35        # 3:35 PM (CAS Settlement Reconciliation)
-SCORING_MINS = 15 * 60 + 36          # 3:36 PM
-BROADCAST_MINS = 15 * 60 + 38        # 3:38 PM
-LOCK_MINS = 15 * 60 + 40             # 3:40 PM
+CAS_CLOSE_MINS = 15 * 60 + 31        # 3:31 PM (CAS Settlement Reconciliation)
+SCORING_MINS = 15 * 60 + 32          # 3:32 PM
+BROADCAST_MINS = 15 * 60 + 33        # 3:33 PM
+LOCK_MINS = 15 * 60 + 30             # 3:30 PM (Market Closing Bell Lock)
 
 NSE_TRADING_HOLIDAYS_2026 = {
     "2026-01-26", "2026-03-06", "2026-03-25", "2026-04-03", "2026-04-14",
@@ -214,13 +214,13 @@ def _step_broadcast(state: Dict[str, Any], broadcast: Optional[Callable[[Dict[st
 def _step_lock(state: Dict[str, Any], lock_picks: Callable[[List[Dict[str, Any]]], Dict[str, Any]]) -> None:
     """`lock_picks` is app.py's existing full lock sequence (news enrichment -> lock_btst_picks
     -> VIX fetch -> per-strategy signal journal logging) — this module doesn't re-implement any
-    of that, it just re-triggers it at 3:40 PM against the CAS-confirmed picks instead of
+    of that, it just re-triggers it at 3:30 PM against the CAS-confirmed picks instead of
     duplicating that already-tested orchestration here."""
     picks = state["snapshot_picks"]
     result = lock_picks(picks)
     state["lock_result"] = result
     state["lock_done"] = True
-    logger.info(f"[Closing Sequence] 3:40 PM LOCK complete: {result.get('locked_count', 0)} pick(s) locked into Signal Journal.")
+    logger.info(f"[Closing Sequence] 3:30 PM LOCK complete: {result.get('locked_count', 0)} pick(s) locked into Signal Journal.")
 
 
 def run_step_if_due(
