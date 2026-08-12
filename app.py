@@ -1185,12 +1185,16 @@ def background_scheduler_worker():
     """Autonomous background scheduler thread executing scheduled scanning & pick locking."""
     logger.info("Starting Autonomous 5-Pillar Background Market Scheduler Thread...")
     
+    today_str = get_ist_now().strftime("%Y-%m-%d")
     saved_snapshot = load_last_market_scan()
-    if saved_snapshot and saved_snapshot.get("stocks"):
+    snapshot_ts = str(saved_snapshot.get("timestamp", "")) if saved_snapshot else ""
+    is_today_snapshot = bool(saved_snapshot) and bool(saved_snapshot.get("stocks")) and (today_str in snapshot_ts)
+
+    if is_today_snapshot:
         cache_store["data"] = saved_snapshot.get("stocks", [])
         cache_store["scan_summary"] = saved_snapshot
         cache_store["timestamp"] = time.time()
-        logger.info(f"Loaded persistent 5-Pillar snapshot ({saved_snapshot.get('timestamp')}) from disk.")
+        logger.info(f"Loaded today's persistent 5-Pillar snapshot ({saved_snapshot.get('timestamp')}) from disk.")
         # Re-compute gap bucket distributions with current engine (format may have changed)
         from gap_bucket_engine import calculate_gap_bucket_distribution
         for s in (cache_store["data"] or []):
@@ -1202,7 +1206,7 @@ def background_scheduler_worker():
             )
         save_last_market_scan(cache_store["scan_summary"])
     else:
-        logger.info("No active market scan found on disk — running immediate initial 5-Pillar scan...")
+        logger.info(f"Disk snapshot is missing or from a previous day ({snapshot_ts}) — running fresh 5-Pillar scan for today ({today_str})...")
         try:
             initial_scan = run_full_scan_pipeline()
             if initial_scan:
@@ -1210,7 +1214,7 @@ def background_scheduler_worker():
                 cache_store["scan_summary"] = initial_scan
                 cache_store["timestamp"] = time.time()
                 save_last_market_scan(initial_scan)
-                logger.info("Immediate initial 5-Pillar scan complete & saved to disk.")
+                logger.info(f"Today's ({today_str}) 5-Pillar scan complete & saved to disk.")
         except Exception as e:
             logger.error(f"Error running initial scan on startup: {e}")
 
