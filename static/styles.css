@@ -387,6 +387,7 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     display: flex;
     align-items: center;
     gap: 14px;
+    margin-left: 10px;
     flex-shrink: 0;
 }
 
@@ -533,25 +534,25 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     border-radius: 16px;
 }
 
-/* Mobile Menu Toggle — Compact button next to topbar logo */
+/* Mobile Menu Toggle — Balanced button next to topbar logo */
 .mobile-menu-toggle {
     display: none;
-    width: 26px;
-    height: 26px;
+    width: 34px;
+    height: 34px;
     border: 1px solid var(--glass-border-strong);
     background: var(--glass-bg-soft);
-    border-radius: 6px;
-    font-size: 11px;
+    border-radius: 8px;
+    font-size: 14px;
     color: var(--ink-primary);
     cursor: pointer;
     transition: all 0.2s ease;
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    margin-right: 6px;
+    margin-right: 16px;
 }
 .mobile-menu-toggle i {
-    font-size: 11px;
+    font-size: 14px;
 }
 
 .mobile-menu-toggle:hover {
