@@ -1186,7 +1186,7 @@ def background_scheduler_worker():
     logger.info("Starting Autonomous 5-Pillar Background Market Scheduler Thread...")
     
     saved_snapshot = load_last_market_scan()
-    if saved_snapshot:
+    if saved_snapshot and saved_snapshot.get("stocks"):
         cache_store["data"] = saved_snapshot.get("stocks", [])
         cache_store["scan_summary"] = saved_snapshot
         cache_store["timestamp"] = time.time()
@@ -1200,11 +1200,19 @@ def background_scheduler_worker():
                 s.get("symbol"),
                 s.get("signal", "")
             )
-        # Persist the recomputed 4-bucket format back to disk/Postgres — otherwise the
-        # checked-in/stored snapshot stays permanently in whatever stale format it was last
-        # saved in, and every restart has to re-patch it in memory instead of serving the
-        # already-correct file.
         save_last_market_scan(cache_store["scan_summary"])
+    else:
+        logger.info("No active market scan found on disk — running immediate initial 5-Pillar scan...")
+        try:
+            initial_scan = run_full_scan_pipeline()
+            if initial_scan:
+                cache_store["data"] = initial_scan.get("stocks", [])
+                cache_store["scan_summary"] = initial_scan
+                cache_store["timestamp"] = time.time()
+                save_last_market_scan(initial_scan)
+                logger.info("Immediate initial 5-Pillar scan complete & saved to disk.")
+        except Exception as e:
+            logger.error(f"Error running initial scan on startup: {e}")
 
     while True:
         try:

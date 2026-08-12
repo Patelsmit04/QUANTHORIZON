@@ -165,7 +165,14 @@
                  shown below the topbar on every section (see app.js fetchTickerIndices()). -->
             <div class="index-ticker-bar" id="indexTickerBar">
                 <div class="index-ticker-track" id="indexTickerTrack">
-                    <!-- JS-populated, item list duplicated once for a seamless marquee loop -->
+                    <span class="index-ticker-item" data-index-name="NIFTY50" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>NIFTY 50</strong> <span>24,380.50</span> <span class="text-bullish">+125.40 (+0.52%)</span></span>
+                    <span class="index-ticker-item" data-index-name="BANKNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>BANKNIFTY</strong> <span>52,240.10</span> <span class="text-bullish">+340.10 (+0.65%)</span></span>
+                    <span class="index-ticker-item" data-index-name="SENSEX" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>SENSEX</strong> <span>79,920.80</span> <span class="text-bullish">+410.20 (+0.52%)</span></span>
+                    <span class="index-ticker-item" data-index-name="GIFTNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>GIFT NIFTY</strong> <span>24,440.00</span> <span class="text-bullish">+145.00 (+0.60%)</span></span>
+                    <span class="index-ticker-item" data-index-name="NIFTY50" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>NIFTY 50</strong> <span>24,380.50</span> <span class="text-bullish">+125.40 (+0.52%)</span></span>
+                    <span class="index-ticker-item" data-index-name="BANKNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>BANKNIFTY</strong> <span>52,240.10</span> <span class="text-bullish">+340.10 (+0.65%)</span></span>
+                    <span class="index-ticker-item" data-index-name="SENSEX" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>SENSEX</strong> <span>79,920.80</span> <span class="text-bullish">+410.20 (+0.52%)</span></span>
+                    <span class="index-ticker-item" data-index-name="GIFTNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>GIFT NIFTY</strong> <span>24,440.00</span> <span class="text-bullish">+145.00 (+0.60%)</span></span>
                 </div>
             </div>
 
@@ -204,18 +211,6 @@
 
                 <!-- Metrics Overview Section -->
                 <section class="metrics-grid">
-
-                    <!-- Card 2: Priority 1 High Conviction -->
-                    <div class="metric-card card-p1" id="metricCardPriority1">
-                        <div class="metric-header">
-                            <span class="metric-title">🔥 PRIORITY 1 (TIER 1)</span>
-                            <div class="card-icon-bubble text-gold"><i class="fa-solid fa-crown"></i></div>
-                        </div>
-                        <div class="metric-body">
-                            <span id="priority1Count" class="metric-value text-gold">0</span>
-                            <span class="metric-subtext">High Conviction Picks</span>
-                        </div>
-                    </div>
 
 
                     <!-- Card 4: BTST Calls -->
