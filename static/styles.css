@@ -3692,18 +3692,119 @@ html, body, #root, #app, .app-shell {
     font-weight: 500;
 }
 
-/* 2. Toolbar Container, Search Box & Filter Chips */
+/* 2. Compact Toolbar Container, Search Box, Sort Box & Filter Pills */
 .toolbar-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    background: var(--glass-bg-soft, #131824) !important;
+    padding: 10px 14px !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)) !important;
+    margin-bottom: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.search-box {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-    background: var(--glass-bg-soft);
-    padding: 10px 14px !important;
-    border-radius: 10px !important;
-    border: 1px solid var(--glass-border);
-    margin-bottom: 16px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.14));
+    border-radius: 8px;
+    padding: 0 12px;
+    height: 38px;
+    flex: 1 1 220px;
+    min-width: 160px;
+}
+
+.search-box i {
+    color: var(--ink-muted, #94a3b8);
+    font-size: 13px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.search-box input {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--ink-primary, #ffffff) !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.sort-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.14));
+    border-radius: 8px;
+    padding: 0 12px;
+    height: 38px;
+    flex: 1 1 220px;
+    min-width: 160px;
+}
+
+.sort-box i {
+    color: var(--ink-muted, #94a3b8);
+    font-size: 13px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.sort-box select {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--ink-primary, #ffffff) !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    width: 100% !important;
+    height: 100% !important;
+    cursor: pointer;
+    appearance: auto;
+}
+
+.live-quick-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.filter-pill-btn {
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    padding: 7px 14px !important;
+    border-radius: 20px !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--ink-secondary) !important;
+    border: 1px solid var(--glass-border) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+}
+
+.filter-pill-btn[data-filter="GAINERS"].active {
+    background: rgba(16, 185, 129, 0.2) !important;
+    color: #10b981 !important;
+    border-color: rgba(16, 185, 129, 0.45) !important;
+}
+
+.filter-pill-btn[data-filter="LOSERS"].active {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #ef4444 !important;
+    border-color: rgba(239, 68, 68, 0.45) !important;
 }
 
 .filter-group {
