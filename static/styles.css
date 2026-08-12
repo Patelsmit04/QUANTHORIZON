@@ -318,16 +318,18 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 .app-sidebar.collapsed .sidebar-brand-text { display: none; }
 
 .sidebar-collapse-btn {
-    width: 30px; height: 30px;
+    width: 22px; height: 22px;
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%;
     border: 1px solid var(--glass-border-strong);
     background: transparent;
     color: var(--ink-muted);
+    font-size: 10px;
     cursor: pointer;
     flex-shrink: 0;
     transition: all 0.2s ease;
 }
+.sidebar-collapse-btn i { font-size: 10px; }
 .sidebar-collapse-btn:hover { background: var(--gold-bg); color: var(--gold); }
 .app-sidebar.collapsed .sidebar-collapse-btn i { transform: rotate(180deg); }
 
@@ -448,11 +450,11 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     .sidebar-collapse-btn { display: none; }
     .drawer-close-btn {
         display: flex; align-items: center; justify-content: center;
-        width: 36px; height: 36px; border-radius: 50%;
+        width: 24px; height: 24px; border-radius: 50%;
         background: var(--glass-bg-soft);
         border: 1px solid var(--glass-border-strong);
         color: var(--ink-primary);
-        font-size: 16px; cursor: pointer;
+        font-size: 12px; cursor: pointer;
         flex-shrink: 0;
         transition: all 0.2s ease;
     }
@@ -3837,25 +3839,26 @@ html, body, #root, #app, .app-shell {
 }
 
 /* ==========================================================================
-   STOCK COMPANY LOGO CIRCULAR CORNER FRAME
+   STOCK COMPANY LOGO — SQUARE FRAME WITH CIRCULAR/ROUNDED CORNERS
    ========================================================================== */
 .symbol-with-logo {
     display: inline-flex;
     align-items: center;
-    gap: 9px;
+    gap: 14px; /* Sufficient space between stock logo and stock name! */
     vertical-align: middle;
 }
 
 .stock-logo-frame {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1.5px solid var(--glass-border-strong, rgba(255, 255, 255, 0.16));
+    width: 30px;
+    height: 30px;
+    border-radius: 8px; /* Square with circular/rounded corners frame! */
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.16));
     display: inline-flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    padding: 2px;
     flex-shrink: 0;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     vertical-align: middle;
@@ -3863,7 +3866,7 @@ html, body, #root, #app, .app-shell {
 }
 
 .stock-logo-frame:hover {
-    transform: scale(1.12);
+    transform: scale(1.08);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
 }
 
@@ -3876,9 +3879,9 @@ html, body, #root, #app, .app-shell {
 .stock-logo-frame img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
-    border-radius: 50%;
+    border-radius: 6px;
 }
 
 .stock-logo-initials {
@@ -3892,7 +3895,7 @@ html, body, #root, #app, .app-shell {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, rgba(212, 175, 55, 0.22), rgba(15, 20, 32, 0.8));
-    border-radius: 50%;
+    border-radius: 6px;
 }
 
 
