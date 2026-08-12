@@ -67,6 +67,11 @@
                     <span class="nav-label">Scanner</span>
                     <span class="nav-badge" id="signalsNavBadge">0</span>
                 </button>
+                <button class="sidebar-nav-item" data-section="liveTrades" title="Live Trade">
+                    <i class="fa-solid fa-chart-line text-gold"></i>
+                    <span class="nav-label">Live Trade</span>
+                    <span class="nav-badge badge-green" id="liveTradesNavBadge">LIVE</span>
+                </button>
                 <button class="sidebar-nav-item" data-section="stocksNews" title="Stocks News">
                     <i class="fa-solid fa-arrow-trend-up"></i>
                     <span class="nav-label">Stocks News</span>
@@ -375,6 +380,84 @@
 
             </div>
             <!-- ============================== END SCANNER / SIGNALS ENGINE SECTION ============================== -->
+
+            <!-- ============================== LIVE TRADE SECTION ============================== -->
+            <div id="liveTradesSection" class="hidden">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-chart-line text-gold"></i> LIVE TRADE DASHBOARD
+                        <span class="section-page-subtitle">Real-Time Setup Monitoring, Entry/Exit Levels, Trailing Stop &amp; Order Book</span>
+                    </h2>
+                </div>
+
+                <div class="analytics-row" style="margin-bottom: 20px;">
+                    <div class="metric-card gold-glow">
+                        <div class="metric-header">
+                            <span class="metric-label">ACTIVE SETUPS</span>
+                            <i class="fa-solid fa-bolt text-gold"></i>
+                        </div>
+                        <div class="metric-value text-gold" id="liveActiveCount">0</div>
+                        <div class="metric-subtext">Monitored live with target &amp; stop loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">PENDING TRADES</span>
+                            <i class="fa-solid fa-clock-rotate-left text-sub"></i>
+                        </div>
+                        <div class="metric-value" id="livePendingCount">0</div>
+                        <div class="metric-subtext">Awaiting trigger price or open entry</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <span class="metric-label">CLOSED TRADES</span>
+                            <i class="fa-solid fa-square-check text-bullish"></i>
+                        </div>
+                        <div class="metric-value text-bullish" id="liveClosedCount">0</div>
+                        <div class="metric-subtext">Completed session trades</div>
+                    </div>
+                </div>
+
+                <!-- Tabs: Active Setups vs Pending Orders -->
+                <div class="filter-bar sticky-filter-row" style="margin-bottom:16px;">
+                    <div class="filter-group">
+                        <button class="tab-btn active" id="liveTabActive" data-live-tab="active">
+                            <i class="fa-solid fa-fire text-gold"></i> ACTIVE SETUPS
+                        </button>
+                        <button class="tab-btn" id="liveTabPending" data-live-tab="pending">
+                            <i class="fa-solid fa-hourglass-half"></i> PENDING ORDERS
+                        </button>
+                        <button class="tab-btn" id="liveTabClosed" data-live-tab="closed">
+                            <i class="fa-solid fa-receipt"></i> TRADE LOG
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Trade Cards Container -->
+                <div id="liveActiveContainer" class="live-trade-cards-grid">
+                    <!-- Dynamic Active Trade Cards injected by JS -->
+                </div>
+
+                <!-- Pending / Closed Table Container -->
+                <div id="liveTableContainer" class="table-container hidden">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ORDER ID</th>
+                                <th>STOCK</th>
+                                <th>SIGNAL</th>
+                                <th>ENTRY PRICE</th>
+                                <th>TARGET</th>
+                                <th>STOP LOSS</th>
+                                <th>P&amp;L</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="liveTableBody">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- ============================== END LIVE TRADE SECTION ============================== -->
 
             <!-- ============================== STOCKS NEWS SECTION ============================== -->
             <div id="stocksNewsSection" class="hidden">

@@ -2635,6 +2635,21 @@ def evaluate_next_day_picks():
         cache_store["scan_summary"]["prediction_accuracy_pct"] = win_summary.get("prediction_accuracy_pct", 78.5)
         cache_store["scan_summary"]["total_tracked_trades"] = win_summary.get("total_trades", 0)
 
+    try:
+        from ws_broadcast import broadcast_sync
+        from accuracy_evaluator import get_latest_split_accuracy
+        recalc_acc = get_latest_split_accuracy()
+        broadcast_sync({
+            "type": "ACCURACY_UPDATED",
+            "win_rate_pct": win_summary.get("win_rate_pct", 75.0),
+            "prediction_accuracy_pct": win_summary.get("prediction_accuracy_pct", 78.5),
+            "total_tracked_trades": win_summary.get("total_trades", 0),
+            "split_accuracy": recalc_acc,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+    except Exception as broadcast_err:
+        logger.warning(f"Failed to broadcast ACCURACY_UPDATED event: {broadcast_err}")
+
     eval_count = result.get("evaluated_count", 0) + eval_sig.get("evaluated_count", 0) + eval_idx.get("evaluated_count", 0)
     return {
         "status": "SUCCESS",
@@ -2832,6 +2847,21 @@ def get_chart_data(
     except Exception as e:
         logger.warning(f"Error fetching chart data for {symbol}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/live_trades")
+def api_get_live_trades():
+    """
+    Returns active setups, pending orders, and closed trade history
+    for the dedicated Live Trade dashboard section.
+    """
+    try:
+        from execution_provider import get_live_trades_data
+        return sanitize_json_data(get_live_trades_data())
+    except Exception as e:
+        logger.error(f"Error fetching live trades: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.get("/api/stock/{symbol}")

@@ -3970,14 +3970,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 socket.onmessage = (event) => {
                     try {
                         const data = JSON.parse(event.data);
-                        if (data.type === "evaluation_update") {
-                            showToast(`9:15 AM Evaluation Complete: ${data.evaluated_count || 0} setup(s) graded`, "success");
-                            fetchScanData();
+                        if (data.type === "evaluation_update" || data.type === "ACCURACY_UPDATED") {
+                            showToast(`9:15 AM Evaluation / Accuracy Complete: ${data.evaluated_count || 0} setup(s) graded`, "success");
+                            fetchScanResults();
                             fetchSplitAccuracy();
-                            fetchTickerIndices();
+                            fetchWinRatePerformance();
+                            fetchLiveTradesSection();
                         } else if (data.type === "scan_update" || data.type === "market_lock") {
-                            fetchScanData();
+                            fetchScanResults();
                             fetchTickerIndices();
+                            fetchLiveTradesSection();
+                        } else if (data.type === "INTRADAY_SETUP" || data.type === "SETUP_TRIGGER") {
+                            const sym = data.symbol || "UNKNOWN";
+                            const sig = data.signal || "SETUP";
+                            const msg = `⚡ INTRADAY SETUP ALERT: ${sym} (${sig})`;
+                            showToast(msg, "success");
+                            if ("Notification" in window && Notification.permission === "granted") {
+                                new Notification("TRADEXO Intraday Setup", { body: msg, icon: "/static/logo.png" });
+                            }
+                            fetchLiveTradesSection();
                         }
                     } catch (e) { console.error("WS message parse error:", e); }
                 };
@@ -3986,5 +3997,161 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         connect();
     }
+
+    if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+    }
+
+    window.openStockChartModal = openStockModal;
+
+    // Attach Live Trade Tab Switching & Data Fetch
+    const liveTabActive = document.getElementById("liveTabActive");
+    const liveTabPending = document.getElementById("liveTabPending");
+    const liveTabClosed = document.getElementById("liveTabClosed");
+    const liveActiveContainer = document.getElementById("liveActiveContainer");
+    const liveTableContainer = document.getElementById("liveTableContainer");
+
+    if (liveTabActive && liveTabPending && liveTabClosed) {
+        liveTabActive.addEventListener("click", () => {
+            liveTabActive.classList.add("active");
+            liveTabPending.classList.remove("active");
+            liveTabClosed.classList.remove("active");
+            if (liveActiveContainer) liveActiveContainer.classList.remove("hidden");
+            if (liveTableContainer) liveTableContainer.classList.add("hidden");
+        });
+        liveTabPending.addEventListener("click", () => {
+            liveTabPending.classList.add("active");
+            liveTabActive.classList.remove("active");
+            liveTabClosed.classList.remove("active");
+            if (liveActiveContainer) liveActiveContainer.classList.add("hidden");
+            if (liveTableContainer) liveTableContainer.classList.remove("hidden");
+        });
+        liveTabClosed.addEventListener("click", () => {
+            liveTabClosed.classList.add("active");
+            liveTabActive.classList.remove("active");
+            liveTabPending.classList.remove("active");
+            if (liveActiveContainer) liveActiveContainer.classList.add("hidden");
+            if (liveTableContainer) liveTableContainer.classList.remove("hidden");
+        });
+    }
+
     initWebSocket();
 });
+
+async function fetchLiveTradesSection() {
+    try {
+        const res = await apiFetch("/api/live_trades");
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const activeCountEl = document.getElementById("liveActiveCount");
+        const pendingCountEl = document.getElementById("livePendingCount");
+        const closedCountEl = document.getElementById("liveClosedCount");
+        const navBadge = document.getElementById("liveTradesNavBadge");
+
+        if (activeCountEl) activeCountEl.textContent = data.total_active || 0;
+        if (pendingCountEl) pendingCountEl.textContent = data.total_pending || 0;
+        if (closedCountEl) closedCountEl.textContent = data.total_closed || 0;
+        if (navBadge) navBadge.textContent = `${data.total_active || 0} LIVE`;
+
+        renderLiveTradeCards(data.active_setups || []);
+        renderLiveTradeTable(data.pending_trades || [], data.closed_trades || []);
+    } catch (e) {
+        console.warn("Failed to fetch live trades:", e);
+    }
+}
+
+function renderLiveTradeCards(activeSetups) {
+    const container = document.getElementById("liveActiveContainer");
+    if (!container) return;
+    if (!activeSetups.length) {
+        container.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1; padding: 40px 20px;">
+                <i class="fa-solid fa-chart-line fa-3x text-gold"></i>
+                <h3>No Active Setups Right Now</h3>
+                <p>The autonomous scanner continuously monitors the market. Setups will populate here automatically as signals trigger.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = activeSetups.map(s => {
+        const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(s.symbol) : '';
+        const sigClass = (s.signal || "").includes("BUY") || (s.signal || "").includes("BTST") ? "text-bullish" : "text-bearish";
+        const pnl = s.pnl_pct || 0;
+        const pnlClass = pnl >= 0 ? "text-bullish" : "text-bearish";
+
+        return `
+            <div class="live-trade-card">
+                <div class="live-trade-card-header">
+                    <div class="symbol-with-logo">
+                        ${logoHtml}
+                        <div>
+                            <div style="font-size: 15px; font-weight: 800; color: var(--ink-primary);">${s.symbol}</div>
+                            <div style="font-size: 10.5px; font-weight: 700; color: var(--ink-muted);">${s.strategy_id}</div>
+                        </div>
+                    </div>
+                    <span class="signal-badge ${sigClass}">${s.signal}</span>
+                </div>
+
+                <div class="live-trade-card-body">
+                    <div class="live-trade-stat">
+                        <span class="live-trade-stat-label">ENTRY</span>
+                        <span class="live-trade-stat-value">₹${s.entry_price || '--'}</span>
+                    </div>
+                    <div class="live-trade-stat">
+                        <span class="live-trade-stat-label">TARGET</span>
+                        <span class="live-trade-stat-value text-bullish">₹${s.target_price || '--'}</span>
+                    </div>
+                    <div class="live-trade-stat">
+                        <span class="live-trade-stat-label">STOP LOSS</span>
+                        <span class="live-trade-stat-value text-bearish">₹${s.stop_loss || '--'}</span>
+                    </div>
+                </div>
+
+                <div class="live-trade-card-footer">
+                    <div>
+                        <span style="font-weight: 700; color: var(--ink-muted);">P&L:</span>
+                        <strong class="${pnlClass}" style="font-size: 13px;">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}%</strong>
+                    </div>
+                    <button class="btn btn-sm btn-ghost" onclick="window.openStockChartModal('${s.symbol}')">
+                        <i class="fa-solid fa-chart-simple text-gold"></i> VIEW CHART
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function renderLiveTradeTable(pendingTrades, closedTrades) {
+    const tbody = document.getElementById("liveTableBody");
+    if (!tbody) return;
+    const all = [...pendingTrades, ...closedTrades];
+    if (!all.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;">No order history logged yet.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = all.map(t => {
+        const sigClass = (t.signal || "").includes("BUY") || (t.signal || "").includes("BTST") ? "text-bullish" : "text-bearish";
+        const statusClass = t.status === "ACTIVE" ? "badge-green" : (t.status === "PENDING" ? "badge" : "badge-gold");
+        const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(t.symbol) : '';
+        return `
+            <tr>
+                <td><strong>${t.id}</strong></td>
+                <td>
+                    <div class="symbol-with-logo">
+                        ${logoHtml}
+                        <span class="symbol-name">${t.symbol}</span>
+                    </div>
+                </td>
+                <td><span class="signal-badge ${sigClass}">${t.signal}</span></td>
+                <td>₹${t.entry_price || '--'}</td>
+                <td class="text-bullish">₹${t.target_price || '--'}</td>
+                <td class="text-bearish">₹${t.stop_loss || '--'}</td>
+                <td><strong class="${(t.pnl_pct||0)>=0?'text-bullish':'text-bearish'}">${(t.pnl_pct||0)>=0?'+':''}${(t.pnl_pct||0).toFixed(2)}%</strong></td>
+                <td><span class="badge ${statusClass}">${t.status}</span></td>
+            </tr>
+        `;
+    }).join("");
+}
+

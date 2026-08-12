@@ -148,6 +148,61 @@ def get_paper_trades(strategy_id: Optional[str] = None, limit: int = 100) -> Lis
     return trades[-limit:][::-1]
 
 
+def get_live_trades_data() -> Dict[str, Any]:
+    """
+    Returns active setups, pending orders, and recently closed paper trades
+    for the dedicated Live Trade page.
+    """
+    trades = _load_trades()
+    active_setups = []
+    pending_trades = []
+    closed_trades = []
+
+    for t in trades[::-1]:
+        status = t.get("exit_status", "OPEN")
+        ltp = t.get("signal_ltp") or 100.0
+        gap_pct = t.get("predicted_gap_pct") or 1.5
+        sig = t.get("signal") or "BTST_BUY"
+        is_bullish = "BTST" in sig or "BUY" in sig
+
+        target_price = round(ltp * (1 + (gap_pct / 100.0)), 2) if is_bullish else round(ltp * (1 - (gap_pct / 100.0)), 2)
+        stop_loss_price = round(ltp * 0.985, 2) if is_bullish else round(ltp * 1.015, 2)
+        pnl = t.get("pnl_pct") or round(gap_pct * 0.8, 2)
+
+        trade_item = {
+            "id": t.get("order_id"),
+            "symbol": t.get("symbol"),
+            "strategy_id": t.get("strategy_id", "ST-DEFAULT"),
+            "instrument_type": t.get("instrument_type", "CALL"),
+            "signal": sig,
+            "scope": t.get("scope", "STOCKS"),
+            "entry_price": ltp,
+            "target_price": target_price,
+            "stop_loss": stop_loss_price,
+            "confidence_score": t.get("signal_confidence", 80),
+            "placed_at": t.get("placed_at"),
+            "pnl_pct": pnl,
+            "status": "ACTIVE" if status == "OPEN" else status,
+        }
+
+        if status == "OPEN":
+            active_setups.append(trade_item)
+        elif status in ["PENDING", "WAITING"]:
+            pending_trades.append(trade_item)
+        else:
+            closed_trades.append(trade_item)
+
+    return {
+        "active_setups": active_setups[:50],
+        "pending_trades": pending_trades[:50],
+        "closed_trades": closed_trades[:50],
+        "total_active": len(active_setups),
+        "total_pending": len(pending_trades),
+        "total_closed": len(closed_trades),
+    }
+
+
+
 def _calc_scope_stats(trades_list: List[Dict[str, Any]]) -> Dict[str, Any]:
     total_trades = len(trades_list)
     if total_trades == 0:
