@@ -41,36 +41,6 @@ function getStockLogoHTML(symbol) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // ── Default Dark Theme Setup for First-Time Visitors ──
-    const savedTheme = localStorage.getItem("theme") || "dark";
-    document.documentElement.setAttribute("data-theme", savedTheme);
-    if (savedTheme === "dark") {
-        document.body.classList.add("dark-mode");
-    } else {
-        document.body.classList.remove("dark-mode");
-    }
-
-    const themeToggleBtn = document.getElementById("themeToggleBtn");
-    const themeToggleIcon = document.getElementById("themeToggleIcon");
-    if (themeToggleBtn) {
-        if (themeToggleIcon) {
-            themeToggleIcon.className = savedTheme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
-        }
-        themeToggleBtn.addEventListener("click", () => {
-            const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
-            document.documentElement.setAttribute("data-theme", newTheme);
-            if (newTheme === "dark") {
-                document.body.classList.add("dark-mode");
-                if (themeToggleIcon) themeToggleIcon.className = "fa-solid fa-sun";
-            } else {
-                document.body.classList.remove("dark-mode");
-                if (themeToggleIcon) themeToggleIcon.className = "fa-solid fa-moon";
-            }
-            localStorage.setItem("theme", newTheme);
-        });
-    }
-
     // Application State
     let allStocks = [];
     let currentFilter = "ALL";
@@ -2921,28 +2891,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
         } catch (e) {
-            logger.warning("Error fetching ticker indices:", e);
+            console.warn("Error fetching ticker indices:", e);
             if (!indexTickerTrack.children || indexTickerTrack.children.length === 0) {
                 const itemsHtml = DEFAULT_INDEX_FALLBACKS.map(buildTickerItemHTML).join("");
                 indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
             }
-        }
-    }
-                        spans[0].textContent = ltp;
-                        if (idx.change_pts != null) {
-                            const isUp = idx.change_pts >= 0;
-                            const sign = isUp ? '+' : '';
-                            const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
-                            const pct = pctVal.toFixed(2);
-                            spans[1].textContent = `${sign}${pts} (${sign}${pct}%)`;
-                            spans[1].className = isUp ? 'text-bullish' : 'text-bearish';
-                        }
-                    }
-                });
-            }
-        } catch (error) {
-            console.error("Failed to fetch ticker indices:", error);
         }
     }
 
