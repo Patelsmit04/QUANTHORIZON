@@ -3710,21 +3710,24 @@ html, body, #root, #app, .app-shell {
 
 .search-box {
     position: relative;
-    display: flex;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.14));
-    border-radius: 8px;
-    padding: 0 12px;
-    height: 38px;
-    flex: 1 1 220px;
-    min-width: 160px;
+    display: flex !important;
+    align-items: center !important;
+    background: rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.14)) !important;
+    border-radius: 8px !important;
+    padding: 0 10px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    flex: 1 1 180px !important;
+    max-width: 280px !important;
+    box-sizing: border-box !important;
 }
 
 .search-box i {
     color: var(--ink-muted, #94a3b8);
-    font-size: 13px;
-    margin-right: 8px;
+    font-size: 12px;
+    margin-right: 6px;
     flex-shrink: 0;
 }
 
@@ -3733,29 +3736,37 @@ html, body, #root, #app, .app-shell {
     border: none !important;
     outline: none !important;
     color: var(--ink-primary, #ffffff) !important;
-    font-size: 12.5px !important;
+    font-size: 12px !important;
     font-weight: 600 !important;
     width: 100% !important;
-    height: 100% !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+    line-height: 34px !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .sort-box {
     position: relative;
-    display: flex;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.14));
-    border-radius: 8px;
-    padding: 0 12px;
-    height: 38px;
-    flex: 1 1 220px;
-    min-width: 160px;
+    display: flex !important;
+    align-items: center !important;
+    background: rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.14)) !important;
+    border-radius: 8px !important;
+    padding: 0 10px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    flex: 1 1 180px !important;
+    max-width: 280px !important;
+    box-sizing: border-box !important;
 }
 
 .sort-box i {
     color: var(--ink-muted, #94a3b8);
-    font-size: 13px;
-    margin-right: 8px;
+    font-size: 12px;
+    margin-right: 6px;
     flex-shrink: 0;
 }
 
@@ -3764,10 +3775,15 @@ html, body, #root, #app, .app-shell {
     border: none !important;
     outline: none !important;
     color: var(--ink-primary, #ffffff) !important;
-    font-size: 12.5px !important;
+    font-size: 12px !important;
     font-weight: 700 !important;
     width: 100% !important;
-    height: 100% !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    max-height: 34px !important;
+    line-height: 34px !important;
+    padding: 0 !important;
+    margin: 0 !important;
     cursor: pointer;
     appearance: auto;
 }
