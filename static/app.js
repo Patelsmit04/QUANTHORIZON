@@ -1209,6 +1209,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const sign = isUp ? "+" : "";
                 const colorClass = isUp ? "live-card-up" : "live-card-down";
                 const arrowIcon = isUp ? "fa-caret-up" : "fa-caret-down";
+                const sigText = stock.signal || (isUp ? "TOP GAINER" : "TOP LOSER");
 
                 const card = document.createElement("div");
                 card.className = `live-stock-card ${colorClass}`;
@@ -1216,7 +1217,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.innerHTML = `
                     <div class="symbol-with-logo">
                         ${getStockLogoHTML(stock.symbol)}
-                        <span class="live-card-name" style="font-weight:800; font-size:15px; color:var(--ink-primary);">${escapeHtml(stock.symbol || '--')}</span>
+                        <div>
+                            <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
+                            <div style="font-size: 10px; font-weight: 700; color: ${isUp ? '#10b981' : '#ef4444'}; margin-top: 2px;">
+                                <i class="fa-solid ${isUp ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${escapeHtml(sigText)}
+                            </div>
+                        </div>
                     </div>
                     <div style="text-align:right;">
                         <div class="live-card-ltp">₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
