@@ -386,8 +386,8 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 .topbar-brand {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin-left: 10px;
+    gap: 10px;
+    margin-left: 0;
     flex-shrink: 0;
 }
 
@@ -534,7 +534,7 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     border-radius: 16px;
 }
 
-/* Mobile Menu Toggle — Balanced button next to topbar logo */
+/* Mobile Menu Toggle — Compact spacing next to topbar logo */
 .mobile-menu-toggle {
     display: none;
     width: 34px;
@@ -549,7 +549,7 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    margin-right: 16px;
+    margin-right: 8px;
 }
 .mobile-menu-toggle i {
     font-size: 14px;
