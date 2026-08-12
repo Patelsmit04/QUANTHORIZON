@@ -398,9 +398,9 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 
 .topbar-brand-title {
     font-family: var(--font-brand);
-    font-size: 1.65rem;
+    font-size: 1.1rem;
     font-weight: 800;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--ink-primary, #ffffff);
     line-height: 1;
@@ -495,16 +495,16 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     display: block;
 }
 
-/* Decreased Brand Wordmark Size */
+/* Decreased Brand Wordmark Size (Compact) */
 .brand-wordmark-img {
-    height: 19px;
+    height: 14px;
     width: auto;
     object-fit: contain;
     display: block;
 }
 
 .brand-wordmark-img.sm {
-    height: 16px;
+    height: 12px;
 }
 
 .brand-wordmark-dark {
