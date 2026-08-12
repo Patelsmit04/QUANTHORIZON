@@ -495,16 +495,16 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     display: block;
 }
 
-/* Decreased Brand Wordmark Size (Compact) */
+/* Standalone Brand Wordmark Size */
 .brand-wordmark-img {
-    height: 14px;
+    height: 19px;
     width: auto;
     object-fit: contain;
     display: block;
 }
 
 .brand-wordmark-img.sm {
-    height: 12px;
+    height: 16px;
 }
 
 .brand-wordmark-dark {
