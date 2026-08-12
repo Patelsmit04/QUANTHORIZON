@@ -1184,9 +1184,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (visibleCount) visibleCount.textContent = filtered.length;
 
         // ── LIVE STOCKS VIEW: Render card grid instead of table ──
+        const liveQuickFilters = document.getElementById("liveQuickFilters");
         if (currentStockView === "live") {
             if (btstTableWrapper) btstTableWrapper.classList.add("hidden");
             if (liveStocksGrid) liveStocksGrid.classList.remove("hidden");
+            if (liveQuickFilters) liveQuickFilters.classList.remove("hidden");
             stocksTableBody.innerHTML = "";
             if (emptyState) emptyState.classList.add("hidden");
 
@@ -1241,6 +1243,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // ── BTST STOCKS VIEW: Table rendering (unchanged) ──
         if (btstTableWrapper) btstTableWrapper.classList.remove("hidden");
         if (liveStocksGrid) liveStocksGrid.classList.add("hidden");
+        if (liveQuickFilters) liveQuickFilters.classList.add("hidden");
 
         stocksTableBody.innerHTML = "";
         

@@ -3697,13 +3697,13 @@ html, body, #root, #app, .app-shell {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
     background: var(--glass-bg-soft);
-    padding: 12px 18px;
-    border-radius: var(--radius-md);
+    padding: 10px 14px !important;
+    border-radius: 10px !important;
     border: 1px solid var(--glass-border);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .filter-group {
@@ -4004,24 +4004,24 @@ html, body, #root, #app, .app-shell {
 }
 
 .live-stock-card {
-    background: #0f1422 !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: #0d1017 !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
     border-radius: 12px !important;
     padding: 14px 18px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     cursor: pointer !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
     color: #ffffff !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease !important;
 }
 
 .live-stock-card:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.6) !important;
     border-color: rgba(212, 175, 55, 0.4) !important;
-    background: #151b2d !important;
+    background: #131722 !important;
 }
 
 [data-theme="light"] .live-stock-card {

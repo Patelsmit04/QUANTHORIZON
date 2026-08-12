@@ -51,7 +51,7 @@
                         <img src="/static/tradexo_wordmark_dark_bg.png" alt="TRADEXO" class="brand-wordmark-img brand-wordmark-dark">
                         <img src="/static/tradexo_wordmark_light_bg.png" alt="TRADEXO" class="brand-wordmark-img brand-wordmark-light">
                     </div>
-                    <div class="drawer-subtitle">Where Market Signals Become Conviction</div>
+                    <div class="drawer-subtitle" style="margin-top: 6px;">Market To Conviction</div>
                 </div>
                 <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar" aria-label="Collapse sidebar">
                     <i class="fa-solid fa-angles-left"></i>
@@ -100,7 +100,7 @@
                 <button class="sidebar-nav-item" data-section="strategies" title="Strategies">
                     <i class="fa-solid fa-sliders"></i>
                     <span class="nav-label">Strategies</span>
-                </button>n>
+                </button>
 
                 <div class="sidebar-nav-divider"></div>
 
@@ -295,30 +295,32 @@
                 </div>
 
                 <!-- Controls & Filter Toolbar -->
-                <section class="toolbar-container">
-                    <!-- Toolbar Actions (Search & Sort & Order Basket) -->
-                    <div class="toolbar-actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                        <div class="search-box">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <input type="text" id="searchInput" placeholder="Search Ticker (e.g. RELIANCE)...">
+                <section class="toolbar-container" style="padding: 10px 14px; border-radius: 10px;">
+                    <div class="toolbar-actions" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;width:100%;">
+                        <div style="display:flex;align-items:center;gap:10px;flex:1 1 340px;">
+                            <div class="search-box" style="flex:1;">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="searchInput" placeholder="Search Ticker (e.g. RELIANCE)...">
+                            </div>
+
+                            <div class="sort-box" style="flex:1;">
+                                <i class="fa-solid fa-sort"></i>
+                                <select id="sortSelect" aria-label="Sort stocks">
+                                    <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
+                                    <option value="GAINERS_DESC">Sort: Top Gainers (+% Change)</option>
+                                    <option value="LOSERS_ASC">Sort: Top Losers (-% Change)</option>
+                                    <option value="SCORE_DESC">Sort: Highest Confidence %</option>
+                                    <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
+                                    <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
+                                    <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="sort-box">
-                            <i class="fa-solid fa-sort"></i>
-                            <select id="sortSelect" aria-label="Sort stocks">
-                                <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
-                                <option value="GAINERS_DESC">Sort: Top Gainers (+% Change)</option>
-                                <option value="LOSERS_ASC">Sort: Top Losers (-% Change)</option>
-                                <option value="SCORE_DESC">Sort: Highest Confidence %</option>
-                                <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
-                                <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
-                                <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
-                            </select>
+                        <div class="live-quick-filters hidden" id="liveQuickFilters" style="display:inline-flex;align-items:center;gap:8px;">
+                            <button class="filter-pill-btn active" data-filter="GAINERS" style="font-size:11.5px;font-weight:800;padding:6px 14px;border-radius:20px;background:rgba(16,185,129,0.18);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.4);cursor:pointer;"><i class="fa-solid fa-arrow-trend-up"></i> TOP GAINERS</button>
+                            <button class="filter-pill-btn" data-filter="LOSERS" style="font-size:11.5px;font-weight:800;padding:6px 14px;border-radius:20px;background:rgba(239,68,68,0.12);color:var(--bearish-red);border:1px solid rgba(239,68,68,0.3);cursor:pointer;"><i class="fa-solid fa-arrow-trend-down"></i> TOP LOSERS</button>
                         </div>
-                    </div>
-                    <div class="live-quick-filters hidden" id="liveQuickFilters" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-                        <button class="filter-pill-btn active" data-filter="GAINERS" style="font-size:12px;font-weight:800;padding:5px 16px;border-radius:20px;background:rgba(16,185,129,0.18);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.4);cursor:pointer;"><i class="fa-solid fa-arrow-trend-up"></i> TOP GAINERS</button>
-                        <button class="filter-pill-btn" data-filter="LOSERS" style="font-size:12px;font-weight:800;padding:5px 16px;border-radius:20px;background:rgba(239,68,68,0.12);color:var(--bearish-red);border:1px solid rgba(239,68,68,0.3);cursor:pointer;"><i class="fa-solid fa-arrow-trend-down"></i> TOP LOSERS</button>
                     </div>
                 </section>
 
