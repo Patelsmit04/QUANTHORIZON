@@ -43,12 +43,15 @@
         <!-- ============================== LEFT SIDEBAR (desktop persistent / mobile drawer) ============================== -->
         <aside class="app-sidebar" id="appSidebar">
             <div class="sidebar-header">
+                <div class="app-logo-frame">
+                    <img src="/static/logo.png" alt="TRADEXO Logo">
+                </div>
                 <div class="sidebar-brand-text">
                     <div class="drawer-title">
                         <img src="/static/tradexo_wordmark_dark_bg.png" alt="TRADEXO" class="brand-wordmark-img brand-wordmark-dark">
                         <img src="/static/tradexo_wordmark_light_bg.png" alt="TRADEXO" class="brand-wordmark-img brand-wordmark-light">
                     </div>
-                    <div class="drawer-subtitle">Institutional BTST Engine</div>
+                    <div class="drawer-subtitle">Where Market Signals Become Conviction</div>
                 </div>
                 <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar" aria-label="Collapse sidebar">
                     <i class="fa-solid fa-angles-left"></i>
@@ -57,22 +60,18 @@
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
             <nav class="sidebar-nav" id="sidebarNav">
                 <button class="sidebar-nav-item active" data-section="scanner" title="Scanner">
                     <i class="fa-solid fa-crosshairs"></i>
                     <span class="nav-label">Scanner</span>
-                    <span class="nav-badge" id="signalsNavBadge">0</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="liveTrades" title="Live Trade">
                     <i class="fa-solid fa-chart-line text-gold"></i>
                     <span class="nav-label">Live Trade</span>
-                    <span class="nav-badge badge-green" id="liveTradesNavBadge">LIVE</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="stocksNews" title="Stocks News">
                     <i class="fa-solid fa-arrow-trend-up"></i>
                     <span class="nav-label">Stocks News</span>
-                    <span class="nav-badge" id="stocksNewsNavBadge">--</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="globalNews" title="Global & Macro News">
                     <i class="fa-solid fa-globe"></i>
@@ -81,17 +80,14 @@
                 <button class="sidebar-nav-item" data-section="institutionalFlow" title="Institutional Flow">
                     <i class="fa-solid fa-building-columns"></i>
                     <span class="nav-label">Institutional Flow</span>
-                    <span class="nav-badge" id="institutionalFlowNavBadge">--</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="orderFlow" title="Order Flow">
                     <i class="fa-solid fa-bolt text-gold"></i>
                     <span class="nav-label">Order Flow</span>
-                    <span class="nav-badge" id="orderFlowNavBadge">0 PASS</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="accuracy" title="Accuracy & Win Rate">
                     <i class="fa-solid fa-bullseye text-gold"></i>
                     <span class="nav-label">Accuracy &amp; Win Rate</span>
-                    <span class="nav-badge badge-green" id="accuracyNavBadge">100%</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="indices" title="Index Intelligence">
                     <i class="fa-solid fa-chart-column"></i>
@@ -100,13 +96,11 @@
                 <button class="sidebar-nav-item" data-section="history" title="History & Calibration">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span class="nav-label">History &amp; Calibration</span>
-                    <span class="nav-badge" id="historyNavBadge">LIVE</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="strategies" title="Strategies">
                     <i class="fa-solid fa-sliders"></i>
                     <span class="nav-label">Strategies</span>
-                    <span class="nav-badge" id="strategiesNavBadge">--</span>
-                </button>
+                </button>n>
 
                 <div class="sidebar-nav-divider"></div>
 

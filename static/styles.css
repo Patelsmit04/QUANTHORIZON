@@ -315,6 +315,18 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 }
 
 .sidebar-brand-text { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
+.drawer-subtitle {
+    font-family: var(--font-heading, inherit);
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.35px;
+    color: var(--gold, #d4af37);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+}
 .app-sidebar.collapsed .sidebar-brand-text { display: none; }
 
 .sidebar-collapse-btn {
