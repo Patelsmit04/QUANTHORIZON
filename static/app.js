@@ -24,6 +24,22 @@ async function apiFetch(url, options = {}) {
     }
 }
 
+function getStockLogoHTML(symbol) {
+    if (!symbol) return '';
+    const cleanSym = String(symbol).trim().toUpperCase();
+    const initials = cleanSym.slice(0, 2);
+    const tvLogoUrl = `https://s3-symbol-logo.tradingview.com/crypto/XTVC${cleanSym}.svg`;
+    const fmpLogoUrl = `https://images.financialmodelingprep.com/symbol/${cleanSym}.NS.png`;
+    const nseLogoUrl = `https://raw.githubusercontent.com/swar/nifty-symbols-logos/main/logos/${cleanSym}.png`;
+
+    return `<div class="stock-logo-frame" title="${cleanSym}">` +
+        `<img src="${tvLogoUrl}" ` +
+        `onerror="this.onerror=null; this.src='${fmpLogoUrl}'; this.onerror=function(){ this.onerror=null; this.src='${nseLogoUrl}'; this.onerror=function(){ this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex'; }; };" ` +
+        `alt="${cleanSym}">` +
+        `<span class="stock-logo-initials" style="display:none;">${initials}</span>` +
+        `</div>`;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Application State
     let allStocks = [];
@@ -1313,9 +1329,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 </td>
                 <td data-label="TICKER">
                     <div class="ticker-header-flex">
-                        <span class="symbol-name">
-                            ${escapeHtml(stock.symbol)}
-                            ${stock.rank_position <= 2 ? '<span class="text-gold priority-crown-badge"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
+                        <span class="symbol-with-logo">
+                            ${getStockLogoHTML(stock.symbol)}
+                            <span class="symbol-name">
+                                ${escapeHtml(stock.symbol)}
+                                ${stock.rank_position <= 2 ? '<span class="text-gold priority-crown-badge"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
+                            </span>
                         </span>
                         ${getPhaseBadgeHTML(stock)}
                         <span class="signal-badge-header ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
