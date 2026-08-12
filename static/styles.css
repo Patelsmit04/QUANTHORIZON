@@ -3708,7 +3708,7 @@ html, body, #root, #app, .app-shell {
     padding: 10px 14px !important;
     border-radius: 12px !important;
     border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)) !important;
-    margin-bottom: 6px !important;
+    margin-bottom: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
 }
@@ -3803,8 +3803,8 @@ html, body, #root, #app, .app-shell {
     align-items: center !important;
     justify-content: center !important;
     gap: 10px !important;
-    margin-top: 4px !important;
-    margin-bottom: 4px !important;
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
     width: 100% !important;
     text-align: center !important;
 }
