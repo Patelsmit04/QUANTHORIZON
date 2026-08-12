@@ -1214,11 +1214,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.className = `live-stock-card ${colorClass}`;
                 card.dataset.symbol = stock.symbol || "";
                 card.innerHTML = `
-                    <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
-                    <div class="live-card-ltp">\u20B9${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
-                    <div class="live-card-change">
-                        <i class="fa-solid ${arrowIcon}"></i>
-                        ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
+                    <div class="symbol-with-logo">
+                        ${getStockLogoHTML(stock.symbol)}
+                        <span class="live-card-name" style="font-weight:800; font-size:15px; color:var(--ink-primary);">${escapeHtml(stock.symbol || '--')}</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="live-card-ltp">₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+                        <div class="live-card-change">
+                            <i class="fa-solid ${arrowIcon}"></i>
+                            ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
+                        </div>
                     </div>
                 `;
                 card.addEventListener("click", () => openStockModal(stock.symbol));
