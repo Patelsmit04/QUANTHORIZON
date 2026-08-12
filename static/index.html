@@ -294,7 +294,7 @@
                     </div>
                 </div>
 
-                <!-- Controls & Filter Toolbar (Compact Single-Row Design) -->
+                <!-- Controls & Filter Toolbar -->
                 <section class="toolbar-container">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -313,12 +313,13 @@
                             <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
                         </select>
                     </div>
-
-                    <div class="live-quick-filters hidden" id="liveQuickFilters">
-                        <button class="filter-pill-btn active" data-filter="GAINERS"><i class="fa-solid fa-arrow-trend-up"></i> TOP GAINERS</button>
-                        <button class="filter-pill-btn" data-filter="LOSERS"><i class="fa-solid fa-arrow-trend-down"></i> TOP LOSERS</button>
-                    </div>
                 </section>
+
+                <!-- Standalone Live Quick Filters Row (Pulled Out of Box) -->
+                <div class="live-quick-filters hidden" id="liveQuickFilters">
+                    <button class="filter-pill-btn active" data-filter="GAINERS"><i class="fa-solid fa-arrow-trend-up"></i> TOP GAINERS</button>
+                    <button class="filter-pill-btn" data-filter="LOSERS"><i class="fa-solid fa-arrow-trend-down"></i> TOP LOSERS</button>
+                </div>
 
                 <!-- Dynamic Stocks Data Table -->
                 <section class="table-container">

@@ -3692,18 +3692,18 @@ html, body, #root, #app, .app-shell {
     font-weight: 500;
 }
 
-/* 2. Compact Toolbar Container, Search Box, Sort Box & Filter Pills */
+/* 2. Compact Toolbar Container, Search Box, Sort Box & Standalone Filter Pills */
 .toolbar-container {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     gap: 12px !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     background: var(--glass-bg-soft, #131824) !important;
     padding: 10px 14px !important;
     border-radius: 12px !important;
     border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)) !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 8px !important;
     width: 100% !important;
     box-sizing: border-box !important;
 }
@@ -3716,11 +3716,11 @@ html, body, #root, #app, .app-shell {
     border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.14)) !important;
     border-radius: 8px !important;
     padding: 0 10px !important;
-    height: 36px !important;
-    min-height: 36px !important;
-    max-height: 36px !important;
-    flex: 1 1 180px !important;
-    max-width: 280px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    flex: 1 1 0 !important;
+    width: 50% !important;
     box-sizing: border-box !important;
 }
 
@@ -3739,10 +3739,10 @@ html, body, #root, #app, .app-shell {
     font-size: 12px !important;
     font-weight: 600 !important;
     width: 100% !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    max-height: 34px !important;
-    line-height: 34px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    line-height: 36px !important;
     padding: 0 !important;
     margin: 0 !important;
 }
@@ -3755,11 +3755,11 @@ html, body, #root, #app, .app-shell {
     border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.14)) !important;
     border-radius: 8px !important;
     padding: 0 10px !important;
-    height: 36px !important;
-    min-height: 36px !important;
-    max-height: 36px !important;
-    flex: 1 1 180px !important;
-    max-width: 280px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    flex: 1 1 0 !important;
+    width: 50% !important;
     box-sizing: border-box !important;
 }
 
@@ -3778,10 +3778,10 @@ html, body, #root, #app, .app-shell {
     font-size: 12px !important;
     font-weight: 700 !important;
     width: 100% !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    max-height: 34px !important;
-    line-height: 34px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    line-height: 36px !important;
     padding: 0 !important;
     margin: 0 !important;
     cursor: pointer;
@@ -3789,10 +3789,12 @@ html, body, #root, #app, .app-shell {
 }
 
 .live-quick-filters {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-top: 6px !important;
+    margin-bottom: 8px !important;
+    width: 100% !important;
 }
 
 .filter-pill-btn {
