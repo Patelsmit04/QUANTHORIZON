@@ -3465,8 +3465,13 @@ button, input, select, textarea, .tab-btn, .sidebar-nav-item, .switch, .scanner-
     display: flex !important;
     flex-direction: column !important;
     gap: 6px !important;
-    padding: 12px 0 !important;
+    padding: 2px 0 0 0 !important;
+    margin-top: 0 !important;
     width: 100% !important;
+}
+
+.live-stocks-grid.hidden {
+    display: none !important;
 }
 
 .live-stock-card {
@@ -3798,10 +3803,14 @@ html, body, #root, #app, .app-shell {
     align-items: center !important;
     justify-content: center !important;
     gap: 10px !important;
-    margin-top: 6px !important;
-    margin-bottom: 6px !important;
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
     width: 100% !important;
     text-align: center !important;
+}
+
+.live-quick-filters.hidden {
+    display: none !important;
 }
 
 .filter-pill-btn {

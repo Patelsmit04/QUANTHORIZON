@@ -532,11 +532,17 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add("active");
             currentStockView = btn.dataset.stockView || "intelligence";
             if (currentStockView === "live") {
-                if (liveQuickFilters) liveQuickFilters.classList.remove("hidden");
+                if (liveQuickFilters) {
+                    liveQuickFilters.classList.remove("hidden");
+                    liveQuickFilters.style.setProperty("display", "flex", "important");
+                }
                 currentFilter = "GAINERS";
                 if (sortSelect) sortSelect.value = "GAINERS_DESC";
             } else {
-                if (liveQuickFilters) liveQuickFilters.classList.add("hidden");
+                if (liveQuickFilters) {
+                    liveQuickFilters.classList.add("hidden");
+                    liveQuickFilters.style.setProperty("display", "none", "important");
+                }
                 currentFilter = "ALL";
                 if (sortSelect) sortSelect.value = "RANK_ASC";
             }
@@ -1188,7 +1194,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (currentStockView === "live") {
             if (btstTableWrapper) btstTableWrapper.classList.add("hidden");
             if (liveStocksGrid) liveStocksGrid.classList.remove("hidden");
-            if (liveQuickFilters) liveQuickFilters.classList.remove("hidden");
+            if (liveQuickFilters) {
+                liveQuickFilters.classList.remove("hidden");
+                liveQuickFilters.style.setProperty("display", "flex", "important");
+            }
             stocksTableBody.innerHTML = "";
             if (emptyState) emptyState.classList.add("hidden");
 
@@ -1243,7 +1252,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // ── BTST STOCKS VIEW: Table rendering (unchanged) ──
         if (btstTableWrapper) btstTableWrapper.classList.remove("hidden");
         if (liveStocksGrid) liveStocksGrid.classList.add("hidden");
-        if (liveQuickFilters) liveQuickFilters.classList.add("hidden");
+        if (liveQuickFilters) {
+            liveQuickFilters.classList.add("hidden");
+            liveQuickFilters.style.setProperty("display", "none", "important");
+        }
 
         stocksTableBody.innerHTML = "";
         
