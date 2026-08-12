@@ -3,7 +3,7 @@ WebSocket broadcast infrastructure — /ws/live pushes live events (closing-sequ
 completions, scan updates) to connected clients, so a dashboard doesn't have to poll to find
 out something changed.
 
-QUANTHORIZON's background scheduler runs as plain OS threads (threading.Thread), not asyncio
+TRADEXO's background scheduler runs as plain OS threads (threading.Thread), not asyncio
 tasks — broadcasting from those threads into WebSocket connections owned by FastAPI's asyncio
 event loop needs an explicit bridge: asyncio.run_coroutine_threadsafe(). The alternative
 (converting both scheduler threads' synchronous yfinance/jugaad_data calls to run on the event

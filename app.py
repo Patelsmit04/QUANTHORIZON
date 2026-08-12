@@ -91,8 +91,8 @@ async def lifespan(app_instance: FastAPI):
 
 
 app = FastAPI(
-    title="QuantHorizon Engine — 5-Pillar Matrix & Autonomous Scheduler",
-    description="QuantHorizon Institutional Intraday & BTST Matrix Engine",
+    title="TRADEXO Engine — 5-Pillar Matrix & Autonomous Scheduler",
+    description="TRADEXO Institutional Intraday & BTST Matrix Engine",
     version="5.0.0",
     lifespan=lifespan
 )
@@ -164,24 +164,24 @@ app.add_middleware(NoCacheStaticMiddleware)
 # multi-tenant service. GET endpoints stay fully open exactly as documented above — this only
 # gates state-changing routes.
 API_KEY_HEADER_NAME = "X-API-Key"
-QUANTHORIZON_API_KEY = os.environ.get("QUANTHORIZON_API_KEY", "").strip()
+TRADEXO_API_KEY = os.environ.get("TRADEXO_API_KEY", os.environ.get("QUANTHORIZON_API_KEY", "")).strip()
 
-if not QUANTHORIZON_API_KEY:
+if not TRADEXO_API_KEY:
     logging.getLogger("Auth").warning(
-        "QUANTHORIZON_API_KEY is not set — mutating endpoints (strategy CRUD, lock/evaluate "
+        "TRADEXO_API_KEY is not set — mutating endpoints (strategy CRUD, lock/evaluate "
         "picks, execute, notifications, index intelligence run) are running WITHOUT "
-        "authentication. Set QUANTHORIZON_API_KEY in .env to require it."
+        "authentication. Set TRADEXO_API_KEY in .env to require it."
     )
 
 
 def require_api_key(x_api_key: Optional[str] = Header(default=None, alias=API_KEY_HEADER_NAME)):
-    """FastAPI dependency for mutating routes. No-op (open) if QUANTHORIZON_API_KEY isn't
+    """FastAPI dependency for mutating routes. No-op (open) if TRADEXO_API_KEY isn't
     configured — see the startup warning above; this preserves today's fully-open behavior for
     anyone who hasn't opted in, rather than breaking existing deployments outright the moment
     this ships. Uses a constant-time comparison to avoid leaking the key via response-timing."""
-    if not QUANTHORIZON_API_KEY:
+    if not TRADEXO_API_KEY:
         return
-    if not x_api_key or not secrets.compare_digest(x_api_key, QUANTHORIZON_API_KEY):
+    if not x_api_key or not secrets.compare_digest(x_api_key, TRADEXO_API_KEY):
         raise HTTPException(status_code=401, detail="Missing or invalid API key.")
 
 
@@ -3036,7 +3036,7 @@ if __name__ == "__main__":
             pass
 
     def _force_exit(sig, frame):
-        print("\n[!] Shutting down QuantHorizon Server immediately...", flush=True)
+        print("\n[!] Shutting down TRADEXO Server immediately...", flush=True)
         shutdown_event.set()
         os._exit(0)
 
@@ -3047,7 +3047,7 @@ if __name__ == "__main__":
         pass
 
     print("\n" + "=" * 64)
-    print("  [+] AlgoTrader QuantHorizon Dashboard is Running!")
+    print("  [+] AlgoTrader TRADEXO Dashboard is Running!")
     print("  [>] Open Dashboard Link: http://127.0.0.1:8000")
     print("  [>] Local Server: http://localhost:8000")
     print("  [>] Press CTRL+C in terminal to stop server immediately")

@@ -3,9 +3,9 @@ AI strategy clarification — reads a strategy's CONFIGURATION (target scope, wh
 pillars are active, the confirmation-weight bar, the fundamentals/news quality gates) and
 produces a structured, plain-language summary for the user to confirm before it can go active.
 
-This is QUANTHORIZON's own adaptation of the sibling AlgoTrader project's clarifier: AlgoTrader
+This is TRADEXO's own adaptation of the sibling AlgoTrader project's clarifier: AlgoTrader
 strategies are Python files with custom entry/exit code, so its clarifier reads source code.
-QUANTHORIZON strategies are JSON configs layered on top of the existing 5-pillar/6-pillar
+TRADEXO strategies are JSON configs layered on top of the existing 5-pillar/6-pillar
 engines (see strategy_manager.py) — there's no code to read, so this clarifier reads the config
 dict instead and explains what that specific combination of settings actually does, in the
 context of what the engine's own defaults are (so "required_weight_override: 2.0" reads as

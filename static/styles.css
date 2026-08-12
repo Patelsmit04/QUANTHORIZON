@@ -1,10 +1,12 @@
 /* ==========================================================================
-   QUANTHORIZON — DARK INSTITUTIONAL DASHBOARD
+   TRADEXO — DARK INSTITUTIONAL DASHBOARD
    Deep graphite/black surfaces, high contrast ink, precise gold/amber accent
    reserved for Priority 1 + brand, clean semantic colors for bullish/bearish/
    status. Glass panels keep the premium elevation language from the previous
    light build, re-tuned as dark translucent layers instead of white glass.
    ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap');
 
 :root {
     /* Page + glass surfaces — deep graphite/black, layered elevation */
@@ -51,6 +53,7 @@
     --bearish: #f04949;
     --bearish-bg: rgba(240, 73, 73, 0.14);
 
+    --font-brand: 'Syne', 'Plus Jakarta Sans', -apple-system, sans-serif;
     --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
@@ -377,31 +380,21 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 }
 
 .topbar-brand-title {
-    font-family: var(--font-heading);
-    font-size: 1.75rem;
+    font-family: var(--font-brand);
+    font-size: 1.65rem;
     font-weight: 800;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     color: var(--ink-primary, #ffffff);
     line-height: 1;
 }
 
-.mobile-menu-toggle {
-    width: 28px;
-    height: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    border: 1px solid var(--glass-border-strong);
-    background: var(--glass-bg-soft);
-    color: var(--ink-primary);
-    font-size: 12px;
-    margin-right: 12px;
-    cursor: pointer;
-}
-
 .topbar-brand-title span {
-    color: var(--gold, #c99433);
+    background: linear-gradient(135deg, #FFE895 0%, #E5C05B 35%, #C59833 70%, #AA7C11 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 16px rgba(229, 192, 91, 0.35);
+    font-weight: 800;
 }
 .topbar-spacer { flex: 1 1 auto; }
 
@@ -553,15 +546,20 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 }
 
 .drawer-title {
-    font-family: var(--font-heading);
+    font-family: var(--font-brand);
     font-weight: 800;
     font-size: 21px;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     color: var(--ink-primary);
 }
 
 .drawer-title span {
-    color: var(--gold);
+    background: linear-gradient(135deg, #FFE895 0%, #E5C05B 35%, #C59833 70%, #AA7C11 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 16px rgba(229, 192, 91, 0.35);
+    font-weight: 800;
 }
 
 .drawer-subtitle {

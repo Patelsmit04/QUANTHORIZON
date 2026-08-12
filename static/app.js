@@ -727,10 +727,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const msUntilTarget = targetDate.getTime() - istNow.getTime();
-        console.log(`[QuantHorizon] 9:15:00 AM IST market open refresh scheduled in ${(msUntilTarget / 60000).toFixed(1)} minutes (at ${targetDate.toLocaleTimeString('en-IN')})`);
+        console.log(`[TRADEXO] 9:15:00 AM IST market open refresh scheduled in ${(msUntilTarget / 60000).toFixed(1)} minutes (at ${targetDate.toLocaleTimeString('en-IN')})`);
 
         setTimeout(() => {
-            console.log('[QuantHorizon] 9:15:00 AM IST — hard refreshing for new market day...');
+            console.log('[TRADEXO] 9:15:00 AM IST — hard refreshing for new market day...');
             location.reload();
         }, Math.max(1000, msUntilTarget));
     }
@@ -819,7 +819,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (day !== 0 && day !== 6 && istMins >= 555 && istMins <= 560) {
             // 9:15-9:20 AM: force refresh accuracy every 30 sec
-            console.log('[QuantHorizon] 9:15 AM window — forcing accuracy refresh...');
+            console.log('[TRADEXO] 9:15 AM window — forcing accuracy refresh...');
             fetchScanResults(true);
             fetchWinRatePerformance();
             fetchSplitAccuracy();

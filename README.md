@@ -1,4 +1,4 @@
-# QUANTHORIZON — BTST/STBT Scanner
+# TRADEXO — BTST/STBT Scanner
 
 A quantitative scanner for NSE F&O stocks that ranks BTST (Buy Today Sell Tomorrow) and
 STBT (Sell Today Buy Tomorrow) overnight setups, combining a technical 6-pillar matrix with
@@ -250,13 +250,13 @@ tests/                        pytest suite — `pytest tests/`
 | `POST /api/evaluate_picks` | Manually run the next-day gap evaluation |
 
 Every `POST`/`PUT`/`DELETE` endpoint above requires the `X-API-Key` header (see
-`QUANTHORIZON_API_KEY` below) if that env var is set. All `GET` endpoints stay fully open,
+`TRADEXO_API_KEY` below) if that env var is set. All `GET` endpoints stay fully open,
 unauthenticated, exactly as before.
 
 ## Notes
 
 - **Authentication (2026 audit finding):** every mutating endpoint used to be callable by
-  anyone with the URL. Set `QUANTHORIZON_API_KEY` in `.env` to require an `X-API-Key: <key>`
+  anyone with the URL. Set `TRADEXO_API_KEY` in `.env` to require an `X-API-Key: <key>`
   header on all of them — the dashboard's own UI will prompt for this key the first time you
   try to change anything (🔑 button in the header) and remembers it in your browser's
   `localStorage` afterward. Leave it unset to keep the previous fully-open behavior (a startup
