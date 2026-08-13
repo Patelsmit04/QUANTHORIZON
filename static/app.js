@@ -489,6 +489,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sortSelect) sortSelect.addEventListener("change", filterAndRenderTable);
     if (closeModalBtn) closeModalBtn.addEventListener("click", hideModal);
 
+    // UI State Preservation for Row Expansion / Accordions
+    const expandedTickers = new Set();
+    const expandedFlowDetails = new Set();
+
     // Mobile card collapse/expand — one delegated listener for every row's chevron, rather
     // than a per-row listener re-registered on every filterAndRenderTable() re-render.
     if (stocksTableBody) {
@@ -498,6 +502,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const tr = toggle.closest("tr");
             const key = tr.dataset.rowKey;
             const expanding = !tr.classList.contains("expanded");
+            if (expanding) {
+                expandedTickers.add(key);
+            } else {
+                expandedTickers.delete(key);
+            }
             document.querySelectorAll(`#stocksTableBody [data-row-key="${CSS.escape(key)}"]`)
                 .forEach(el => el.classList.toggle("expanded", expanding));
             toggle.setAttribute("aria-expanded", String(expanding));
@@ -1283,6 +1292,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const reqPillars = stock.required_pillars || 3;
             const rowKey = `${stock.symbol}-${stock.rank_position || 0}`;
             tr.dataset.rowKey = rowKey;
+            const isRowExpanded = expandedTickers.has(rowKey);
+            if (isRowExpanded) {
+                tr.classList.add("expanded");
+            }
             const flowDetailId = `flow-detail-${stock.symbol}-${stock.rank_position || 0}`;
             const flowChipHtml = buildInstitutionalFlowChipHTML(stock.institutional_flow, flowDetailId);
             const flowDetailRowHtml = buildInstitutionalFlowDetailRowHTML(stock, flowDetailId);
@@ -1332,7 +1345,7 @@ document.addEventListener("DOMContentLoaded", () => {
                        <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">EST. LIKELY: ${maxLabel}</span>`;
 
                 bucketHtml = `
-                    <tr class="gap-distribution-row" data-row-key="${rowKey}" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
+                    <tr class="gap-distribution-row ${isRowExpanded ? 'expanded' : ''}" data-row-key="${rowKey}" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
                         <td colspan="12" style="padding:8px 16px;">
                             <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                                 <div style="font-size:10px;font-weight:800;color:var(--ink-primary);white-space:nowrap;">
@@ -1366,8 +1379,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             ${escapeHtml(sigText)}
                         </span>
                         <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
-                        <button class="row-expand-toggle" aria-label="Expand details" aria-expanded="false">
-                            <i class="fa-solid fa-chevron-down"></i>
+                        <button class="row-expand-toggle" aria-label="Expand details" aria-expanded="${isRowExpanded ? 'true' : 'false'}">
+                            <i class="fa-solid ${isRowExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
                         </button>
                     </div>
                 </td>
@@ -1424,7 +1437,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (flowChip) {
                 flowChip.addEventListener("click", () => {
                     const detailRow = document.getElementById(flowDetailId);
-                    if (detailRow) detailRow.classList.toggle("hidden");
+                    if (detailRow) {
+                        const isHidden = detailRow.classList.toggle("hidden");
+                        if (!isHidden) {
+                            expandedFlowDetails.add(flowDetailId);
+                        } else {
+                            expandedFlowDetails.delete(flowDetailId);
+                        }
+                    }
                 });
             }
 
@@ -1438,6 +1458,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const tempTable = document.createElement("table");
                 tempTable.innerHTML = `<tbody>${flowDetailRowHtml}</tbody>`;
                 const detailRow = tempTable.querySelector("tr");
+                if (expandedFlowDetails.has(flowDetailId)) {
+                    detailRow.classList.remove("hidden");
+                }
                 stocksTableBody.appendChild(detailRow);
                 const dealsLink = detailRow.querySelector(".flow-view-deals-link");
                 if (dealsLink) {
