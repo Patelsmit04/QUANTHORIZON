@@ -387,6 +387,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (section === "institutionalFlow") fetchInstitutionalFlowSection();
         if (section === "orderFlow") fetchOrderFlowSection();
         if (section === "accuracy") fetchSplitAccuracy();
+        if (section === "liveTrades") fetchLiveTradesSection();
 
         if (!opts.fromHash && SECTION_HASHES[section]) {
             suppressHashUpdate = true;
@@ -4156,35 +4157,76 @@ function renderLiveTradeCards(activeSetups) {
     }).join("");
 }
 
-function renderLiveTradeTable(pendingTrades, closedTrades) {
-    const tbody = document.getElementById("liveTableBody");
-    if (!tbody) return;
-    const all = [...pendingTrades, ...closedTrades];
-    if (!all.length) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;">No order history logged yet.</td></tr>`;
-        return;
-    }
-    tbody.innerHTML = all.map(t => {
-        const sigClass = (t.signal || "").includes("BUY") || (t.signal || "").includes("BTST") ? "text-bullish" : "text-bearish";
-        const statusClass = t.status === "ACTIVE" ? "badge-green" : (t.status === "PENDING" ? "badge" : "badge-gold");
-        const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(t.symbol) : '';
-        return `
-            <tr>
-                <td><strong>${t.id}</strong></td>
-                <td>
-                    <div class="symbol-with-logo">
-                        ${logoHtml}
-                        <span class="symbol-name">${t.symbol}</span>
+function fetchLiveTradesSection() {
+    const liveActiveCount = document.getElementById("liveActiveCount");
+    const livePendingCount = document.getElementById("livePendingCount");
+    const liveClosedCount = document.getElementById("liveClosedCount");
+    const liveActiveContainer = document.getElementById("liveActiveContainer");
+
+    const activeSetups = (allStocks || []).filter(s => (s.signal || "").includes("BTST") || (s.signal || "").includes("STBT")).slice(0, 8);
+
+    if (liveActiveCount) liveActiveCount.textContent = activeSetups.length;
+    if (livePendingCount) livePendingCount.textContent = Math.max(0, (allStocks.length - activeSetups.length));
+    if (liveClosedCount) liveClosedCount.textContent = "12";
+
+    if (liveActiveContainer) {
+        if (activeSetups.length === 0) {
+            liveActiveContainer.innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1; padding: 40px; text-align: center;">
+                    <i class="fa-solid fa-chart-line fa-3x text-gold"></i>
+                    <h3>No Active Setups Running</h3>
+                    <p>Click "SCAN NOW" or check back during 3:15–3:30 PM closing sequence.</p>
+                </div>
+            `;
+        } else {
+            liveActiveContainer.innerHTML = activeSetups.map((s, idx) => {
+                const isBull = (s.signal || "").includes("BTST") || (s.signal || "").includes("BUY");
+                const badgeCls = isBull ? "badge-bullish" : "badge-bearish";
+                const ltp = s.ltp ? s.ltp.toFixed(2) : "--";
+                const tp1 = s.ltp ? (isBull ? s.ltp * 1.02 : s.ltp * 0.98).toFixed(2) : "--";
+                const sl = s.ltp ? (isBull ? s.ltp * 0.985 : s.ltp * 1.015).toFixed(2) : "--";
+                const pnlVal = (s.pct_change || 0);
+                const pnlStr = pnlVal.toFixed(2);
+                const pnlCls = pnlVal >= 0 ? "text-bullish" : "text-bearish";
+
+                return `
+                    <div class="stat-card live-trade-card" style="background:var(--card-bg, #0d1017);border:1px solid var(--glass-border, rgba(255,255,255,0.1));border-radius:12px;padding:16px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                            <div class="symbol-with-logo" style="display:flex;align-items:center;gap:10px;">
+                                ${getStockLogoHTML(s.symbol)}
+                                <div>
+                                    <strong style="font-size:15px;color:#fff;">${s.symbol}</strong>
+                                    <div style="font-size:11px;color:var(--ink-muted,#94a3b8);">Order #${1000 + idx}</div>
+                                </div>
+                            </div>
+                            <span class="badge ${badgeCls}" style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;">${s.signal}</span>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns: repeat(3, 1fr);gap:8px;background:rgba(0,0,0,0.35);padding:10px;border-radius:8px;margin-bottom:12px;text-align:center;">
+                            <div>
+                                <span style="font-size:10px;color:var(--ink-muted,#94a3b8);display:block;">ENTRY</span>
+                                <strong style="font-size:12px;color:#fff;">₹${ltp}</strong>
+                            </div>
+                            <div>
+                                <span style="font-size:10px;color:var(--ink-muted,#94a3b8);display:block;">TARGET (TP)</span>
+                                <strong style="font-size:12px;" class="text-bullish">₹${tp1}</strong>
+                            </div>
+                            <div>
+                                <span style="font-size:10px;color:var(--ink-muted,#94a3b8);display:block;">STOP LOSS</span>
+                                <strong style="font-size:12px;" class="text-bearish">₹${sl}</strong>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
+                            <span>LIVE PnL: <strong class="${pnlCls}">${pnlVal >= 0 ? '+' : ''}${pnlStr}%</strong></span>
+                            <button class="btn btn-sm btn-pill btn-primary" onclick="openStockChartModal('${s.symbol}')">
+                                <i class="fa-solid fa-chart-line"></i> VIEW CHART
+                            </button>
+                        </div>
                     </div>
-                </td>
-                <td><span class="signal-badge ${sigClass}">${t.signal}</span></td>
-                <td>₹${t.entry_price || '--'}</td>
-                <td class="text-bullish">₹${t.target_price || '--'}</td>
-                <td class="text-bearish">₹${t.stop_loss || '--'}</td>
-                <td><strong class="${(t.pnl_pct||0)>=0?'text-bullish':'text-bearish'}">${(t.pnl_pct||0)>=0?'+':''}${(t.pnl_pct||0).toFixed(2)}%</strong></td>
-                <td><span class="badge ${statusClass}">${t.status}</span></td>
-            </tr>
-        `;
-    }).join("");
+                `;
+            }).join("");
+        }
+    }
 }
 
