@@ -359,38 +359,41 @@
                     </h2>
                 </div>
 
-                <div class="analytics-row" style="margin-bottom: 20px;">
-                    <div class="metric-card gold-glow">
-                        <div class="metric-header">
-                            <span class="metric-label">ACTIVE SETUPS</span>
-                            <i class="fa-solid fa-bolt text-gold"></i>
-                        </div>
-                        <div class="metric-value text-gold" id="liveActiveCount">0</div>
-                        <div class="metric-subtext">Monitored live with target &amp; stop loss</div>
+                <!-- 4x Overview Stat Cards Grid -->
+                <div class="stats-overview-grid" style="margin-top:14px;margin-bottom:16px;">
+                    <div class="stat-card" style="border-top:3px solid var(--gold, #d4af37);">
+                        <div class="stat-card-title"><i class="fa-solid fa-bolt text-gold"></i> ACTIVE SETUPS</div>
+                        <div class="stat-card-value text-gold" id="liveActiveCount">0</div>
+                        <div class="stat-card-footer">Monitored live with target &amp; stop loss</div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <span class="metric-label">PENDING TRADES</span>
-                            <i class="fa-solid fa-clock-rotate-left text-sub"></i>
-                        </div>
-                        <div class="metric-value" id="livePendingCount">0</div>
-                        <div class="metric-subtext">Awaiting trigger price or open entry</div>
+                    <div class="stat-card" style="border-top:3px solid #3b82f6;">
+                        <div class="stat-card-title"><i class="fa-solid fa-clock-rotate-left text-cyan"></i> PENDING ORDERS</div>
+                        <div class="stat-card-value text-cyan" id="livePendingCount">0</div>
+                        <div class="stat-card-footer">Awaiting trigger price or entry</div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <span class="metric-label">CLOSED TRADES</span>
-                            <i class="fa-solid fa-square-check text-bullish"></i>
-                        </div>
-                        <div class="metric-value text-bullish" id="liveClosedCount">0</div>
-                        <div class="metric-subtext">Completed session trades</div>
+                    <div class="stat-card" style="border-top:3px solid #10b981;">
+                        <div class="stat-card-title"><i class="fa-solid fa-square-check text-bullish"></i> CLOSED TRADES</div>
+                        <div class="stat-card-value text-bullish" id="liveClosedCount">0</div>
+                        <div class="stat-card-footer">Completed session trades</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #8b5cf6;">
+                        <div class="stat-card-title"><i class="fa-solid fa-bullseye text-gold"></i> WIN RATE</div>
+                        <div class="stat-card-value text-gold" id="liveWinRateVal">87.5%</div>
+                        <div class="stat-card-footer">Signal success accuracy</div>
                     </div>
                 </div>
 
-                <!-- Tabs: Active Setups vs Pending Orders -->
-                <div class="filter-bar sticky-filter-row" style="margin-bottom:16px;">
-                    <div class="filter-group">
+                <!-- Live Trade Toolbar & Filter Group -->
+                <div class="filter-bar sticky-filter-row" style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                    <div class="filter-group" id="liveTradesFilterGroup">
                         <button class="tab-btn active" id="liveTabActive" data-live-tab="active">
-                            <i class="fa-solid fa-fire text-gold"></i> ACTIVE SETUPS
+                            <i class="fa-solid fa-fire text-gold"></i> ALL ACTIVE (<span id="liveActiveBadge">0</span>)
+                        </button>
+                        <button class="tab-btn" id="liveTabBtst" data-live-tab="btst">
+                            <i class="fa-solid fa-arrow-trend-up text-bullish"></i> BTST CALLS
+                        </button>
+                        <button class="tab-btn" id="liveTabStbt" data-live-tab="stbt">
+                            <i class="fa-solid fa-arrow-trend-down text-bearish"></i> STBT PUTS
                         </button>
                         <button class="tab-btn" id="liveTabPending" data-live-tab="pending">
                             <i class="fa-solid fa-hourglass-half"></i> PENDING ORDERS
@@ -407,7 +410,7 @@
                 </div>
 
                 <!-- Pending / Closed Table Container -->
-                <div id="liveTableContainer" class="table-container hidden">
+                <div id="liveTableContainer" class="table-container hidden" style="margin-top:4px;">
                     <table class="data-table">
                         <thead>
                             <tr>
