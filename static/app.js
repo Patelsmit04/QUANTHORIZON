@@ -1430,7 +1430,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         #${stock.rank_position || '-'}
                     </span>
                 </td>
-                <td data-label="TICKER">
+                <td data-label="TICKER &amp; SIGNAL">
                     <div class="ticker-header-flex">
                         <span class="symbol-with-logo">
                             ${getStockLogoHTML(stock.symbol)}
@@ -1439,30 +1439,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                 ${stock.rank_position <= 2 ? '<span class="text-gold priority-crown-badge"><i class="fa-solid fa-crown"></i> PRIORITY</span>' : ''}
                             </span>
                         </span>
-                        ${getPhaseBadgeHTML(stock)}
                         <span class="signal-badge-header ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
                             ${escapeHtml(sigText)}
                         </span>
-                        <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
                         <button class="row-expand-toggle" aria-label="Expand details" aria-expanded="${isRowExpanded ? 'true' : 'false'}">
                             <i class="fa-solid ${isRowExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
                         </button>
                     </div>
-                </td>
-                <td data-label="SIGNAL">
-                    <span class="signal-badge ${sigText.includes('BTST') ? 'text-bullish' : (sigText.includes('STBT') ? 'text-bearish' : 'text-sub')}">
-                        ${escapeHtml(sigText)}
-                    </span>
-                </td>
-                <td data-label="OPTION TYPE">${getOptionTypeBadgeHTML(stock.option_type || 'NONE')}</td>
-                <td data-label="PRIORITY">${getPriorityBadgeHTML(stock.priority_level || 'P3_LOW', sigText)}</td>
-                <td data-label="CONFIDENCE">
-                    <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
-                </td>
-                <td data-label="EST. GAP">
-                    <span class="est-gap-pill ${estGap >= 0 ? 'est-gap-up' : 'est-gap-down'}">
-                        ${estGap >= 0 ? '+' : ''}${estGap}% EST
-                    </span>
                 </td>
                 <td data-label="LTP"><strong>₹${ltpVal}</strong></td>
                 <td data-label="CHANGE">
@@ -1470,25 +1453,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${(stock.change_pts || 0) >= 0 ? '+' : ''}${(stock.change_pts || 0).toFixed(2)} (${(stock.pct_change || 0) >= 0 ? '+' : ''}${(stock.pct_change || 0).toFixed(2)}%)
                     </span>
                 </td>
-                <td data-label="VOL SURGE">
-                    <div class="vol-surge-container">
-                        ${(stock.volume_spike || 0) >= 3.0 ? 
-                            `<span class="badge-amber-vol"><i class="fa-solid fa-fire"></i> ${stock.volume_spike}x HIGH VOL</span>` :
-                            `<span class="vol-surge-text text-sub">${stock.volume_spike || 1.0}x</span>`
-                        }
-                    </div>
-                </td>
-                <td data-label="RSI">
-                    <span class="rsi-badge ${getRsiColorClass(stock.rsi || 50)}">${stock.rsi || 50}</span>
-                </td>
-                <td data-label="PILLAR WEIGHT">
-                    <span class="pillar-weight-badge text-gold" title="Confirmed Weight: ${Number(pillarWeight).toFixed(1)} / Required Bar: ${Number(reqPillars).toFixed(1)}">
-                        ${Number(pillarWeight).toFixed(1)}/${Number(reqPillars).toFixed(1)} Wt
-                    </span>
-                    ${flowChipHtml}
+                <td data-label="GAP PROBABILITY">
+                    <span class="score-pill ${getScoreColorClass(stock.confidence_score || 50)}">${stock.confidence_score || 50}%</span>
                 </td>
                 <td data-label="ACTION">
-                    <button class="btn btn-pill btn-secondary view-detail-btn" data-symbol="${escapeAttr(stock.symbol)}" title="Quick Technical Breakdown">
+                    <button class="btn btn-pill btn-gold view-detail-btn" onclick="openStockModal('${escapeAttr(stock.symbol)}')" title="View Dedicated Technical Analysis">
                         <i class="fa-solid fa-chart-line"></i>
                         <span>VIEW DETAILS</span>
                     </button>
