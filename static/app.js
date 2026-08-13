@@ -1230,44 +1230,55 @@ document.addEventListener("DOMContentLoaded", () => {
                 const arrowIcon = isUp ? "fa-caret-up" : "fa-caret-down";
                 const sigText = stock.signal || (isUp ? "TOP GAINER" : "TOP LOSER");
 
-                const card = document.createElement("div");
-                card.className = `live-stock-card ${colorClass}`;
-                card.dataset.symbol = stock.symbol || "";
-                card.innerHTML = `
-                    <div class="symbol-with-logo">
-                        ${getStockLogoHTML(stock.symbol)}
-                        <div>
-                            <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
-                            <div style="font-size: 10px; font-weight: 700; color: ${isUp ? '#10b981' : '#ef4444'}; margin-top: 2px;">
-                                <i class="fa-solid ${isUp ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${escapeHtml(sigText)}
+                let card = liveStocksGrid.querySelector(`[data-symbol="${CSS.escape(stock.symbol || '')}"]`);
+                if (card) {
+                    // Selective In-Place Update — PRESERVES LOGO IMAGE TAG & PREVENTS FLASHING
+                    card.className = `live-stock-card ${colorClass}`;
+                    const ltpEl = card.querySelector(".live-card-ltp");
+                    if (ltpEl) ltpEl.textContent = `₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                    const changeEl = card.querySelector(".live-card-change");
+                    if (changeEl) {
+                        changeEl.innerHTML = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)`;
+                    }
+                } else {
+                    card = document.createElement("div");
+                    card.className = `live-stock-card ${colorClass}`;
+                    card.dataset.symbol = stock.symbol || "";
+                    card.innerHTML = `
+                        <div class="symbol-with-logo">
+                            ${getStockLogoHTML(stock.symbol)}
+                            <div>
+                                <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
+                                <div style="font-size: 10px; font-weight: 700; color: ${isUp ? '#10b981' : '#ef4444'}; margin-top: 2px;">
+                                    <i class="fa-solid ${isUp ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${escapeHtml(sigText)}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div style="text-align:right;">
-                        <div class="live-card-ltp">₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
-                        <div class="live-card-change">
-                            <i class="fa-solid ${arrowIcon}"></i>
-                            ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
+                        <div style="text-align:right;">
+                            <div class="live-card-ltp">₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+                            <div class="live-card-change">
+                                <i class="fa-solid ${arrowIcon}"></i>
+                                ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
+                            </div>
                         </div>
-                    </div>
-                `;
-                card.addEventListener("click", () => openStockModal(stock.symbol));
-                liveStocksGrid.appendChild(card);
+                    `;
+                    card.addEventListener("click", () => openStockModal(stock.symbol));
+                    liveStocksGrid.appendChild(card);
+                }
             });
             return;
         }
 
-        // ── BTST STOCKS VIEW: Table rendering (unchanged) ──
+        // ── BTST STOCKS VIEW: Table rendering ──
         if (btstTableWrapper) btstTableWrapper.classList.remove("hidden");
         if (liveStocksGrid) liveStocksGrid.classList.add("hidden");
         if (liveQuickFilters) {
             liveQuickFilters.classList.add("hidden");
             liveQuickFilters.style.setProperty("display", "none", "important");
         }
-
-        stocksTableBody.innerHTML = "";
         
         if (filtered.length === 0) {
+            stocksTableBody.innerHTML = "";
             setEmptyStateMessage(EMPTY_STATE_DEFAULT_TITLE, EMPTY_STATE_DEFAULT_TEXT);
             if (emptyState) emptyState.classList.remove("hidden");
             return;
@@ -1276,7 +1287,50 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         filtered.forEach((stock) => {
-            const tr = document.createElement("tr");
+            const estGap = stock.predicted_gap_pct !== undefined ? stock.predicted_gap_pct : 0.0;
+            const ltpVal = stock.ltp ? stock.ltp.toLocaleString('en-IN') : '0.00';
+            const sigText = stock.signal || 'NEUTRAL';
+            const pillarWeight = stock.confirmed_pillars_weight !== undefined ? stock.confirmed_pillars_weight : 0.0;
+            const reqPillars = stock.required_pillars || 3;
+            const rowKey = `${stock.symbol}-${stock.rank_position || 0}`;
+            const isRowExpanded = expandedTickers.has(rowKey);
+
+            const flowDetailId = `flow-detail-${stock.symbol}-${stock.rank_position || 0}`;
+            const flowChipHtml = buildInstitutionalFlowChipHTML(stock.institutional_flow, flowDetailId);
+            const flowDetailRowHtml = buildInstitutionalFlowDetailRowHTML(stock, flowDetailId);
+
+            let tr = stocksTableBody.querySelector(`tr[data-row-key="${CSS.escape(rowKey)}"]`);
+            if (tr) {
+                // Selective In-Place DOM Update for Existing Row — PRESERVES OPEN ACCORDION & LOGO IMAGE
+                if (isRowExpanded) tr.classList.add("expanded");
+                const ltpTd = tr.querySelector('[data-label="LTP"]');
+                if (ltpTd) ltpTd.innerHTML = `<strong>₹${ltpVal}</strong>`;
+                const changeTd = tr.querySelector('[data-label="CHANGE"]');
+                if (changeTd) {
+                    const isPos = (stock.change_pts || 0) >= 0;
+                    changeTd.innerHTML = `
+                        <span class="${isPos ? 'text-bullish' : 'text-bearish'}" style="font-weight:700;font-size:12px;">
+                            ${isPos ? '+' : ''}${(stock.change_pts || 0).toFixed(2)} (${(stock.pct_change || 0) >= 0 ? '+' : ''}${(stock.pct_change || 0).toFixed(2)}%)
+                        </span>
+                    `;
+                }
+                const estGapTd = tr.querySelector('[data-label="EST. GAP"]');
+                if (estGapTd) {
+                    estGapTd.innerHTML = `
+                        <span class="est-gap-pill ${estGap >= 0 ? 'est-gap-up' : 'est-gap-down'}">
+                            ${estGap >= 0 ? '+' : ''}${estGap}% EST
+                        </span>
+                    `;
+                }
+                const rsiTd = tr.querySelector('[data-label="RSI"]');
+                if (rsiTd) {
+                    rsiTd.innerHTML = `<span class="rsi-badge ${getRsiColorClass(stock.rsi || 50)}">${stock.rsi || 50}</span>`;
+                }
+                return;
+            }
+
+            tr = document.createElement("tr");
+            tr.dataset.rowKey = rowKey;
             
             if (stock.rank_position <= 2) {
                 tr.classList.add("top-choice-row");
@@ -1284,21 +1338,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (stock.next_day_bestest_5) {
                 tr.classList.add("bestest-5-row");
             }
-
-            const estGap = stock.predicted_gap_pct !== undefined ? stock.predicted_gap_pct : 0.0;
-            const ltpVal = stock.ltp ? stock.ltp.toLocaleString('en-IN') : '0.00';
-            const sigText = stock.signal || 'NEUTRAL';
-            const pillarWeight = stock.confirmed_pillars_weight !== undefined ? stock.confirmed_pillars_weight : 0.0;
-            const reqPillars = stock.required_pillars || 3;
-            const rowKey = `${stock.symbol}-${stock.rank_position || 0}`;
-            tr.dataset.rowKey = rowKey;
-            const isRowExpanded = expandedTickers.has(rowKey);
             if (isRowExpanded) {
                 tr.classList.add("expanded");
             }
-            const flowDetailId = `flow-detail-${stock.symbol}-${stock.rank_position || 0}`;
-            const flowChipHtml = buildInstitutionalFlowChipHTML(stock.institutional_flow, flowDetailId);
-            const flowDetailRowHtml = buildInstitutionalFlowDetailRowHTML(stock, flowDetailId);
 
             let bucketHtml = "";
             if (stock.gap_bucket_distribution && stock.gap_bucket_distribution.bucket_probabilities) {
@@ -1307,7 +1349,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const isSufficient = distMeta.is_sufficient === true || distMeta.is_empirical === true;
                 const sampleSize = distMeta.sample_size || 0;
 
-                // Backend now sends 4 clean buckets directly: "0-1%", "1-2%", "2-3%", "3%+"
                 const mapped = {
                     "0-1%": probs["0-1%"] || 0,
                     "1-2%": probs["1-2%"] || 0,
