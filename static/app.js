@@ -319,11 +319,13 @@ document.addEventListener("DOMContentLoaded", () => {
         HASH_TO_SECTION[secKey.toLowerCase()] = secKey;
     });
     let suppressHashUpdate = false;
+    let currentActiveSection = "scanner";
 
     // Unified Section Switcher — #sidebarNav is the single nav source for both the desktop
     // rail and the mobile drawer (see appSidebar above), so only one active-state loop is needed.
     function switchSection(section, opts = {}) {
         if (!section) return;
+        currentActiveSection = section;
 
         // Dynamic fallback lookup for section DOM nodes
         const sections = {
@@ -649,7 +651,11 @@ document.addEventListener("DOMContentLoaded", () => {
             
             allStocks = data.stocks || [];
             updateSummaryMetrics(data);
-            filterAndRenderTable();
+
+            // Only re-render scanner DOM table/cards if the user is ALREADY on the scanner/dashboard page!
+            if (currentActiveSection === "scanner" || currentActiveSection === "dashboard") {
+                filterAndRenderTable();
+            }
             
             const marketStatusText = document.getElementById("marketStatusText");
             const statusDot = document.getElementById("statusDot");
