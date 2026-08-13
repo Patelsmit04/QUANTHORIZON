@@ -1386,14 +1386,38 @@ document.addEventListener("DOMContentLoaded", () => {
                        <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">EST. LIKELY: ${maxLabel}</span>`;
 
                 bucketHtml = `
-                    <tr class="gap-distribution-row ${isRowExpanded ? 'expanded' : ''}" data-row-key="${rowKey}" style="background:var(--glass-bg-soft);border-bottom:1px solid var(--gridline);">
-                        <td colspan="12" style="padding:8px 16px;">
-                            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                                <div style="font-size:10px;font-weight:800;color:var(--ink-primary);white-space:nowrap;">
-                                    <i class="fa-solid fa-chart-simple text-gold"></i> GAP PROBABILITY DISTRIBUTION:
-                                    ${sufficiencyLabel}
+                    <tr class="gap-distribution-row ${isRowExpanded ? 'expanded' : ''}" data-row-key="${rowKey}">
+                        <td colspan="12" style="padding: 16px; background: rgba(13, 16, 23, 0.95); border-bottom: 1px solid var(--glass-border);">
+                            <div style="display: flex; flex-direction: column; gap: 14px; max-width: 600px; margin: 0 auto;">
+                                
+                                <!-- Row 1: LTP & Change -->
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                    <span style="font-size: 11px; font-weight: 700; color: var(--ink-muted);">LAST TRADED PRICE &amp; DAY CHANGE</span>
+                                    <div style="font-size: 14px; font-weight: 800; color: #fff;">
+                                        ₹${ltpVal} <span style="color: var(--ink-muted); margin: 0 6px;">|</span> 
+                                        <span class="${(stock.change_pts || 0) >= 0 ? 'text-bullish' : 'text-bearish'}">
+                                            ${(stock.change_pts || 0) >= 0 ? '+' : ''}${(stock.change_pts || 0).toFixed(2)} 
+                                            (${(stock.pct_change || 0) >= 0 ? '+' : ''}${(stock.pct_change || 0).toFixed(2)}%)
+                                        </span>
+                                    </div>
                                 </div>
-                                <div style="display:flex;gap:8px;flex:1;min-width:240px;">${bars}</div>
+
+                                <!-- Row 2: Gap Probability Distribution -->
+                                <div>
+                                    <div style="font-size: 10.5px; font-weight: 800; color: var(--ink-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fa-solid fa-chart-simple text-gold"></i> GAP PROBABILITY DISTRIBUTION:
+                                        ${sufficiencyLabel}
+                                    </div>
+                                    <div style="display: flex; gap: 8px; width: 100%;">${bars}</div>
+                                </div>
+
+                                <!-- Row 3: Prominent View Details Button -->
+                                <div style="text-align: center; padding-top: 4px;">
+                                    <button class="btn btn-pill btn-primary" onclick="openStockModal('${escapeAttr(stock.symbol)}')" style="width: 100%; max-width: 280px; min-height: 38px; font-size: 12px; font-weight: 800; letter-spacing: 0.5px;">
+                                        <i class="fa-solid fa-chart-line"></i> VIEW DETAILS
+                                    </button>
+                                </div>
+
                             </div>
                         </td>
                     </tr>
@@ -4223,52 +4247,83 @@ function renderStockDetailPage(symbol, timeframe = "15") {
         const tp1 = stock.ltp ? (isBull ? stock.ltp * 1.02 : stock.ltp * 0.98).toFixed(2) : '--';
         const tp2 = stock.ltp ? (isBull ? stock.ltp * 1.04 : stock.ltp * 0.96).toFixed(2) : '--';
         const sl = stock.ltp ? (isBull ? stock.ltp * 0.985 : stock.ltp * 1.015).toFixed(2) : '--';
+        const estGapVal = stock.predicted_gap_pct !== undefined ? stock.predicted_gap_pct : 0.0;
+        const volSurgeVal = stock.volume_spike || stock.volume_surge_ratio || 1.8;
+        const rsiVal = stock.rsi || 52;
+        const optionTypeVal = stock.option_type || (isBull ? "CE" : "PE");
+        const priorityVal = stock.priority_level || "P1_HIGH";
+        const weightVal = `${(stock.confirmed_pillars_weight || 3.5).toFixed(1)} / ${(stock.required_pillars || 3.0).toFixed(1)} Wt`;
 
         gridEl.innerHTML = `
             <div class="stat-card" style="background:#0d1017;border:1px solid var(--glass-border);border-radius:12px;padding:20px;">
-                <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
                     <i class="fa-solid fa-crosshairs"></i> 5-PILLAR CONVICTION MATRIX
                 </div>
-                <div style="font-size:28px;font-weight:800;color:#fff;margin-bottom:4px;">${stock.confidence_score || 93}%</div>
-                <div style="font-size:12px;color:var(--ink-muted);margin-bottom:12px;">Multi-Pillar Technical Alignment Rating</div>
-                <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:12px;">
-                    <div>Confirmed Weight: <strong class="text-gold">${(stock.confirmed_pillars_weight || 3.5).toFixed(1)} / 5.0</strong></div>
-                    <div style="margin-top:4px;">Priority Level: <strong class="text-bullish">${stock.priority_level || 'P1_HIGH'}</strong></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">PRIORITY</span>
+                        <strong class="text-gold" style="font-size:14px;">${priorityVal}</strong>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">PILLAR WEIGHT</span>
+                        <strong class="text-gold" style="font-size:14px;">${weightVal}</strong>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">OPTION TYPE</span>
+                        <strong class="${isBull ? 'text-bullish' : 'text-bearish'}" style="font-size:14px;">${optionTypeVal}</strong>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">CONVICTION SCORE</span>
+                        <strong class="text-bullish" style="font-size:14px;">${stock.confidence_score || 93}%</strong>
+                    </div>
                 </div>
             </div>
 
             <div class="stat-card" style="background:#0d1017;border:1px solid var(--glass-border);border-radius:12px;padding:20px;">
-                <div style="font-size:14px;font-weight:800;color:var(--cyan);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-                    <i class="fa-solid fa-bullseye"></i> INTRADAY TARGET &amp; SL LEVELS
+                <div style="font-size:14px;font-weight:800;color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-chart-line"></i> VOLATILITY &amp; TECHNICAL METRICS
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">
-                    <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;">
-                        <span style="font-size:10px;color:var(--ink-muted);display:block;">TARGET 1 (TP1)</span>
-                        <strong class="text-bullish" style="font-size:14px;">₹${tp1}</strong>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">ESTIMATED GAP</span>
+                        <strong class="${estGapVal >= 0 ? 'text-bullish' : 'text-bearish'}" style="font-size:14px;">${estGapVal >= 0 ? '+' : ''}${estGapVal.toFixed(2)}% EST</strong>
                     </div>
-                    <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;">
-                        <span style="font-size:10px;color:var(--ink-muted);display:block;">TARGET 2 (TP2)</span>
-                        <strong class="text-bullish" style="font-size:14px;">₹${tp2}</strong>
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">VOL SURGE</span>
+                        <strong class="text-gold" style="font-size:14px;">${Number(volSurgeVal).toFixed(1)}x HIGH VOL</strong>
                     </div>
-                    <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;">
-                        <span style="font-size:10px;color:var(--ink-muted);display:block;">STOP LOSS (SL)</span>
-                        <strong class="text-bearish" style="font-size:14px;">₹${sl}</strong>
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">RSI (14-PERIOD)</span>
+                        <strong class="text-cyan" style="font-size:14px;">${rsiVal}</strong>
                     </div>
-                    <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;">
-                        <span style="font-size:10px;color:var(--ink-muted);display:block;">RISK / REWARD</span>
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">RISK / REWARD</span>
                         <strong class="text-gold" style="font-size:14px;">1 : 2.5</strong>
                     </div>
                 </div>
             </div>
 
             <div class="stat-card" style="background:#0d1017;border:1px solid var(--glass-border);border-radius:12px;padding:20px;">
-                <div style="font-size:14px;font-weight:800;color:var(--bullish);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-                    <i class="fa-solid fa-arrow-trend-up"></i> VOLUME &amp; GAP BUCKET
+                <div style="font-size:14px;font-weight:800;color:var(--bullish);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-bullseye"></i> INTRADAY TARGET &amp; SL BREAKDOWN
                 </div>
-                <div style="font-size:12px;color:var(--ink-secondary);line-height:1.6;">
-                    <div>Volume Spike: <strong class="text-gold">${(stock.volume_spike || stock.volume_surge_ratio || 1.8).toFixed(1)}x Average</strong></div>
-                    <div>Predicted Opening Gap: <strong class="text-bullish">+${(stock.predicted_gap_pct || 1.4).toFixed(1)}%</strong></div>
-                    <div>Closing Power Hour Aggression: <strong class="text-gold">HIGH BUY ACCUMULATION</strong></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">TARGET 1 (TP1)</span>
+                        <strong class="text-bullish" style="font-size:14px;">₹${tp1}</strong>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">TARGET 2 (TP2)</span>
+                        <strong class="text-bullish" style="font-size:14px;">₹${tp2}</strong>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">STOP LOSS (SL)</span>
+                        <strong class="text-bearish" style="font-size:14px;">₹${sl}</strong>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:12px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;margin-bottom:2px;">POWER HOUR AGGRESSION</span>
+                        <strong class="text-gold" style="font-size:12px;">HIGH ACCUMULATION</strong>
+                    </div>
                 </div>
             </div>
         `;
