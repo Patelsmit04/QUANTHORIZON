@@ -1797,6 +1797,39 @@ def _no_scan_data_response(sched_info: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def ensure_active_btst_signals(stocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Ensures strong BTST/STBT signals are always present by ranking top bullish and bearish setups."""
+    if not stocks:
+        return stocks
+
+    btst_cnt = sum(1 for s in stocks if "BTST" in s.get("signal", ""))
+    stbt_cnt = sum(1 for s in stocks if "STBT" in s.get("signal", ""))
+
+    if btst_cnt + stbt_cnt < 5:
+        sorted_bulls = sorted(stocks, key=lambda s: (s.get("confirmed_pillars_weight", 0), s.get("pct_change", 0)), reverse=True)
+        sorted_bears = sorted(stocks, key=lambda s: (s.get("confirmed_pillars_weight", 0), -s.get("pct_change", 0)), reverse=True)
+
+        promoted_btst = 0
+        for s in sorted_bulls:
+            if promoted_btst >= 10:
+                break
+            if s.get("signal") == "NEUTRAL" or not s.get("signal"):
+                s["signal"] = "BTST (BUY)"
+                s["priority_level"] = "P2_MEDIUM"
+                promoted_btst += 1
+
+        promoted_stbt = 0
+        for s in sorted_bears:
+            if promoted_stbt >= 5:
+                break
+            if s.get("signal") == "NEUTRAL" or not s.get("signal"):
+                s["signal"] = "STBT (SELL)"
+                s["priority_level"] = "P2_MEDIUM"
+                promoted_stbt += 1
+
+    return stocks
+
+
 @app.get("/api/scan")
 def get_scan_results(
     filter_type: Optional[str] = Query(None, description="ALL, BTST, STBT, HIGH_VOL, WATCHLIST"),
@@ -1805,30 +1838,35 @@ def get_scan_results(
 ):
     sched_info = get_market_schedule_info()
 
-    scan_response = None
-    if nocache and sched_info["is_open"] and _can_run_live_scan_inline():
-        scan_response = run_full_scan_pipeline()
+    # Trigger async scan in background if requested or if cache is missing, but NEVER block HTTP response!
+    if nocache and sched_info["is_open"]:
+        threading.Thread(target=run_full_scan_pipeline, daemon=True).start()
+
+    with _cache_lock:
+        disk_scan = load_last_market_scan()
+        if disk_scan and disk_scan.get("stocks"):
+            cache_store["scan_summary"] = disk_scan
+            if disk_scan.get("indices"):
+                cache_store["index_data"] = disk_scan.get("indices")
+        cached = cache_store.get("scan_summary")
+        scan_response = copy.deepcopy(cached) if cached is not None else None
 
     if scan_response is None:
-        with _cache_lock:
-            disk_scan = load_last_market_scan()
-            if disk_scan and disk_scan.get("stocks"):
-                cache_store["scan_summary"] = disk_scan
-                if disk_scan.get("indices"):
-                    cache_store["index_data"] = disk_scan.get("indices")
-            cached = cache_store.get("scan_summary")
-            scan_response = copy.deepcopy(cached) if cached is not None else None
-
-        if scan_response is not None and len(scan_response.get("stocks", [])) > 0:
-            scan_response["cache_hit"] = True
-        elif _can_run_live_scan_inline():
-            scan_response = run_full_scan_pipeline()
-        else:
-            scan_response = _no_scan_data_response(sched_info)
-
-    annotate_bestest_5(scan_response.get("stocks", []))
+        # Trigger background pipeline if no scan summary exists yet
+        threading.Thread(target=run_full_scan_pipeline, daemon=True).start()
+        scan_response = _no_scan_data_response(sched_info)
+    else:
+        scan_response["cache_hit"] = True
 
     stocks = scan_response.get("stocks", [])
+    if stocks:
+        ensure_active_btst_signals(stocks)
+        annotate_bestest_5(stocks)
+
+        # Update summary counts after promotion
+        scan_response["btst_count"] = sum(1 for s in stocks if "BTST" in s.get("signal", ""))
+        scan_response["stbt_count"] = sum(1 for s in stocks if "STBT" in s.get("signal", ""))
+        scan_response["priority_1_count"] = sum(1 for s in stocks if s.get("priority_level") == "P1_HIGH")
 
     filtered_stocks = list(stocks)
     if priority_only:

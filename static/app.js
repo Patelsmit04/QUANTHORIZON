@@ -11,7 +11,7 @@ var lastBtstStatus = "pre_btst";
 // endpoints (strategy CRUD, lock/evaluate picks, execute, notifications) now require one —
 // see promptForApiKey() below. Uses window.fetch explicitly so this definition itself isn't
 // caught by the fetch->apiFetch rename applied to every call site in this file.
-const DEFAULT_FETCH_TIMEOUT_MS = 15000;
+const DEFAULT_FETCH_TIMEOUT_MS = 30000;
 
 async function apiFetch(url, options = {}) {
     const { timeoutMs, headers, ...rest } = options;
@@ -711,24 +711,13 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupAutoRefresh() {
         if (autoRefreshInterval) clearInterval(autoRefreshInterval);
 
-        // Time-aware refresh intervals:
-        // 9:15-10:00 AM IST: 60-sec (opening volatility)
-        // 10:00-15:30 IST: 30-sec (regular market)
-        // Off-market: 60-sec
-        const now = new Date();
-        const istOffset = 5.5 * 60 * 60 * 1000;
-        const istNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + istOffset);
-        const istMins = istNow.getHours() * 60 + istNow.getMinutes();
-
-        let refreshMs = 60000; // default 60s
-        if (istMins >= 555 && istMins < 600) {
-            refreshMs = 60000; // 9:15-10:00 AM: 1 min
-        } else if (istMins >= 600 && istMins < 930) {
-            refreshMs = 30000; // 10:00-15:30: 30 sec
-        }
+        // Strict 10-second live market refresh for stocks & top index marquee ticker bar
+        const refreshMs = 10000; // 10 seconds live refresh
 
         autoRefreshInterval = setInterval(() => {
             fetchScanResults(false);
+            if (typeof fetchTickerIndices === 'function') fetchTickerIndices();
+            if (typeof fetchLivePrices === 'function') fetchLivePrices();
         }, refreshMs);
     }
 
