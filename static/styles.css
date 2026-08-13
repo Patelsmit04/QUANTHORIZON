@@ -4228,6 +4228,50 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
     color: #ef4444 !important;
 }
 
+/* ==========================================================================
+   LIVE TRADES SECTION & CARDS GRID STYLING
+   ========================================================================== */
+#liveTradesSection {
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    padding-top: 4px !important;
+}
+
+#liveTradesSection.hidden {
+    display: none !important;
+}
+
+.live-trade-cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    gap: 16px !important;
+    margin-top: 14px !important;
+    margin-bottom: 20px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 640px) {
+    .live-trade-cards-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.live-trade-card {
+    background: var(--card-bg, #0d1017) !important;
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1)) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.live-trade-card:hover {
+    border-color: rgba(212, 175, 55, 0.4) !important;
+    transform: translateY(-2px);
+}
+
 
 
 
