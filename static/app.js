@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Sidebar destination -> URL hash, so every section is deep-linkable and back/forward-safe.
     const SECTION_HASHES = {
-        dashboard: "dashboard", scanner: "signals", stocksNews: "stocks-news",
+        dashboard: "dashboard", scanner: "signals", liveTrades: "live-trade", stocksNews: "stocks-news",
         globalNews: "global-news", institutionalFlow: "institutional-flow",
         orderFlow: "order-flow", accuracy: "accuracy", indices: "index-intelligence", strategies: "strategies", history: "history",
         guide: "guide", rules: "rules"
@@ -329,6 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const sections = {
             dashboard: document.getElementById("dashboardSection"),
             scanner: document.getElementById("scannerSection"),
+            liveTrades: document.getElementById("liveTradesSection"),
             stocksNews: document.getElementById("stocksNewsSection"),
             globalNews: document.getElementById("globalNewsSection"),
             institutionalFlow: document.getElementById("institutionalFlowSection"),
