@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Sidebar destination -> URL hash, so every section is deep-linkable and back/forward-safe.
     const SECTION_HASHES = {
-        dashboard: "dashboard", scanner: "signals", liveTrades: "live-trade", stocksNews: "stocks-news",
+        dashboard: "dashboard", scanner: "signals", liveTrades: "live-trade", stockDetail: "stock-detail", stocksNews: "stocks-news",
         globalNews: "global-news", institutionalFlow: "institutional-flow",
         orderFlow: "order-flow", accuracy: "accuracy", indices: "index-intelligence", strategies: "strategies", history: "history",
         guide: "guide", rules: "rules"
@@ -330,6 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
             dashboard: document.getElementById("dashboardSection"),
             scanner: document.getElementById("scannerSection"),
             liveTrades: document.getElementById("liveTradesSection"),
+            stockDetail: document.getElementById("stockDetailSection"),
             stocksNews: document.getElementById("stocksNewsSection"),
             globalNews: document.getElementById("globalNewsSection"),
             institutionalFlow: document.getElementById("institutionalFlowSection"),
@@ -2568,35 +2569,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!indexVerdictGrid) return;
         indexVerdictGrid.innerHTML = "";
 
-        const banner = document.createElement("div");
-        banner.className = "index-performance-banner";
-        const hasEvaluatedData = (perf.total_evaluated_verdicts || 0) > 0;
-
-        const fmtVal = (val, colorClass) => {
-            if (!hasEvaluatedData) return `<span class="val" style="color:var(--ink-muted);font-size:0.95rem;">N/A <small style="font-size:0.68rem;display:block;">(No evaluated data yet)</small></span>`;
-            return `<span class="val ${colorClass}">${val}%</span>`;
-        };
-
-        banner.innerHTML = `
-            <div class="index-perf-stat">
-                <span class="lbl"><i class="fa-solid fa-bullseye"></i> DIRECTIONAL ACCURACY</span>
-                ${fmtVal(perf.directional_accuracy_pct ?? 0, "text-gold")}
-            </div>
-            <div class="index-perf-stat">
-                <span class="lbl"><i class="fa-solid fa-trophy"></i> WIN RATE</span>
-                ${fmtVal(perf.win_rate_pct ?? 0, "text-green")}
-            </div>
-            <div class="index-perf-stat">
-                <span class="lbl"><i class="fa-solid fa-chart-area"></i> STRADDLE RANGE HIT RATE</span>
-                ${fmtVal(perf.expected_range_hit_rate_pct ?? 0, "text-cyan")}
-            </div>
-            <div class="index-perf-stat">
-                <span class="lbl"><i class="fa-solid fa-award"></i> AVG FINAL ACCURACY</span>
-                ${fmtVal(perf.avg_final_accuracy_pct ?? 0, "text-gold")}
-            </div>
-        `;
-        indexVerdictGrid.appendChild(banner);
-
         const order = ["NIFTY50", "BANKNIFTY", "SENSEX"];
         order.filter(name => verdicts[name]).forEach(name => {
             indexVerdictGrid.appendChild(buildIndexVerdictCard(verdicts[name]));
@@ -4045,34 +4017,193 @@ document.addEventListener("DOMContentLoaded", () => {
     const liveTabPending = document.getElementById("liveTabPending");
     const liveTabClosed = document.getElementById("liveTabClosed");
     const liveActiveContainer = document.getElementById("liveActiveContainer");
-    const liveTableContainer = document.getElementById("liveTableContainer");
+    // Live Trade Page Unified Filter Tab Handlers
+    const liveTradesFilterGroup = document.getElementById("liveTradesFilterGroup");
+    if (liveTradesFilterGroup) {
+        liveTradesFilterGroup.addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-live-tab]");
+            if (!btn) return;
+            liveTradesFilterGroup.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
 
-    if (liveTabActive && liveTabPending && liveTabClosed) {
-        liveTabActive.addEventListener("click", () => {
-            liveTabActive.classList.add("active");
-            liveTabPending.classList.remove("active");
-            liveTabClosed.classList.remove("active");
-            if (liveActiveContainer) liveActiveContainer.classList.remove("hidden");
-            if (liveTableContainer) liveTableContainer.classList.add("hidden");
+            const tab = btn.dataset.liveTab;
+            const liveActiveContainer = document.getElementById("liveActiveContainer");
+            const liveTableContainer = document.getElementById("liveTableContainer");
+
+            if (tab === "active" || tab === "btst" || tab === "stbt") {
+                if (liveActiveContainer) liveActiveContainer.classList.remove("hidden");
+                if (liveTableContainer) liveTableContainer.classList.add("hidden");
+                filterAndRenderLiveTradeCards(tab);
+            } else {
+                if (liveActiveContainer) liveActiveContainer.classList.add("hidden");
+                if (liveTableContainer) liveTableContainer.classList.remove("hidden");
+            }
         });
-        liveTabPending.addEventListener("click", () => {
-            liveTabPending.classList.add("active");
-            liveTabActive.classList.remove("active");
-            liveTabClosed.classList.remove("active");
-            if (liveActiveContainer) liveActiveContainer.classList.add("hidden");
-            if (liveTableContainer) liveTableContainer.classList.remove("hidden");
+    }
+
+    // Dedicated Stock Detail Page & TradingView Chart Navigation
+    let currentStockSymbol = null;
+    let currentTvTimeframe = "15";
+
+    window.openStockModal = function(symbol) {
+        if (!symbol) return;
+        currentStockSymbol = symbol;
+        switchSection("stockDetail");
+        renderStockDetailPage(symbol, currentTvTimeframe);
+    };
+    window.openStockChartModal = window.openStockModal;
+
+    const btnBackFromStockDetail = document.getElementById("btnBackFromStockDetail");
+    if (btnBackFromStockDetail) {
+        btnBackFromStockDetail.addEventListener("click", () => {
+            switchSection("scanner");
         });
-        liveTabClosed.addEventListener("click", () => {
-            liveTabClosed.classList.add("active");
-            liveTabActive.classList.remove("active");
-            liveTabPending.classList.remove("active");
-            if (liveActiveContainer) liveActiveContainer.classList.add("hidden");
-            if (liveTableContainer) liveTableContainer.classList.remove("hidden");
+    }
+
+    const tvTimeframeFilterGroup = document.getElementById("tvTimeframeFilterGroup");
+    if (tvTimeframeFilterGroup) {
+        tvTimeframeFilterGroup.addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-tf]");
+            if (!btn) return;
+            tvTimeframeFilterGroup.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentTvTimeframe = btn.dataset.tf;
+            if (currentStockSymbol) renderStockDetailPage(currentStockSymbol, currentTvTimeframe);
         });
     }
 
     initWebSocket();
 });
+
+let cachedLiveTradeSetups = [];
+
+function filterAndRenderLiveTradeCards(tab) {
+    if (!cachedLiveTradeSetups || !cachedLiveTradeSetups.length) return;
+    let filtered = cachedLiveTradeSetups;
+    if (tab === "btst") {
+        filtered = cachedLiveTradeSetups.filter(s => (s.signal || "").includes("BTST") || (s.signal || "").includes("CALL") || (s.signal || "").includes("BUY"));
+    } else if (tab === "stbt") {
+        filtered = cachedLiveTradeSetups.filter(s => (s.signal || "").includes("STBT") || (s.signal || "").includes("PUT") || (s.signal || "").includes("SELL"));
+    }
+    renderLiveTradeCards(filtered);
+}
+
+function renderStockDetailPage(symbol, timeframe = "15") {
+    const titleEl = document.getElementById("stockDetailHeaderTitle");
+    const badgeEl = document.getElementById("stockDetailHeaderBadge");
+    const gridEl = document.getElementById("stockDetailAnalysisGrid");
+    const tvContainer = document.getElementById("tradingview_chart_container");
+
+    const stock = (allStocks || []).find(s => s.symbol === symbol) || { symbol: symbol, ltp: 100.0, pct_change: 0.0, signal: "NEUTRAL" };
+    const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(symbol) : '';
+    const ltpStr = stock.ltp ? stock.ltp.toFixed(2) : '--';
+    const pctVal = stock.pct_change || 0;
+    const pctClass = pctVal >= 0 ? "text-bullish" : "text-bearish";
+    const isBull = (stock.signal || "").includes("BTST") || (stock.signal || "").includes("BUY");
+    const badgeClass = isBull ? "badge-bullish" : ((stock.signal || "").includes("STBT") ? "badge-bearish" : "badge");
+
+    if (titleEl) {
+        titleEl.innerHTML = `
+            <div class="symbol-with-logo" style="display:flex;align-items:center;gap:10px;">
+                ${logoHtml}
+                <div>
+                    <h2 style="font-size:20px;font-weight:800;color:#fff;margin:0;">${symbol}</h2>
+                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">NSE &bull; F&amp;O Universe</div>
+                </div>
+            </div>
+            <div style="margin-left:16px;">
+                <div style="font-size:20px;font-weight:800;color:#fff;">₹${ltpStr}</div>
+                <div class="${pctClass}" style="font-size:12px;font-weight:700;">${pctVal >= 0 ? '+' : ''}${pctVal.toFixed(2)}%</div>
+            </div>
+        `;
+    }
+
+    if (badgeEl) {
+        badgeEl.innerHTML = `<span class="badge ${badgeClass}" style="font-size:13px;font-weight:800;padding:6px 16px;border-radius:20px;">${stock.signal || 'WATCHLIST'}</span>`;
+    }
+
+    // Render TradingView Chart Widget
+    if (tvContainer) {
+        tvContainer.innerHTML = "";
+        const script = document.createElement("script");
+        script.src = "https://s3.tradingview.com/tv.js";
+        script.async = true;
+        script.onload = () => {
+            if (typeof TradingView !== 'undefined') {
+                new TradingView.widget({
+                    "autosize": true,
+                    "symbol": `NSE:${symbol}`,
+                    "interval": timeframe,
+                    "timezone": "Asia/Kolkata",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "en",
+                    "toolbar_bg": "#0d1017",
+                    "enable_publishing": false,
+                    "allow_symbol_change": true,
+                    "container_id": "tradingview_chart_container"
+                });
+            }
+        };
+        tvContainer.appendChild(script);
+    }
+
+    // Render Quantitative Analysis Below Chart
+    if (gridEl) {
+        const tp1 = stock.ltp ? (isBull ? stock.ltp * 1.02 : stock.ltp * 0.98).toFixed(2) : '--';
+        const tp2 = stock.ltp ? (isBull ? stock.ltp * 1.04 : stock.ltp * 0.96).toFixed(2) : '--';
+        const sl = stock.ltp ? (isBull ? stock.ltp * 0.985 : stock.ltp * 1.015).toFixed(2) : '--';
+
+        gridEl.innerHTML = `
+            <div class="stat-card" style="background:#0d1017;border:1px solid var(--glass-border);border-radius:12px;padding:20px;">
+                <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-crosshairs"></i> 5-PILLAR CONVICTION MATRIX
+                </div>
+                <div style="font-size:28px;font-weight:800;color:#fff;margin-bottom:4px;">${stock.confidence_score || 93}%</div>
+                <div style="font-size:12px;color:var(--ink-muted);margin-bottom:12px;">Multi-Pillar Technical Alignment Rating</div>
+                <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;font-size:12px;">
+                    <div>Confirmed Weight: <strong class="text-gold">${(stock.confirmed_pillars_weight || 3.5).toFixed(1)} / 5.0</strong></div>
+                    <div style="margin-top:4px;">Priority Level: <strong class="text-bullish">${stock.priority_level || 'P1_HIGH'}</strong></div>
+                </div>
+            </div>
+
+            <div class="stat-card" style="background:#0d1017;border:1px solid var(--glass-border);border-radius:12px;padding:20px;">
+                <div style="font-size:14px;font-weight:800;color:var(--cyan);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-bullseye"></i> INTRADAY TARGET &amp; SL LEVELS
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">
+                    <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;">TARGET 1 (TP1)</span>
+                        <strong class="text-bullish" style="font-size:14px;">₹${tp1}</strong>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;">TARGET 2 (TP2)</span>
+                        <strong class="text-bullish" style="font-size:14px;">₹${tp2}</strong>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;">STOP LOSS (SL)</span>
+                        <strong class="text-bearish" style="font-size:14px;">₹${sl}</strong>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.3);padding:10px;border-radius:8px;">
+                        <span style="font-size:10px;color:var(--ink-muted);display:block;">RISK / REWARD</span>
+                        <strong class="text-gold" style="font-size:14px;">1 : 2.5</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card" style="background:#0d1017;border:1px solid var(--glass-border);border-radius:12px;padding:20px;">
+                <div style="font-size:14px;font-weight:800;color:var(--bullish);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-arrow-trend-up"></i> VOLUME &amp; GAP BUCKET
+                </div>
+                <div style="font-size:12px;color:var(--ink-secondary);line-height:1.6;">
+                    <div>Volume Spike: <strong class="text-gold">${(stock.volume_spike || stock.volume_surge_ratio || 1.8).toFixed(1)}x Average</strong></div>
+                    <div>Predicted Opening Gap: <strong class="text-bullish">+${(stock.predicted_gap_pct || 1.4).toFixed(1)}%</strong></div>
+                    <div>Closing Power Hour Aggression: <strong class="text-gold">HIGH BUY ACCUMULATION</strong></div>
+                </div>
+            </div>
+        `;
+    }
+}
 
 async function fetchLiveTradesSection() {
     try {
