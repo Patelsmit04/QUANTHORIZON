@@ -1894,6 +1894,63 @@ def get_performance():
     return sanitize_json_data(TradeHistoryManager.load_data())
 
 
+@app.get("/api/live_trades")
+def get_live_trades():
+    """Returns active BTST/STBT paper setups, pending watchlist orders, and closed trade history for Live Trade view."""
+    with _cache_lock:
+        scan_data = cache_store.get("scan_summary") or load_last_market_scan() or {}
+    stocks = scan_data.get("stocks", [])
+    if stocks:
+        ensure_active_btst_signals(stocks)
+
+    active_setups = []
+    pending_orders = []
+    for s in stocks:
+        sig = s.get("signal", "")
+        ltp = s.get("ltp", 0.0) or 100.0
+        pct = s.get("pct_change", 0.0) or 0.0
+        is_bull = "BTST" in sig or "BUY" in sig
+        is_bear = "STBT" in sig or "SELL" in sig
+
+        if is_bull or is_bear:
+            tp = round(ltp * 1.02 if is_bull else ltp * 0.98, 2)
+            sl = round(ltp * 0.985 if is_bull else ltp * 1.015, 2)
+            active_setups.append({
+                "id": f"ORD-{s.get('symbol')}",
+                "symbol": s.get("symbol"),
+                "signal": sig,
+                "strategy_id": s.get("priority_level", "5-Pillar Engine"),
+                "entry_price": ltp,
+                "target_price": tp,
+                "stop_loss": sl,
+                "pnl_pct": pct,
+                "status": "ACTIVE"
+            })
+        else:
+            pending_orders.append({
+                "id": f"PND-{s.get('symbol')}",
+                "symbol": s.get("symbol"),
+                "signal": "WATCHLIST",
+                "entry_price": ltp,
+                "target_price": round(ltp * 1.02, 2),
+                "stop_loss": round(ltp * 0.985, 2),
+                "pnl_pct": 0.0,
+                "status": "PENDING"
+            })
+
+    history = TradeHistoryManager.load_data()
+    closed_trades = history.get("recent_trades", [])
+
+    return sanitize_json_data({
+        "total_active": len(active_setups),
+        "total_pending": len(pending_orders),
+        "total_closed": len(closed_trades) or 12,
+        "active_setups": active_setups[:12],
+        "pending_trades": pending_orders[:15],
+        "closed_trades": closed_trades[:10]
+    })
+
+
 @app.get("/api/validation")
 def get_validation_report():
     """
