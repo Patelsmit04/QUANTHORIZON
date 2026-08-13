@@ -361,17 +361,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
         document.body.scrollLeft = 0;
         document.documentElement.scrollLeft = 0;
         const appMainNode = document.querySelector(".app-main");
-        if (appMainNode) appMainNode.scrollLeft = 0;
+        if (appMainNode) { appMainNode.scrollTop = 0; appMainNode.scrollLeft = 0; }
         const mainContentNode = document.querySelector(".main-content");
-        if (mainContentNode) mainContentNode.scrollLeft = 0;
-
-        if (section === "scanner" && (scannerSection || sections.scanner)) {
-            const sc = scannerSection || sections.scanner;
-            if (sc) sc.scrollIntoView({ behavior: "smooth" });
-        }
+        if (mainContentNode) { mainContentNode.scrollTop = 0; mainContentNode.scrollLeft = 0; }
 
         if (section === "stocksNews" || section === "globalNews") {
             fetchNewsSection();
