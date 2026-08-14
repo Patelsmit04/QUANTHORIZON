@@ -569,54 +569,43 @@
     }
 
     #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row) {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        background: var(--card-bg, rgba(23, 23, 23, 0.8));
-        border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.12));
-        border-radius: 14px;
-        padding: 12px 14px;
-        gap: 8px 10px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        display: block !important;
+        background: var(--card-bg, rgba(18, 22, 31, 0.95)) !important;
+        border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.1)) !important;
+        border-radius: 14px !important;
+        padding: 10px 14px !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+        transition: all 0.2s ease !important;
+        margin-bottom: 0 !important;
     }
 
     #scannerDataTable > tbody > tr.top-choice-row {
-        border: 1.5px solid var(--gold, #c99433);
-        box-shadow: 0 0 16px rgba(201, 148, 51, 0.18);
-        background: linear-gradient(180deg, rgba(201, 148, 51, 0.08) 0%, var(--card-bg, rgba(23, 23, 23, 0.8)) 100%);
+        border: 1.5px solid var(--gold, #c99433) !important;
+        box-shadow: 0 0 16px rgba(201, 148, 51, 0.18) !important;
     }
 
-    /* Transform td cells inside signal card into compact pills */
-    #scannerDataTable > tbody > tr > td {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 6px 8px;
-        border: 1px solid var(--glass-border);
-        background: var(--glass-bg-soft);
-        border-radius: 8px;
-        font-size: 0.8rem;
+    /* When expanded, seamlessly attach top header to bottom distribution box */
+    #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row).expanded {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        margin-bottom: 0 !important;
     }
 
-    #scannerDataTable > tbody > tr > td:before {
-        content: attr(data-label);
-        font-size: 0.65rem;
-        font-weight: 800;
-        letter-spacing: 0.04em;
-        color: var(--ink-muted);
-        text-transform: uppercase;
-        margin-right: 6px;
+    /* Hide all extra redundant table cells on mobile so card is 100% clean matching Picture 2 */
+    #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row) > td:not([data-label="TICKER"]) {
+        display: none !important;
     }
 
-    /* Top Line: Ticker, Signal Badge & Score Pill in 1 Horizontal Top Row */
+    /* Top Line: Ticker, Signal Badge, Score Pill & Chevron in 1 Horizontal Top Row */
     #scannerDataTable > tbody > tr > td[data-label="TICKER"] {
-        grid-column: 1 / -1;
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid var(--glass-border);
-        border-radius: 0;
-        font-size: 0.85rem;
-        font-weight: 800;
-        padding: 4px 0 8px 0;
+        display: block !important;
+        width: 100% !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        font-size: 0.85rem !important;
+        font-weight: 800 !important;
     }
     #scannerDataTable > tbody > tr > td[data-label="TICKER"] .symbol-name {
         font-size: 13px !important;
@@ -626,40 +615,10 @@
         align-items: center !important;
         justify-content: space-between !important;
         width: 100% !important;
-        gap: 6px !important;
+        gap: 8px !important;
     }
     #scannerDataTable > tbody > tr > td[data-label="TICKER"]:before {
-        display: none;
-    }
-
-    #scannerDataTable > tbody > tr > td[data-label="RANK"],
-    #scannerDataTable > tbody > tr > td[data-label="SIGNAL"],
-    #scannerDataTable > tbody > tr > td[data-label="CONFIDENCE"] {
         display: none !important;
-    }
-
-    /* Action Cell: Full-Width Button spans 2 columns */
-    #scannerDataTable > tbody > tr > td[data-label="ACTION"] {
-        grid-column: 1 / -1;
-        width: 100%;
-        background: transparent;
-        border: none;
-        border-top: 1px solid var(--glass-border);
-        border-radius: 0;
-        padding-top: 6px;
-    }
-    #scannerDataTable > tbody > tr > td[data-label="ACTION"]:before {
-        display: none;
-    }
-    #scannerDataTable > tbody > tr > td[data-label="ACTION"] .view-detail-btn {
-        width: 100%;
-        min-height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.82rem;
-        font-weight: 700;
-        border-radius: 999px;
     }
 
     /* Expandable Gap Probability & Flow Rows */
@@ -672,12 +631,16 @@
     #scannerDataTable > tbody > tr.flow-detail-row.expanded {
         display: block !important;
         width: 100% !important;
-        background: rgba(13, 16, 23, 0.95) !important;
-        border: 1px solid var(--glass-border-strong) !important;
-        border-radius: 12px !important;
-        padding: 12px !important;
-        margin-top: 4px !important;
-        margin-bottom: 8px !important;
+        background: var(--card-bg, rgba(18, 22, 31, 0.95)) !important;
+        border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.1)) !important;
+        border-top: none !important;
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-left-radius: 14px !important;
+        border-bottom-right-radius: 14px !important;
+        padding: 10px 14px 14px 14px !important;
+        margin-top: 0 !important;
+        margin-bottom: 12px !important;
         box-sizing: border-box !important;
     }
 
@@ -697,20 +660,52 @@
         display: none !important;
     }
 
-    /* On mobile, collapsed main card row shows TICKER header row */
-    #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row):not(.expanded) > td:not([data-label="TICKER"]) {
-        display: none !important;
+    .row-expand-toggle {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        color: var(--ink-primary, #ffffff) !important;
+        font-size: 13px !important;
+        width: 32px !important;
+        height: 32px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+        transition: all 0.2s ease !important;
     }
 
-    .row-expand-toggle {
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: var(--ink-muted);
-        font-size: 16px;
-        padding: 4px 6px;
-        line-height: 1;
-        transition: transform 0.2s ease;
+    .row-expand-toggle:hover {
+        background: rgba(212, 175, 55, 0.15) !important;
+        border-color: var(--gold, #c99433) !important;
+        color: var(--gold, #c99433) !important;
+    }
+
+    .btn-card-details {
+        width: 100% !important;
+        min-height: 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        font-size: 12.5px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 999px !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .btn-card-details:hover {
+        background: rgba(212, 175, 55, 0.15) !important;
+        border-color: var(--gold, #c99433) !important;
+        color: var(--gold, #c99433) !important;
+        box-shadow: 0 4px 14px rgba(201, 148, 51, 0.25) !important;
     }
 }
 

@@ -1477,52 +1477,55 @@ document.addEventListener("DOMContentLoaded", () => {
             const bars = Object.entries(mapped).map(([b, p]) => {
                 const pct = Math.round(p * 100);
                 const isHighlight = b === maxLabel;
-                const color = isHighlight ? 'var(--gold)' : 'rgba(212, 175, 55, 0.35)';
+                const barColor = isHighlight ? '#c99433' : 'rgba(201, 148, 51, 0.28)';
                 return `
                     <div style="flex:1;text-align:center;">
-                        <div style="font-size:9px;font-weight:800;color:${isHighlight ? 'var(--gold)' : 'var(--ink-muted)'};margin-bottom:2px;">${b}</div>
-                        <div style="height:16px;background:rgba(11,11,11,0.06);border-radius:4px;overflow:hidden;position:relative;" title="${b}: ${pct}% probability${!isSufficient ? ' (model estimate)' : ''}">
-                            <div style="height:100%;width:${Math.max(pct, 5)}%;background:${color};border-radius:4px;transition:width 0.3s ease;${!isSufficient ? 'opacity:0.75;' : ''}"></div>
-                            <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;color:var(--ink-primary);">${pct}%</span>
+                        <div style="font-size:9.5px;font-weight:800;color:${isHighlight ? 'var(--gold, #c99433)' : 'var(--ink-muted, #7e8b9b)'};margin-bottom:4px;">${b}</div>
+                        <div style="font-size:11px;font-weight:800;color:${isHighlight ? '#ffffff' : 'var(--ink-primary, #e2e8f0)'};margin-bottom:6px;">${pct}%</div>
+                        <div style="height:12px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;position:relative;" title="${b}: ${pct}% probability${!isSufficient ? ' (model estimate)' : ''}">
+                            <div style="height:100%;width:${Math.max(pct, 6)}%;background:${barColor};border-radius:4px;transition:width 0.3s ease;"></div>
                         </div>
                     </div>
                 `;
             }).join("");
 
             const sufficiencyLabel = isSufficient
-                ? `<span class="badge badge-gold" style="font-size:9px;margin-left:4px;">MOST LIKELY: ${maxLabel}</span>`
-                : `<span class="badge" style="font-size:8px;margin-left:4px;background:rgba(212,175,55,0.15);color:var(--gold);border:1px solid rgba(212,175,55,0.3);padding:2px 6px;border-radius:4px;">PRELIMINARY (n=${sampleSize})</span>
-                   <span class="badge badge-gold" style="font-size:9px;margin-left:4px;">EST. LIKELY: ${maxLabel}</span>`;
+                ? `<span class="badge" style="font-size:8.5px;margin-left:6px;background:rgba(212,175,55,0.15);color:var(--gold,#c99433);border:1px solid rgba(212,175,55,0.3);padding:2px 6px;border-radius:4px;">CONFIRMED (n=${sampleSize})</span>
+                   <span style="font-size:10px;font-weight:800;color:var(--gold,#c99433);margin-left:auto;">EST. LIKELY: ${maxLabel}</span>`
+                : `<span class="badge" style="font-size:8.5px;margin-left:6px;background:rgba(212,175,55,0.12);color:var(--gold,#c99433);border:1px solid rgba(212,175,55,0.28);padding:2px 6px;border-radius:4px;">PRELIMINARY (n=${sampleSize})</span>
+                   <span style="font-size:10px;font-weight:800;color:var(--gold,#c99433);margin-left:auto;">EST. LIKELY: ${maxLabel}</span>`;
 
             bucketHtml = `
                 <tr class="gap-distribution-row ${isRowExpanded ? 'expanded' : ''}" data-row-key="${rowKey}">
-                    <td colspan="13" style="padding: 16px; background: rgba(13, 16, 23, 0.95); border-bottom: 1px solid var(--glass-border);">
-                        <div style="display: flex; flex-direction: column; gap: 14px; max-width: 600px; margin: 0 auto;">
+                    <td colspan="13" class="gap-distribution-td" style="padding: 10px 14px 14px 14px; background: transparent; border-bottom: 1px solid var(--glass-border);">
+                        <div class="card-expanded-body" style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 650px; margin: 0 auto;">
                             
                             <!-- Row 1: LTP & Day Change -->
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08);">
-                                <span style="font-size: 11px; font-weight: 700; color: var(--ink-muted);">LAST TRADED PRICE &amp; DAY CHANGE</span>
-                                <div style="font-size: 14px; font-weight: 800; color: #fff;">
-                                    ₹${ltpVal} <span style="color: var(--ink-muted); margin: 0 6px;">|</span> 
-                                    <span class="${(stock.change_pts || 0) >= 0 ? 'text-bullish' : 'text-bearish'}">
-                                        ${(stock.change_pts || 0) >= 0 ? '+' : ''}${(stock.change_pts || 0).toFixed(2)} 
-                                        (${(stock.pct_change || 0) >= 0 ? '+' : ''}${(stock.pct_change || 0).toFixed(2)}%)
-                                    </span>
+                            <div class="card-ltp-strip" style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px;">
+                                <div style="display: flex; align-items: baseline; gap: 8px;">
+                                    <span style="font-size: 10.5px; font-weight: 800; color: var(--ink-muted, #7e8b9b); text-transform: uppercase; letter-spacing: 0.04em;">LTP</span>
+                                    <strong style="font-size: 15px; font-weight: 800; color: #ffffff;">₹${ltpVal}</strong>
+                                </div>
+                                <div style="display: flex; align-items: baseline; gap: 8px;">
+                                    <span style="font-size: 10.5px; font-weight: 800; color: var(--ink-muted, #7e8b9b); text-transform: uppercase; letter-spacing: 0.04em;">CHANGE</span>
+                                    <strong class="${(stock.change_pts || 0) >= 0 ? 'text-bullish' : 'text-bearish'}" style="font-size: 13.5px; font-weight: 800;">
+                                        ${(stock.change_pts || 0) >= 0 ? '+' : ''}${(stock.change_pts || 0).toFixed(2)} (${(stock.pct_change || 0) >= 0 ? '+' : ''}${(stock.pct_change || 0).toFixed(2)}%)
+                                    </strong>
                                 </div>
                             </div>
 
                             <!-- Row 2: Gap Probability Distribution Container -->
-                            <div>
-                                <div style="font-size: 10.5px; font-weight: 800; color: var(--ink-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                    <i class="fa-solid fa-chart-simple text-gold"></i> GAP PROBABILITY DISTRIBUTION:
+                            <div class="gap-dist-card-box" style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">
+                                <div style="font-size: 10px; font-weight: 800; color: var(--ink-primary, #ffffff); display: flex; align-items: center; width: 100%;">
+                                    <i class="fa-solid fa-chart-simple text-gold" style="margin-right: 5px;"></i> GAP PROBABILITY DISTRIBUTION:
                                     ${sufficiencyLabel}
                                 </div>
-                                <div style="display: flex; gap: 8px; width: 100%;">${bars}</div>
+                                <div style="display: flex; gap: 8px; width: 100%; margin-top: 2px;">${bars}</div>
                             </div>
 
-                            <!-- Row 3: Single Styled Yellow View Details Button -->
-                            <div style="text-align: center; padding-top: 4px;">
-                                <button class="btn btn-pill btn-primary" onclick="openStockModal('${escapeAttr(stock.symbol)}')" style="width: 100%; max-width: 280px; min-height: 38px; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; background: linear-gradient(135deg, #d4af37 0%, #f5d77f 100%); color: #000; border: none; box-shadow: 0 4px 14px rgba(212, 175, 55, 0.35); cursor: pointer;">
+                            <!-- Row 3: Single Styled View Details Button -->
+                            <div style="text-align: center; width: 100%;">
+                                <button class="btn btn-card-details" onclick="openStockModal('${escapeAttr(stock.symbol)}')" style="width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px; background: rgba(255, 255, 255, 0.04); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 999px; cursor: pointer; transition: all 0.2s ease;">
                                     <i class="fa-solid fa-chart-line"></i> VIEW DETAILS
                                 </button>
                             </div>

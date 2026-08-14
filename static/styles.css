@@ -2307,132 +2307,92 @@ input:checked + .slider:before { transform: translateX(16px); }
        display type. Must be lifted here or every card renders 1100px wide regardless of
        viewport. */
     #scannerDataTable { min-width: 0; width: 100%; }
-    #stocksTableBody { display: block; }
+    #stocksTableBody { display: flex; flex-direction: column; gap: 12px; }
 
-    #stocksTableBody tr {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        gap: 4px 10px;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: var(--radius-lg);
-        box-shadow: var(--glass-shadow);
-        padding: 14px;
-        margin-bottom: 12px;
+    #stocksTableBody tr:not(.gap-distribution-row):not(.flow-detail-row) {
+        display: block !important;
+        background: var(--card-bg, rgba(18, 22, 31, 0.95)) !important;
+        border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.1)) !important;
+        border-radius: 14px !important;
+        padding: 10px 14px !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+        transition: all 0.2s ease !important;
+        margin-bottom: 0 !important;
     }
 
-    /* Priority-1 hero card: larger, elevated, gold-glow — the two top-ranked cards should read
-       as the primary thing to look at on a phone screen, not just another row in the list. */
     #stocksTableBody tr.top-choice-row {
-        border-color: var(--gold);
-        border-width: 1.5px;
-        background: linear-gradient(180deg, rgba(212, 175, 55, 0.10), var(--glass-bg) 60%);
-        box-shadow: 0 8px 28px rgba(212, 175, 55, 0.16), var(--glass-shadow);
-        padding: 18px 16px;
+        border: 1.5px solid var(--gold, #c99433) !important;
+        box-shadow: 0 0 16px rgba(201, 148, 51, 0.18) !important;
     }
-    #stocksTableBody tr.top-choice-row td:nth-child(2) .symbol-name { font-size: 14px; }
-    #stocksTableBody tr.top-choice-row td:nth-child(6) .score-pill { font-size: 16px; padding: 7px 14px; }
 
-    /* The gap-probability-distribution and institutional-flow-detail sub-rows are already
-       single full-width colspan cells (free-form content, not per-field key/value pairs) —
-       keep them as simple blocks rather than flex-restructuring them. */
+    #stocksTableBody tr:not(.gap-distribution-row):not(.flow-detail-row).expanded {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* Hide all extra legacy table cells on mobile so card is 100% clean matching Picture 2 */
+    #stocksTableBody tr:not(.gap-distribution-row):not(.flow-detail-row) > td:not([data-label="TICKER"]) {
+        display: none !important;
+    }
+
+    #stocksTableBody tr > td[data-label="TICKER"] {
+        display: block !important;
+        width: 100% !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    #stocksTableBody tr > td[data-label="TICKER"]:before {
+        display: none !important;
+    }
+
+    #stocksTableBody tr > td[data-label="TICKER"] .ticker-header-flex {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        gap: 8px !important;
+    }
+
     #stocksTableBody tr.gap-distribution-row:not(.expanded),
     #stocksTableBody tr.flow-detail-row:not(.expanded) {
         display: none !important;
     }
+
     #stocksTableBody tr.gap-distribution-row.expanded,
     #stocksTableBody tr.flow-detail-row.expanded {
-        display: table-row;
+        display: block !important;
+        width: 100% !important;
+        background: var(--card-bg, rgba(18, 22, 31, 0.95)) !important;
+        border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.1)) !important;
+        border-top: none !important;
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
+        border-bottom-left-radius: 14px !important;
+        border-bottom-right-radius: 14px !important;
+        padding: 10px 14px 14px 14px !important;
+        margin-top: 0 !important;
+        margin-bottom: 12px !important;
+        box-sizing: border-box !important;
     }
+
     #stocksTableBody tr.gap-distribution-row td,
     #stocksTableBody tr.flow-detail-row td {
-        white-space: normal;
-    }
-
-    #stocksTableBody td {
-        display: block;
+        display: block !important;
+        width: 100% !important;
         padding: 0 !important;
-        border: none !important;
-        position: static !important;
         background: transparent !important;
+        border: none !important;
         box-shadow: none !important;
-        min-width: 0 !important;
-        white-space: normal !important;
-        font-size: 13px;
     }
 
-    #stocksTableBody td[data-label]::before {
-        content: attr(data-label);
-        display: block;
-        font-size: 9px;
-        font-weight: 800;
-        letter-spacing: 0.4px;
-        color: var(--ink-muted);
-        margin-bottom: 3px;
-    }
-
-    /* Header line: Rank (small) + Ticker (prominent, grows) + Confidence (prominent, right) */
-    #stocksTableBody td:nth-child(1) { order: 1; flex: 0 0 auto; }
-    #stocksTableBody td:nth-child(2) { order: 2; flex: 1 1 auto; min-width: 100px; }
-    #stocksTableBody td:nth-child(2) .symbol-name { font-size: 13px; }
-    #stocksTableBody td:nth-child(6) { order: 3; flex: 0 0 auto; text-align: right; }
-    #stocksTableBody td:nth-child(6) .score-pill { font-size: 14px; padding: 6px 12px; }
-    #stocksTableBody td:nth-child(1)::before,
-    #stocksTableBody td:nth-child(2)::before,
-    #stocksTableBody td:nth-child(6)::before { content: none; }
-
-    /* Sub-header: Signal, full width */
-    #stocksTableBody td:nth-child(3) {
-        order: 4;
-        flex: 1 1 100%;
-    }
-    #stocksTableBody td:nth-child(3)::before { content: none; }
-    #stocksTableBody td:nth-child(3) .signal-badge { font-size: 14px; }
-
-    /* 2-column grid: Option Type, Priority, Est. Gap, LTP, Vol Surge, RSI, Pillar Weight */
-    #stocksTableBody td:nth-child(4),
-    #stocksTableBody td:nth-child(5),
-    #stocksTableBody td:nth-child(7),
-    #stocksTableBody td:nth-child(8),
-    #stocksTableBody td:nth-child(9),
-    #stocksTableBody td:nth-child(10),
-    #stocksTableBody td:nth-child(11) {
-        flex: 1 1 calc(50% - 5px);
-        border-top: 1px solid var(--gridline) !important;
-        padding-top: 8px !important;
-        margin-top: 2px;
-    }
-    #stocksTableBody td:nth-child(4) { order: 5; }
-    #stocksTableBody td:nth-child(5) { order: 6; }
-    #stocksTableBody td:nth-child(7) { order: 7; }
-    #stocksTableBody td:nth-child(8) { order: 8; }
-    #stocksTableBody td:nth-child(9) { order: 9; }
-    #stocksTableBody td:nth-child(10) { order: 10; }
-    #stocksTableBody td:nth-child(11) { order: 11; }
-
-    /* Action: full-width, 44px-tall labeled button (was a small icon-only circle) */
-    #stocksTableBody td:nth-child(12) {
-        order: 12;
-        flex: 1 1 100%;
-        border-top: 1px solid var(--gridline) !important;
-        padding-top: 10px !important;
-        margin-top: 4px;
-    }
-    #stocksTableBody td:nth-child(12)::before { content: none; }
-    #stocksTableBody td:nth-child(12) .view-detail-btn {
-        width: 100%;
-        height: 44px;
-        border-radius: var(--radius-md);
-        background: var(--gold-bg);
-        color: var(--gold);
-        font-weight: 800;
-        font-size: 12px;
-        letter-spacing: 0.4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
+    #stocksTableBody tr.gap-distribution-row td:before,
+    #stocksTableBody tr.flow-detail-row td:before {
+        content: none !important;
+        display: none !important;
     }
 
     .index-grid, .strategy-grid, .news-grid, .index-verdict-grid {
