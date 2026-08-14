@@ -16,7 +16,7 @@ If score < 85, discards and returns {"status": "NO_TRADE", "message": "Stand asi
 
 import logging
 from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 import pandas as pd
 import yfinance as yf
 

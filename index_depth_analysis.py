@@ -18,7 +18,7 @@ price." — no other field is allowed to imply a real read when the price itself
 
 import logging
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 logger = logging.getLogger("IndexDepthAnalysis")
 

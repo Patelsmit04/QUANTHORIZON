@@ -15,7 +15,7 @@ opaque score) precisely so a reader can judge them rather than trust them blindl
 
 import logging
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 
 logger = logging.getLogger("IndexDerivativesAnalyzer")
 

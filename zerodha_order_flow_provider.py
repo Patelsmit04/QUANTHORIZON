@@ -15,11 +15,10 @@ Note: Delta/CVD in this module is INFERRED via the tick-rule, not exchange-tagge
 import os
 import time
 import logging
-from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 
-from env_utils import load_env_with_fallback, get_ist_now, IST
+from env_utils import load_env_with_fallback, IST
 
 BASE_DIR = Path(__file__).resolve().parent
 load_env_with_fallback(str(BASE_DIR))

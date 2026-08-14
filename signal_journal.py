@@ -14,10 +14,9 @@ import json
 import uuid
 import logging
 from contextlib import contextmanager
-from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Any, Optional, Tuple
+from datetime import datetime, timezone
+from typing import Dict, List, Any, Optional
 import pandas as pd
-import yfinance as yf
 try:
     from psycopg.rows import dict_row  # type: ignore
 except (ImportError, ModuleNotFoundError):
@@ -25,9 +24,8 @@ except (ImportError, ModuleNotFoundError):
 
 from strategy_manager import DEFAULT_STRATEGY_ID
 from index_scoring import INDEX_TICKERS
-from net_utils import call_with_retry
 from candle_utils import fetch_post_lock_candles
-from env_utils import DATA_DIR, get_ist_today_str, get_ist_now, IST
+from env_utils import DATA_DIR, get_ist_today_str, IST
 from pg_utils import USE_POSTGRES, get_pg_connection
 
 logger = logging.getLogger("SignalJournal")

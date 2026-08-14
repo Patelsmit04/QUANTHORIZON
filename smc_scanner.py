@@ -12,8 +12,8 @@ Monitors tracked stocks and indices across multiple timeframes (1m, 3m, 5m, 15m,
 import time
 import logging
 import threading
-from datetime import datetime, timezone
-from typing import Dict, List, Any, Optional, Tuple
+from datetime import datetime, timezone, timedelta
+from typing import Dict, Any, Optional, Tuple
 import pandas as pd
 import yfinance as yf
 
@@ -22,7 +22,6 @@ from smc_strategy import evaluate_signal
 from strategy_manager import get_strategy
 from signal_journal import log_notification
 import ws_broadcast
-from datetime import timedelta
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -30,14 +29,6 @@ IST = timezone(timedelta(hours=5, minutes=30))
 def get_ist_now() -> datetime:
     return datetime.now(timezone.utc).astimezone(IST)
 
-
-def is_market_open_ist() -> bool:
-    now = get_ist_now()
-    if now.weekday() >= 5:
-        return False
-    market_open = now.replace(hour=9, minute=15, second=0, microsecond=0)
-    market_close = now.replace(hour=15, minute=30, second=0, microsecond=0)
-    return market_open <= now <= market_close
 
 logger = logging.getLogger("SMCScanner")
 

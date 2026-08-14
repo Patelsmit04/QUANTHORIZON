@@ -18,7 +18,7 @@ checks rather than defaulted to a value that could fake a pass or fail.
 import os
 import time
 import logging
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 from typing import Dict, List, Any, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 

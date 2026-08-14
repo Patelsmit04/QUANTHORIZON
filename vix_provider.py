@@ -8,7 +8,7 @@ Fetches live India VIX benchmark and classifies market volatility regime:
 """
 
 import logging
-from typing import Dict, Any, Optional, Tuple
+from typing import Optional, Tuple
 import yfinance as yf
 
 from net_utils import call_with_retry

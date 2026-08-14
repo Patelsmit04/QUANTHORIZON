@@ -9,11 +9,9 @@ Pure, stateless helper functions for institutional SMC pattern analysis:
 - Inducement Clearance & Opposing Liquidity Targets
 """
 
-import math
 import logging
 from typing import Dict, List, Any, Optional
 import pandas as pd
-import numpy as np
 
 logger = logging.getLogger("SMCHelpers")
 

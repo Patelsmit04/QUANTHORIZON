@@ -6,7 +6,7 @@ Structure Shifts (BOS/CHoCH) + Liquidity Sweeps + OB/FVG + Premium/Discount.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any, Optional
 import pandas as pd
 from smc_helpers import (
     detect_market_structure,

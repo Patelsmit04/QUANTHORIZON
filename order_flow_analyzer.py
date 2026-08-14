@@ -10,7 +10,7 @@ Detects:
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from zerodha_order_flow_provider import OrderFlowData
 
 logger = logging.getLogger("OrderFlowAnalyzer")

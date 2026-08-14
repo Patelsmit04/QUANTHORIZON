@@ -6,7 +6,7 @@ import threading
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timezone, timedelta
-from fastapi import FastAPI, HTTPException, Query, Body, WebSocket, WebSocketDisconnect, Header, Depends, Response
+from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, Header, Depends, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,9 +26,9 @@ import ws_broadcast
 from btst_engine import check_macro_guard
 from json_utils import atomic_write_json, read_json, json_file_lock
 from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json, pg_key_lock
-from scoring_engine import evaluate_5_pillar_matrix, get_liquidity_tier
+from scoring_engine import evaluate_5_pillar_matrix
 from nse_data_provider import (
-    fetch_all_nse_data, get_per_stock_oi_data, get_per_stock_delivery_data,
+    get_per_stock_oi_data, get_per_stock_delivery_data,
     was_nse_refresh_completed_today, refresh_nse_data_cache,
 )
 from block_deal_provider import (
@@ -39,7 +39,7 @@ from block_deal_provider import (
     SHADOW_MODE as INSTITUTIONAL_FLOW_SHADOW_MODE,
     MIN_VALUE_CR as INSTITUTIONAL_FLOW_MIN_VALUE_CR,
 )
-from fo_universe import get_canonical_fo_tickers, NSE_FO_STOCKS, is_valid_fo_stock
+from fo_universe import get_canonical_fo_tickers, is_valid_fo_stock
 from vix_provider import fetch_india_vix
 from signal_journal import (
     log_signal_entry, evaluate_pending_signals, get_metrics_summary, get_confidence_calibration,
@@ -53,7 +53,7 @@ from walk_forward_validator import (
 from fundamental_provider import refresh_fundamentals_cache, get_fundamental_data, load_all_fundamentals, was_refresh_completed_today
 from depth_analysis import generate_depth_analysis
 from news_provider import (
-    fetch_stock_news, fetch_market_news, classify_news_signal, apply_news_gate,
+    fetch_market_news, classify_news_signal, apply_news_gate,
     should_refresh_universe_news, refresh_universe_news_cache, get_cached_stock_news,
     get_all_cached_news, get_universe_news_meta
 )
@@ -743,14 +743,6 @@ def score_stock_universe(raw: Dict[str, Any], strategy: Dict[str, Any], oi_mult:
 
     return results
 
-
-def fetch_all_stocks_data(oi_mult: float = 1.5) -> List[Dict[str, Any]]:
-    """Backward-compatible entry point — scores the stock universe against the Default
-    5-Pillar strategy, exactly matching pre-strategy-system behavior. Everything already
-    built (locking, evaluation, depth analysis, news enrichment) keeps working unchanged."""
-    raw = fetch_raw_stock_universe()
-    default_strategy = get_strategy(DEFAULT_STRATEGY_ID)
-    return score_stock_universe(raw, default_strategy, oi_mult=oi_mult)
 
 
 def fetch_raw_index_universe() -> Dict[str, Any]:

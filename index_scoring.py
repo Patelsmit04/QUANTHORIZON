@@ -33,7 +33,6 @@ driven by a strategy config (pillar_weight_multipliers) — see strategy_manager
 """
 
 import logging
-import urllib.request
 import re
 from typing import Dict, Any, Optional
 

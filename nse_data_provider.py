@@ -21,8 +21,6 @@ import warnings
 from datetime import datetime, date, timedelta
 from typing import Dict, Any, Optional, List
 
-import pandas as pd
-
 from json_utils import atomic_write_json, read_json, json_file_lock
 from net_utils import call_with_retry
 from lock_utils import file_lock
