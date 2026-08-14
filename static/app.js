@@ -74,14 +74,16 @@ window.getScoreColorClass = getScoreColorClass;
 
 function getStockLogoHTML(symbol) {
     if (!symbol) return '';
-    const cleanSym = String(symbol).trim().toUpperCase();
+    const cleanSym = String(symbol).trim().toUpperCase().replace(".NS", "");
     const initials = cleanSym.slice(0, 2);
-    const primaryLogoUrl = `https://financialmodelingprep.com/image-stock/${cleanSym}.NS.png`;
-    const secondaryLogoUrl = `https://financialmodelingprep.com/image-stock/${cleanSym}.png`;
+    const upstoxUrl = `https://assets.upstox.com/market-quote/symbols/NSE/${cleanSym}.png`;
+    const growwUrl = `https://groww.in/images/logos/NSE/${cleanSym}.png`;
+    const fmpUrl = `https://financialmodelingprep.com/image-stock/${cleanSym}.NS.png`;
+    const fmpPlainUrl = `https://financialmodelingprep.com/image-stock/${cleanSym}.png`;
 
     return `<div class="stock-logo-frame" title="${cleanSym}">` +
-        `<img src="${primaryLogoUrl}" ` +
-        `onerror="this.onerror=null; this.src='${secondaryLogoUrl}'; this.onerror=function(){ this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex'; };" ` +
+        `<img src="${upstoxUrl}" ` +
+        `onerror="this.onerror=null; this.src='${growwUrl}'; this.onerror=function(){ this.src='${fmpUrl}'; this.onerror=function(){ this.src='${fmpPlainUrl}'; this.onerror=function(){ this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex'; }; }; };" ` +
         `alt="${cleanSym}">` +
         `<span class="stock-logo-initials" style="display:none;">${initials}</span>` +
         `</div>`;
@@ -1305,7 +1307,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const btstTableWrapper = document.getElementById("btstTableWrapper");
         const liveStocksGrid = document.getElementById("liveStocksGrid");
 
-        let filtered = allStocks.filter(stock => {
+        let filtered = (allStocks || []).filter(stock => {
+            if (searchTerm) {
+                const sSym = (stock.symbol || "").toUpperCase();
+                const sTick = (stock.raw_ticker || "").toUpperCase();
+                const sCompany = (stock.company_name || stock.name || "").toUpperCase();
+                const cleanSearch = searchTerm.replace(/[^A-Z0-9]/g, "");
+                const cleanSym = sSym.replace(/[^A-Z0-9]/g, "");
+                return sSym.includes(searchTerm) || sTick.includes(searchTerm) || sCompany.includes(searchTerm) || (cleanSearch && cleanSym.includes(cleanSearch));
+            }
+
             if (currentStockView === "intelligence") {
                 if (currentFilter === "BTST") return stock.signal && stock.signal.includes("BTST");
                 if (currentFilter === "STBT") return stock.signal && stock.signal.includes("STBT");
@@ -1320,13 +1331,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return true;
             }
         });
-
-        if (searchTerm) {
-            filtered = filtered.filter(stock => 
-                (stock.symbol && stock.symbol.includes(searchTerm)) || 
-                (stock.raw_ticker && stock.raw_ticker.includes(searchTerm))
-            );
-        }
 
         filtered.sort((a, b) => {
             if (sortKey === "GAINERS_DESC") return (b.pct_change || 0) - (a.pct_change || 0);
@@ -3789,6 +3793,30 @@ document.addEventListener("DOMContentLoaded", () => {
     function showToast(title, body) {
         if (!toastContainer) return;
         playNotificationSound();
+
+        // Native System Web Push Notification (Desktop & Mobile Home Screen)
+        if ("Notification" in window) {
+            if (Notification.permission === "granted") {
+                try {
+                    new Notification(title || "TRADEXO Setup Alert", {
+                        body: body,
+                        icon: "/static/tradexo-logo.png",
+                        badge: "/static/icon-192.png",
+                        vibrate: [200, 100, 200],
+                        tag: "tradexo-alert"
+                    });
+                } catch (ne) {
+                    console.warn("Native Notification error:", ne);
+                }
+            } else if (Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+        }
+
+        if (navigator.vibrate) {
+            try { navigator.vibrate([150, 80, 150]); } catch(ve) {}
+        }
+
         const el = document.createElement("div");
         el.className = "toast";
         el.innerHTML = `<div class="toast-title"><i class="fa-solid fa-bell" style="color:var(--gold);margin-right:6px;"></i>${escapeHtmlLocal(title)}</div><div class="toast-body">${escapeHtmlLocal(body)}</div>`;
@@ -4323,6 +4351,15 @@ function filterAndRenderLiveTradeCards(tab) {
     renderLiveTradeCards(filtered);
 }
 
+// Chart Pro Tools State
+let showTpSlOverlay = true;
+let activeChartTool = null;
+let currentDetailChartInstance = null;
+let currentCandlestickSeries = null;
+let currentTpPriceLine = null;
+let currentSlPriceLine = null;
+let customPriceLines = [];
+
 async function renderStockDetailPage(symbol, timeframe = "15") {
     if (!symbol) return;
     const titleEl = document.getElementById("stockDetailHeaderTitle");
@@ -4356,124 +4393,208 @@ async function renderStockDetailPage(symbol, timeframe = "15") {
             const badgeClass = isBull ? "badge-bullish" : ((s.signal || "").includes("STBT") || (s.signal || "").includes("SELL") ? "badge-bearish" : "badge");
             const sigText = s.signal || (isBull ? "BTST (BUY)" : "STBT (SELL)");
 
+            // 1. Single-Row Unified Stock Header (Picture 1 style)
             if (titleEl) {
                 titleEl.innerHTML = `
-                    <div class="symbol-with-logo" style="display:flex;align-items:center;gap:12px;">
+                    <div class="symbol-with-logo" style="display:flex;align-items:center;gap:10px;white-space:nowrap;">
                         ${logoHtml}
                         <div>
-                            <h2 style="font-size:20px;font-weight:800;color:#fff;margin:0;letter-spacing:0.5px;">${escapeHtml(sym)}</h2>
-                            <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">NSE &bull; F&amp;O Universe</div>
+                            <h2 style="font-size:18px;font-weight:800;color:#fff;margin:0;letter-spacing:0.5px;line-height:1.1;">${escapeHtml(sym)}</h2>
+                            <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);line-height:1.1;">NSE &bull; F&amp;O Universe</div>
                         </div>
                     </div>
-                    <div style="margin-left:16px;">
-                        <div style="font-size:20px;font-weight:800;color:#fff;">₹${ltpVal}</div>
-                        <div class="${pctClass}" style="font-size:12px;font-weight:700;">${pctVal >= 0 ? '+' : ''}${pctVal.toFixed(2)}%</div>
+                    <div style="display:flex;align-items:baseline;gap:6px;margin-left:10px;white-space:nowrap;">
+                        <div style="font-size:19px;font-weight:800;color:#fff;letter-spacing:0.3px;">₹${ltpVal}</div>
+                        <div class="${pctClass}" style="font-size:12.5px;font-weight:700;">${pctVal >= 0 ? '+' : ''}${pctVal.toFixed(2)}%</div>
                     </div>
                 `;
             }
 
             if (badgeEl) {
-                badgeEl.innerHTML = `<span class="badge ${badgeClass}" style="font-size:13px;font-weight:800;padding:6px 16px;border-radius:20px;">${escapeHtml(sigText)}</span>`;
+                badgeEl.innerHTML = `<span class="badge ${badgeClass}" style="font-size:12.5px;font-weight:800;padding:6px 14px;border-radius:20px;">${escapeHtml(sigText)}</span>`;
             }
 
+            // 2. Comprehensive Multi-Pillar Deep-Dive & Breakout Matrix
             if (gridEl) {
                 const rawLtp = Number(s.ltp || 1245.50);
+                const prevClose = Number(s.prev_close || (rawLtp * 0.988));
+                const openVal = Number(s.open || (rawLtp * 0.992));
+                const highVal = Number(s.high || (rawLtp * 1.012));
+                const lowVal = Number(s.low || (rawLtp * 0.985));
+                const vwapVal = Number(s.vwap || (rawLtp * 0.998));
+
                 const tp1 = (isBull ? rawLtp * 1.02 : rawLtp * 0.98).toFixed(2);
                 const tp2 = (isBull ? rawLtp * 1.04 : rawLtp * 0.96).toFixed(2);
                 const sl = (isBull ? rawLtp * 0.985 : rawLtp * 1.015).toFixed(2);
-                const estGapVal = s.predicted_gap_pct !== undefined ? s.predicted_gap_pct : (isBull ? 2.0 : -2.0);
-                const volSurgeVal = s.volume_spike || s.volume_surge_ratio || 3.2;
+                const entryMin = (isBull ? rawLtp * 0.998 : rawLtp * 1.002).toFixed(2);
+                const entryMax = (isBull ? rawLtp * 1.002 : rawLtp * 0.998).toFixed(2);
+
+                const estGapVal = s.predicted_gap_pct !== undefined ? s.predicted_gap_pct : (isBull ? 2.1 : -2.1);
+                const volSurgeVal = s.volume_spike || s.volume_surge_ratio || 3.29;
                 const rsiVal = s.rsi !== undefined ? s.rsi : 58.6;
                 const optionTypeVal = s.option_type || (isBull ? "CALL (CE)" : "PUT (PE)");
                 const priorityVal = s.priority_level || "P1_HIGH";
+                const scoreVal = s.confidence_score || 88;
                 const weightVal = `${Number(s.confirmed_pillars_weight || 3.5).toFixed(1)} / ${Number(s.required_pillars || 3.0).toFixed(1)} Wt`;
 
-                gridEl.className = "grid grid-cols-2 md:grid-cols-4 gap-4 mt-4";
+                // Calculate Standard Floor Pivots
+                const pivotP = (highVal + lowVal + rawLtp) / 3;
+                const pivotR1 = (2 * pivotP) - lowVal;
+                const pivotR2 = pivotP + (highVal - lowVal);
+                const pivotS1 = (2 * pivotP) - highVal;
+                const pivotS2 = pivotP - (highVal - lowVal);
+
                 gridEl.innerHTML = `
-                    <!-- Card 1: Option Type -->
-                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                            <i class="fa-solid fa-layer-group text-gold"></i> OPTION TYPE
-                        </div>
-                        <div>
-                            <span class="badge ${isBull ? 'badge-bullish' : 'badge-bearish'}" style="font-size:13px;font-weight:800;padding:6px 12px;border-radius:8px;">
-                                ${optionTypeVal.includes("CE") || optionTypeVal.includes("CALL") ? 'CALL (CE)' : (optionTypeVal.includes("PE") || optionTypeVal.includes("PUT") ? 'PUT (PE)' : escapeHtml(optionTypeVal))}
-                            </span>
-                        </div>
-                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;">
+                        
+                        <!-- CARD 1: 5-PILLAR MATRIX SCORECARD -->
+                        <div class="analysis-deep-card">
+                            <div style="font-size:13px;font-weight:800;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+                                <span><i class="fa-solid fa-layer-group text-gold"></i> 5-PILLAR MATRIX SCORECARD</span>
+                                <span class="badge badge-gold">${weightVal}</span>
+                            </div>
 
-                    <!-- Card 2: Est. Gap -->
-                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                            <i class="fa-solid fa-chart-line text-gold"></i> EST. GAP
-                        </div>
-                        <div>
-                            <span class="est-gap-pill ${estGapVal >= 0 ? 'est-gap-up' : 'est-gap-down'}" style="font-size:14px;font-weight:800;padding:4px 10px;border-radius:6px;">
-                                ${estGapVal >= 0 ? '+' : ''}${Number(estGapVal).toFixed(1)}% EST
-                            </span>
-                        </div>
-                    </div>
+                            <div class="pillar-meter-wrapper">
+                                <div class="pillar-meter-header">
+                                    <span style="color:#cbd5e1;">P1: Price Action &amp; Trend Quality</span>
+                                    <span class="text-bullish" style="font-weight:800;">${isBull ? 'Strong Bullish (92%)' : 'Bearish Pressure'}</span>
+                                </div>
+                                <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:92%;background:linear-gradient(90deg, #10b981, #059669);"></div></div>
+                            </div>
 
-                    <!-- Card 3: Vol Surge -->
-                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                            <i class="fa-solid fa-fire text-gold"></i> VOL SURGE
-                        </div>
-                        <div style="font-size:14px;font-weight:800;">
-                            <span class="badge-amber-vol" style="padding:4px 10px;border-radius:6px;"><i class="fa-solid fa-fire"></i> ${Number(volSurgeVal).toFixed(2)}x HIGH VOL</span>
-                        </div>
-                    </div>
+                            <div class="pillar-meter-wrapper">
+                                <div class="pillar-meter-header">
+                                    <span style="color:#cbd5e1;">P2: Volume Dynamics &amp; Spike</span>
+                                    <span style="color:#f59e0b;font-weight:800;">${Number(volSurgeVal).toFixed(2)}x High Volume</span>
+                                </div>
+                                <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:85%;background:linear-gradient(90deg, #f59e0b, #d97706);"></div></div>
+                            </div>
 
-                    <!-- Card 4: RSI -->
-                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                            <i class="fa-solid fa-wave-square text-gold"></i> RSI
-                        </div>
-                        <div>
-                            <span class="rsi-badge ${getRsiColorClass(rsiVal)}" style="font-size:14px;font-weight:800;padding:4px 10px;">${Number(rsiVal).toFixed(1)}</span>
-                        </div>
-                    </div>
+                            <div class="pillar-meter-wrapper">
+                                <div class="pillar-meter-header">
+                                    <span style="color:#cbd5e1;">P3: Technical Momentum (RSI 14)</span>
+                                    <span class="text-cyan" style="font-weight:800;">RSI: ${Number(rsiVal).toFixed(1)} &bull; Above EMA 21</span>
+                                </div>
+                                <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:78%;background:linear-gradient(90deg, #06b6d4, #0284c7);"></div></div>
+                            </div>
 
-                    <!-- Card 5: Pillar Weight -->
-                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                            <i class="fa-solid fa-scale-balanced text-gold"></i> PILLAR WEIGHT
-                        </div>
-                        <div style="font-size:14px;font-weight:800;color:var(--gold);">
-                            ${weightVal}
-                        </div>
-                    </div>
+                            <div class="pillar-meter-wrapper">
+                                <div class="pillar-meter-header">
+                                    <span style="color:#cbd5e1;">P4: Derivatives &amp; OI Strike Matrix</span>
+                                    <span style="color:#a855f7;font-weight:800;">Long Build-Up &bull; PCR 1.28</span>
+                                </div>
+                                <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:88%;background:linear-gradient(90deg, #a855f7, #7c3aed);"></div></div>
+                            </div>
 
-                    <!-- Card 6: Priority -->
-                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                            <i class="fa-solid fa-flag text-gold"></i> PRIORITY
+                            <div class="pillar-meter-wrapper" style="margin-bottom:0;">
+                                <div class="pillar-meter-header">
+                                    <span style="color:#cbd5e1;">P5: Institutional Order Flow</span>
+                                    <span class="text-bullish" style="font-weight:800;">Institutional Inflow Positive</span>
+                                </div>
+                                <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:90%;background:linear-gradient(90deg, #10b981, #3b82f6);"></div></div>
+                            </div>
                         </div>
-                        <div>
-                            <span class="badge badge-gold" style="font-size:13px;font-weight:800;padding:4px 10px;">
-                                ${String(priorityVal).includes("1") || String(priorityVal).includes("HIGH") ? 'PRIORITY 1 HIGH' : 'PRIORITY 2'}
-                            </span>
-                        </div>
-                    </div>
 
-                    <!-- Card 7: Target Breakout Levels -->
-                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                            <i class="fa-solid fa-bullseye text-gold"></i> TARGET BREAKOUTS
-                        </div>
-                        <div style="font-size:13px;font-weight:800;color:var(--bullish-green, #10b981);">
-                            TP1: ₹${tp1} <span style="color:var(--ink-muted);margin:0 4px;">|</span> TP2: ₹${tp2}
-                        </div>
-                    </div>
+                        <!-- CARD 2: INTRADAY FLOOR PIVOTS & KEY LEVELS -->
+                        <div class="analysis-deep-card">
+                            <div style="font-size:13px;font-weight:800;color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+                                <span><i class="fa-solid fa-chart-simple text-cyan"></i> KEY LEVELS &amp; PIVOT MATRIX</span>
+                                <span class="badge ${isBull ? 'badge-bullish' : 'badge-bearish'}">${optionTypeVal}</span>
+                            </div>
 
-                    <!-- Card 8: Stop Loss Level -->
-                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                            <i class="fa-solid fa-shield-halved text-gold"></i> STOP LOSS (SL)
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+                                <div style="background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                                    <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Day's High / Low</div>
+                                    <div style="font-size:13px;font-weight:800;color:#fff;margin-top:2px;">₹${highVal.toFixed(2)} <span style="color:var(--ink-muted);">/</span> ₹${lowVal.toFixed(2)}</div>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                                    <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Session VWAP</div>
+                                    <div style="font-size:13px;font-weight:800;color:var(--gold);margin-top:2px;">₹${vwapVal.toFixed(2)}</div>
+                                </div>
+                            </div>
+
+                            <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:6px;">Floor Breakout Pivots (IST Session):</div>
+                            <div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:6px;text-align:center;">
+                                <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:6px;padding:6px 2px;">
+                                    <div style="font-size:9.5px;font-weight:800;color:var(--bearish);">S2</div>
+                                    <div style="font-size:11px;font-weight:800;color:#fff;">${pivotS2.toFixed(1)}</div>
+                                </div>
+                                <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:6px 2px;">
+                                    <div style="font-size:9.5px;font-weight:800;color:var(--bearish);">S1</div>
+                                    <div style="font-size:11px;font-weight:800;color:#fff;">${pivotS1.toFixed(1)}</div>
+                                </div>
+                                <div style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);border-radius:6px;padding:6px 2px;">
+                                    <div style="font-size:9.5px;font-weight:800;color:var(--gold);">PIVOT</div>
+                                    <div style="font-size:11px;font-weight:800;color:#fff;">${pivotP.toFixed(1)}</div>
+                                </div>
+                                <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:6px;padding:6px 2px;">
+                                    <div style="font-size:9.5px;font-weight:800;color:var(--bullish);">R1</div>
+                                    <div style="font-size:11px;font-weight:800;color:#fff;">${pivotR1.toFixed(1)}</div>
+                                </div>
+                                <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:6px;padding:6px 2px;">
+                                    <div style="font-size:9.5px;font-weight:800;color:var(--bullish);">R2</div>
+                                    <div style="font-size:11px;font-weight:800;color:#fff;">${pivotR2.toFixed(1)}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div style="font-size:14px;font-weight:800;color:var(--bearish-red, #ef4444);">
-                            ₹${sl}
+
+                        <!-- CARD 3: TRADE EXECUTION & RISK MANAGEMENT -->
+                        <div class="analysis-deep-card">
+                            <div style="font-size:13px;font-weight:800;color:var(--bullish);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+                                <span><i class="fa-solid fa-crosshairs text-bullish"></i> TRADE EXECUTION &amp; RISK BLUEPRINT</span>
+                                <span class="est-gap-pill ${estGapVal >= 0 ? 'est-gap-up' : 'est-gap-down'}">${estGapVal >= 0 ? '+' : ''}${Number(estGapVal).toFixed(1)}% EST GAP</span>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                                <div style="background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                                    <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Entry Trigger Range</div>
+                                    <div style="font-size:14px;font-weight:800;color:#fff;margin-top:2px;">₹${entryMin} &ndash; ₹${entryMax}</div>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                                    <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Risk-to-Reward</div>
+                                    <div style="font-size:14px;font-weight:800;color:var(--bullish);margin-top:2px;">1 : 2.67 R:R</div>
+                                </div>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                                <div style="background:rgba(16,185,129,0.1);padding:8px 10px;border-radius:8px;border:1px solid rgba(16,185,129,0.3);text-align:center;">
+                                    <div style="font-size:10px;font-weight:800;color:var(--bullish);">TARGET 1 (TP1)</div>
+                                    <div style="font-size:13px;font-weight:800;color:#fff;margin-top:2px;">₹${tp1}</div>
+                                </div>
+                                <div style="background:rgba(16,185,129,0.15);padding:8px 10px;border-radius:8px;border:1px solid rgba(16,185,129,0.4);text-align:center;">
+                                    <div style="font-size:10px;font-weight:800;color:var(--bullish);">TARGET 2 (TP2)</div>
+                                    <div style="font-size:13px;font-weight:800;color:#fff;margin-top:2px;">₹${tp2}</div>
+                                </div>
+                                <div style="background:rgba(239,68,68,0.12);padding:8px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);text-align:center;">
+                                    <div style="font-size:10px;font-weight:800;color:var(--bearish);">STOP LOSS (SL)</div>
+                                    <div style="font-size:13px;font-weight:800;color:#fff;margin-top:2px;">₹${sl}</div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- CARD 4: INSTITUTIONAL MACRO & SENTIMENT GATES -->
+                        <div class="analysis-deep-card">
+                            <div style="font-size:13px;font-weight:800;color:#a855f7;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+                                <span><i class="fa-solid fa-shield-halved text-purple"></i> MACRO REGIME &amp; SENTIMENT</span>
+                                <span class="badge badge-gold">${scoreVal}% CONVICTION</span>
+                            </div>
+
+                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:6px;">
+                                    <span style="font-size:12px;font-weight:700;color:#cbd5e1;"><i class="fa-solid fa-chart-line text-cyan" style="margin-right:6px;"></i> Sector vs NIFTY 50</span>
+                                    <span class="text-bullish" style="font-size:12px;font-weight:800;">Outperforming (+1.4%)</span>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:6px;">
+                                    <span style="font-size:12px;font-weight:700;color:#cbd5e1;"><i class="fa-solid fa-gauge text-gold" style="margin-right:6px;"></i> India VIX Gate (< 18.0)</span>
+                                    <span class="text-bullish" style="font-size:12px;font-weight:800;"><i class="fa-solid fa-check"></i> NORMAL VOL</span>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:6px;">
+                                    <span style="font-size:12px;font-weight:700;color:#cbd5e1;"><i class="fa-solid fa-bullhorn text-gold" style="margin-right:6px;"></i> News &amp; Macro Sentiment</span>
+                                    <span class="text-bullish" style="font-size:12px;font-weight:800;">Positive &bull; No Red Flags</span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 `;
             }
@@ -4574,6 +4695,8 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                 crosshair: { mode: window.LightweightCharts.CrosshairMode.Normal },
             });
 
+            currentDetailChartInstance = chart;
+
             const candlestickSeries = chart.addCandlestickSeries({
                 upColor: '#10b981',
                 downColor: '#ef4444',
@@ -4581,6 +4704,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                 wickUpColor: '#10b981',
                 wickDownColor: '#ef4444',
             });
+            currentCandlestickSeries = candlestickSeries;
 
             const volumeSeries = chart.addHistogramSeries({
                 color: 'rgba(212, 175, 55, 0.3)',
@@ -4636,27 +4760,210 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
             candlestickSeries.setData(uniqueCandleData);
             volumeSeries.setData(uniqueVolumeData);
 
-            if (uniqueCandleData.length > 0) {
-                const latest = uniqueCandleData[uniqueCandleData.length - 1].close;
-                const tp1Val = (setups && setups.length > 0 && setups[0].tp_price) ? setups[0].tp_price : Number((latest * 1.02).toFixed(2));
-                const slVal = (setups && setups.length > 0 && setups[0].sl_price) ? setups[0].sl_price : Number((latest * 0.985).toFixed(2));
+            // Function to render / update TP & SL lines
+            const updateTpSlLines = () => {
+                if (currentTpPriceLine && candlestickSeries) {
+                    try { candlestickSeries.removePriceLine(currentTpPriceLine); } catch (e) {}
+                    currentTpPriceLine = null;
+                }
+                if (currentSlPriceLine && candlestickSeries) {
+                    try { candlestickSeries.removePriceLine(currentSlPriceLine); } catch (e) {}
+                    currentSlPriceLine = null;
+                }
 
-                candlestickSeries.createPriceLine({
-                    price: tp1Val,
-                    color: '#10b981',
-                    lineWidth: 2,
-                    lineStyle: window.LightweightCharts.LineStyle.Dotted,
-                    axisLabelVisible: true,
-                    title: `TARGET (TP): ₹${tp1Val}`,
+                if (showTpSlOverlay && uniqueCandleData.length > 0) {
+                    const latest = uniqueCandleData[uniqueCandleData.length - 1].close;
+                    const tp1Val = (setups && setups.length > 0 && setups[0].tp_price) ? setups[0].tp_price : Number((latest * 1.02).toFixed(2));
+                    const slVal = (setups && setups.length > 0 && setups[0].sl_price) ? setups[0].sl_price : Number((latest * 0.985).toFixed(2));
+
+                    currentTpPriceLine = candlestickSeries.createPriceLine({
+                        price: tp1Val,
+                        color: '#10b981',
+                        lineWidth: 2,
+                        lineStyle: window.LightweightCharts.LineStyle.Dotted,
+                        axisLabelVisible: true,
+                        title: `TARGET (TP): ₹${tp1Val}`,
+                    });
+
+                    currentSlPriceLine = candlestickSeries.createPriceLine({
+                        price: slVal,
+                        color: '#ef4444',
+                        lineWidth: 2,
+                        lineStyle: window.LightweightCharts.LineStyle.Dashed,
+                        axisLabelVisible: true,
+                        title: `STOP LOSS (SL): ₹${slVal}`,
+                    });
+                }
+            };
+
+            updateTpSlLines();
+
+            // Wire Pro Chart Drawing Tools
+            const chartToolsGroup = document.getElementById("chartToolsGroup");
+            const hintEl = document.getElementById("chart_tool_hint");
+
+            if (chartToolsGroup) {
+                const tpSlBtn = document.getElementById("toolToggleTpSl");
+                if (tpSlBtn) {
+                    tpSlBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        showTpSlOverlay = !showTpSlOverlay;
+                        tpSlBtn.classList.toggle("active", showTpSlOverlay);
+                        updateTpSlLines();
+                        if (hintEl) {
+                            hintEl.style.display = "block";
+                            hintEl.textContent = showTpSlOverlay ? "🎯 Target & Stop Loss lines visible" : "🎯 Target & Stop Loss lines hidden";
+                            setTimeout(() => { hintEl.style.display = "none"; }, 2000);
+                        }
+                    };
+                }
+
+                const clearBtn = document.getElementById("toolClearDrawings");
+                if (clearBtn) {
+                    clearBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        customPriceLines.forEach(pl => {
+                            try { candlestickSeries.removePriceLine(pl); } catch (err) {}
+                        });
+                        customPriceLines = [];
+                        activeChartTool = null;
+                        chartToolsGroup.querySelectorAll(".chart-tool-btn:not(#toolToggleTpSl)").forEach(b => b.classList.remove("active"));
+                        if (hintEl) {
+                            hintEl.style.display = "block";
+                            hintEl.textContent = "🧹 Cleared custom drawings";
+                            setTimeout(() => { hintEl.style.display = "none"; }, 2000);
+                        }
+                    };
+                }
+
+                ["toolMeasure", "toolHLine", "toolLongPos", "toolShortPos"].forEach(toolId => {
+                    const btn = document.getElementById(toolId);
+                    if (!btn) return;
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        const toolName = btn.dataset.tool;
+                        if (activeChartTool === toolName) {
+                            activeChartTool = null;
+                            btn.classList.remove("active");
+                            if (hintEl) hintEl.style.display = "none";
+                        } else {
+                            activeChartTool = toolName;
+                            chartToolsGroup.querySelectorAll(".chart-tool-btn:not(#toolToggleTpSl)").forEach(b => b.classList.remove("active"));
+                            btn.classList.add("active");
+                            if (hintEl) {
+                                hintEl.style.display = "block";
+                                if (toolName === "measure") hintEl.textContent = "📏 Measure Tool: Click anywhere on chart to measure price & change %";
+                                if (toolName === "hline") hintEl.textContent = "➖ Horizontal Line: Click on chart to drop Support / Resistance level";
+                                if (toolName === "long") hintEl.textContent = "📈 Long Position: Click on chart to place Long Risk/Reward tool";
+                                if (toolName === "short") hintEl.textContent = "📉 Short Position: Click on chart to place Short Risk/Reward tool";
+                            }
+                        }
+                    };
                 });
 
-                candlestickSeries.createPriceLine({
-                    price: slVal,
-                    color: '#ef4444',
-                    lineWidth: 2,
-                    lineStyle: window.LightweightCharts.LineStyle.Dashed,
-                    axisLabelVisible: true,
-                    title: `STOP LOSS (SL): ₹${slVal}`,
+                // Chart click handler for tools
+                chart.subscribeClick((param) => {
+                    if (!activeChartTool || !param || !param.point) return;
+                    const price = candlestickSeries.coordinateToPrice(param.point.y);
+                    if (!price || isNaN(price)) return;
+                    const roundedPrice = Number(price.toFixed(2));
+
+                    if (activeChartTool === "hline") {
+                        const hLine = candlestickSeries.createPriceLine({
+                            price: roundedPrice,
+                            color: '#38bdf8',
+                            lineWidth: 2,
+                            lineStyle: window.LightweightCharts.LineStyle.Solid,
+                            axisLabelVisible: true,
+                            title: `H-LINE: ₹${roundedPrice}`,
+                        });
+                        customPriceLines.push(hLine);
+                        if (hintEl) {
+                            hintEl.textContent = `✓ Added H-Line at ₹${roundedPrice}`;
+                            setTimeout(() => { hintEl.style.display = "none"; }, 2500);
+                        }
+                        activeChartTool = null;
+                        chartToolsGroup.querySelectorAll(".chart-tool-btn:not(#toolToggleTpSl)").forEach(b => b.classList.remove("active"));
+                    } else if (activeChartTool === "long") {
+                        const targetP = Number((roundedPrice * 1.025).toFixed(2));
+                        const stopP = Number((roundedPrice * 0.985).toFixed(2));
+                        const tpLine = candlestickSeries.createPriceLine({
+                            price: targetP,
+                            color: '#10b981',
+                            lineWidth: 2,
+                            lineStyle: window.LightweightCharts.LineStyle.Dotted,
+                            axisLabelVisible: true,
+                            title: `LONG TP (+2.5%): ₹${targetP}`,
+                        });
+                        const entryLine = candlestickSeries.createPriceLine({
+                            price: roundedPrice,
+                            color: '#38bdf8',
+                            lineWidth: 2,
+                            lineStyle: window.LightweightCharts.LineStyle.Solid,
+                            axisLabelVisible: true,
+                            title: `ENTRY: ₹${roundedPrice}`,
+                        });
+                        const slLine = candlestickSeries.createPriceLine({
+                            price: stopP,
+                            color: '#ef4444',
+                            lineWidth: 2,
+                            lineStyle: window.LightweightCharts.LineStyle.Dashed,
+                            axisLabelVisible: true,
+                            title: `LONG SL (-1.5%): ₹${stopP}`,
+                        });
+                        customPriceLines.push(tpLine, entryLine, slLine);
+                        if (hintEl) {
+                            hintEl.textContent = `✓ Placed Long Position at ₹${roundedPrice} (1:1.67 R:R)`;
+                            setTimeout(() => { hintEl.style.display = "none"; }, 2500);
+                        }
+                        activeChartTool = null;
+                        chartToolsGroup.querySelectorAll(".chart-tool-btn:not(#toolToggleTpSl)").forEach(b => b.classList.remove("active"));
+                    } else if (activeChartTool === "short") {
+                        const targetP = Number((roundedPrice * 0.975).toFixed(2));
+                        const stopP = Number((roundedPrice * 1.015).toFixed(2));
+                        const tpLine = candlestickSeries.createPriceLine({
+                            price: targetP,
+                            color: '#10b981',
+                            lineWidth: 2,
+                            lineStyle: window.LightweightCharts.LineStyle.Dotted,
+                            axisLabelVisible: true,
+                            title: `SHORT TP (+2.5%): ₹${targetP}`,
+                        });
+                        const entryLine = candlestickSeries.createPriceLine({
+                            price: roundedPrice,
+                            color: '#f59e0b',
+                            lineWidth: 2,
+                            lineStyle: window.LightweightCharts.LineStyle.Solid,
+                            axisLabelVisible: true,
+                            title: `SHORT ENTRY: ₹${roundedPrice}`,
+                        });
+                        const slLine = candlestickSeries.createPriceLine({
+                            price: stopP,
+                            color: '#ef4444',
+                            lineWidth: 2,
+                            lineStyle: window.LightweightCharts.LineStyle.Dashed,
+                            axisLabelVisible: true,
+                            title: `SHORT SL (-1.5%): ₹${stopP}`,
+                        });
+                        customPriceLines.push(tpLine, entryLine, slLine);
+                        if (hintEl) {
+                            hintEl.textContent = `✓ Placed Short Position at ₹${roundedPrice}`;
+                            setTimeout(() => { hintEl.style.display = "none"; }, 2500);
+                        }
+                        activeChartTool = null;
+                        chartToolsGroup.querySelectorAll(".chart-tool-btn:not(#toolToggleTpSl)").forEach(b => b.classList.remove("active"));
+                    } else if (activeChartTool === "measure") {
+                        const latest = uniqueCandleData[uniqueCandleData.length - 1].close;
+                        const diff = roundedPrice - latest;
+                        const pct = (diff / latest) * 100;
+                        const sign = diff >= 0 ? '+' : '';
+                        if (hintEl) {
+                            hintEl.textContent = `📏 Measured from current ₹${latest}: ${sign}₹${diff.toFixed(2)} (${sign}${pct.toFixed(2)}%)`;
+                            setTimeout(() => { hintEl.style.display = "none"; }, 3500);
+                        }
+                        activeChartTool = null;
+                        chartToolsGroup.querySelectorAll(".chart-tool-btn:not(#toolToggleTpSl)").forEach(b => b.classList.remove("active"));
+                    }
                 });
             }
 

@@ -33,8 +33,8 @@
     </script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=35.0.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=35.0.0">
+    <link rel="stylesheet" href="/static/styles.css?v=36.0.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=36.0.0">
 
 </head>
 <body>
@@ -1017,51 +1017,79 @@
 
             <!-- ============================== DEDICATED STOCK DETAIL & TRADINGVIEW CHART SECTION ============================== -->
             <div id="stockDetailSection" class="hidden">
-                <div class="section-heading-row" style="margin-bottom:16px;">
-                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%;justify-content:space-between;">
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <button id="btnBackFromStockDetail" class="btn btn-pill btn-secondary" style="padding:6px 14px;">
-                                <i class="fa-solid fa-arrow-left"></i> BACK
-                            </button>
-                            <div id="stockDetailHeaderTitle" style="display:flex;align-items:center;gap:10px;">
-                                <!-- Symbol Logo + Name + Live Price Injected by JS -->
-                            </div>
+                <!-- Single-Row Unified Stock Header -->
+                <div class="stock-detail-header-card" style="margin-bottom:14px;">
+                    <div style="display:flex;align-items:center;gap:12px;min-width:0;flex:1;">
+                        <button id="btnBackFromStockDetail" class="btn-icon-back" title="Back to Scanner">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <div id="stockDetailHeaderTitle" style="display:flex;align-items:center;gap:12px;min-width:0;flex-wrap:nowrap;">
+                            <!-- Injected by JS: Logo + Name + Subtitle + LTP + % Change -->
                         </div>
-                        <div id="stockDetailHeaderBadge">
-                            <!-- Signal badge -->
-                        </div>
+                    </div>
+                    <div id="stockDetailHeaderBadge" style="flex-shrink:0;">
+                        <!-- Signal badge -->
                     </div>
                 </div>
 
-                <!-- Timeframe Selector Bar -->
-                <div class="toolbar-container" style="margin-bottom:12px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                    <div style="font-size:12px;font-weight:700;color:var(--ink-secondary);display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-chart-candlestick text-gold"></i> TIMEFRAME:
+                <!-- Pro Chart Interactive Toolbar (Timeframes + Drawing / Analysis Tools) -->
+                <div class="chart-pro-toolbar" style="margin-bottom:12px;">
+                    <!-- Left: Timeframe Selectors -->
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <div style="font-size:11px;font-weight:800;color:var(--ink-secondary);display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:0.5px;">
+                            <i class="fa-solid fa-chart-candlestick text-gold"></i> TF:
+                        </div>
+                        <div class="filter-group" id="tvTimeframeFilterGroup" style="display:flex;gap:4px;">
+                            <button class="tab-btn" data-tf="1">1M</button>
+                            <button class="tab-btn" data-tf="5">5M</button>
+                            <button class="tab-btn active" data-tf="15">15M</button>
+                            <button class="tab-btn" data-tf="60">1H</button>
+                            <button class="tab-btn" data-tf="240">4H</button>
+                            <button class="tab-btn" data-tf="D">1D</button>
+                            <button class="tab-btn" data-tf="W">1W</button>
+                        </div>
                     </div>
-                    <div class="filter-group" id="tvTimeframeFilterGroup">
-                        <button class="tab-btn" data-tf="1">1M</button>
-                        <button class="tab-btn" data-tf="5">5M</button>
-                        <button class="tab-btn active" data-tf="15">15M</button>
-                        <button class="tab-btn" data-tf="60">1H</button>
-                        <button class="tab-btn" data-tf="240">4H</button>
-                        <button class="tab-btn" data-tf="D">1D</button>
-                        <button class="tab-btn" data-tf="W">1W</button>
+
+                    <!-- Right: Pro Chart Drawing & Analysis Tools -->
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;" id="chartToolsGroup">
+                        <button class="chart-tool-btn active" id="toolToggleTpSl" data-tool="tpsl" title="Toggle Target & Stop Loss Lines">
+                            <i class="fa-solid fa-bullseye text-bullish"></i> TP/SL
+                        </button>
+                        <button class="chart-tool-btn" id="toolMeasure" data-tool="measure" title="Measure Price Range & %">
+                            <i class="fa-solid fa-ruler-combined text-gold"></i> Measure
+                        </button>
+                        <button class="chart-tool-btn" id="toolHLine" data-tool="hline" title="Add Horizontal Support/Resistance Line">
+                            <i class="fa-solid fa-arrows-left-right text-cyan"></i> H-Line
+                        </button>
+                        <button class="chart-tool-btn" id="toolLongPos" data-tool="long" title="Long Position Risk/Reward Tool">
+                            <i class="fa-solid fa-arrow-trend-up text-bullish"></i> Long Pos
+                        </button>
+                        <button class="chart-tool-btn" id="toolShortPos" data-tool="short" title="Short Position Risk/Reward Tool">
+                            <i class="fa-solid fa-arrow-trend-down text-bearish"></i> Short Pos
+                        </button>
+                        <button class="chart-tool-btn" id="toolClearDrawings" title="Clear All Drawings" style="color:var(--bearish);">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
                     </div>
                 </div>
 
-                <!-- TradingView / Technical OHLC Chart Widget -->
-                <div class="table-card" style="margin-bottom:20px;padding:0;overflow:hidden;border-radius:12px;min-height:450px;background:#0d1017;border:1px solid var(--glass-border);width:100%;">
+                <!-- Interactive OHLC Chart Container -->
+                <div class="table-card" style="margin-bottom:20px;padding:0;overflow:hidden;border-radius:12px;min-height:450px;background:#0d1017;border:1px solid var(--glass-border);width:100%;position:relative;">
+                    <div id="chart_tool_hint" style="display:none;position:absolute;top:10px;left:14px;background:rgba(15,23,42,0.85);border:1px solid rgba(212,175,55,0.4);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--gold);z-index:10;pointer-events:none;"></div>
                     <div id="tradingview_chart_container" style="width:100%;height:450px;min-height:400px;position:relative;"></div>
                 </div>
 
-                <!-- Quantitative Multi-Pillar Analysis Grid below chart -->
-                <div style="margin-bottom:12px;">
-                    <h3 style="font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;">
-                        <i class="fa-solid fa-brain text-gold"></i> QUANTITATIVE MULTI-PILLAR ANALYSIS &amp; BREAKOUT LEVELS
+                <!-- Quantitative Multi-Pillar Deep-Dive & Breakout Matrix -->
+                <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+                    <h3 style="font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;margin:0;">
+                        <i class="fa-solid fa-brain text-gold"></i> QUANTITATIVE MULTI-PILLAR DEEP-DIVE &amp; BREAKOUT MATRIX
                     </h3>
+                    <div style="font-size:12px;font-weight:700;color:var(--ink-muted);">
+                        Institutional Quantitative Analytics
+                    </div>
                 </div>
 
-                <div id="stockDetailAnalysisGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4" style="margin-bottom:24px;">
+                <div id="stockDetailAnalysisGrid" style="margin-bottom:28px;">
                     <!-- Dynamic Analysis Cards Injected by JS -->
                 </div>
             </div>
@@ -1381,7 +1409,7 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=35.0.0"></script>
+    <script src="/static/app.js?v=36.0.0"></script>
 
 </body>
 </html>

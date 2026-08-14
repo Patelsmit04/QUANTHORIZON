@@ -4292,6 +4292,114 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
 .price-tick-flash {
     animation: priceTickGlow 0.6s ease-out;
     border-radius: 4px;
+/* ==========================================================================
+   STOCK DETAIL PAGE — SINGLE ROW HEADER & PRO TOOLS
+   ========================================================================== */
+.stock-detail-header-card {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.btn-icon-back {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-icon-back:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: rgba(212, 175, 55, 0.6);
+    color: var(--gold);
+    transform: scale(1.06);
+}
+
+.chart-pro-toolbar {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chart-tool-btn {
+    padding: 6px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.18s ease;
+}
+
+.chart-tool-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.chart-tool-btn.active {
+    background: rgba(212, 175, 55, 0.2) !important;
+    border-color: rgba(212, 175, 55, 0.6) !important;
+    color: var(--gold) !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+}
+
+.analysis-deep-card {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.pillar-meter-wrapper {
+    margin-bottom: 12px;
+}
+
+.pillar-meter-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.pillar-meter-track {
+    width: 100%;
+    height: 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.pillar-meter-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.6s ease;
 }
 
 
