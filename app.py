@@ -1401,11 +1401,11 @@ def live_price_ticker_worker():
                         daily_prev_closes = _get_daily_prev_closes(all_t)
                         last_daily_fetch_date = today_date
 
-                    # 1. Update Index Ticks Every 10 Seconds (only 4 tickers - zero rate limiting)
+                    # 1. Update Index Ticks Every 5 Seconds
                     idx_download_df = call_with_retry(
                         lambda: yf.download(tickers=list(idx_ticker_map.keys()), period="2d", interval="1m", group_by="ticker", progress=False, threads=True),
-                        label="live index 10s ticker download",
-                        timeout=8.0,
+                        label="live index 5s ticker download",
+                        timeout=5.0,
                     )
                     current_indices = cache_store.get("index_data") or []
                     idx_dict = {idx.get("index_name"): idx for idx in current_indices if isinstance(idx, dict)}
@@ -1426,16 +1426,23 @@ def live_price_ticker_worker():
                             ltp = float(sub_df.iloc[-1]["Close"])
                             if not prev_close:
                                 prev_close = float(sub_df.iloc[0]["Open"])
-                        elif idx_code in ("NIFTY50", "BANKNIFTY"):
-                            # Direct NSE Live fallback when yfinance is rate limited
+
+                        # Direct NSE Live option chain underlying spot fallback/verification for accuracy
+                        if idx_code in ("NIFTY50", "BANKNIFTY"):
                             try:
                                 chain = fetch_index_option_chain(idx_code)
                                 if chain and chain.get("verified") and chain.get("underlying_value"):
-                                    ltp = float(chain["underlying_value"])
+                                    nse_underlying = float(chain["underlying_value"])
+                                    if nse_underlying > 0:
+                                        # Use NSE underlying spot value directly if yfinance is missing or outdated
+                                        if ltp is None or abs(ltp - nse_underlying) > 1000.0:
+                                            ltp = nse_underlying
                             except Exception as ex:
                                 logger.warning(f"NSE Live spot fallback warning for {idx_code}: {ex}")
 
-                        if ltp is not None and prev_close:
+                        if ltp is not None and ltp > 0:
+                            if not prev_close or prev_close <= 0:
+                                prev_close = ltp
                             change_pts = round(ltp - prev_close, 2)
                             pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
 
@@ -1457,8 +1464,8 @@ def live_price_ticker_worker():
                     if idx_dict:
                         cache_store["index_data"] = list(idx_dict.values())
 
-                    # 2. Update Stock Ticks Every 25 Seconds
-                    if now_time - last_stock_fetch_time >= 25.0:
+                    # 2. Update Stock Ticks Every 5 Seconds
+                    if now_time - last_stock_fetch_time >= 5.0:
                         last_stock_fetch_time = now_time
                         stock_tickers = [f"{s}.NS" if not s.endswith(".NS") else s for s in FO_STOCKS]
                         stock_download_df = call_with_retry(
@@ -1506,10 +1513,10 @@ def live_price_ticker_worker():
                 except Exception as e:
                     logger.warning(f"[LiveTickerWorker] Fast price tick warning: {e}")
 
-            time.sleep(10)
+            time.sleep(5)
         except Exception as e:
             logger.error(f"Error in live_price_ticker_worker: {e}")
-            time.sleep(10)
+            time.sleep(5)
 
 
 # -------------------------------------------------------------
@@ -2212,10 +2219,10 @@ def get_index_signals():
     # Guarantee all 4 primary indices are present in index_data when running locally / non-VERCEL
     if not index_data and not os.environ.get("VERCEL"):
         index_data = [
-            {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24350.00, "change_pts": 125.40, "pct_change": 0.52, "signal": "NEUTRAL", "confidence_score": 75},
-            {"index_name": "BANKNIFTY", "display_name": "BANKNIFTY", "ltp": 52180.00, "change_pts": 340.10, "pct_change": 0.65, "signal": "NEUTRAL", "confidence_score": 78},
-            {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 79850.00, "change_pts": 410.20, "pct_change": 0.52, "signal": "NEUTRAL", "confidence_score": 74},
-            {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24410.00, "change_pts": 145.00, "pct_change": 0.60, "signal": "NEUTRAL", "confidence_score": 80},
+            {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24500.00, "change_pts": 125.40, "pct_change": 0.52, "signal": "NEUTRAL", "confidence_score": 75},
+            {"index_name": "BANKNIFTY", "display_name": "BANKNIFTY", "ltp": 57500.00, "change_pts": 340.10, "pct_change": 0.60, "signal": "NEUTRAL", "confidence_score": 78},
+            {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 80200.00, "change_pts": 410.20, "pct_change": 0.52, "signal": "NEUTRAL", "confidence_score": 74},
+            {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24560.00, "change_pts": 145.00, "pct_change": 0.60, "signal": "NEUTRAL", "confidence_score": 80},
         ]
     elif isinstance(index_data, list) and index_data:
         if not any(idx.get("index_name") == "GIFTNIFTY" for idx in index_data):
@@ -2243,8 +2250,8 @@ def get_index_signals():
 
 @app.get("/api/live_prices")
 def get_live_prices():
-    """Lightweight endpoint for 10-second polling — returns LTP, change_pts, pct_change
-    for all cached indices and stocks. If cache is empty or stale (> 15s), fetches live quotes
+    """Lightweight endpoint for 5-second polling — returns LTP, change_pts, pct_change
+    for all cached indices and stocks. If cache is empty or stale (> 3s), fetches live quotes
     on-demand so live numbers are NEVER empty or stuck."""
     # 1. Index prices from cache or fallback
     index_data = cache_store.get("index_data") or []
@@ -2260,10 +2267,10 @@ def get_live_prices():
 
     if not index_data:
         index_data = [
-            {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24350.00, "change_pts": 125.40, "pct_change": 0.52},
-            {"index_name": "BANKNIFTY", "display_name": "BANKNIFTY", "ltp": 52180.00, "change_pts": 340.10, "pct_change": 0.65},
-            {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 79850.00, "change_pts": 410.20, "pct_change": 0.52},
-            {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24410.00, "change_pts": 145.00, "pct_change": 0.60},
+            {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24500.00, "change_pts": 125.40, "pct_change": 0.52},
+            {"index_name": "BANKNIFTY", "display_name": "BANKNIFTY", "ltp": 57500.00, "change_pts": 340.10, "pct_change": 0.60},
+            {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 80200.00, "change_pts": 410.20, "pct_change": 0.52},
+            {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24560.00, "change_pts": 145.00, "pct_change": 0.60},
         ]
 
     index_prices = []
@@ -2284,8 +2291,8 @@ def get_live_prices():
     last_ts = cache_store.get("live_prices_timestamp", 0)
     now_ts = time.time()
 
-    # Fetch 1m quotes on demand if live_map is empty or stale (> 15s)
-    if not live_map or (now_ts - last_ts > 15.0):
+    # Fetch 1m quotes on demand if live_map is empty or stale (> 3.0s)
+    if not live_map or (now_ts - last_ts > 3.0):
         try:
             tickers = [f"{s}.NS" if not s.endswith(".NS") else s for s in FO_STOCKS]
             download_df = call_with_retry(

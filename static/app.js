@@ -28,13 +28,12 @@ function getStockLogoHTML(symbol) {
     if (!symbol) return '';
     const cleanSym = String(symbol).trim().toUpperCase();
     const initials = cleanSym.slice(0, 2);
-    const tvLogoUrl = `https://s3-symbol-logo.tradingview.com/crypto/XTVC${cleanSym}.svg`;
-    const fmpLogoUrl = `https://images.financialmodelingprep.com/symbol/${cleanSym}.NS.png`;
-    const nseLogoUrl = `https://raw.githubusercontent.com/swar/nifty-symbols-logos/main/logos/${cleanSym}.png`;
+    const primaryLogoUrl = `https://financialmodelingprep.com/image-stock/${cleanSym}.NS.png`;
+    const secondaryLogoUrl = `https://financialmodelingprep.com/image-stock/${cleanSym}.png`;
 
     return `<div class="stock-logo-frame" title="${cleanSym}">` +
-        `<img src="${tvLogoUrl}" ` +
-        `onerror="this.onerror=null; this.src='${fmpLogoUrl}'; this.onerror=function(){ this.onerror=null; this.src='${nseLogoUrl}'; this.onerror=function(){ this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex'; }; };" ` +
+        `<img src="${primaryLogoUrl}" ` +
+        `onerror="this.onerror=null; this.src='${secondaryLogoUrl}'; this.onerror=function(){ this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex'; };" ` +
         `alt="${cleanSym}">` +
         `<span class="stock-logo-initials" style="display:none;">${initials}</span>` +
         `</div>`;
@@ -246,8 +245,8 @@ document.addEventListener("DOMContentLoaded", () => {
     refreshStrategiesNavBadge();
     initNotifications();
     fetchTickerIndices();
-    setInterval(fetchTickerIndices, 10000); // 10-sec ticker refresh
-    setInterval(fetchLivePrices, 10000); // 10-sec live number updater
+    setInterval(fetchTickerIndices, 5000); // 5-sec ticker refresh
+    setInterval(fetchLivePrices, 5000); // 5-sec live number updater
     setInterval(fetchSplitAccuracy, 60000); // 1-min accuracy score metrics recalculation
     setInterval(fetchWinRatePerformance, 60000); // 1-min win rate performance updater
     scheduleMarketOpenRefresh();
@@ -730,8 +729,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupAutoRefresh() {
         if (autoRefreshInterval) clearInterval(autoRefreshInterval);
 
-        // Strict 10-second live market refresh for stocks & top index marquee ticker bar
-        const refreshMs = 10000; // 10 seconds live refresh
+        // Strict 5-second live market refresh for stocks & top index marquee ticker bar
+        const refreshMs = 5000; // 5 seconds live refresh
 
         autoRefreshInterval = setInterval(() => {
             fetchScanResults(false);
@@ -2945,10 +2944,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const DEFAULT_INDEX_FALLBACKS = [
-        { index_name: "NIFTY50", display_name: "NIFTY 50", ltp: 24380.50, change_pts: 125.40, pct_change: 0.52 },
-        { index_name: "BANKNIFTY", display_name: "BANKNIFTY", ltp: 52240.10, change_pts: 340.10, pct_change: 0.65 },
-        { index_name: "SENSEX", display_name: "SENSEX", ltp: 79920.80, change_pts: 410.20, pct_change: 0.52 },
-        { index_name: "GIFTNIFTY", display_name: "GIFT NIFTY", ltp: 24440.00, change_pts: 145.00, pct_change: 0.60 }
+        { index_name: "NIFTY50", display_name: "NIFTY 50", ltp: 24500.00, change_pts: 125.40, pct_change: 0.52 },
+        { index_name: "BANKNIFTY", display_name: "BANKNIFTY", ltp: 57500.00, change_pts: 340.10, pct_change: 0.60 },
+        { index_name: "SENSEX", display_name: "SENSEX", ltp: 80200.00, change_pts: 410.20, pct_change: 0.52 },
+        { index_name: "GIFTNIFTY", display_name: "GIFT NIFTY", ltp: 24560.00, change_pts: 145.00, pct_change: 0.60 }
     ];
 
     function buildTickerItemHTML(idx) {
@@ -2984,46 +2983,57 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (indexTickerTrack) {
-                const itemsHtml = indices.map(buildTickerItemHTML).join("");
-                    });
-                });
-            } else {
-                // Update numbers in-place without touching innerHTML (preserves CSS marquee scroll position!)
-                const indexMap = {};
-                indices.forEach(idx => {
-                    if (idx.index_name) {
-                        indexMap[idx.index_name] = idx;
-                        if (idx.index_name === "NIFTY50") indexMap["NIFTY"] = idx;
-                        if (idx.index_name === "NIFTY") indexMap["NIFTY50"] = idx;
-                    }
-                    if (idx.display_name) indexMap[idx.display_name] = idx;
-                });
-                indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
-                    const idxName = item.dataset.indexName;
-                    const nameEl = item.querySelector('strong');
-                    const nameText = nameEl ? nameEl.textContent.trim() : '';
-                    const fallback = DEFAULT_INDEX_FALLBACKS.find(f => f.index_name === idxName || f.display_name === nameText) || DEFAULT_INDEX_FALLBACKS[0];
-                    const idx = (idxName && indexMap[idxName]) || (nameText && indexMap[nameText]) || fallback;
-                    const spans = item.querySelectorAll('span');
-                    if (spans.length >= 2) {
-                        const rawLtp = idx.ltp != null ? idx.ltp : fallback.ltp;
-                        const ltp = rawLtp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                        const changePts = idx.change_pts != null ? idx.change_pts : fallback.change_pts;
-                        const pctChange = idx.pct_change != null ? idx.pct_change : fallback.pct_change;
-                        const isUp = changePts >= 0;
-                        const sign = isUp ? '+' : '';
-                        const ptsText = Math.abs(changePts).toFixed(2);
-                        const pctText = (typeof pctChange === 'number' ? Math.abs(pctChange).toFixed(2) : pctChange);
+                if (!indexTickerTrack.children || indexTickerTrack.children.length === 0) {
+                    const itemsHtml = indices.map(buildTickerItemHTML).join("");
+                    indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
 
-                        spans[0].textContent = ltp;
-                        spans[1].className = isUp ? 'text-bullish' : 'text-bearish';
-                        spans[1].textContent = `${sign}${ptsText} (${sign}${pctText}%)`;
-                    }
-                });
+                    indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const idxName = item.dataset.indexName;
+                            if (idxName) openIndexChartModal(idxName);
+                        });
+                    });
+                } else {
+                    // Update numbers in-place without touching innerHTML (preserves CSS marquee scroll position!)
+                    const indexMap = {};
+                    indices.forEach(idx => {
+                        if (idx.index_name) {
+                            indexMap[idx.index_name] = idx;
+                            if (idx.index_name === "NIFTY50") indexMap["NIFTY"] = idx;
+                            if (idx.index_name === "NIFTY") indexMap["NIFTY50"] = idx;
+                        }
+                        if (idx.display_name) indexMap[idx.display_name] = idx;
+                    });
+                    indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                        const idxName = item.dataset.indexName;
+                        const nameEl = item.querySelector('strong');
+                        const nameText = nameEl ? nameEl.textContent.trim() : '';
+                        const fallback = DEFAULT_INDEX_FALLBACKS.find(f => f.index_name === idxName || f.display_name === nameText) || DEFAULT_INDEX_FALLBACKS[0];
+                        const idx = (idxName && indexMap[idxName]) || (nameText && indexMap[nameText]) || fallback;
+                        const spans = item.querySelectorAll('span');
+                        if (spans.length >= 2) {
+                            const rawLtp = idx.ltp != null ? idx.ltp : fallback.ltp;
+                            const ltp = rawLtp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            const changePts = idx.change_pts != null ? idx.change_pts : fallback.change_pts;
+                            const pctChange = idx.pct_change != null ? idx.pct_change : fallback.pct_change;
+                            const isUp = changePts >= 0;
+                            const sign = isUp ? '+' : '';
+                            const ptsText = Math.abs(changePts).toFixed(2);
+                            const pctText = (typeof pctChange === 'number' ? Math.abs(pctChange).toFixed(2) : pctChange);
+
+                            spans[0].textContent = ltp;
+                            const changeSpan = spans[1] || spans[2];
+                            if (changeSpan) {
+                                changeSpan.className = isUp ? 'text-bullish' : 'text-bearish';
+                                changeSpan.textContent = `${sign}${ptsText} (${sign}${pctText}%)`;
+                            }
+                        }
+                    });
+                }
             }
         } catch (e) {
             console.warn("Error fetching ticker indices:", e);
-            if (!indexTickerTrack.children || indexTickerTrack.children.length === 0) {
+            if (indexTickerTrack && (!indexTickerTrack.children || indexTickerTrack.children.length === 0)) {
                 const itemsHtml = DEFAULT_INDEX_FALLBACKS.map(buildTickerItemHTML).join("");
                 indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
             }
