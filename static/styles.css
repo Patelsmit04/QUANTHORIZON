@@ -2337,14 +2337,16 @@ input:checked + .slider:before { transform: translateX(16px); }
     /* The gap-probability-distribution and institutional-flow-detail sub-rows are already
        single full-width colspan cells (free-form content, not per-field key/value pairs) —
        keep them as simple blocks rather than flex-restructuring them. */
-    #stocksTableBody tr.gap-distribution-row,
-    #stocksTableBody tr.flow-detail-row {
-        display: block;
-        padding: 10px 14px;
+    #stocksTableBody tr.gap-distribution-row:not(.expanded),
+    #stocksTableBody tr.flow-detail-row:not(.expanded) {
+        display: none !important;
+    }
+    #stocksTableBody tr.gap-distribution-row.expanded,
+    #stocksTableBody tr.flow-detail-row.expanded {
+        display: table-row;
     }
     #stocksTableBody tr.gap-distribution-row td,
     #stocksTableBody tr.flow-detail-row td {
-        display: block;
         white-space: normal;
     }
 
@@ -4271,6 +4273,56 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
     border-color: rgba(212, 175, 55, 0.4) !important;
     transform: translateY(-2px);
 }
+
+/* ==========================================================================
+   FIX 2 & FIX 3 UTILITY CLASSES (Grid & Chart Wrapper)
+   ========================================================================== */
+#tradingview_chart_container {
+    width: 100% !important;
+    height: 450px !important;
+    min-height: 400px !important;
+    position: relative !important;
+    background: #0d1017 !important;
+}
+
+.grid {
+    display: grid !important;
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.gap-4 {
+    gap: 1rem !important;
+}
+
+.mt-4 {
+    margin-top: 1rem !important;
+}
+
+.bg-slate-900\/80 {
+    background: rgba(15, 23, 42, 0.8) !important;
+}
+
+.border-slate-800 {
+    border-color: rgba(30, 41, 59, 1) !important;
+}
+
+.p-4 {
+    padding: 1rem !important;
+}
+
+.rounded-xl {
+    border-radius: 0.75rem !important;
+}
+
+@media (min-width: 768px) {
+    .md\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
 
 
 

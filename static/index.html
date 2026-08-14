@@ -311,10 +311,17 @@
                             <thead>
                                 <tr>
                                     <th>RANK</th>
-                                    <th>TICKER &amp; SIGNAL</th>
+                                    <th>TICKER</th>
+                                    <th>SIGNAL</th>
+                                    <th>OPTION TYPE</th>
+                                    <th>PRIORITY LEVEL</th>
+                                    <th>CONFIDENCE SCORE</th>
+                                    <th>EST. OVERNIGHT GAP</th>
                                     <th>LTP</th>
                                     <th>CHANGE (+/-)</th>
-                                    <th>GAP PROBABILITY</th>
+                                    <th>VOL SURGE</th>
+                                    <th>RSI</th>
+                                    <th>5-PILLAR WEIGHT</th>
                                     <th>ACTION</th>
                                 </tr>
                             </thead>
@@ -1037,19 +1044,19 @@
                     </div>
                 </div>
 
-                <!-- TradingView Embed Chart Widget -->
-                <div class="table-card" style="margin-bottom:20px;padding:0;overflow:hidden;border-radius:12px;min-height:500px;background:#0d1017;border:1px solid var(--glass-border);">
-                    <div id="tradingview_chart_container" style="width:100%;height:500px;"></div>
+                <!-- TradingView / Technical OHLC Chart Widget -->
+                <div class="table-card" style="margin-bottom:20px;padding:0;overflow:hidden;border-radius:12px;min-height:450px;background:#0d1017;border:1px solid var(--glass-border);width:100%;">
+                    <div id="tradingview_chart_container" style="width:100%;height:450px;min-height:400px;position:relative;"></div>
                 </div>
 
-                <!-- Deep Multi-Pillar Analysis Grid below chart -->
+                <!-- Quantitative Multi-Pillar Analysis Grid below chart -->
                 <div style="margin-bottom:12px;">
                     <h3 style="font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;">
                         <i class="fa-solid fa-brain text-gold"></i> QUANTITATIVE MULTI-PILLAR ANALYSIS &amp; BREAKOUT LEVELS
                     </h3>
                 </div>
 
-                <div id="stockDetailAnalysisGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;margin-bottom:24px;">
+                <div id="stockDetailAnalysisGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4" style="margin-bottom:24px;">
                     <!-- Dynamic Analysis Cards Injected by JS -->
                 </div>
             </div>

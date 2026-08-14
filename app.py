@@ -1839,7 +1839,7 @@ def get_scan_results(
     sched_info = get_market_schedule_info()
 
     # Trigger async scan in background if requested or if cache is missing, but NEVER block HTTP response!
-    if nocache and sched_info["is_open"]:
+    if nocache and sched_info["is_open"] and _can_run_live_scan_inline():
         threading.Thread(target=run_full_scan_pipeline, daemon=True).start()
 
     with _cache_lock:
@@ -1852,8 +1852,9 @@ def get_scan_results(
         scan_response = copy.deepcopy(cached) if cached is not None else None
 
     if scan_response is None:
-        # Trigger background pipeline if no scan summary exists yet
-        threading.Thread(target=run_full_scan_pipeline, daemon=True).start()
+        # Trigger background pipeline if no scan summary exists yet and inline scans are permitted
+        if _can_run_live_scan_inline():
+            threading.Thread(target=run_full_scan_pipeline, daemon=True).start()
         scan_response = _no_scan_data_response(sched_info)
     else:
         scan_response["cache_hit"] = True
@@ -2242,9 +2243,9 @@ def get_index_signals():
 
 @app.get("/api/live_prices")
 def get_live_prices():
-    """Lightweight endpoint for 10-second polling — returns only LTP, change_pts, pct_change
-    for all cached indices and stocks. If cache is empty (e.g. on serverless/cold restart),
-    fetches live quotes on-demand so live numbers are NEVER empty or stuck on remote deployments."""
+    """Lightweight endpoint for 10-second polling — returns LTP, change_pts, pct_change
+    for all cached indices and stocks. If cache is empty or stale (> 15s), fetches live quotes
+    on-demand so live numbers are NEVER empty or stuck."""
     # 1. Index prices from cache or fallback
     index_data = cache_store.get("index_data") or []
     if not index_data:
@@ -2270,18 +2271,21 @@ def get_live_prices():
         if isinstance(idx, dict):
             index_prices.append({
                 "index_name": idx.get("index_name", ""),
+                "display_name": idx.get("display_name", idx.get("index_name", "")),
                 "ltp": idx.get("ltp"),
                 "change_pts": idx.get("change_pts"),
                 "pct_change": idx.get("pct_change"),
                 "prev_close": idx.get("prev_close"),
             })
 
-    # 2. Stock prices from cache or on-demand fetch
+    # 2. Stock prices from live_map or on-demand fetch
     stock_data = cache_store.get("data") or []
     live_map = cache_store.get("live_prices_map") or {}
+    last_ts = cache_store.get("live_prices_timestamp", 0)
+    now_ts = time.time()
 
-    # If both cache sources are empty (e.g. Vercel serverless cold start), fetch 1m quotes on demand!
-    if not stock_data and not live_map:
+    # Fetch 1m quotes on demand if live_map is empty or stale (> 15s)
+    if not live_map or (now_ts - last_ts > 15.0):
         try:
             tickers = [f"{s}.NS" if not s.endswith(".NS") else s for s in FO_STOCKS]
             download_df = call_with_retry(
@@ -2290,7 +2294,8 @@ def get_live_prices():
                 timeout=10.0,
             )
             if download_df is not None and not download_df.empty:
-                new_map = {}
+                new_map = dict(live_map)
+                daily_prev = cache_store.get("daily_prev_closes") or {}
                 for sym in FO_STOCKS:
                     raw_t = f"{sym}.NS"
                     sub_df = None
@@ -2302,7 +2307,7 @@ def get_live_prices():
 
                     if sub_df is not None and not sub_df.empty:
                         ltp = float(sub_df.iloc[-1]["Close"])
-                        prev_close = float(sub_df.iloc[0]["Open"])
+                        prev_close = daily_prev.get(raw_t) or float(sub_df.iloc[0]["Open"])
                         change_pts = round(ltp - prev_close, 2)
                         pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
                         new_map[sym] = {
@@ -2312,38 +2317,51 @@ def get_live_prices():
                             "change_pts": change_pts,
                             "pct_change": pct_change,
                         }
-                cache_store["live_prices_map"] = new_map
-                live_map = new_map
+                if new_map:
+                    cache_store["live_prices_map"] = new_map
+                    cache_store["live_prices_timestamp"] = now_ts
+                    live_map = new_map
         except Exception as e:
             logger.warning(f"On-demand stock fetch in /api/live_prices failed: {e}")
 
-    stock_prices = []
+    # Build stock_prices dictionary matching symbols
+    stock_prices_dict = {}
     if live_map:
         for sym, s in live_map.items():
             if isinstance(s, dict):
-                stock_prices.append({
+                stock_prices_dict[s.get("symbol", sym)] = {
                     "symbol": s.get("symbol", sym),
                     "ltp": s.get("ltp"),
                     "change_pts": s.get("change_pts"),
                     "pct_change": s.get("pct_change"),
                     "prev_close": s.get("prev_close"),
-                })
-    elif stock_data:
-        for s in stock_data:
-            if isinstance(s, dict):
-                stock_prices.append({
-                    "symbol": s.get("symbol", ""),
-                    "ltp": s.get("ltp"),
-                    "change_pts": s.get("change_pts"),
-                    "pct_change": s.get("pct_change"),
-                    "prev_close": s.get("prev_close"),
-                })
-    elif live_map:
-        for sym, s in live_map.items():
-            if isinstance(s, dict):
-                stock_prices.append(s)
+                }
 
-    # 3. BTST status
+    if stock_data:
+        for s in stock_data:
+            if isinstance(s, dict) and s.get("symbol"):
+                sym = s["symbol"]
+                if sym not in stock_prices_dict:
+                    stock_prices_dict[sym] = {
+                        "symbol": sym,
+                        "ltp": s.get("ltp"),
+                        "change_pts": s.get("change_pts"),
+                        "pct_change": s.get("pct_change"),
+                        "prev_close": s.get("prev_close"),
+                    }
+                else:
+                    # Update stock_data's in-memory price if live_map updated it
+                    live_s = stock_prices_dict[sym]
+                    if live_s.get("ltp") is not None:
+                        s["ltp"] = live_s["ltp"]
+                        s["change_pts"] = live_s["change_pts"]
+                        s["pct_change"] = live_s["pct_change"]
+                        if live_s.get("prev_close"):
+                            s["prev_close"] = live_s["prev_close"]
+
+    stock_prices = list(stock_prices_dict.values())
+
+    # Determine BTST display status based on current IST time
     ist_now = get_ist_now()
     time_in_mins = ist_now.hour * 60 + ist_now.minute
     is_weekday = ist_now.weekday() not in [5, 6]

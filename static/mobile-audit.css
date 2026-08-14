@@ -663,16 +663,22 @@
     }
 
     /* Expandable Gap Probability & Flow Rows */
-    #scannerDataTable > tbody > tr.gap-distribution-row,
-    #scannerDataTable > tbody > tr.flow-detail-row {
+    #scannerDataTable > tbody > tr.gap-distribution-row:not(.expanded),
+    #scannerDataTable > tbody > tr.flow-detail-row:not(.expanded) {
+        display: none !important;
+    }
+
+    #scannerDataTable > tbody > tr.gap-distribution-row.expanded,
+    #scannerDataTable > tbody > tr.flow-detail-row.expanded {
         display: block !important;
         width: 100% !important;
-        background: var(--glass-bg-soft) !important;
-        border: 1px dashed var(--glass-border-strong) !important;
-        border-radius: 10px !important;
-        padding: 10px !important;
-        margin-top: -4px !important;
+        background: rgba(13, 16, 23, 0.95) !important;
+        border: 1px solid var(--glass-border-strong) !important;
+        border-radius: 12px !important;
+        padding: 12px !important;
+        margin-top: 4px !important;
         margin-bottom: 8px !important;
+        box-sizing: border-box !important;
     }
 
     #scannerDataTable > tbody > tr.gap-distribution-row td,
@@ -682,17 +688,17 @@
         padding: 0 !important;
         background: transparent !important;
         border: none !important;
+        box-shadow: none !important;
     }
 
-    /* Collapsed by default: the Ticker cell alone already shows name + signal badge +
-       confidence pill + chevron inline (see .ticker-header-flex above) — everything else,
-       plus the gap-distribution/institutional-flow detail sub-rows, stays hidden until the
-       chevron toggle adds .expanded to every row sharing the same data-row-key. */
-    #scannerDataTable > tbody > tr:not(.expanded) > td:not([data-label="TICKER"]) {
+    #scannerDataTable > tbody > tr.gap-distribution-row td:before,
+    #scannerDataTable > tbody > tr.flow-detail-row td:before {
+        content: none !important;
         display: none !important;
     }
-    #scannerDataTable > tbody > tr.gap-distribution-row:not(.expanded),
-    #scannerDataTable > tbody > tr.flow-detail-row:not(.expanded) {
+
+    /* On mobile, collapsed main card row shows TICKER header row */
+    #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row):not(.expanded) > td:not([data-label="TICKER"]) {
         display: none !important;
     }
 
