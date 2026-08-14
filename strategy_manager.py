@@ -305,17 +305,17 @@ def _seed_default_strategy_if_missing():
         # for every applicable scope, per the spec ("Default: All strategies ON").
         intraday_specs = [
             ("vwap-pullback-v1", "VWAP Pullback", "Buy Call on a bullish pullback to VWAP/EMA with an RSI reversal above 50.",
-             ["NIFTY50", "BANKNIFTY", "SENSEX"], {"stocks": False, "indices": True}),
+             ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX", "GIFTNIFTY"], {"stocks": True, "indices": True}),
             ("breakdown-spike-v1", "Breakdown Spike", "Buy Put on a range breakdown confirmed by a 1.5x volume spike.",
-             ["NIFTY50", "BANKNIFTY", "SENSEX"], {"stocks": False, "indices": True}),
+             ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX", "GIFTNIFTY"], {"stocks": True, "indices": True}),
             ("orb-v1", "ORB", "Opening Range Breakout — Buy Call/Put on a break of the first 30 minutes' high/low.",
-             ["NIFTY50", "BANKNIFTY", "SENSEX"], {"stocks": False, "indices": True}),
+             ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX", "GIFTNIFTY"], {"stocks": True, "indices": True}),
             ("oi-surge-v1", "OI Surge", "Buy 1-strike-OTM Call on a 15-min price surge with long OI build-up.",
-             ["STOCKS"], {"stocks": True, "indices": False}),
+             ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX", "GIFTNIFTY"], {"stocks": True, "indices": True}),
             ("death-cross-v1", "Death Cross", "Buy ATM Put on a 15-min 5/20 EMA death cross with short OI build-up.",
-             ["STOCKS"], {"stocks": True, "indices": False}),
+             ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX", "GIFTNIFTY"], {"stocks": True, "indices": True}),
             ("volatility-straddle-v1", "Volatility Straddle", "Buy ATM Call + Put ahead of a high-impact event when IV is in its low percentile. Sensex excluded — no live options data source exists for it.",
-             ["STOCKS", "NIFTY50", "BANKNIFTY"], {"stocks": True, "indices": True}),
+             ["STOCKS", "NIFTY50", "BANKNIFTY", "SENSEX", "GIFTNIFTY"], {"stocks": True, "indices": True}),
         ]
         for strat_id, strat_name, desc, target_scope, scope_toggles in intraday_specs:
             if strat_id in store:

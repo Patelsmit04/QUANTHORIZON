@@ -197,6 +197,20 @@ class StrategyEngine:
                 if alert:
                     candidates.append(alert)
 
+            if self._is_strategy_enabled("oi_surge", "indices"):
+                oi_change = get_oi_change_15min(asset, now=now)
+                alert = rules.evaluate_oi_surge(df5, oi_change)
+                if alert:
+                    candidates.append(alert)
+
+            if self._is_strategy_enabled("death_cross", "indices"):
+                df15 = fetch_intraday_ohlc(ticker, interval="15m", period="1mo")
+                if df15 is not None:
+                    oi_change = get_oi_change_15min(asset, now=now)
+                    alert = rules.evaluate_death_cross(df15, oi_change)
+                    if alert:
+                        candidates.append(alert)
+
             if asset in INDEX_CHAIN_SUPPORTED and self._is_strategy_enabled("volatility_straddle", "indices"):
                 straddle_alert = self._maybe_evaluate_straddle(
                     asset, spot=float(df5["Close"].iloc[-1]),
@@ -218,10 +232,13 @@ class StrategyEngine:
     # -- stocks ---------------------------------------------------------------
 
     def _scan_stocks(self, now: datetime, vix_value: Optional[float], past_eod: bool):
+        a_enabled = self._is_strategy_enabled("vwap_pullback", "stocks")
+        b_enabled = self._is_strategy_enabled("breakdown_spike", "stocks")
+        c_enabled = self._is_strategy_enabled("orb", "stocks")
         d_enabled = self._is_strategy_enabled("oi_surge", "stocks")
         e_enabled = self._is_strategy_enabled("death_cross", "stocks")
         f_enabled = self._is_strategy_enabled("volatility_straddle", "stocks")
-        if not (d_enabled or e_enabled or f_enabled):
+        if not (a_enabled or b_enabled or c_enabled or d_enabled or e_enabled or f_enabled):
             return
 
         universe = get_canonical_fo_tickers()
@@ -234,7 +251,8 @@ class StrategyEngine:
                 break
             symbol = ticker.replace(".NS", "").upper()
             try:
-                self._scan_one_stock(symbol, ticker, now, vix_value, past_eod, d_enabled, e_enabled, f_enabled)
+                self._scan_one_stock(symbol, ticker, now, vix_value, past_eod,
+                                     a_enabled, b_enabled, c_enabled, d_enabled, e_enabled, f_enabled)
             except Exception as e:
                 logger.debug(f"Error scanning {symbol}: {e}")
             time.sleep(0.2)  # stagger — same rate-limit compromise smc_scanner.py makes
@@ -248,7 +266,8 @@ class StrategyEngine:
         return batch
 
     def _scan_one_stock(self, symbol: str, ticker: str, now: datetime, vix_value: Optional[float],
-                         past_eod: bool, d_enabled: bool, e_enabled: bool, f_enabled: bool):
+                         past_eod: bool, a_enabled: bool, b_enabled: bool, c_enabled: bool,
+                         d_enabled: bool, e_enabled: bool, f_enabled: bool):
         if d_enabled or e_enabled:
             fut = fetch_stock_futures_snapshot(symbol)
             if fut and fut.get("open_interest"):
@@ -268,6 +287,33 @@ class StrategyEngine:
             return
 
         candidates: List[Dict[str, Any]] = []
+
+        if a_enabled:
+            alert = rules.evaluate_vwap_pullback(df5)
+            if alert:
+                candidates.append(alert)
+
+        if b_enabled:
+            alert = rules.evaluate_breakdown_spike(df5)
+            if alert:
+                candidates.append(alert)
+
+        if c_enabled:
+            today_str = now.strftime("%Y-%m-%d")
+            orb_state = self._orb_levels.get(symbol)
+            if orb_state is None or orb_state.get("date") != today_str:
+                levels = rules.compute_orb_levels(df5, now.date())
+                if levels:
+                    orb_state = {"date": today_str, **levels}
+                    self._orb_levels[symbol] = orb_state
+
+            if orb_state:
+                alert = rules.evaluate_orb(df5, orb_state["orb_high"], orb_state["orb_low"])
+                if alert:
+                    fired_key = (today_str, symbol, alert["direction"])
+                    if fired_key not in self._orb_fired_today:
+                        self._orb_fired_today.add(fired_key)
+                        candidates.append(alert)
 
         if d_enabled:
             oi_change = get_oi_change_15min(symbol, now=now)
