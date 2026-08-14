@@ -17,8 +17,25 @@ async function apiFetch(url, options = {}) {
     const { timeoutMs, headers, ...rest } = options;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs || DEFAULT_FETCH_TIMEOUT_MS);
+    
+    // Add cache-busting query parameter for GET requests
+    let finalUrl = url;
+    if (!options.method || options.method.toUpperCase() === 'GET') {
+        const sep = finalUrl.includes('?') ? '&' : '?';
+        finalUrl = `${finalUrl}${sep}_t=${Date.now()}`;
+    }
+
     try {
-        return await window.fetch(url, { ...rest, headers: headers || {}, signal: controller.signal });
+        return await window.fetch(finalUrl, {
+            ...rest,
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate',
+                'Pragma': 'no-cache',
+                ...(headers || {})
+            },
+            signal: controller.signal
+        });
     } finally {
         clearTimeout(timeoutId);
     }
@@ -864,7 +881,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Lightweight 10-sec live price updater — updates numbers in-place without re-rendering
+    function normalizeIndexKey(name) {
+        return String(name || '').replace(/[\s\-_^]/g, '').toUpperCase();
+    }
+
+    // Lightweight 5-sec live price updater — updates numbers in-place without re-rendering
     let lastBtstStatus = 'pre_btst';
     async function fetchLivePrices() {
         try {
@@ -879,8 +900,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.indices && Array.isArray(data.indices) && data.indices.length > 0) {
                 const indexMap = {};
                 data.indices.forEach(idx => {
-                    if (idx.index_name) indexMap[idx.index_name] = idx;
-                    if (idx.display_name) indexMap[idx.display_name] = idx;
+                    if (idx.index_name) indexMap[normalizeIndexKey(idx.index_name)] = idx;
+                    if (idx.display_name) indexMap[normalizeIndexKey(idx.display_name)] = idx;
                 });
 
                 // Top marquee ticker bar (#indexTickerTrack)
@@ -890,7 +911,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const idxName = item.dataset.indexName;
                         const nameEl = item.querySelector('strong');
                         const nameText = nameEl ? nameEl.textContent.trim() : '';
-                        const idx = (idxName && indexMap[idxName]) || (nameText && indexMap[nameText]);
+                        const idx = indexMap[normalizeIndexKey(idxName)] || indexMap[normalizeIndexKey(nameText)];
                         if (!idx) return;
                         const spans = item.querySelectorAll('span');
                         if (spans.length >= 1 && idx.ltp != null) {
@@ -917,7 +938,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const idxName = card.dataset.indexName;
                         const nameEl = card.querySelector('.index-card-name');
                         const nameText = nameEl ? nameEl.textContent.trim() : '';
-                        const idx = (idxName && indexMap[idxName]) || (nameText && indexMap[nameText]);
+                        const idx = indexMap[normalizeIndexKey(idxName)] || indexMap[normalizeIndexKey(nameText)];
                         if (!idx) return;
 
                         const ltpEl = card.querySelector('.index-card-ltp');
@@ -3001,19 +3022,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     // Update numbers in-place without touching innerHTML (preserves CSS marquee scroll position!)
                     const indexMap = {};
                     indices.forEach(idx => {
-                        if (idx.index_name) {
-                            indexMap[idx.index_name] = idx;
-                            if (idx.index_name === "NIFTY50") indexMap["NIFTY"] = idx;
-                            if (idx.index_name === "NIFTY") indexMap["NIFTY50"] = idx;
-                        }
-                        if (idx.display_name) indexMap[idx.display_name] = idx;
+                        if (idx.index_name) indexMap[normalizeIndexKey(idx.index_name)] = idx;
+                        if (idx.display_name) indexMap[normalizeIndexKey(idx.display_name)] = idx;
                     });
                     indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
                         const idxName = item.dataset.indexName;
                         const nameEl = item.querySelector('strong');
                         const nameText = nameEl ? nameEl.textContent.trim() : '';
-                        const fallback = DEFAULT_INDEX_FALLBACKS.find(f => f.index_name === idxName || f.display_name === nameText) || DEFAULT_INDEX_FALLBACKS[0];
-                        const idx = (idxName && indexMap[idxName]) || (nameText && indexMap[nameText]) || fallback;
+                        const fallback = DEFAULT_INDEX_FALLBACKS.find(f => normalizeIndexKey(f.index_name) === normalizeIndexKey(idxName) || normalizeIndexKey(f.display_name) === normalizeIndexKey(nameText)) || DEFAULT_INDEX_FALLBACKS[0];
+                        const idx = indexMap[normalizeIndexKey(idxName)] || indexMap[normalizeIndexKey(nameText)] || fallback;
                         const spans = item.querySelectorAll('span');
                         if (spans.length >= 2) {
                             const rawLtp = idx.ltp != null ? idx.ltp : fallback.ltp;
