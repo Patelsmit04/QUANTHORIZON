@@ -41,6 +41,37 @@ async function apiFetch(url, options = {}) {
     }
 }
 
+function escapeHtml(str) {
+    if (str === null || str === undefined) return "";
+    const div = document.createElement("div");
+    div.textContent = String(str);
+    return div.innerHTML;
+}
+window.escapeHtml = escapeHtml;
+
+function escapeAttr(str) {
+    return escapeHtml(str).replace(/"/g, "&quot;");
+}
+window.escapeAttr = escapeAttr;
+
+function getRsiColorClass(rsi) {
+    const val = Number(rsi);
+    if (isNaN(val)) return "text-cyan";
+    if (val >= 65) return "text-bullish";
+    if (val <= 35) return "text-bearish";
+    return "text-cyan";
+}
+window.getRsiColorClass = getRsiColorClass;
+
+function getScoreColorClass(score) {
+    const val = Number(score);
+    if (isNaN(val)) return "score-med";
+    if (val >= 85) return "score-high";
+    if (val >= 65) return "score-med";
+    return "score-low";
+}
+window.getScoreColorClass = getScoreColorClass;
+
 function getStockLogoHTML(symbol) {
     if (!symbol) return '';
     const cleanSym = String(symbol).trim().toUpperCase();
@@ -55,6 +86,7 @@ function getStockLogoHTML(symbol) {
         `<span class="stock-logo-initials" style="display:none;">${initials}</span>` +
         `</div>`;
 }
+window.getStockLogoHTML = getStockLogoHTML;
 
 document.addEventListener("DOMContentLoaded", () => {
     // Application State
@@ -4292,6 +4324,7 @@ function filterAndRenderLiveTradeCards(tab) {
 }
 
 async function renderStockDetailPage(symbol, timeframe = "15") {
+    if (!symbol) return;
     const titleEl = document.getElementById("stockDetailHeaderTitle");
     const badgeEl = document.getElementById("stockDetailHeaderBadge");
     const gridEl = document.getElementById("stockDetailAnalysisGrid");
@@ -4313,141 +4346,146 @@ async function renderStockDetailPage(symbol, timeframe = "15") {
     };
 
     const updateHeaderAndGrid = (s) => {
-        const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(s.symbol) : '';
-        const ltpVal = s.ltp ? Number(s.ltp).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '1,245.50';
-        const pctVal = s.pct_change !== undefined ? Number(s.pct_change) : (s.change_pct !== undefined ? Number(s.change_pct) : 1.25);
-        const pctClass = pctVal >= 0 ? "text-bullish" : "text-bearish";
-        const isBull = (s.signal || "").includes("BTST") || (s.signal || "").includes("BUY") || (s.option_type || "").includes("CE");
-        const badgeClass = isBull ? "badge-bullish" : ((s.signal || "").includes("STBT") || (s.signal || "").includes("SELL") ? "badge-bearish" : "badge");
-        const sigText = s.signal || (isBull ? "BTST (BUY)" : "STBT (SELL)");
+        try {
+            const sym = s.symbol || symbol;
+            const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(sym) : '';
+            const ltpVal = s.ltp ? Number(s.ltp).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '1,245.50';
+            const pctVal = s.pct_change !== undefined ? Number(s.pct_change) : (s.change_pct !== undefined ? Number(s.change_pct) : 1.25);
+            const pctClass = pctVal >= 0 ? "text-bullish" : "text-bearish";
+            const isBull = (s.signal || "").includes("BTST") || (s.signal || "").includes("BUY") || (s.option_type || "").includes("CE");
+            const badgeClass = isBull ? "badge-bullish" : ((s.signal || "").includes("STBT") || (s.signal || "").includes("SELL") ? "badge-bearish" : "badge");
+            const sigText = s.signal || (isBull ? "BTST (BUY)" : "STBT (SELL)");
 
-        if (titleEl) {
-            titleEl.innerHTML = `
-                <div class="symbol-with-logo" style="display:flex;align-items:center;gap:12px;">
-                    ${logoHtml}
-                    <div>
-                        <h2 style="font-size:20px;font-weight:800;color:#fff;margin:0;letter-spacing:0.5px;">${escapeHtml(s.symbol)}</h2>
-                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">NSE &bull; F&amp;O Universe</div>
+            if (titleEl) {
+                titleEl.innerHTML = `
+                    <div class="symbol-with-logo" style="display:flex;align-items:center;gap:12px;">
+                        ${logoHtml}
+                        <div>
+                            <h2 style="font-size:20px;font-weight:800;color:#fff;margin:0;letter-spacing:0.5px;">${escapeHtml(sym)}</h2>
+                            <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">NSE &bull; F&amp;O Universe</div>
+                        </div>
                     </div>
-                </div>
-                <div style="margin-left:16px;">
-                    <div style="font-size:20px;font-weight:800;color:#fff;">₹${ltpVal}</div>
-                    <div class="${pctClass}" style="font-size:12px;font-weight:700;">${pctVal >= 0 ? '+' : ''}${pctVal.toFixed(2)}%</div>
-                </div>
-            `;
-        }
+                    <div style="margin-left:16px;">
+                        <div style="font-size:20px;font-weight:800;color:#fff;">₹${ltpVal}</div>
+                        <div class="${pctClass}" style="font-size:12px;font-weight:700;">${pctVal >= 0 ? '+' : ''}${pctVal.toFixed(2)}%</div>
+                    </div>
+                `;
+            }
 
-        if (badgeEl) {
-            badgeEl.innerHTML = `<span class="badge ${badgeClass}" style="font-size:13px;font-weight:800;padding:6px 16px;border-radius:20px;">${escapeHtml(sigText)}</span>`;
-        }
+            if (badgeEl) {
+                badgeEl.innerHTML = `<span class="badge ${badgeClass}" style="font-size:13px;font-weight:800;padding:6px 16px;border-radius:20px;">${escapeHtml(sigText)}</span>`;
+            }
 
-        if (gridEl) {
-            const rawLtp = s.ltp || 1245.50;
-            const tp1 = (isBull ? rawLtp * 1.02 : rawLtp * 0.98).toFixed(2);
-            const tp2 = (isBull ? rawLtp * 1.04 : rawLtp * 0.96).toFixed(2);
-            const sl = (isBull ? rawLtp * 0.985 : rawLtp * 1.015).toFixed(2);
-            const estGapVal = s.predicted_gap_pct !== undefined ? s.predicted_gap_pct : (isBull ? 2.0 : -2.0);
-            const volSurgeVal = s.volume_spike || s.volume_surge_ratio || 3.2;
-            const rsiVal = s.rsi || 58.6;
-            const optionTypeVal = s.option_type || (isBull ? "CALL (CE)" : "PUT (PE)");
-            const priorityVal = s.priority_level || "P1_HIGH";
-            const weightVal = `${(s.confirmed_pillars_weight || 3.5).toFixed(1)} / ${(s.required_pillars || 3.0).toFixed(1)} Wt`;
+            if (gridEl) {
+                const rawLtp = Number(s.ltp || 1245.50);
+                const tp1 = (isBull ? rawLtp * 1.02 : rawLtp * 0.98).toFixed(2);
+                const tp2 = (isBull ? rawLtp * 1.04 : rawLtp * 0.96).toFixed(2);
+                const sl = (isBull ? rawLtp * 0.985 : rawLtp * 1.015).toFixed(2);
+                const estGapVal = s.predicted_gap_pct !== undefined ? s.predicted_gap_pct : (isBull ? 2.0 : -2.0);
+                const volSurgeVal = s.volume_spike || s.volume_surge_ratio || 3.2;
+                const rsiVal = s.rsi !== undefined ? s.rsi : 58.6;
+                const optionTypeVal = s.option_type || (isBull ? "CALL (CE)" : "PUT (PE)");
+                const priorityVal = s.priority_level || "P1_HIGH";
+                const weightVal = `${Number(s.confirmed_pillars_weight || 3.5).toFixed(1)} / ${Number(s.required_pillars || 3.0).toFixed(1)} Wt`;
 
-            gridEl.className = "grid grid-cols-2 md:grid-cols-4 gap-4 mt-4";
-            gridEl.innerHTML = `
-                <!-- Card 1: Option Type -->
-                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-layer-group text-gold"></i> OPTION TYPE
+                gridEl.className = "grid grid-cols-2 md:grid-cols-4 gap-4 mt-4";
+                gridEl.innerHTML = `
+                    <!-- Card 1: Option Type -->
+                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                            <i class="fa-solid fa-layer-group text-gold"></i> OPTION TYPE
+                        </div>
+                        <div>
+                            <span class="badge ${isBull ? 'badge-bullish' : 'badge-bearish'}" style="font-size:13px;font-weight:800;padding:6px 12px;border-radius:8px;">
+                                ${optionTypeVal.includes("CE") || optionTypeVal.includes("CALL") ? 'CALL (CE)' : (optionTypeVal.includes("PE") || optionTypeVal.includes("PUT") ? 'PUT (PE)' : escapeHtml(optionTypeVal))}
+                            </span>
+                        </div>
                     </div>
-                    <div>
-                        <span class="badge ${isBull ? 'badge-bullish' : 'badge-bearish'}" style="font-size:13px;font-weight:800;padding:6px 12px;border-radius:8px;">
-                            ${optionTypeVal.includes("CE") || optionTypeVal.includes("CALL") ? 'CALL (CE)' : (optionTypeVal.includes("PE") || optionTypeVal.includes("PUT") ? 'PUT (PE)' : escapeHtml(optionTypeVal))}
-                        </span>
-                    </div>
-                </div>
 
-                <!-- Card 2: Est. Gap -->
-                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-chart-line text-gold"></i> EST. GAP
+                    <!-- Card 2: Est. Gap -->
+                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                            <i class="fa-solid fa-chart-line text-gold"></i> EST. GAP
+                        </div>
+                        <div>
+                            <span class="est-gap-pill ${estGapVal >= 0 ? 'est-gap-up' : 'est-gap-down'}" style="font-size:14px;font-weight:800;padding:4px 10px;border-radius:6px;">
+                                ${estGapVal >= 0 ? '+' : ''}${Number(estGapVal).toFixed(1)}% EST
+                            </span>
+                        </div>
                     </div>
-                    <div>
-                        <span class="est-gap-pill ${estGapVal >= 0 ? 'est-gap-up' : 'est-gap-down'}" style="font-size:14px;font-weight:800;padding:4px 10px;border-radius:6px;">
-                            ${estGapVal >= 0 ? '+' : ''}${Number(estGapVal).toFixed(1)}% EST
-                        </span>
-                    </div>
-                </div>
 
-                <!-- Card 3: Vol Surge -->
-                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-fire text-gold"></i> VOL SURGE
+                    <!-- Card 3: Vol Surge -->
+                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                            <i class="fa-solid fa-fire text-gold"></i> VOL SURGE
+                        </div>
+                        <div style="font-size:14px;font-weight:800;">
+                            <span class="badge-amber-vol" style="padding:4px 10px;border-radius:6px;"><i class="fa-solid fa-fire"></i> ${Number(volSurgeVal).toFixed(2)}x HIGH VOL</span>
+                        </div>
                     </div>
-                    <div style="font-size:14px;font-weight:800;">
-                        <span class="badge-amber-vol" style="padding:4px 10px;border-radius:6px;"><i class="fa-solid fa-fire"></i> ${Number(volSurgeVal).toFixed(2)}x HIGH VOL</span>
-                    </div>
-                </div>
 
-                <!-- Card 4: RSI -->
-                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-wave-square text-gold"></i> RSI
+                    <!-- Card 4: RSI -->
+                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                            <i class="fa-solid fa-wave-square text-gold"></i> RSI
+                        </div>
+                        <div>
+                            <span class="rsi-badge ${getRsiColorClass(rsiVal)}" style="font-size:14px;font-weight:800;padding:4px 10px;">${Number(rsiVal).toFixed(1)}</span>
+                        </div>
                     </div>
-                    <div>
-                        <span class="rsi-badge ${getRsiColorClass(rsiVal)}" style="font-size:14px;font-weight:800;padding:4px 10px;">${Number(rsiVal).toFixed(1)}</span>
-                    </div>
-                </div>
 
-                <!-- Card 5: Pillar Weight -->
-                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-scale-balanced text-gold"></i> PILLAR WEIGHT
+                    <!-- Card 5: Pillar Weight -->
+                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                            <i class="fa-solid fa-scale-balanced text-gold"></i> PILLAR WEIGHT
+                        </div>
+                        <div style="font-size:14px;font-weight:800;color:var(--gold);">
+                            ${weightVal}
+                        </div>
                     </div>
-                    <div style="font-size:14px;font-weight:800;color:var(--gold);">
-                        ${weightVal}
-                    </div>
-                </div>
 
-                <!-- Card 6: Priority -->
-                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-flag text-gold"></i> PRIORITY
+                    <!-- Card 6: Priority -->
+                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                            <i class="fa-solid fa-flag text-gold"></i> PRIORITY
+                        </div>
+                        <div>
+                            <span class="badge badge-gold" style="font-size:13px;font-weight:800;padding:4px 10px;">
+                                ${String(priorityVal).includes("1") || String(priorityVal).includes("HIGH") ? 'PRIORITY 1 HIGH' : 'PRIORITY 2'}
+                            </span>
+                        </div>
                     </div>
-                    <div>
-                        <span class="badge badge-gold" style="font-size:13px;font-weight:800;padding:4px 10px;">
-                            ${priorityVal.includes("1") || priorityVal.includes("HIGH") ? 'PRIORITY 1 HIGH' : 'PRIORITY 2'}
-                        </span>
-                    </div>
-                </div>
 
-                <!-- Card 7: Target Breakout Levels -->
-                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-bullseye text-gold"></i> TARGET BREAKOUTS
+                    <!-- Card 7: Target Breakout Levels -->
+                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                            <i class="fa-solid fa-bullseye text-gold"></i> TARGET BREAKOUTS
+                        </div>
+                        <div style="font-size:13px;font-weight:800;color:var(--bullish-green, #10b981);">
+                            TP1: ₹${tp1} <span style="color:var(--ink-muted);margin:0 4px;">|</span> TP2: ₹${tp2}
+                        </div>
                     </div>
-                    <div style="font-size:13px;font-weight:800;color:var(--bullish-green, #10b981);">
-                        TP1: ₹${tp1} <span style="color:var(--ink-muted);margin:0 4px;">|</span> TP2: ₹${tp2}
-                    </div>
-                </div>
 
-                <!-- Card 8: Stop Loss Level -->
-                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-shield-halved text-gold"></i> STOP LOSS (SL)
+                    <!-- Card 8: Stop Loss Level -->
+                    <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                            <i class="fa-solid fa-shield-halved text-gold"></i> STOP LOSS (SL)
+                        </div>
+                        <div style="font-size:14px;font-weight:800;color:var(--bearish-red, #ef4444);">
+                            ₹${sl}
+                        </div>
                     </div>
-                    <div style="font-size:14px;font-weight:800;color:var(--bearish-red, #ef4444);">
-                        ₹${sl}
-                    </div>
-                </div>
-            `;
+                `;
+            }
+        } catch (renderErr) {
+            console.error("Error in updateHeaderAndGrid:", renderErr);
         }
     };
 
     // Render immediately with initial data
     updateHeaderAndGrid(stock);
 
-    // Mount interactive Lightweight Charts candlestick graph
+    // Mount interactive candlestick graph
     renderLightweightCandleChart(symbol, timeframe);
 
     // Asynchronously fetch complete quantitative details to enrich view
@@ -4490,12 +4528,12 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
         console.warn("Chart API fetch error:", e);
     }
 
+    const now = Math.floor(Date.now() / 1000);
     if (!candles || candles.length === 0) {
         const stocksList = window.allStocks || [];
         const stock = stocksList.find(s => s.symbol === symbol) || { ltp: 1245.50 };
-        const basePrice = stock.ltp || 1245.50;
+        const basePrice = Number(stock.ltp || 1245.50);
         let price = basePrice * 0.97;
-        const now = Math.floor(Date.now() / 1000);
         candles = [];
         for (let i = 50; i >= 0; i--) {
             const change = (Math.random() - 0.48) * (basePrice * 0.01);
@@ -4518,7 +4556,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
 
     mountNode.innerHTML = "";
 
-    if (window.LightweightCharts) {
+    if (window.LightweightCharts && typeof window.LightweightCharts.createChart === 'function') {
         try {
             const chart = window.LightweightCharts.createChart(mountNode, {
                 width: mountNode.clientWidth || container.clientWidth || 800,
@@ -4551,29 +4589,55 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                 scaleMargins: { top: 0.82, bottom: 0 },
             });
 
-            const validCandles = candles
-                .filter(c => c.ts)
+            // Map and ensure strictly increasing timestamps
+            let lastTime = 0;
+            const uniqueCandleData = [];
+            const uniqueVolumeData = [];
+
+            const sortedCandles = candles
+                .map((c, i) => {
+                    let ts = c.ts;
+                    if (!ts || isNaN(ts)) {
+                        ts = now - (candles.length - i) * 900;
+                    }
+                    return {
+                        ts: Number(ts),
+                        open: Number(c.open || 100),
+                        high: Number(c.high || c.open || 100),
+                        low: Number(c.low || c.open || 100),
+                        close: Number(c.close || 100),
+                        volume: Number(c.volume || 1000)
+                    };
+                })
                 .sort((a, b) => a.ts - b.ts);
 
-            const candleData = validCandles.map(c => ({
-                time: c.ts,
-                open: c.open,
-                high: c.high,
-                low: c.low,
-                close: c.close
-            }));
+            sortedCandles.forEach((c) => {
+                let t = c.ts;
+                if (t <= lastTime) {
+                    t = lastTime + 60;
+                }
+                lastTime = t;
 
-            const volumeData = validCandles.map(c => ({
-                time: c.ts,
-                value: c.volume || 1000,
-                color: c.close >= c.open ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'
-            }));
+                uniqueCandleData.push({
+                    time: t,
+                    open: c.open,
+                    high: c.high,
+                    low: c.low,
+                    close: c.close
+                });
 
-            candlestickSeries.setData(candleData);
-            volumeSeries.setData(volumeData);
+                uniqueVolumeData.push({
+                    time: t,
+                    value: c.volume,
+                    color: c.close >= c.open ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'
+                });
+            });
 
-            if (candleData.length > 0) {
-                const latest = candleData[candleData.length - 1].close;
+            candlestickSeries.setData(uniqueCandleData);
+            volumeSeries.setData(uniqueVolumeData);
+
+            if (uniqueCandleData.length > 0) {
+                const latest = uniqueCandleData[uniqueCandleData.length - 1].close;
                 const tp1Val = (setups && setups.length > 0 && setups[0].tp_price) ? setups[0].tp_price : Number((latest * 1.02).toFixed(2));
                 const slVal = (setups && setups.length > 0 && setups[0].sl_price) ? setups[0].sl_price : Number((latest * 0.985).toFixed(2));
 

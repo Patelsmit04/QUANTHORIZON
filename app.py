@@ -6,7 +6,7 @@ import threading
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timezone, timedelta
-from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, Header, Depends, Response
+from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, Header, Depends, Response, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -96,6 +96,17 @@ app = FastAPI(
     version="5.0.0",
     lifespan=lifespan
 )
+
+
+@app.middleware("http")
+async def add_no_cache_headers_for_static(request: Request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+    if path.startswith("/static/") or path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
 
 
 class StrategyCreateRequest(BaseModel):
