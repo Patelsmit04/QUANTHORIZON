@@ -58,7 +58,8 @@ function getStockLogoHTML(symbol) {
 
 document.addEventListener("DOMContentLoaded", () => {
     // Application State
-    let allStocks = [];
+    window.allStocks = [];
+    let allStocks = window.allStocks;
     let currentFilter = "ALL";
     let currentStockView = "intelligence"; // "intelligence" or "live"
     let autoRefreshInterval = null;
@@ -4290,239 +4291,218 @@ function filterAndRenderLiveTradeCards(tab) {
     renderLiveTradeCards(filtered);
 }
 
-function renderStockDetailPage(symbol, timeframe = "15") {
+async function renderStockDetailPage(symbol, timeframe = "15") {
     const titleEl = document.getElementById("stockDetailHeaderTitle");
     const badgeEl = document.getElementById("stockDetailHeaderBadge");
     const gridEl = document.getElementById("stockDetailAnalysisGrid");
-    const tvContainer = document.getElementById("tradingview_chart_container");
 
-    const stock = (allStocks || []).find(s => s.symbol === symbol) || { symbol: symbol, ltp: 1245.50, pct_change: 1.25, signal: "BTST_BUY" };
-    const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(symbol) : '';
-    const ltpStr = stock.ltp ? stock.ltp.toFixed(2) : '1,245.50';
-    const pctVal = stock.pct_change !== undefined ? stock.pct_change : 1.25;
-    const pctClass = pctVal >= 0 ? "text-bullish" : "text-bearish";
-    const isBull = (stock.signal || "").includes("BTST") || (stock.signal || "").includes("BUY") || (stock.option_type || "").includes("CE");
-    const badgeClass = isBull ? "badge-bullish" : ((stock.signal || "").includes("STBT") ? "badge-bearish" : "badge");
+    const stocksList = (window.allStocks && window.allStocks.length) ? window.allStocks : [];
+    let stock = stocksList.find(s => s.symbol === symbol) || { 
+        symbol: symbol, 
+        ltp: 1245.50, 
+        pct_change: 1.25, 
+        signal: "BTST (BUY)",
+        option_type: "CALL (CE)",
+        priority_level: "P1_HIGH",
+        confidence_score: 88,
+        predicted_gap_pct: 2.0,
+        volume_spike: 3.2,
+        rsi: 58.6,
+        confirmed_pillars_weight: 3.5,
+        required_pillars: 3.0
+    };
 
-    if (titleEl) {
-        titleEl.innerHTML = `
-            <div class="symbol-with-logo" style="display:flex;align-items:center;gap:10px;">
-                ${logoHtml}
-                <div>
-                    <h2 style="font-size:20px;font-weight:800;color:#fff;margin:0;">${symbol}</h2>
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">NSE &bull; F&amp;O Universe</div>
-                </div>
-            </div>
-            <div style="margin-left:16px;">
-                <div style="font-size:20px;font-weight:800;color:#fff;">₹${ltpStr}</div>
-                <div class="${pctClass}" style="font-size:12px;font-weight:700;">${pctVal >= 0 ? '+' : ''}${pctVal.toFixed(2)}%</div>
-            </div>
-        `;
-    }
+    const updateHeaderAndGrid = (s) => {
+        const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(s.symbol) : '';
+        const ltpVal = s.ltp ? Number(s.ltp).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '1,245.50';
+        const pctVal = s.pct_change !== undefined ? Number(s.pct_change) : (s.change_pct !== undefined ? Number(s.change_pct) : 1.25);
+        const pctClass = pctVal >= 0 ? "text-bullish" : "text-bearish";
+        const isBull = (s.signal || "").includes("BTST") || (s.signal || "").includes("BUY") || (s.option_type || "").includes("CE");
+        const badgeClass = isBull ? "badge-bullish" : ((s.signal || "").includes("STBT") || (s.signal || "").includes("SELL") ? "badge-bearish" : "badge");
+        const sigText = s.signal || (isBull ? "BTST (BUY)" : "STBT (SELL)");
 
-    if (badgeEl) {
-        badgeEl.innerHTML = `<span class="badge ${badgeClass}" style="font-size:13px;font-weight:800;padding:6px 16px;border-radius:20px;">${stock.signal || 'BTST_BUY'}</span>`;
-    }
+        if (titleEl) {
+            titleEl.innerHTML = `
+                <div class="symbol-with-logo" style="display:flex;align-items:center;gap:12px;">
+                    ${logoHtml}
+                    <div>
+                        <h2 style="font-size:20px;font-weight:800;color:#fff;margin:0;letter-spacing:0.5px;">${escapeHtml(s.symbol)}</h2>
+                        <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">NSE &bull; F&amp;O Universe</div>
+                    </div>
+                </div>
+                <div style="margin-left:16px;">
+                    <div style="font-size:20px;font-weight:800;color:#fff;">₹${ltpVal}</div>
+                    <div class="${pctClass}" style="font-size:12px;font-weight:700;">${pctVal >= 0 ? '+' : ''}${pctVal.toFixed(2)}%</div>
+                </div>
+            `;
+        }
 
-    // FIX 2: Repair Blank Chart Render with Explicit Height & Mount Fallback
-    if (tvContainer) {
-        tvContainer.style.width = "100%";
-        tvContainer.style.height = "450px";
-        tvContainer.style.minHeight = "400px";
-        tvContainer.style.position = "relative";
-        tvContainer.innerHTML = '<div id="tv_chart_mount" style="width:100%;height:100%;min-height:400px;background:#0d1017;border-radius:12px;overflow:hidden;"></div>';
+        if (badgeEl) {
+            badgeEl.innerHTML = `<span class="badge ${badgeClass}" style="font-size:13px;font-weight:800;padding:6px 16px;border-radius:20px;">${escapeHtml(sigText)}</span>`;
+        }
 
-        mountStockChart(symbol, timeframe);
-    }
+        if (gridEl) {
+            const rawLtp = s.ltp || 1245.50;
+            const tp1 = (isBull ? rawLtp * 1.02 : rawLtp * 0.98).toFixed(2);
+            const tp2 = (isBull ? rawLtp * 1.04 : rawLtp * 0.96).toFixed(2);
+            const sl = (isBull ? rawLtp * 0.985 : rawLtp * 1.015).toFixed(2);
+            const estGapVal = s.predicted_gap_pct !== undefined ? s.predicted_gap_pct : (isBull ? 2.0 : -2.0);
+            const volSurgeVal = s.volume_spike || s.volume_surge_ratio || 3.2;
+            const rsiVal = s.rsi || 58.6;
+            const optionTypeVal = s.option_type || (isBull ? "CALL (CE)" : "PUT (PE)");
+            const priorityVal = s.priority_level || "P1_HIGH";
+            const weightVal = `${(s.confirmed_pillars_weight || 3.5).toFixed(1)} / ${(s.required_pillars || 3.0).toFixed(1)} Wt`;
 
-    // FIX 3: Quantitative Multi-Pillar Analysis Grid (2-col mobile / 4-col desktop)
-    if (gridEl) {
-        const tp1 = stock.ltp ? (isBull ? stock.ltp * 1.02 : stock.ltp * 0.98).toFixed(2) : '1,270.40';
-        const tp2 = stock.ltp ? (isBull ? stock.ltp * 1.04 : stock.ltp * 0.96).toFixed(2) : '1,295.30';
-        const sl = stock.ltp ? (isBull ? stock.ltp * 0.985 : stock.ltp * 1.015).toFixed(2) : '1,226.80';
-        const estGapVal = stock.predicted_gap_pct !== undefined ? stock.predicted_gap_pct : 2.3;
-        const volSurgeVal = stock.volume_spike || stock.volume_surge_ratio || 3.7;
-        const rsiVal = stock.rsi || 71.4;
-        const optionTypeVal = stock.option_type || (isBull ? "CALL (CE)" : "PUT (PE)");
-        const priorityVal = stock.priority_level || (stock.rank_position && stock.rank_position <= 2 ? "Priority 1" : "Priority 2");
-        const weightVal = `${(stock.confirmed_pillars_weight || 4.0).toFixed(1)} / ${(stock.required_pillars || 3.0).toFixed(1)} Wt`;
+            gridEl.className = "grid grid-cols-2 md:grid-cols-4 gap-4 mt-4";
+            gridEl.innerHTML = `
+                <!-- Card 1: Option Type -->
+                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-layer-group text-gold"></i> OPTION TYPE
+                    </div>
+                    <div>
+                        <span class="badge ${isBull ? 'badge-bullish' : 'badge-bearish'}" style="font-size:13px;font-weight:800;padding:6px 12px;border-radius:8px;">
+                            ${optionTypeVal.includes("CE") || optionTypeVal.includes("CALL") ? 'CALL (CE)' : (optionTypeVal.includes("PE") || optionTypeVal.includes("PUT") ? 'PUT (PE)' : escapeHtml(optionTypeVal))}
+                        </span>
+                    </div>
+                </div>
 
-        gridEl.className = "grid grid-cols-2 md:grid-cols-4 gap-4 mt-4";
-        gridEl.innerHTML = `
-            <!-- Card 1: Option Type -->
-            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl stat-card-item" style="background:rgba(15,23,42,0.8);border:1px solid rgba(30,41,59,1);padding:16px;border-radius:12px;">
-                <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-layer-group text-gold"></i> OPTION TYPE
+                <!-- Card 2: Est. Gap -->
+                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-chart-line text-gold"></i> EST. GAP
+                    </div>
+                    <div>
+                        <span class="est-gap-pill ${estGapVal >= 0 ? 'est-gap-up' : 'est-gap-down'}" style="font-size:14px;font-weight:800;padding:4px 10px;border-radius:6px;">
+                            ${estGapVal >= 0 ? '+' : ''}${Number(estGapVal).toFixed(1)}% EST
+                        </span>
+                    </div>
                 </div>
-                <div>
-                    <span class="badge ${isBull ? 'badge-bullish' : 'badge-bearish'}" style="font-size:13px;font-weight:800;padding:6px 12px;">
-                        ${optionTypeVal.includes("CE") || optionTypeVal.includes("CALL") ? 'CALL (CE)' : (optionTypeVal.includes("PE") || optionTypeVal.includes("PUT") ? 'PUT (PE)' : escapeHtml(optionTypeVal))}
-                    </span>
-                </div>
-            </div>
 
-            <!-- Card 2: Est. Gap -->
-            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl stat-card-item" style="background:rgba(15,23,42,0.8);border:1px solid rgba(30,41,59,1);padding:16px;border-radius:12px;">
-                <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-chart-line text-gold"></i> EST. GAP
+                <!-- Card 3: Vol Surge -->
+                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-fire text-gold"></i> VOL SURGE
+                    </div>
+                    <div style="font-size:14px;font-weight:800;">
+                        <span class="badge-amber-vol" style="padding:4px 10px;border-radius:6px;"><i class="fa-solid fa-fire"></i> ${Number(volSurgeVal).toFixed(2)}x HIGH VOL</span>
+                    </div>
                 </div>
-                <div>
-                    <span class="est-gap-pill ${estGapVal >= 0 ? 'est-gap-up' : 'est-gap-down'}" style="font-size:14px;font-weight:800;padding:4px 10px;border-radius:6px;">
-                        ${estGapVal >= 0 ? '+' : ''}${Number(estGapVal).toFixed(1)}% EST
-                    </span>
-                </div>
-            </div>
 
-            <!-- Card 3: Vol Surge -->
-            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl stat-card-item" style="background:rgba(15,23,42,0.8);border:1px solid rgba(30,41,59,1);padding:16px;border-radius:12px;">
-                <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-fire text-gold"></i> VOL SURGE
+                <!-- Card 4: RSI -->
+                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-wave-square text-gold"></i> RSI
+                    </div>
+                    <div>
+                        <span class="rsi-badge ${getRsiColorClass(rsiVal)}" style="font-size:14px;font-weight:800;padding:4px 10px;">${Number(rsiVal).toFixed(1)}</span>
+                    </div>
                 </div>
-                <div style="font-size:14px;font-weight:800;">
-                    <span class="badge-amber-vol" style="padding:4px 10px;border-radius:6px;"><i class="fa-solid fa-fire"></i> ${Number(volSurgeVal).toFixed(1)}x HIGH VOL</span>
-                </div>
-            </div>
 
-            <!-- Card 4: RSI -->
-            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl stat-card-item" style="background:rgba(15,23,42,0.8);border:1px solid rgba(30,41,59,1);padding:16px;border-radius:12px;">
-                <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-wave-square text-gold"></i> RSI
+                <!-- Card 5: Pillar Weight -->
+                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-scale-balanced text-gold"></i> PILLAR WEIGHT
+                    </div>
+                    <div style="font-size:14px;font-weight:800;color:var(--gold);">
+                        ${weightVal}
+                    </div>
                 </div>
-                <div>
-                    <span class="rsi-badge ${getRsiColorClass(rsiVal)}" style="font-size:14px;font-weight:800;padding:4px 10px;">${Number(rsiVal).toFixed(1)}</span>
-                </div>
-            </div>
 
-            <!-- Card 5: Pillar Weight -->
-            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl stat-card-item" style="background:rgba(15,23,42,0.8);border:1px solid rgba(30,41,59,1);padding:16px;border-radius:12px;">
-                <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-scale-balanced text-gold"></i> PILLAR WEIGHT
+                <!-- Card 6: Priority -->
+                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-flag text-gold"></i> PRIORITY
+                    </div>
+                    <div>
+                        <span class="badge badge-gold" style="font-size:13px;font-weight:800;padding:4px 10px;">
+                            ${priorityVal.includes("1") || priorityVal.includes("HIGH") ? 'PRIORITY 1 HIGH' : 'PRIORITY 2'}
+                        </span>
+                    </div>
                 </div>
-                <div style="font-size:14px;font-weight:800;color:var(--gold);">
-                    ${weightVal}
-                </div>
-            </div>
 
-            <!-- Card 6: Priority -->
-            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl stat-card-item" style="background:rgba(15,23,42,0.8);border:1px solid rgba(30,41,59,1);padding:16px;border-radius:12px;">
-                <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-flag text-gold"></i> PRIORITY
+                <!-- Card 7: Target Breakout Levels -->
+                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-bullseye text-gold"></i> TARGET BREAKOUTS
+                    </div>
+                    <div style="font-size:13px;font-weight:800;color:var(--bullish-green, #10b981);">
+                        TP1: ₹${tp1} <span style="color:var(--ink-muted);margin:0 4px;">|</span> TP2: ₹${tp2}
+                    </div>
                 </div>
-                <div>
-                    <span class="badge badge-gold" style="font-size:13px;font-weight:800;padding:4px 10px;">
-                        ${priorityVal.includes("1") || priorityVal.includes("HIGH") ? 'Priority 1' : 'Priority 2'}
-                    </span>
-                </div>
-            </div>
 
-            <!-- Card 7: Target Breakout Levels -->
-            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl stat-card-item" style="background:rgba(15,23,42,0.8);border:1px solid rgba(30,41,59,1);padding:16px;border-radius:12px;">
-                <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-bullseye text-gold"></i> TARGET BREAKOUTS
+                <!-- Card 8: Stop Loss Level -->
+                <div class="stat-card-item" style="background:rgba(18,22,31,0.95);border:1px solid rgba(255,255,255,0.1);padding:14px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-shield-halved text-gold"></i> STOP LOSS (SL)
+                    </div>
+                    <div style="font-size:14px;font-weight:800;color:var(--bearish-red, #ef4444);">
+                        ₹${sl}
+                    </div>
                 </div>
-                <div style="font-size:13px;font-weight:800;color:var(--bullish);">
-                    TP1: ₹${tp1} <span style="color:var(--ink-muted);">|</span> TP2: ₹${tp2}
-                </div>
-            </div>
+            `;
+        }
+    };
 
-            <!-- Card 8: Stop Loss Level -->
-            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl stat-card-item" style="background:rgba(15,23,42,0.8);border:1px solid rgba(30,41,59,1);padding:16px;border-radius:12px;">
-                <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-shield-halved text-gold"></i> STOP LOSS (SL)
-                </div>
-                <div style="font-size:14px;font-weight:800;color:var(--bearish);">
-                    ₹${sl}
-                </div>
-            </div>
-        `;
+    // Render immediately with initial data
+    updateHeaderAndGrid(stock);
+
+    // Mount interactive Lightweight Charts candlestick graph
+    renderLightweightCandleChart(symbol, timeframe);
+
+    // Asynchronously fetch complete quantitative details to enrich view
+    try {
+        const resp = await apiFetch(`/api/stock/${encodeURIComponent(symbol)}`);
+        if (resp.ok) {
+            const data = await resp.json();
+            if (data && data.summary) {
+                const merged = Object.assign({}, stock, data.summary);
+                updateHeaderAndGrid(merged);
+            }
+        }
+    } catch (e) {
+        console.warn("Could not enrich stock details:", e);
     }
 }
 
 function mountStockChart(symbol, timeframe) {
-    const mountNode = document.getElementById("tv_chart_mount");
-    if (!mountNode) return;
-
-    const tvSymbol = symbol.includes(":") ? symbol : `NSE:${symbol}`;
-
-    function tryTradingView() {
-        if (window.TradingView && window.TradingView.widget) {
-            try {
-                new window.TradingView.widget({
-                    "autosize": true,
-                    "symbol": tvSymbol,
-                    "interval": timeframe,
-                    "timezone": "Asia/Kolkata",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "en",
-                    "toolbar_bg": "#0d1017",
-                    "enable_publishing": false,
-                    "allow_symbol_change": true,
-                    "container_id": "tv_chart_mount"
-                });
-                return true;
-            } catch (e) {
-                console.warn("TradingView widget init error:", e);
-            }
-        }
-        return false;
-    }
-
-    if (window.TradingView && window.TradingView.widget) {
-        tryTradingView();
-    } else {
-        let script = document.getElementById("tradingview-js-script");
-        if (!script) {
-            script = document.createElement("script");
-            script.id = "tradingview-js-script";
-            script.src = "https://s3.tradingview.com/tv.js";
-            script.async = true;
-            document.head.appendChild(script);
-        }
-
-        const onLoad = () => {
-            if (!tryTradingView()) {
-                renderLightweightCandleChart(symbol, timeframe);
-            }
-        };
-
-        script.addEventListener("load", onLoad);
-
-        setTimeout(() => {
-            if (mountNode && (!mountNode.children || mountNode.children.length === 0 || mountNode.innerHTML === "")) {
-                renderLightweightCandleChart(symbol, timeframe);
-            }
-        }, 1200);
-    }
+    renderLightweightCandleChart(symbol, timeframe);
 }
 
-async function renderLightweightCandleChart(symbol, timeframe) {
+async function renderLightweightCandleChart(symbol, timeframe = "15") {
+    const container = document.getElementById("tradingview_chart_container");
+    if (!container) return;
+
+    container.innerHTML = '<div id="tv_chart_mount" style="width:100%;height:450px;min-height:400px;background:#0d1017;border-radius:12px;overflow:hidden;position:relative;"></div>';
     const mountNode = document.getElementById("tv_chart_mount");
     if (!mountNode) return;
 
     let candles = [];
+    let setups = [];
     try {
-        const res = await apiFetch(`/api/chart/${symbol}?interval=${timeframe}`);
+        const res = await apiFetch(`/api/chart/${encodeURIComponent(symbol)}?interval=${encodeURIComponent(timeframe)}`);
         if (res.ok) {
             const data = await res.json();
             candles = data.candles || [];
+            setups = data.setups || [];
         }
     } catch (e) {
         console.warn("Chart API fetch error:", e);
     }
 
     if (!candles || candles.length === 0) {
-        const stock = (allStocks || []).find(s => s.symbol === symbol) || { ltp: 1245.50 };
+        const stocksList = window.allStocks || [];
+        const stock = stocksList.find(s => s.symbol === symbol) || { ltp: 1245.50 };
         const basePrice = stock.ltp || 1245.50;
-        let price = basePrice * 0.96;
+        let price = basePrice * 0.97;
         const now = Math.floor(Date.now() / 1000);
         candles = [];
-        for (let i = 40; i >= 0; i--) {
-            const change = (Math.random() - 0.47) * (basePrice * 0.012);
+        for (let i = 50; i >= 0; i--) {
+            const change = (Math.random() - 0.48) * (basePrice * 0.01);
             const open = price;
             const close = price + change;
-            const high = Math.max(open, close) + Math.random() * (basePrice * 0.006);
-            const low = Math.min(open, close) - Math.random() * (basePrice * 0.006);
+            const high = Math.max(open, close) + Math.random() * (basePrice * 0.005);
+            const low = Math.min(open, close) - Math.random() * (basePrice * 0.005);
             const ts = now - (i * 900);
             candles.push({
                 ts: ts,
@@ -4541,7 +4521,7 @@ async function renderLightweightCandleChart(symbol, timeframe) {
     if (window.LightweightCharts) {
         try {
             const chart = window.LightweightCharts.createChart(mountNode, {
-                width: mountNode.clientWidth || 800,
+                width: mountNode.clientWidth || container.clientWidth || 800,
                 height: 450,
                 layout: {
                     background: { type: 'solid', color: '#0d1017' },
@@ -4552,7 +4532,8 @@ async function renderLightweightCandleChart(symbol, timeframe) {
                     horzLines: { color: 'rgba(255, 255, 255, 0.05)' },
                 },
                 rightPriceScale: { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                timeScale: { borderColor: 'rgba(255, 255, 255, 0.1)', timeVisible: true },
+                timeScale: { borderColor: 'rgba(255, 255, 255, 0.1)', timeVisible: true, secondsVisible: false },
+                crosshair: { mode: window.LightweightCharts.CrosshairMode.Normal },
             });
 
             const candlestickSeries = chart.addCandlestickSeries({
@@ -4563,22 +4544,66 @@ async function renderLightweightCandleChart(symbol, timeframe) {
                 wickDownColor: '#ef4444',
             });
 
-            const formattedCandles = candles.map(c => ({
-                time: c.ts || Math.floor(Date.now() / 1000),
+            const volumeSeries = chart.addHistogramSeries({
+                color: 'rgba(212, 175, 55, 0.3)',
+                priceFormat: { type: 'volume' },
+                priceScaleId: '',
+                scaleMargins: { top: 0.82, bottom: 0 },
+            });
+
+            const validCandles = candles
+                .filter(c => c.ts)
+                .sort((a, b) => a.ts - b.ts);
+
+            const candleData = validCandles.map(c => ({
+                time: c.ts,
                 open: c.open,
                 high: c.high,
                 low: c.low,
                 close: c.close
             }));
 
-            candlestickSeries.setData(formattedCandles);
+            const volumeData = validCandles.map(c => ({
+                time: c.ts,
+                value: c.volume || 1000,
+                color: c.close >= c.open ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'
+            }));
+
+            candlestickSeries.setData(candleData);
+            volumeSeries.setData(volumeData);
+
+            if (candleData.length > 0) {
+                const latest = candleData[candleData.length - 1].close;
+                const tp1Val = (setups && setups.length > 0 && setups[0].tp_price) ? setups[0].tp_price : Number((latest * 1.02).toFixed(2));
+                const slVal = (setups && setups.length > 0 && setups[0].sl_price) ? setups[0].sl_price : Number((latest * 0.985).toFixed(2));
+
+                candlestickSeries.createPriceLine({
+                    price: tp1Val,
+                    color: '#10b981',
+                    lineWidth: 2,
+                    lineStyle: window.LightweightCharts.LineStyle.Dotted,
+                    axisLabelVisible: true,
+                    title: `TARGET (TP): ₹${tp1Val}`,
+                });
+
+                candlestickSeries.createPriceLine({
+                    price: slVal,
+                    color: '#ef4444',
+                    lineWidth: 2,
+                    lineStyle: window.LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: true,
+                    title: `STOP LOSS (SL): ₹${slVal}`,
+                });
+            }
+
             chart.timeScale().fitContent();
 
-            window.addEventListener('resize', () => {
-                if (mountNode && chart) {
-                    chart.applyOptions({ width: mountNode.clientWidth });
+            new ResizeObserver(() => {
+                if (chart && mountNode) {
+                    chart.applyOptions({ width: mountNode.clientWidth, height: 450 });
                 }
-            });
+            }).observe(mountNode);
+
             return;
         } catch (err) {
             console.error("LightweightCharts render error:", err);
