@@ -893,18 +893,19 @@ document.addEventListener("DOMContentLoaded", () => {
                         const idx = (idxName && indexMap[idxName]) || (nameText && indexMap[nameText]);
                         if (!idx) return;
                         const spans = item.querySelectorAll('span');
-                        if (spans.length >= 2) {
-                            const ltp = idx.ltp != null ? idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '--';
-                            spans[0].textContent = ltp;
-                            if (spans.length >= 3 && idx.change_pts != null) {
-                                const isUp = idx.change_pts >= 0;
-                                const sign = isUp ? '+' : '';
-                                const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                                const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
-                                const pct = pctVal.toFixed(2);
-                                spans[2].textContent = `${sign}${pts} (${sign}${pct}%)`;
-                                spans[2].className = isUp ? 'text-bullish' : 'text-bearish';
-                            }
+                        if (spans.length >= 1 && idx.ltp != null) {
+                            const formattedLtp = idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            spans[0].textContent = formattedLtp;
+                        }
+                        const changeSpan = spans[1] || spans[2];
+                        if (changeSpan && idx.change_pts != null) {
+                            const isUp = idx.change_pts >= 0;
+                            const sign = isUp ? '+' : '';
+                            const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
+                            const pct = pctVal.toFixed(2);
+                            changeSpan.textContent = `${sign}${pts} (${sign}${pct}%)`;
+                            changeSpan.className = isUp ? 'text-bullish' : 'text-bearish';
                         }
                     });
                 }
@@ -960,7 +961,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.stocks.forEach(s => { stockMap[s.symbol] = s; });
 
                 if (allStocks.length === 0) {
-                    // Cold-start fallback: populate allStocks from 10-sec live prices endpoint
+                    // Cold-start fallback: populate allStocks from 5-sec live prices endpoint
                     allStocks = data.stocks.map((s, idx) => ({
                         symbol: s.symbol,
                         raw_ticker: `${s.symbol}.NS`,
@@ -1021,55 +1022,58 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (hasNew) filterAndRenderTable();
                     }
 
-                    // Update DOM in-place depending on current view
-                    if (currentStockView === "live") {
-                        // Update live stock cards in-place
-                        const liveGrid = document.getElementById("liveStocksGrid");
-                        if (liveGrid) {
-                            const cards = liveGrid.querySelectorAll('.live-stock-card');
-                            if (cards.length === 0) {
-                                filterAndRenderTable();
-                            } else {
-                                cards.forEach(card => {
-                                    const sym = card.dataset.symbol;
-                                    const s = stockMap[sym];
-                                    if (!s) return;
-                                    const isUp = (s.change_pts || 0) >= 0;
-                                    const sign = isUp ? '+' : '';
-                                    card.className = `live-stock-card ${isUp ? 'live-card-up' : 'live-card-down'}`;
-                                    const ltpEl = card.querySelector('.live-card-ltp');
-                                    if (ltpEl && s.ltp != null) {
-                                        ltpEl.textContent = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-                                    }
-                                    const changeEl = card.querySelector('.live-card-change');
-                                    if (changeEl && s.change_pts != null && s.pct_change != null) {
-                                        const arrowIcon = isUp ? 'fa-caret-up' : 'fa-caret-down';
-                                        changeEl.innerHTML = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
-                                    }
-                                });
-                            }
-                        }
-                    } else {
-                        // Update BTST table cells in-place
-                        if (stocksTableBody) {
-                            stocksTableBody.querySelectorAll('tr[data-row-key]').forEach(tr => {
-                                const key = tr.dataset.rowKey || '';
-                                const sym = key.split('-')[0];
+                    // Update Live Stock Grid Cards in-place
+                    const liveGrid = document.getElementById("liveStocksGrid");
+                    if (liveGrid) {
+                        const cards = liveGrid.querySelectorAll('.live-stock-card');
+                        if (cards.length === 0 && currentStockView === "live") {
+                            filterAndRenderTable();
+                        } else {
+                            cards.forEach(card => {
+                                const sym = card.dataset.symbol;
                                 const s = stockMap[sym];
                                 if (!s) return;
-                                const ltpCell = tr.querySelector('[data-label="LTP"]');
-                                if (ltpCell && s.ltp != null) {
-                                    ltpCell.innerHTML = `<strong>₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</strong>`;
+                                const isUp = (s.change_pts || 0) >= 0;
+                                const sign = isUp ? '+' : '';
+                                card.className = `live-stock-card ${isUp ? 'live-card-up' : 'live-card-down'}`;
+                                const ltpEl = card.querySelector('.live-card-ltp');
+                                if (ltpEl && s.ltp != null) {
+                                    const formattedLtp = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                                    if (ltpEl.textContent !== formattedLtp) {
+                                        ltpEl.textContent = formattedLtp;
+                                        ltpEl.classList.add('price-tick-flash');
+                                        setTimeout(() => ltpEl.classList.remove('price-tick-flash'), 800);
+                                    }
                                 }
-                                const changeCell = tr.querySelector('[data-label="CHANGE"]');
-                                if (changeCell && s.change_pts != null && s.pct_change != null) {
-                                    const isUp = s.change_pts >= 0;
-                                    const sign = isUp ? '+' : '';
-                                    const cls = isUp ? 'text-bullish' : 'text-bearish';
-                                    changeCell.innerHTML = `<span class="${cls}" style="font-weight:700;font-size:12px;">${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)</span>`;
+                                const changeEl = card.querySelector('.live-card-change');
+                                if (changeEl && s.change_pts != null && s.pct_change != null) {
+                                    const arrowIcon = isUp ? 'fa-caret-up' : 'fa-caret-down';
+                                    changeEl.innerHTML = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
                                 }
                             });
                         }
+                    }
+
+                    // Update BTST Scanner Table cells in-place
+                    if (stocksTableBody) {
+                        stocksTableBody.querySelectorAll('tr[data-row-key]').forEach(tr => {
+                            const key = tr.dataset.rowKey || '';
+                            const sym = key.split('-')[0];
+                            const s = stockMap[sym];
+                            if (!s) return;
+                            const ltpCell = tr.querySelector('[data-label="LTP"]');
+                            if (ltpCell && s.ltp != null) {
+                                const formattedLtp = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                                ltpCell.innerHTML = `<strong>${formattedLtp}</strong>`;
+                            }
+                            const changeCell = tr.querySelector('[data-label="CHANGE"]');
+                            if (changeCell && s.change_pts != null && s.pct_change != null) {
+                                const isUp = s.change_pts >= 0;
+                                const sign = isUp ? '+' : '';
+                                const cls = isUp ? 'text-bullish' : 'text-bearish';
+                                changeCell.innerHTML = `<span class="${cls}" style="font-weight:700;font-size:12px;">${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)</span>`;
+                            }
+                        });
                     }
                 }
             }

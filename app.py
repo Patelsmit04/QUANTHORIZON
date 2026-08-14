@@ -6,7 +6,7 @@ import threading
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timezone, timedelta
-from fastapi import FastAPI, HTTPException, Query, Body, WebSocket, WebSocketDisconnect, Header, Depends
+from fastapi import FastAPI, HTTPException, Query, Body, WebSocket, WebSocketDisconnect, Header, Depends, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -2180,10 +2180,21 @@ def get_stock_news_detail(symbol: str):
     return sanitize_json_data(cached)
 
 
+@app.middleware("http")
+async def add_no_cache_headers_middleware(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
+
 # -------------------------------------------------------------
 # INDEX SIGNALS (Nifty 50 / Bank Nifty / Sensex) — Default strategy's read
 # -------------------------------------------------------------
 @app.get("/api/indices")
+@app.get("/api/indices/live")
 def get_index_signals():
     """
     Current BTST/STBT-style signals for Nifty 50, Bank Nifty, and Sensex under the Default
@@ -2249,6 +2260,8 @@ def get_index_signals():
 
 
 @app.get("/api/live_prices")
+@app.get("/api/live-stocks")
+@app.get("/api/stocks/live")
 def get_live_prices():
     """Lightweight endpoint for 5-second polling — returns LTP, change_pts, pct_change
     for all cached indices and stocks. If cache is empty or stale (> 3s), fetches live quotes

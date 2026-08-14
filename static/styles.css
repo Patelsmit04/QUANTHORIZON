@@ -4323,6 +4323,17 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
     }
 }
 
+/* Real-time price tick pulse animation */
+@keyframes priceTickGlow {
+    0% { background-color: rgba(47, 209, 92, 0.22); color: #2fd15c; }
+    100% { background-color: transparent; }
+}
+
+.price-tick-flash {
+    animation: priceTickGlow 0.6s ease-out;
+    border-radius: 4px;
+}
+
 
 
 
