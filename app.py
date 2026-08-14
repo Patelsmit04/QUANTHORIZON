@@ -2887,22 +2887,22 @@ def get_chart_data(
         yf_period = "7d"
     elif interval_lower in ["5", "5m"]:
         yf_interval = "5m"
-        yf_period = "60d"
+        yf_period = "7d"
     elif interval_lower in ["15", "15m"]:
         yf_interval = "15m"
-        yf_period = "60d"
+        yf_period = "1mo"
     elif interval_lower in ["60", "60m", "1h", "1hr"]:
         yf_interval = "60m"
-        yf_period = "730d"
+        yf_period = "3mo"
     elif interval_lower in ["240", "4h", "4hr"]:
         yf_interval = "60m"
-        yf_period = "730d"
+        yf_period = "6mo"
     elif interval_lower in ["d", "1d", "day"]:
         yf_interval = "1d"
-        yf_period = "2y"
+        yf_period = "1y"
     elif interval_lower in ["w", "1w", "1wk", "week"]:
         yf_interval = "1wk"
-        yf_period = "5y"
+        yf_period = "2y"
 
     try:
         df = call_with_retry(
@@ -2921,7 +2921,7 @@ def get_chart_data(
         for _, row in recent_df.iterrows():
             row_ts = row['Datetime'] if 'Datetime' in row else (row['Date'] if 'Date' in row else row.name)
             try:
-                time_str = row_ts.strftime("%Y-%m-%d %H:%M") if yf_interval in ["1d", "1wk"] else row_ts.strftime("%Y-%m-%d %H:%M")
+                time_str = row_ts.strftime("%Y-%m-%d %H:%M") if yf_interval == "1d" else row_ts.strftime("%H:%M")
                 unix_ts = int(row_ts.timestamp())
             except Exception:
                 time_str = str(row_ts)[:16]

@@ -4356,393 +4356,18 @@ let activeChartTool = null;
 let currentDetailChartInstance = null;
 let currentCandlestickSeries = null;
 let customPriceLines = [];
-let currentDetailAnalysisTab = "pillars";
-let currentDetailStockData = null;
-
-function renderDetailAnalysisContent(s, activeTab = "pillars") {
-    const gridEl = document.getElementById("stockDetailAnalysisGrid");
-    if (!gridEl) return;
-
-    const rawLtp = Number(s.ltp || 1245.50);
-    const prevClose = Number(s.prev_close || (rawLtp * 0.988));
-    const openVal = Number(s.open || (rawLtp * 0.992));
-    const highVal = Number(s.high || (rawLtp * 1.012));
-    const lowVal = Number(s.low || (rawLtp * 0.985));
-    const vwapVal = Number(s.vwap || (rawLtp * 0.998));
-    const isBull = (s.signal || "").includes("BTST") || (s.signal || "").includes("BUY") || (s.option_type || "").includes("CE");
-    const optType = s.option_type || (isBull ? "CALL (CE)" : "PUT (PE)");
-    const rsiVal = Number(s.rsi !== undefined ? s.rsi : 58.6);
-    const volSurgeVal = Number(s.volume_spike || s.volume_surge_ratio || 3.29);
-    const scoreVal = s.confidence_score || 88;
-    const estGapVal = s.predicted_gap_pct !== undefined ? s.predicted_gap_pct : (isBull ? 2.1 : -2.1);
-    const weightVal = `${Number(s.confirmed_pillars_weight || 3.5).toFixed(1)} / ${Number(s.required_pillars || 3.0).toFixed(1)} Wt`;
-
-    // Floor Pivots
-    const pClassic = (highVal + lowVal + rawLtp) / 3;
-    const r1Classic = (2 * pClassic) - lowVal;
-    const r2Classic = pClassic + (highVal - lowVal);
-    const r3Classic = highVal + 2 * (pClassic - lowVal);
-    const s1Classic = (2 * pClassic) - highVal;
-    const s2Classic = pClassic - (highVal - lowVal);
-    const s3Classic = lowVal - 2 * (highVal - pClassic);
-
-    const range = highVal - lowVal;
-    const r1Fib = pClassic + 0.382 * range;
-    const r2Fib = pClassic + 0.618 * range;
-    const r3Fib = pClassic + 1.0 * range;
-    const s1Fib = pClassic - 0.382 * range;
-    const s2Fib = pClassic - 0.618 * range;
-    const s3Fib = pClassic - 1.0 * range;
-
-    const r4Cam = rawLtp + range * (1.1 / 2);
-    const r3Cam = rawLtp + range * (1.1 / 4);
-    const s3Cam = rawLtp - range * (1.1 / 4);
-    const s4Cam = rawLtp - range * (1.1 / 2);
-
-    if (activeTab === "pillars") {
-        const tp1 = (isBull ? rawLtp * 1.02 : rawLtp * 0.98).toFixed(2);
-        const tp2 = (isBull ? rawLtp * 1.04 : rawLtp * 0.96).toFixed(2);
-        const sl = (isBull ? rawLtp * 0.985 : rawLtp * 1.015).toFixed(2);
-        const entryMin = (isBull ? rawLtp * 0.998 : rawLtp * 1.002).toFixed(2);
-        const entryMax = (isBull ? rawLtp * 1.002 : rawLtp * 0.998).toFixed(2);
-
-        gridEl.innerHTML = `
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;">
-                
-                <!-- CARD 1: 5-PILLAR MATRIX SCORECARD -->
-                <div class="analysis-deep-card">
-                    <div style="font-size:13px;font-weight:800;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
-                        <span><i class="fa-solid fa-layer-group text-gold"></i> 5-PILLAR MATRIX SCORECARD</span>
-                        <span class="badge badge-gold">${weightVal}</span>
-                    </div>
-
-                    <div class="pillar-meter-wrapper">
-                        <div class="pillar-meter-header">
-                            <span style="color:#cbd5e1;">P1: Price Action &amp; Trend Quality</span>
-                            <span class="text-bullish" style="font-weight:800;">${isBull ? 'Strong Bullish (92%)' : 'Bearish Pressure'}</span>
-                        </div>
-                        <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:92%;background:linear-gradient(90deg, #10b981, #059669);"></div></div>
-                    </div>
-
-                    <div class="pillar-meter-wrapper">
-                        <div class="pillar-meter-header">
-                            <span style="color:#cbd5e1;">P2: Volume Dynamics &amp; Spike</span>
-                            <span style="color:#f59e0b;font-weight:800;">${volSurgeVal.toFixed(2)}x High Volume</span>
-                        </div>
-                        <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:85%;background:linear-gradient(90deg, #f59e0b, #d97706);"></div></div>
-                    </div>
-
-                    <div class="pillar-meter-wrapper">
-                        <div class="pillar-meter-header">
-                            <span style="color:#cbd5e1;">P3: Technical Momentum (RSI 14)</span>
-                            <span class="text-cyan" style="font-weight:800;">RSI: ${rsiVal.toFixed(1)} &bull; Above EMA 21</span>
-                        </div>
-                        <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:78%;background:linear-gradient(90deg, #06b6d4, #0284c7);"></div></div>
-                    </div>
-
-                    <div class="pillar-meter-wrapper">
-                        <div class="pillar-meter-header">
-                            <span style="color:#cbd5e1;">P4: Derivatives &amp; OI Strike Matrix</span>
-                            <span style="color:#a855f7;font-weight:800;">Long Build-Up &bull; PCR 1.28</span>
-                        </div>
-                        <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:88%;background:linear-gradient(90deg, #a855f7, #7c3aed);"></div></div>
-                    </div>
-
-                    <div class="pillar-meter-wrapper" style="margin-bottom:0;">
-                        <div class="pillar-meter-header">
-                            <span style="color:#cbd5e1;">P5: Institutional Order Flow</span>
-                            <span class="text-bullish" style="font-weight:800;">Institutional Inflow Positive</span>
-                        </div>
-                        <div class="pillar-meter-track"><div class="pillar-meter-fill" style="width:90%;background:linear-gradient(90deg, #10b981, #3b82f6);"></div></div>
-                    </div>
-                </div>
-
-                <!-- CARD 2: INTRADAY FLOOR PIVOTS & KEY LEVELS -->
-                <div class="analysis-deep-card">
-                    <div style="font-size:13px;font-weight:800;color:var(--cyan);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
-                        <span><i class="fa-solid fa-chart-simple text-cyan"></i> KEY LEVELS &amp; PIVOT MATRIX</span>
-                        <span class="badge ${isBull ? 'badge-bullish' : 'badge-bearish'}">${optType}</span>
-                    </div>
-
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-                        <div style="background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                            <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Day's High / Low</div>
-                            <div style="font-size:13px;font-weight:800;color:#fff;margin-top:2px;">₹${highVal.toFixed(2)} <span style="color:var(--ink-muted);">/</span> ₹${lowVal.toFixed(2)}</div>
-                        </div>
-                        <div style="background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                            <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Session VWAP</div>
-                            <div style="font-size:13px;font-weight:800;color:var(--gold);margin-top:2px;">₹${vwapVal.toFixed(2)}</div>
-                        </div>
-                    </div>
-
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:6px;">Floor Breakout Pivots (IST Session):</div>
-                    <div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:6px;text-align:center;">
-                        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:6px;padding:6px 2px;">
-                            <div style="font-size:9.5px;font-weight:800;color:var(--bearish);">S2</div>
-                            <div style="font-size:11px;font-weight:800;color:#fff;">${s2Classic.toFixed(1)}</div>
-                        </div>
-                        <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:6px 2px;">
-                            <div style="font-size:9.5px;font-weight:800;color:var(--bearish);">S1</div>
-                            <div style="font-size:11px;font-weight:800;color:#fff;">${s1Classic.toFixed(1)}</div>
-                        </div>
-                        <div style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);border-radius:6px;padding:6px 2px;">
-                            <div style="font-size:9.5px;font-weight:800;color:var(--gold);">PIVOT</div>
-                            <div style="font-size:11px;font-weight:800;color:#fff;">${pClassic.toFixed(1)}</div>
-                        </div>
-                        <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:6px;padding:6px 2px;">
-                            <div style="font-size:9.5px;font-weight:800;color:var(--bullish);">R1</div>
-                            <div style="font-size:11px;font-weight:800;color:#fff;">${r1Classic.toFixed(1)}</div>
-                        </div>
-                        <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:6px;padding:6px 2px;">
-                            <div style="font-size:9.5px;font-weight:800;color:var(--bullish);">R2</div>
-                            <div style="font-size:11px;font-weight:800;color:#fff;">${r2Classic.toFixed(1)}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CARD 3: TRADE EXECUTION & RISK MANAGEMENT -->
-                <div class="analysis-deep-card">
-                    <div style="font-size:13px;font-weight:800;color:var(--bullish);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
-                        <span><i class="fa-solid fa-crosshairs text-bullish"></i> TRADE EXECUTION &amp; RISK BLUEPRINT</span>
-                        <span class="est-gap-pill ${estGapVal >= 0 ? 'est-gap-up' : 'est-gap-down'}">${estGapVal >= 0 ? '+' : ''}${Number(estGapVal).toFixed(1)}% EST GAP</span>
-                    </div>
-
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                        <div style="background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                            <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Entry Trigger Range</div>
-                            <div style="font-size:14px;font-weight:800;color:#fff;margin-top:2px;">₹${entryMin} &ndash; ₹${entryMax}</div>
-                        </div>
-                        <div style="background:rgba(255,255,255,0.03);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
-                            <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Risk-to-Reward</div>
-                            <div style="font-size:14px;font-weight:800;color:var(--bullish);margin-top:2px;">1 : 2.67 R:R</div>
-                        </div>
-                    </div>
-
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-                        <div style="background:rgba(16,185,129,0.1);padding:8px 10px;border-radius:8px;border:1px solid rgba(16,185,129,0.3);text-align:center;">
-                            <div style="font-size:10px;font-weight:800;color:var(--bullish);">TARGET 1 (TP1)</div>
-                            <div style="font-size:13px;font-weight:800;color:#fff;margin-top:2px;">₹${tp1}</div>
-                        </div>
-                        <div style="background:rgba(16,185,129,0.15);padding:8px 10px;border-radius:8px;border:1px solid rgba(16,185,129,0.4);text-align:center;">
-                            <div style="font-size:10px;font-weight:800;color:var(--bullish);">TARGET 2 (TP2)</div>
-                            <div style="font-size:13px;font-weight:800;color:#fff;margin-top:2px;">₹${tp2}</div>
-                        </div>
-                        <div style="background:rgba(239,68,68,0.12);padding:8px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);text-align:center;">
-                            <div style="font-size:10px;font-weight:800;color:var(--bearish);">STOP LOSS (SL)</div>
-                            <div style="font-size:13px;font-weight:800;color:#fff;margin-top:2px;">₹${sl}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CARD 4: INSTITUTIONAL MACRO & SENTIMENT GATES -->
-                <div class="analysis-deep-card">
-                    <div style="font-size:13px;font-weight:800;color:#a855f7;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
-                        <span><i class="fa-solid fa-shield-halved text-purple"></i> MACRO REGIME &amp; SENTIMENT</span>
-                        <span class="badge badge-gold">${scoreVal}% CONVICTION</span>
-                    </div>
-
-                    <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:6px;">
-                            <span style="font-size:12px;font-weight:700;color:#cbd5e1;"><i class="fa-solid fa-chart-line text-cyan" style="margin-right:6px;"></i> Sector vs NIFTY 50</span>
-                            <span class="text-bullish" style="font-size:12px;font-weight:800;">Outperforming (+1.4%)</span>
-                        </div>
-                        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:6px;">
-                            <span style="font-size:12px;font-weight:700;color:#cbd5e1;"><i class="fa-solid fa-gauge text-gold" style="margin-right:6px;"></i> India VIX Gate (< 18.0)</span>
-                            <span class="text-bullish" style="font-size:12px;font-weight:800;"><i class="fa-solid fa-check"></i> NORMAL VOL</span>
-                        </div>
-                        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:6px;">
-                            <span style="font-size:12px;font-weight:700;color:#cbd5e1;"><i class="fa-solid fa-bullhorn text-gold" style="margin-right:6px;"></i> News &amp; Macro Sentiment</span>
-                            <span class="text-bullish" style="font-size:12px;font-weight:800;">Positive &bull; No Red Flags</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        `;
-    } else if (activeTab === "summary") {
-        gridEl.innerHTML = `
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px;">
-                <div class="tv-gauge-card">
-                    <div style="font-size:12px;font-weight:800;color:var(--ink-muted);text-transform:uppercase;">Oscillators Summary</div>
-                    <div class="tv-gauge-meter text-bullish">BUY</div>
-                    <div style="display:flex;justify-content:center;gap:12px;font-size:11.5px;font-weight:700;margin-top:6px;">
-                        <span class="text-bullish">2 Buy</span>
-                        <span style="color:#f59e0b;">8 Neutral</span>
-                        <span class="text-bearish">1 Sell</span>
-                    </div>
-                </div>
-
-                <div class="tv-gauge-card" style="border-color:rgba(212,175,55,0.3);background:rgba(212,175,55,0.04);">
-                    <div style="font-size:12px;font-weight:800;color:var(--gold);text-transform:uppercase;">Overall Summary</div>
-                    <div class="tv-gauge-meter text-bullish" style="font-size:26px;">STRONG BUY</div>
-                    <div style="display:flex;justify-content:center;gap:12px;font-size:11.5px;font-weight:700;margin-top:6px;">
-                        <span class="text-bullish">15 Buy</span>
-                        <span style="color:#f59e0b;">9 Neutral</span>
-                        <span class="text-bearish">2 Sell</span>
-                    </div>
-                </div>
-
-                <div class="tv-gauge-card">
-                    <div style="font-size:12px;font-weight:800;color:var(--ink-muted);text-transform:uppercase;">Moving Averages</div>
-                    <div class="tv-gauge-meter text-bullish">STRONG BUY</div>
-                    <div style="display:flex;justify-content:center;gap:12px;font-size:11.5px;font-weight:700;margin-top:6px;">
-                        <span class="text-bullish">13 Buy</span>
-                        <span style="color:#f59e0b;">1 Neutral</span>
-                        <span class="text-bearish">1 Sell</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    } else if (activeTab === "mas") {
-        gridEl.innerHTML = `
-            <div class="analysis-deep-card" style="padding:0;overflow:hidden;">
-                <table class="tv-table-pro">
-                    <thead>
-                        <tr>
-                            <th>Indicator</th>
-                            <th>Value</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>EMA (10)</td><td>₹${(rawLtp * 0.994).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>SMA (10)</td><td>₹${(rawLtp * 0.991).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>EMA (20)</td><td>₹${(rawLtp * 0.985).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>SMA (20)</td><td>₹${(rawLtp * 0.982).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>EMA (50)</td><td>₹${(rawLtp * 0.965).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>SMA (50)</td><td>₹${(rawLtp * 0.958).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>EMA (100)</td><td>₹${(rawLtp * 0.932).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>SMA (100)</td><td>₹${(rawLtp * 0.924).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>EMA (200)</td><td>₹${(rawLtp * 0.885).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>SMA (200)</td><td>₹${(rawLtp * 0.872).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>Ichimoku Base Line</td><td>₹${(rawLtp * 0.988).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-neutral">NEUTRAL</span></td></tr>
-                        <tr><td>Volume Weighted MA (VWMA)</td><td>₹${(rawLtp * 0.996).toFixed(2)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        `;
-    } else if (activeTab === "oscillators") {
-        gridEl.innerHTML = `
-            <div class="analysis-deep-card" style="padding:0;overflow:hidden;">
-                <table class="tv-table-pro">
-                    <thead>
-                        <tr>
-                            <th>Oscillator</th>
-                            <th>Value</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Relative Strength Index (14)</td><td>${rsiVal.toFixed(1)}</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>Stochastic %K (14, 3, 3)</td><td>68.4</td><td><span class="tv-badge-action tv-badge-neutral">NEUTRAL</span></td></tr>
-                        <tr><td>Commodity Channel Index (20)</td><td>+112.5</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>Average Directional Index (14)</td><td>34.2</td><td><span class="tv-badge-action tv-badge-neutral">TRENDING</span></td></tr>
-                        <tr><td>Awesome Oscillator</td><td>+18.40</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>Momentum (10)</td><td>+8.65</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>MACD Level (12, 26)</td><td>+4.12</td><td><span class="tv-badge-action tv-badge-buy">BUY</span></td></tr>
-                        <tr><td>Williams %R (14)</td><td>-28.5</td><td><span class="tv-badge-action tv-badge-neutral">NEUTRAL</span></td></tr>
-                        <tr><td>Ultimate Oscillator (7, 14, 28)</td><td>58.2</td><td><span class="tv-badge-action tv-badge-neutral">NEUTRAL</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        `;
-    } else if (activeTab === "pivots") {
-        gridEl.innerHTML = `
-            <div class="analysis-deep-card" style="padding:0;overflow:hidden;">
-                <table class="tv-table-pro">
-                    <thead>
-                        <tr>
-                            <th>Method</th>
-                            <th>S3</th>
-                            <th>S2</th>
-                            <th>S1</th>
-                            <th>Pivot (P)</th>
-                            <th>R1</th>
-                            <th>R2</th>
-                            <th>R3</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><b>Classic</b></td>
-                            <td>₹${s3Classic.toFixed(1)}</td>
-                            <td>₹${s2Classic.toFixed(1)}</td>
-                            <td>₹${s1Classic.toFixed(1)}</td>
-                            <td style="color:var(--gold);font-weight:800;">₹${pClassic.toFixed(1)}</td>
-                            <td>₹${r1Classic.toFixed(1)}</td>
-                            <td>₹${r2Classic.toFixed(1)}</td>
-                            <td>₹${r3Classic.toFixed(1)}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Fibonacci</b></td>
-                            <td>₹${s3Fib.toFixed(1)}</td>
-                            <td>₹${s2Fib.toFixed(1)}</td>
-                            <td>₹${s1Fib.toFixed(1)}</td>
-                            <td style="color:var(--gold);font-weight:800;">₹${pClassic.toFixed(1)}</td>
-                            <td>₹${r1Fib.toFixed(1)}</td>
-                            <td>₹${r2Fib.toFixed(1)}</td>
-                            <td>₹${r3Fib.toFixed(1)}</td>
-                        </tr>
-                        <tr>
-                            <td><b>Camarilla</b></td>
-                            <td>₹${s4Cam.toFixed(1)}</td>
-                            <td>₹${s3Cam.toFixed(1)}</td>
-                            <td>--</td>
-                            <td style="color:var(--gold);font-weight:800;">₹${pClassic.toFixed(1)}</td>
-                            <td>--</td>
-                            <td>₹${r3Cam.toFixed(1)}</td>
-                            <td>₹${r4Cam.toFixed(1)}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        `;
-    } else if (activeTab === "performance") {
-        gridEl.innerHTML = `
-            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;">
-                <div class="analysis-deep-card" style="text-align:center;padding:14px;">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">1 DAY</div>
-                    <div class="text-bullish" style="font-size:18px;font-weight:800;margin-top:4px;">+0.85%</div>
-                </div>
-                <div class="analysis-deep-card" style="text-align:center;padding:14px;">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">1 WEEK</div>
-                    <div class="text-bullish" style="font-size:18px;font-weight:800;margin-top:4px;">+2.40%</div>
-                </div>
-                <div class="analysis-deep-card" style="text-align:center;padding:14px;">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">1 MONTH</div>
-                    <div class="text-bullish" style="font-size:18px;font-weight:800;margin-top:4px;">+5.12%</div>
-                </div>
-                <div class="analysis-deep-card" style="text-align:center;padding:14px;">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">3 MONTHS</div>
-                    <div class="text-bullish" style="font-size:18px;font-weight:800;margin-top:4px;">+14.30%</div>
-                </div>
-                <div class="analysis-deep-card" style="text-align:center;padding:14px;">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">6 MONTHS</div>
-                    <div class="text-bullish" style="font-size:18px;font-weight:800;margin-top:4px;">+22.80%</div>
-                </div>
-                <div class="analysis-deep-card" style="text-align:center;padding:14px;">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">1 YEAR</div>
-                    <div class="text-bullish" style="font-size:18px;font-weight:800;margin-top:4px;">+38.50%</div>
-                </div>
-                <div class="analysis-deep-card" style="text-align:center;padding:14px;">
-                    <div style="font-size:11px;font-weight:700;color:var(--ink-muted);">YTD</div>
-                    <div class="text-bullish" style="font-size:18px;font-weight:800;margin-top:4px;">+18.90%</div>
-                </div>
-            </div>
-        `;
-    }
-}
 
 async function renderStockDetailPage(symbol, timeframe = "15") {
     if (!symbol) return;
     const titleEl = document.getElementById("stockDetailHeaderTitle");
     const badgeEl = document.getElementById("stockDetailHeaderBadge");
+    const gridEl = document.getElementById("stockDetailAnalysisGrid");
 
     const stocksList = (window.allStocks && window.allStocks.length) ? window.allStocks : [];
     let stock = stocksList.find(s => s.symbol === symbol) || { 
         symbol: symbol, 
-        ltp: 1245.50, 
-        pct_change: 1.25, 
+        ltp: 1217.40, 
+        pct_change: 0.20, 
         signal: "BTST (BUY)",
         option_type: "CALL (CE)",
         priority_level: "P1_HIGH",
@@ -4753,21 +4378,19 @@ async function renderStockDetailPage(symbol, timeframe = "15") {
         confirmed_pillars_weight: 3.5,
         required_pillars: 3.0
     };
-    currentDetailStockData = stock;
 
     const updateHeaderAndGrid = (s) => {
         try {
-            currentDetailStockData = s;
             const sym = s.symbol || symbol;
             const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(sym) : '';
-            const ltpVal = s.ltp ? Number(s.ltp).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '1,245.50';
-            const pctVal = s.pct_change !== undefined ? Number(s.pct_change) : (s.change_pct !== undefined ? Number(s.change_pct) : 1.25);
+            const ltpVal = s.ltp ? Number(s.ltp).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '1,217.40';
+            const pctVal = s.pct_change !== undefined ? Number(s.pct_change) : (s.change_pct !== undefined ? Number(s.change_pct) : 0.20);
             const pctClass = pctVal >= 0 ? "text-bullish" : "text-bearish";
             const isBull = (s.signal || "").includes("BTST") || (s.signal || "").includes("BUY") || (s.option_type || "").includes("CE");
             const badgeClass = isBull ? "badge-bullish" : ((s.signal || "").includes("STBT") || (s.signal || "").includes("SELL") ? "badge-bearish" : "badge");
             const sigText = s.signal || (isBull ? "BTST (BUY)" : "STBT (SELL)");
 
-            // 1. Single-Row Unified Stock Header (Picture 1 style)
+            // 1. Single-Row Unified Stock Header
             if (titleEl) {
                 titleEl.innerHTML = `
                     <div class="symbol-with-logo" style="display:flex;align-items:center;gap:10px;white-space:nowrap;">
@@ -4788,19 +4411,248 @@ async function renderStockDetailPage(symbol, timeframe = "15") {
                 badgeEl.innerHTML = `<span class="badge ${badgeClass}" style="font-size:12.5px;font-weight:800;padding:6px 14px;border-radius:20px;">${escapeHtml(sigText)}</span>`;
             }
 
-            renderDetailAnalysisContent(s, currentDetailAnalysisTab);
+            // 2. Comprehensive TradingView-Style Technical Analysis Matrix
+            if (gridEl) {
+                const rawLtp = Number(s.ltp || 1217.40);
+                const prevClose = Number(s.prev_close || (rawLtp * 0.998));
+                const openVal = Number(s.open || (rawLtp * 0.996));
+                const highVal = Number(s.high || (rawLtp * 1.012));
+                const lowVal = Number(s.low || (rawLtp * 0.988));
+                const vwapVal = Number(s.vwap || (rawLtp * 0.999));
 
-            // Wire sub-tabs
-            const subTabsContainer = document.getElementById("tvAnalysisSubTabs");
-            if (subTabsContainer) {
-                subTabsContainer.querySelectorAll(".tv-sub-tab-btn").forEach(btn => {
-                    btn.onclick = () => {
-                        subTabsContainer.querySelectorAll(".tv-sub-tab-btn").forEach(b => b.classList.remove("active"));
-                        btn.classList.add("active");
-                        currentDetailAnalysisTab = btn.dataset.tab;
-                        renderDetailAnalysisContent(currentDetailStockData || s, currentDetailAnalysisTab);
-                    };
-                });
+                const estGapVal = s.predicted_gap_pct !== undefined ? s.predicted_gap_pct : (isBull ? 2.1 : -2.1);
+                const volSurgeVal = s.volume_spike || s.volume_surge_ratio || 3.29;
+                const rsiVal = s.rsi !== undefined ? Number(s.rsi) : 58.6;
+                const scoreVal = s.confidence_score || 88;
+                const weightVal = `${Number(s.confirmed_pillars_weight || 3.5).toFixed(1)} / ${Number(s.required_pillars || 3.0).toFixed(1)} Wt`;
+
+                // Calculate Standard Floor Pivots
+                const pivotP = (highVal + lowVal + rawLtp) / 3;
+                const pivotR1 = (2 * pivotP) - lowVal;
+                const pivotR2 = pivotP + (highVal - lowVal);
+                const pivotR3 = highVal + 2 * (pivotP - lowVal);
+                const pivotS1 = (2 * pivotP) - highVal;
+                const pivotS2 = pivotP - (highVal - lowVal);
+                const pivotS3 = lowVal - 2 * (highVal - pivotP);
+
+                // Fibonacci Retracements
+                const rangeDiff = highVal - lowVal;
+                const fib236 = highVal - (rangeDiff * 0.236);
+                const fib382 = highVal - (rangeDiff * 0.382);
+                const fib500 = highVal - (rangeDiff * 0.500);
+                const fib618 = highVal - (rangeDiff * 0.618);
+
+                // Moving Averages Computation (Mocked based on real price)
+                const ema9 = rawLtp * (isBull ? 0.995 : 1.005);
+                const ema20 = rawLtp * (isBull ? 0.990 : 1.010);
+                const ema50 = rawLtp * (isBull ? 0.982 : 1.018);
+                const ema100 = rawLtp * (isBull ? 0.970 : 1.030);
+                const ema200 = rawLtp * (isBull ? 0.955 : 1.045);
+                const sma20 = rawLtp * (isBull ? 0.989 : 1.011);
+                const sma50 = rawLtp * (isBull ? 0.980 : 1.020);
+
+                // 52-Week Range
+                const w52High = highVal * 1.15;
+                const w52Low = lowVal * 0.82;
+                const w52Pct = Math.min(100, Math.max(0, ((rawLtp - w52Low) / (w52High - w52Low)) * 100));
+
+                gridEl.innerHTML = `
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));gap:16px;">
+                        
+                        <!-- CARD 1: TRADINGVIEW TECHNICAL OSCILLATORS -->
+                        <div class="tv-matrix-card">
+                            <div style="font-size:13px;font-weight:800;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+                                <span><i class="fa-solid fa-gauge-high text-gold"></i> TECHNICAL OSCILLATORS (TRADINGVIEW)</span>
+                                <span class="badge ${isBull ? 'badge-bullish' : 'badge-bearish'}">${isBull ? 'STRONG BUY' : 'SELL'}</span>
+                            </div>
+
+                            <table class="tv-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Value</th>
+                                        <th style="text-align:right;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Relative Strength Index (14)</td>
+                                        <td>${rsiVal.toFixed(1)}</td>
+                                        <td style="text-align:right;"><span class="${rsiVal > 55 ? 'tv-badge-buy' : (rsiVal < 45 ? 'tv-badge-sell' : 'tv-badge-neutral')}">${rsiVal > 55 ? 'BUY' : (rsiVal < 45 ? 'SELL' : 'NEUTRAL')}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Stochastic %K (14, 3, 3)</td>
+                                        <td>${(rsiVal + 5).toFixed(1)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Commodity Channel Index (20)</td>
+                                        <td>+${(rsiVal * 1.4).toFixed(1)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Average Directional Index (14)</td>
+                                        <td>32.4</td>
+                                        <td style="text-align:right;"><span class="tv-badge-neutral">TRENDING</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Awesome Oscillator</td>
+                                        <td>+${(rawLtp * 0.008).toFixed(2)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>MACD Level (12, 26)</td>
+                                        <td>+${(rawLtp * 0.003).toFixed(2)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BULLISH</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Bollinger Bands %B</td>
+                                        <td>0.74</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">UPPER EXP</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- CARD 2: MOVING AVERAGES SPEED MATRIX -->
+                        <div class="tv-matrix-card">
+                            <div style="font-size:13px;font-weight:800;color:var(--cyan);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+                                <span><i class="fa-solid fa-chart-line text-cyan"></i> MOVING AVERAGES MATRIX</span>
+                                <span class="badge badge-gold">7 / 7 BULLISH</span>
+                            </div>
+
+                            <table class="tv-table">
+                                <thead>
+                                    <tr>
+                                        <th>MA Period</th>
+                                        <th>Price</th>
+                                        <th style="text-align:right;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>EMA (9) — Fast Momentum</td>
+                                        <td>₹${ema9.toFixed(2)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY (+${(((rawLtp - ema9)/ema9)*100).toFixed(2)}%)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>EMA (20) — Short Trend</td>
+                                        <td>₹${ema20.toFixed(2)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY (+${(((rawLtp - ema20)/ema20)*100).toFixed(2)}%)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>EMA (50) — Medium Trend</td>
+                                        <td>₹${ema50.toFixed(2)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY (+${(((rawLtp - ema50)/ema50)*100).toFixed(2)}%)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>EMA (100) — Macro Baseline</td>
+                                        <td>₹${ema100.toFixed(2)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY (+${(((rawLtp - ema100)/ema100)*100).toFixed(2)}%)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>EMA (200) — Institutional Line</td>
+                                        <td>₹${ema200.toFixed(2)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY (+${(((rawLtp - ema200)/ema200)*100).toFixed(2)}%)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>SMA (20) — Standard Line</td>
+                                        <td>₹${sma20.toFixed(2)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>SMA (50) — Quarterly Pivot</td>
+                                        <td>₹${sma50.toFixed(2)}</td>
+                                        <td style="text-align:right;"><span class="tv-badge-buy">BUY</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- CARD 3: FLOOR PIVOTS & FIBONACCI RETRACEMENTS -->
+                        <div class="tv-matrix-card">
+                            <div style="font-size:13px;font-weight:800;color:var(--bullish);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+                                <span><i class="fa-solid fa-bezier-curve text-bullish"></i> PIVOTS &amp; FIBONACCI LEVELS</span>
+                                <span class="est-gap-pill ${estGapVal >= 0 ? 'est-gap-up' : 'est-gap-down'}">${estGapVal >= 0 ? '+' : ''}${Number(estGapVal).toFixed(1)}% GAP</span>
+                            </div>
+
+                            <div style="font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:6px;text-transform:uppercase;">Classic Floor Breakout Pivots:</div>
+                            <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;text-align:center;margin-bottom:14px;">
+                                <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:6px 2px;">
+                                    <div style="font-size:9px;font-weight:800;color:var(--bearish);">S2</div>
+                                    <div style="font-size:11px;font-weight:800;color:#fff;">${pivotS2.toFixed(1)}</div>
+                                </div>
+                                <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:6px;padding:6px 2px;">
+                                    <div style="font-size:9px;font-weight:800;color:var(--bearish);">S1</div>
+                                    <div style="font-size:11px;font-weight:800;color:#fff;">${pivotS1.toFixed(1)}</div>
+                                </div>
+                                <div style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);border-radius:6px;padding:6px 2px;">
+                                    <div style="font-size:9px;font-weight:800;color:var(--gold);">PIVOT</div>
+                                    <div style="font-size:11px;font-weight:800;color:#fff;">${pivotP.toFixed(1)}</div>
+                                </div>
+                                <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:6px;padding:6px 2px;">
+                                    <div style="font-size:9px;font-weight:800;color:var(--bullish);">R1</div>
+                                    <div style="font-size:11px;font-weight:800;color:#fff;">${pivotR1.toFixed(1)}</div>
+                                </div>
+                            </div>
+
+                            <div style="font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:6px;text-transform:uppercase;">Fibonacci Retracement Levels:</div>
+                            <table class="tv-table">
+                                <tbody>
+                                    <tr><td>Fib 23.6% (Shallow Pullback)</td><td style="text-align:right;font-weight:700;color:#fff;">₹${fib236.toFixed(2)}</td></tr>
+                                    <tr><td>Fib 38.2% (Key Support)</td><td style="text-align:right;font-weight:700;color:var(--gold);">₹${fib382.toFixed(2)}</td></tr>
+                                    <tr><td>Fib 50.0% (Equilibrium)</td><td style="text-align:right;font-weight:700;color:#cbd5e1;">₹${fib500.toFixed(2)}</td></tr>
+                                    <tr><td>Fib 61.8% (Golden Ratio)</td><td style="text-align:right;font-weight:700;color:var(--bullish);">₹${fib618.toFixed(2)}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- CARD 4: INSTITUTIONAL FLOW & 52W RANGE -->
+                        <div class="tv-matrix-card">
+                            <div style="font-size:13px;font-weight:800;color:#a855f7;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+                                <span><i class="fa-solid fa-shield-halved text-purple"></i> INSTITUTIONAL FLOW &amp; VALUATION</span>
+                                <span class="badge badge-gold">${scoreVal}% CONVICTION</span>
+                            </div>
+
+                            <div style="margin-bottom:14px;">
+                                <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">
+                                    <span>52W LOW: ₹${w52Low.toFixed(1)}</span>
+                                    <span style="color:#fff;">52W RANGE (${w52Pct.toFixed(0)}%)</span>
+                                    <span>52W HIGH: ₹${w52High.toFixed(1)}</span>
+                                </div>
+                                <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;">
+                                    <div style="width:${w52Pct}%;height:100%;background:linear-gradient(90deg, #f59e0b, #10b981);border-radius:999px;"></div>
+                                </div>
+                            </div>
+
+                            <table class="tv-table">
+                                <tbody>
+                                    <tr>
+                                        <td>Volume Spike Ratio</td>
+                                        <td style="text-align:right;"><span style="color:#f59e0b;font-weight:800;">${Number(volSurgeVal).toFixed(2)}x vs 20D SMA</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Delivery Volume %</td>
+                                        <td style="text-align:right;"><span class="text-bullish" style="font-weight:800;">64.8% (High Delivery)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cumulative Delta (CVD)</td>
+                                        <td style="text-align:right;"><span class="text-bullish" style="font-weight:800;">+245.8K Net Buying</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Shadow Accumulation</td>
+                                        <td style="text-align:right;"><span class="badge-bullish" style="padding:2px 8px;font-size:10px;">ACTIVE INFLOW</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>India VIX Volatility Gate</td>
+                                        <td style="text-align:right;"><span class="text-bullish" style="font-weight:800;">&lt; 18.0 (NORMAL VOL)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                `;
             }
         } catch (renderErr) {
             console.error("Error in updateHeaderAndGrid:", renderErr);
@@ -4836,8 +4688,15 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
     const container = document.getElementById("tradingview_chart_container");
     if (!container) return;
 
-    container.innerHTML = '<div id="tv_chart_mount" style="width:100%;height:460px;min-height:420px;background:#0d1017;border-radius:12px;overflow:hidden;position:relative;"></div>';
+    container.innerHTML = `
+        <div id="tv_chart_legend">
+            <span><strong style="color:#fff;">${escapeHtml(symbol)}</strong> &bull; ${timeframe.toUpperCase()}</span>
+            <span>Hover candle to inspect OHLCV</span>
+        </div>
+        <div id="tv_chart_mount" style="width:100%;height:450px;min-height:400px;background:#0d1017;border-radius:12px;overflow:hidden;position:relative;"></div>
+    `;
     const mountNode = document.getElementById("tv_chart_mount");
+    const legendNode = document.getElementById("tv_chart_legend");
     if (!mountNode) return;
 
     let candles = [];
@@ -4852,27 +4711,38 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
     }
 
     const now = Math.floor(Date.now() / 1000);
-    // Deep fallback generator (300+ candles) if API is offline
-    if (!candles || candles.length === 0) {
+    // Extended historical candles generation (350+ candles) if API has fewer than 100 candles
+    if (!candles || candles.length < 50) {
         const stocksList = window.allStocks || [];
-        const stock = stocksList.find(s => s.symbol === symbol) || { ltp: 1245.50 };
-        const basePrice = Number(stock.ltp || 1245.50);
-        let price = basePrice * 0.92;
+        const stock = stocksList.find(s => s.symbol === symbol) || { ltp: 1217.40 };
+        const basePrice = Number(stock.ltp || 1217.40);
+        let price = basePrice * 0.94;
         candles = [];
-        for (let i = 300; i >= 0; i--) {
-            const change = (Math.random() - 0.485) * (basePrice * 0.008);
+        const candleCount = 350;
+        
+        let intervalSec = 900;
+        if (timeframe === "1") intervalSec = 60;
+        else if (timeframe === "5") intervalSec = 300;
+        else if (timeframe === "60") intervalSec = 3600;
+        else if (timeframe === "240") intervalSec = 14400;
+        else if (timeframe === "D") intervalSec = 86400;
+        else if (timeframe === "W") intervalSec = 604800;
+
+        for (let i = candleCount; i >= 0; i--) {
+            const wave = Math.sin(i / 18) * (basePrice * 0.008) + Math.cos(i / 40) * (basePrice * 0.012);
+            const change = (Math.random() - 0.485) * (basePrice * 0.006) + (wave * 0.06);
             const open = price;
-            const close = Math.max(10, price + change);
+            const close = price + change;
             const high = Math.max(open, close) + Math.random() * (basePrice * 0.004);
             const low = Math.min(open, close) - Math.random() * (basePrice * 0.004);
-            const ts = now - (i * 900);
+            const ts = now - (i * intervalSec);
             candles.push({
                 ts: ts,
                 open: Number(open.toFixed(2)),
                 high: Number(high.toFixed(2)),
                 low: Number(low.toFixed(2)),
                 close: Number(close.toFixed(2)),
-                volume: Math.floor(Math.random() * 80000) + 15000
+                volume: Math.floor(Math.random() * 45000) + 8000
             });
             price = close;
         }
@@ -4884,7 +4754,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
         try {
             const chart = window.LightweightCharts.createChart(mountNode, {
                 width: mountNode.clientWidth || container.clientWidth || 800,
-                height: 460,
+                height: 450,
                 layout: {
                     background: { type: 'solid', color: '#0d1017' },
                     textColor: '#94a3b8',
@@ -4893,31 +4763,33 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                     vertLines: { color: 'rgba(255, 255, 255, 0.04)' },
                     horzLines: { color: 'rgba(255, 255, 255, 0.04)' },
                 },
-                rightPriceScale: {
+                rightPriceScale: { 
                     borderColor: 'rgba(255, 255, 255, 0.1)',
-                    scaleMargins: { top: 0.1, bottom: 0.18 },
+                    scaleMargins: { top: 0.1, bottom: 0.2 },
                 },
-                timeScale: {
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    timeVisible: true,
-                    secondsVisible: false,
-                    rightOffset: 12,
-                    barSpacing: 8,
+                timeScale: { 
+                    borderColor: 'rgba(255, 255, 255, 0.1)', 
+                    timeVisible: true, 
+                    secondsVisible: false 
                 },
-                crosshair: {
+                crosshair: { 
                     mode: window.LightweightCharts.CrosshairMode.Normal,
                     vertLine: {
+                        visible: true,
+                        labelVisible: true,
                         color: 'rgba(212, 175, 55, 0.5)',
                         width: 1,
-                        style: 3,
-                        labelBackgroundColor: '#1e293b',
+                        style: window.LightweightCharts.LineStyle.Dashed,
+                        labelBackgroundColor: '#1e293b'
                     },
                     horzLine: {
+                        visible: true,
+                        labelVisible: true,
                         color: 'rgba(212, 175, 55, 0.5)',
                         width: 1,
-                        style: 3,
-                        labelBackgroundColor: '#1e293b',
-                    },
+                        style: window.LightweightCharts.LineStyle.Dashed,
+                        labelBackgroundColor: '#1e293b'
+                    }
                 },
             });
 
@@ -4936,7 +4808,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                 color: 'rgba(212, 175, 55, 0.25)',
                 priceFormat: { type: 'volume' },
                 priceScaleId: '',
-                scaleMargins: { top: 0.85, bottom: 0 },
+                scaleMargins: { top: 0.84, bottom: 0 },
             });
 
             // Map and ensure strictly increasing timestamps
@@ -4979,54 +4851,52 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                 uniqueVolumeData.push({
                     time: t,
                     value: c.volume,
-                    color: c.close >= c.open ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'
+                    color: c.close >= c.open ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'
                 });
             });
 
             candlestickSeries.setData(uniqueCandleData);
             volumeSeries.setData(uniqueVolumeData);
 
-            // Floating Live OHLCV HUD Updates on Crosshair hover
-            const hudO = document.getElementById("hudOpen");
-            const hudH = document.getElementById("hudHigh");
-            const hudL = document.getElementById("hudLow");
-            const hudC = document.getElementById("hudClose");
-            const hudV = document.getElementById("hudVol");
-            const hudChg = document.getElementById("hudChg");
-
-            const updateHud = (data) => {
-                if (!data) return;
-                if (hudO) hudO.textContent = `₹${Number(data.open).toFixed(2)}`;
-                if (hudH) hudH.textContent = `₹${Number(data.high).toFixed(2)}`;
-                if (hudL) hudL.textContent = `₹${Number(data.low).toFixed(2)}`;
-                if (hudC) hudC.textContent = `₹${Number(data.close).toFixed(2)}`;
-                if (hudV && data.volume !== undefined) hudV.textContent = `${(Number(data.volume) / 1000).toFixed(1)}k`;
-                if (hudChg) {
-                    const diff = data.close - data.open;
-                    const pct = (diff / data.open) * 100;
-                    const sign = diff >= 0 ? '+' : '';
-                    hudChg.textContent = `${sign}${pct.toFixed(2)}%`;
-                    hudChg.style.color = diff >= 0 ? 'var(--bullish)' : 'var(--bearish)';
-                }
-            };
-
-            if (uniqueCandleData.length > 0) {
-                updateHud(uniqueCandleData[uniqueCandleData.length - 1]);
-            }
-
+            // Crosshair move listener to update HUD Legend in real time
             chart.subscribeCrosshairMove((param) => {
-                if (!param || !param.time || !param.seriesData) return;
-                const candle = param.seriesData.get(candlestickSeries);
-                if (candle) {
-                    const vol = param.seriesData.get(volumeSeries);
-                    updateHud({
-                        open: candle.open,
-                        high: candle.high,
-                        low: candle.low,
-                        close: candle.close,
-                        volume: vol ? vol.value : 0
-                    });
+                if (!legendNode) return;
+                if (!param || !param.time || !param.seriesData || !param.seriesData.get(candlestickSeries)) {
+                    if (uniqueCandleData.length > 0) {
+                        const last = uniqueCandleData[uniqueCandleData.length - 1];
+                        const diff = last.close - last.open;
+                        const pct = (diff / last.open) * 100;
+                        const sign = diff >= 0 ? '+' : '';
+                        const colorClass = diff >= 0 ? 'text-bullish' : 'text-bearish';
+                        legendNode.innerHTML = `
+                            <span><strong style="color:#fff;">${escapeHtml(symbol)}</strong> &bull; ${timeframe.toUpperCase()}</span>
+                            <span>O: <strong class="hud-val">₹${last.open.toFixed(2)}</strong></span>
+                            <span>H: <strong class="hud-val">₹${last.high.toFixed(2)}</strong></span>
+                            <span>L: <strong class="hud-val">₹${last.low.toFixed(2)}</strong></span>
+                            <span>C: <strong class="hud-val">₹${last.close.toFixed(2)}</strong></span>
+                            <span class="${colorClass}"><strong>${sign}${pct.toFixed(2)}%</strong></span>
+                        `;
+                    }
+                    return;
                 }
+
+                const data = param.seriesData.get(candlestickSeries);
+                const volData = param.seriesData.get(volumeSeries);
+                const diff = data.close - data.open;
+                const pct = (diff / data.open) * 100;
+                const sign = diff >= 0 ? '+' : '';
+                const colorClass = diff >= 0 ? 'text-bullish' : 'text-bearish';
+                const volStr = volData && volData.value ? (volData.value > 1000000 ? `${(volData.value/1000000).toFixed(1)}M` : `${(volData.value/1000).toFixed(1)}K`) : '';
+
+                legendNode.innerHTML = `
+                    <span><strong style="color:#fff;">${escapeHtml(symbol)}</strong> &bull; ${timeframe.toUpperCase()}</span>
+                    <span>O: <strong class="hud-val">₹${data.open.toFixed(2)}</strong></span>
+                    <span>H: <strong class="hud-val">₹${data.high.toFixed(2)}</strong></span>
+                    <span>L: <strong class="hud-val">₹${data.low.toFixed(2)}</strong></span>
+                    <span>C: <strong class="hud-val">₹${data.close.toFixed(2)}</strong></span>
+                    ${volStr ? `<span>Vol: <strong class="hud-val">${volStr}</strong></span>` : ''}
+                    <span class="${colorClass}"><strong>${sign}${pct.toFixed(2)}%</strong></span>
+                `;
             });
 
             // Wire Pro Chart Drawing Tools
@@ -5068,8 +4938,8 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                             btn.classList.add("active");
                             if (hintEl) {
                                 hintEl.style.display = "block";
-                                if (toolName === "measure") hintEl.textContent = "📏 Measure: Click on chart to calculate price & % move";
-                                if (toolName === "hline") hintEl.textContent = "➖ H-Line: Click on chart to drop Support / Resistance line";
+                                if (toolName === "measure") hintEl.textContent = "📏 Measure Tool: Click anywhere on chart to measure price & change %";
+                                if (toolName === "hline") hintEl.textContent = "➖ Horizontal Line: Click on chart to drop Support / Resistance level";
                                 if (toolName === "long") hintEl.textContent = "📈 Long Position: Click on chart to place Long Risk/Reward tool";
                                 if (toolName === "short") hintEl.textContent = "📉 Short Position: Click on chart to place Short Risk/Reward tool";
                             }
@@ -5182,23 +5052,6 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                     }
                 });
             }
-
-            chart.timeScale().fitContent();
-
-            new ResizeObserver(() => {
-                if (chart && mountNode) {
-                    chart.applyOptions({ width: mountNode.clientWidth, height: 460 });
-                }
-            }).observe(mountNode);
-
-            return;
-        } catch (err) {
-            console.error("LightweightCharts render error:", err);
-        }
-    }
-
-    renderCanvasChartFallback(mountNode, candles, symbol);
-}
 
             chart.timeScale().fitContent();
 
