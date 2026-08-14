@@ -33,8 +33,8 @@
     </script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=36.0.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=36.0.0">
+    <link rel="stylesheet" href="/static/styles.css?v=37.0.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=37.0.0">
 
 </head>
 <body>
@@ -1032,14 +1032,14 @@
                     </div>
                 </div>
 
-                <!-- Pro Chart Interactive Toolbar (Timeframes + Drawing / Analysis Tools) -->
+                <!-- Pro Chart Interactive Toolbar (Timeframes + TradingView Pro Analysis Tools) -->
                 <div class="chart-pro-toolbar" style="margin-bottom:12px;">
                     <!-- Left: Timeframe Selectors -->
-                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                        <div style="font-size:11px;font-weight:800;color:var(--ink-secondary);display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:0.5px;">
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                        <div style="font-size:11px;font-weight:800;color:var(--ink-secondary);display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:0.5px;margin-right:2px;">
                             <i class="fa-solid fa-chart-candlestick text-gold"></i> TF:
                         </div>
-                        <div class="filter-group" id="tvTimeframeFilterGroup" style="display:flex;gap:4px;">
+                        <div class="filter-group" id="tvTimeframeFilterGroup" style="display:flex;gap:3px;">
                             <button class="tab-btn" data-tf="1">1M</button>
                             <button class="tab-btn" data-tf="5">5M</button>
                             <button class="tab-btn active" data-tf="15">15M</button>
@@ -1051,46 +1051,64 @@
                     </div>
 
                     <!-- Right: Pro Chart Drawing & Analysis Tools -->
-                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;" id="chartToolsGroup">
-                        <button class="chart-tool-btn active" id="toolToggleTpSl" data-tool="tpsl" title="Toggle Target & Stop Loss Lines">
-                            <i class="fa-solid fa-bullseye text-bullish"></i> TP/SL
-                        </button>
-                        <button class="chart-tool-btn" id="toolMeasure" data-tool="measure" title="Measure Price Range & %">
+                    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;" id="chartToolsGroup">
+                        <button class="chart-tool-btn" id="toolMeasure" data-tool="measure" title="Measure Price Range & % Change">
                             <i class="fa-solid fa-ruler-combined text-gold"></i> Measure
                         </button>
-                        <button class="chart-tool-btn" id="toolHLine" data-tool="hline" title="Add Horizontal Support/Resistance Line">
+                        <button class="chart-tool-btn" id="toolHLine" data-tool="hline" title="Add Horizontal Support/Resistance Level">
                             <i class="fa-solid fa-arrows-left-right text-cyan"></i> H-Line
                         </button>
-                        <button class="chart-tool-btn" id="toolLongPos" data-tool="long" title="Long Position Risk/Reward Tool">
+                        <button class="chart-tool-btn" id="toolLongPos" data-tool="long" title="Long Position Risk/Reward Calculator">
                             <i class="fa-solid fa-arrow-trend-up text-bullish"></i> Long Pos
                         </button>
-                        <button class="chart-tool-btn" id="toolShortPos" data-tool="short" title="Short Position Risk/Reward Tool">
+                        <button class="chart-tool-btn" id="toolShortPos" data-tool="short" title="Short Position Risk/Reward Calculator">
                             <i class="fa-solid fa-arrow-trend-down text-bearish"></i> Short Pos
                         </button>
-                        <button class="chart-tool-btn" id="toolClearDrawings" title="Clear All Drawings" style="color:var(--bearish);">
+                        <button class="chart-tool-btn" id="toolClearDrawings" title="Clear All Chart Annotations" style="color:var(--bearish);">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Interactive OHLC Chart Container -->
-                <div class="table-card" style="margin-bottom:20px;padding:0;overflow:hidden;border-radius:12px;min-height:450px;background:#0d1017;border:1px solid var(--glass-border);width:100%;position:relative;">
-                    <div id="chart_tool_hint" style="display:none;position:absolute;top:10px;left:14px;background:rgba(15,23,42,0.85);border:1px solid rgba(212,175,55,0.4);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--gold);z-index:10;pointer-events:none;"></div>
-                    <div id="tradingview_chart_container" style="width:100%;height:450px;min-height:400px;position:relative;"></div>
-                </div>
-
-                <!-- Quantitative Multi-Pillar Deep-Dive & Breakout Matrix -->
-                <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                    <h3 style="font-size:16px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px;margin:0;">
-                        <i class="fa-solid fa-brain text-gold"></i> QUANTITATIVE MULTI-PILLAR DEEP-DIVE &amp; BREAKOUT MATRIX
-                    </h3>
-                    <div style="font-size:12px;font-weight:700;color:var(--ink-muted);">
-                        Institutional Quantitative Analytics
+                <!-- Interactive OHLC Chart Container with Floating HUD -->
+                <div class="table-card" style="margin-bottom:20px;padding:0;overflow:hidden;border-radius:12px;min-height:460px;background:#0d1017;border:1px solid var(--glass-border);width:100%;position:relative;">
+                    <div id="tv_chart_legend" class="tv-chart-legend">
+                        <span>O: <b id="hudOpen">--</b></span>
+                        <span>H: <b id="hudHigh">--</b></span>
+                        <span>L: <b id="hudLow">--</b></span>
+                        <span>C: <b id="hudClose">--</b></span>
+                        <span>Vol: <b id="hudVol">--</b></span>
+                        <span id="hudChg" style="color:var(--bullish);">--</span>
                     </div>
+                    <div id="chart_tool_hint" style="display:none;position:absolute;top:44px;left:14px;background:rgba(15,23,42,0.9);border:1px solid rgba(212,175,55,0.4);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--gold);z-index:10;pointer-events:none;"></div>
+                    <div id="tradingview_chart_container" style="width:100%;height:460px;min-height:420px;position:relative;"></div>
                 </div>
 
+                <!-- TradingView Pro Technical Deep-Dive Navigation Sub-Tabs -->
+                <div class="tv-analysis-tabs" id="tvAnalysisSubTabs">
+                    <button class="tv-sub-tab-btn active" data-tab="pillars">
+                        <i class="fa-solid fa-brain text-gold"></i> 5-Pillar &amp; Execution Matrix
+                    </button>
+                    <button class="tv-sub-tab-btn" data-tab="summary">
+                        <i class="fa-solid fa-gauge-high text-cyan"></i> Technical Summary &amp; Gauges
+                    </button>
+                    <button class="tv-sub-tab-btn" data-tab="mas">
+                        <i class="fa-solid fa-chart-line text-bullish"></i> Moving Averages (10-200)
+                    </button>
+                    <button class="tv-sub-tab-btn" data-tab="oscillators">
+                        <i class="fa-solid fa-wave-square text-purple"></i> Technical Oscillators
+                    </button>
+                    <button class="tv-sub-tab-btn" data-tab="pivots">
+                        <i class="fa-solid fa-crosshairs text-amber"></i> Pivot Breakout Levels
+                    </button>
+                    <button class="tv-sub-tab-btn" data-tab="performance">
+                        <i class="fa-solid fa-calendar-days text-gold"></i> Historical Performance
+                    </button>
+                </div>
+
+                <!-- Dynamic TradingView Technical Analysis Content Container -->
                 <div id="stockDetailAnalysisGrid" style="margin-bottom:28px;">
-                    <!-- Dynamic Analysis Cards Injected by JS -->
+                    <!-- Dynamic Content Injected by JS based on active sub-tab -->
                 </div>
             </div>
             <!-- ============================== END DEDICATED STOCK DETAIL SECTION ============================== -->
@@ -1409,7 +1427,7 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=36.0.0"></script>
+    <script src="/static/app.js?v=37.0.0"></script>
 
 </body>
 </html>

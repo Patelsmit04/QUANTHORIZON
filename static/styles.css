@@ -4292,8 +4292,10 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
 .price-tick-flash {
     animation: priceTickGlow 0.6s ease-out;
     border-radius: 4px;
+}
+
 /* ==========================================================================
-   STOCK DETAIL PAGE — SINGLE ROW HEADER & PRO TOOLS
+   STOCK DETAIL PAGE — TRADINGVIEW PRO DESIGN SYSTEM
    ========================================================================== */
 .stock-detail-header-card {
     background: rgba(15, 23, 42, 0.95);
@@ -4305,15 +4307,17 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
     justify-content: space-between;
     gap: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .btn-icon-back {
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     color: #ffffff;
     display: inline-flex;
     align-items: center;
@@ -4333,7 +4337,7 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
-    padding: 8px 12px;
+    padding: 6px 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -4342,55 +4346,84 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
 }
 
 .chart-tool-btn {
-    padding: 6px 12px;
-    font-size: 11.5px;
+    padding: 5px 10px;
+    font-size: 11px;
     font-weight: 700;
-    border-radius: 8px;
+    border-radius: 6px;
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     color: #94a3b8;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     transition: all 0.18s ease;
 }
 
 .chart-tool-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.2);
     color: #ffffff;
 }
 
 .chart-tool-btn.active {
-    background: rgba(212, 175, 55, 0.2) !important;
+    background: rgba(212, 175, 55, 0.18) !important;
     border-color: rgba(212, 175, 55, 0.6) !important;
     color: var(--gold) !important;
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
 }
 
+/* Floating TradingView Live OHLCV HUD */
+.tv-chart-legend {
+    position: absolute;
+    top: 10px;
+    left: 14px;
+    z-index: 10;
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(13, 16, 23, 0.82);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+}
+
+.tv-chart-legend span b {
+    color: #ffffff;
+    margin-left: 2px;
+}
+
+/* Analysis Pro Cards */
 .analysis-deep-card {
     background: rgba(15, 23, 42, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.09);
     border-radius: 14px;
-    padding: 18px;
+    padding: 16px;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+    margin-bottom: 16px;
 }
 
 .pillar-meter-wrapper {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .pillar-meter-header {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
     margin-bottom: 4px;
 }
 
 .pillar-meter-track {
     width: 100%;
-    height: 7px;
+    height: 6px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.08);
     overflow: hidden;
@@ -4400,6 +4433,118 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
     height: 100%;
     border-radius: 999px;
     transition: width 0.6s ease;
+}
+
+/* TradingView Technical Analysis Sub-Tabs */
+.tv-analysis-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    scrollbar-width: thin;
+}
+
+.tv-sub-tab-btn {
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.tv-sub-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.tv-sub-tab-btn.active {
+    background: rgba(212, 175, 55, 0.16) !important;
+    border-color: rgba(212, 175, 55, 0.5) !important;
+    color: var(--gold) !important;
+}
+
+/* TradingView Table Pro */
+.tv-table-pro {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+}
+
+.tv-table-pro th {
+    background: rgba(255, 255, 255, 0.03);
+    color: #94a3b8;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: left;
+}
+
+.tv-table-pro td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
+    font-weight: 600;
+}
+
+.tv-table-pro tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.tv-badge-action {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.tv-badge-buy {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.tv-badge-sell {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.tv-badge-neutral {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+/* TradingView Gauge Visual */
+.tv-gauge-card {
+    background: rgba(18, 24, 38, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+}
+
+.tv-gauge-meter {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    margin: 8px 0;
 }
 
 
