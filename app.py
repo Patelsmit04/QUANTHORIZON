@@ -2328,30 +2328,35 @@ def get_live_prices():
 
     stock_prices = list(stock_prices_dict.values())
 
-    # Apply realistic 5-second dynamic micro-ticks so numbers continuously pulse and update
-    import random
-    tick_seed = int(now_ts // 5)  # updates exactly every 5 seconds
-    rng = random.Random(tick_seed)
+    sched_info = get_market_schedule_info()
+    is_live_market = sched_info.get("is_open", False)
 
-    for idx in index_prices:
-        if idx.get("ltp") is not None:
-            base_ltp = float(idx["ltp"])
-            prev_c = float(idx.get("prev_close") or base_ltp)
-            delta_pct = rng.uniform(-0.02, 0.02)
-            live_ltp = round(base_ltp * (1.0 + delta_pct / 100.0), 2)
-            idx["ltp"] = live_ltp
-            idx["change_pts"] = round(live_ltp - prev_c, 2)
-            idx["pct_change"] = round(((live_ltp - prev_c) / prev_c) * 100.0, 2) if prev_c > 0 else 0.0
+    # Apply realistic 5-second dynamic micro-ticks ONLY during off-market hours or static testing
+    # During live market hours, 100% authentic exchange quotes are passed with 0% artificial variation
+    if not is_live_market:
+        import random
+        tick_seed = int(now_ts // 5)  # updates exactly every 5 seconds
+        rng = random.Random(tick_seed)
 
-    for s in stock_prices:
-        if s.get("ltp") is not None:
-            base_ltp = float(s["ltp"])
-            prev_c = float(s.get("prev_close") or base_ltp)
-            delta_pct = rng.uniform(-0.03, 0.03)
-            live_ltp = round(base_ltp * (1.0 + delta_pct / 100.0), 2)
-            s["ltp"] = live_ltp
-            s["change_pts"] = round(live_ltp - prev_c, 2)
-            s["pct_change"] = round(((live_ltp - prev_c) / prev_c) * 100.0, 2) if prev_c > 0 else 0.0
+        for idx in index_prices:
+            if idx.get("ltp") is not None:
+                base_ltp = float(idx["ltp"])
+                prev_c = float(idx.get("prev_close") or base_ltp)
+                delta_pct = rng.uniform(-0.02, 0.02)
+                live_ltp = round(base_ltp * (1.0 + delta_pct / 100.0), 2)
+                idx["ltp"] = live_ltp
+                idx["change_pts"] = round(live_ltp - prev_c, 2)
+                idx["pct_change"] = round(((live_ltp - prev_c) / prev_c) * 100.0, 2) if prev_c > 0 else 0.0
+
+        for s in stock_prices:
+            if s.get("ltp") is not None:
+                base_ltp = float(s["ltp"])
+                prev_c = float(s.get("prev_close") or base_ltp)
+                delta_pct = rng.uniform(-0.03, 0.03)
+                live_ltp = round(base_ltp * (1.0 + delta_pct / 100.0), 2)
+                s["ltp"] = live_ltp
+                s["change_pts"] = round(live_ltp - prev_c, 2)
+                s["pct_change"] = round(((live_ltp - prev_c) / prev_c) * 100.0, 2) if prev_c > 0 else 0.0
 
     # Determine BTST display status based on current IST time
     ist_now = get_ist_now()
