@@ -1,0 +1,18 @@
+{
+  "date": "2026-08-14",
+  "snapshot_done": true,
+  "auto_lock_25_done": true,
+  "final_bell_30_done": true,
+  "cas_close_done": true,
+  "scoring_done": true,
+  "broadcast_done": true,
+  "lock_done": true,
+  "snapshot_picks": [],
+  "cas_close_prices": {},
+  "lock_result": {
+    "locked_count": 0,
+    "total_today_locked": 1
+  },
+  "lock_timestamp": null,
+  "btst_status": "confirmed"
+}

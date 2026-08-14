@@ -1,0 +1,49 @@
+{
+  "updated_at": "2026-08-08 13:19:53 IST",
+  "deals": [
+    {
+      "symbol": "GRASIM",
+      "raw_ticker": "GRASIM.NS",
+      "side": "BUY",
+      "quantity": 350000,
+      "price": 3315.0,
+      "value_cr": 116.02,
+      "deal_type": "BLOCK",
+      "client_name": "SMC_INSTITUTIONAL_FUND",
+      "timestamp": "2026-08-08"
+    },
+    {
+      "symbol": "NTPC",
+      "raw_ticker": "NTPC.NS",
+      "side": "BUY",
+      "quantity": 1800000,
+      "price": 412.5,
+      "value_cr": 74.25,
+      "deal_type": "BLOCK",
+      "client_name": "HDFC_MUTUAL_FUND",
+      "timestamp": "2026-08-08"
+    },
+    {
+      "symbol": "HINDALCO",
+      "raw_ticker": "HINDALCO.NS",
+      "side": "BUY",
+      "quantity": 950000,
+      "price": 685.0,
+      "value_cr": 65.07,
+      "deal_type": "BULK",
+      "client_name": "NIPPON_INDIA_ETF",
+      "timestamp": "2026-08-08"
+    },
+    {
+      "symbol": "ICICIBANK",
+      "raw_ticker": "ICICIBANK.NS",
+      "side": "SELL",
+      "quantity": 400000,
+      "price": 1420.0,
+      "value_cr": 56.8,
+      "deal_type": "BLOCK",
+      "client_name": "FOREIGN_INSTITUTIONAL_SELLER",
+      "timestamp": "2026-08-08"
+    }
+  ]
+}

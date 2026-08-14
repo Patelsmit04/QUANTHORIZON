@@ -1,0 +1,422 @@
+{
+  "default-5-pillar": {
+    "id": "default-5-pillar",
+    "name": "5-Pillar",
+    "description": "The original scanner behavior: every pillar active, liquidity-tiered thresholds for stocks, both fundamentals and news gates on.",
+    "target_scope": [
+      "STOCKS",
+      "NIFTY50",
+      "BANKNIFTY",
+      "SENSEX",
+      "GIFTNIFTY"
+    ],
+    "active_pillars": {
+      "Pillar 1: Futures OI": true,
+      "Pillar 2: Vol Persistence": true,
+      "Pillar 3: Relative Strength": true,
+      "Pillar 4: Volume Spike": true,
+      "Pillar 5: Marubozu Close": true,
+      "Pillar 6: Institutional Flow": true,
+      "Index: Marubozu Close": true,
+      "Index: Relative Strength": true,
+      "Index: Global Cues": true,
+      "Index: Macro News": true,
+      "Index: Derivatives Positioning": true,
+      "Index: Greeks Outlook": true
+    },
+    "required_weight_override": null,
+    "fundamentals_gate_enabled": true,
+    "news_gate_enabled": true,
+    "auto_paper_trade": false,
+    "is_active": true,
+    "is_builtin": true,
+    "clarification": {
+      "confirmed": true,
+      "confirmed_at": "2026-08-06T12:15:39.241508+00:00",
+      "target_summary": "Every tracked stock plus Nifty 50, Bank Nifty, and Sensex.",
+      "pillar_summary": "All 5 stock pillars and all 6 index pillars active \u00e2\u20ac\u201d no pillar disabled.",
+      "confirmation_bar_summary": "Engine defaults unchanged: liquidity-tiered for stocks (3.0/4.0), fixed 2.0 for indices.",
+      "gate_summary": "Both the fundamentals and news quality gates are on.",
+      "assumptions": [],
+      "plain_summary": "The baseline scanner behavior every custom strategy is compared against \u00e2\u20ac\u201d nothing disabled, nothing loosened.",
+      "auto_confirmed_reason": "Built-in default strategy \u00e2\u20ac\u201d matches the original scanner behavior exactly, no clarification needed."
+    },
+    "created_at": "2026-08-06T12:15:39.241508+00:00",
+    "updated_at": "2026-08-06T12:37:09.294652+00:00",
+    "config_hash": "3d775bba5a1c24802ff1e86bf87df12f60c01bce6c98e955117c5de353ba6673",
+    "scope_toggles": {
+      "stocks": true,
+      "indices": true
+    },
+    "python_code": "# AlgoTrader Python Strategy Logic\n# Defines entry and exit rules for scanning\ndef evaluate_signal(df, pillars_matrix):\n    # Standard 5-pillar confirmation gate\n    score = sum(pillars_matrix.values())\n    if score >= 3.0:\n        return {'signal': 'BTST_BUY', 'tp_pct': 1.5, 'sl_pct': 0.75}\n    return {'signal': 'NEUTRAL'}\n"
+  },
+  "smc-institutional-v1": {
+    "id": "smc-institutional-v1",
+    "name": "SMC (Smart Money Concepts)",
+    "description": "Detects institutional order flow via market structure shifts, order blocks, fair value gaps, and liquidity sweeps \u00e2\u20ac\u201d entries taken at premium/discount extremes with sweep confirmation.",
+    "target_scope": [
+      "STOCKS",
+      "NIFTY50",
+      "BANKNIFTY",
+      "SENSEX",
+      "GIFTNIFTY"
+    ],
+    "active_pillars": {
+      "Pillar 1: Futures OI": true,
+      "Pillar 2: Vol Persistence": true,
+      "Pillar 3: Relative Strength": true,
+      "Pillar 4: Volume Spike": true,
+      "Pillar 5: Marubozu Close": true,
+      "Pillar 6: Institutional Flow": true,
+      "Index: Marubozu Close": true,
+      "Index: Relative Strength": true,
+      "Index: Global Cues": true,
+      "Index: Macro News": true,
+      "Index: Derivatives Positioning": true,
+      "Index: Greeks Outlook": true
+    },
+    "required_weight_override": null,
+    "fundamentals_gate_enabled": true,
+    "news_gate_enabled": true,
+    "auto_paper_trade": false,
+    "is_active": true,
+    "is_builtin": false,
+    "scope_toggles": {
+      "stocks": true,
+      "indices": true
+    },
+    "python_code": "# AlgoTrader Python Strategy Logic\n# SMC (Smart Money Concepts): structure shift + order block/FVG + liquidity sweep confirmation\n\nfrom smc_helpers import (\n    detect_market_structure,\n    detect_liquidity_sweep,\n    find_nearest_order_block,\n    find_nearest_fvg,\n    premium_discount_zone,\n    check_inducement_cleared,\n    next_opposing_liquidity_pool,\n    distance_pct\n)\n\ndef evaluate_signal(df, pillars_matrix=None):\n    combine_with_pillars = False\n    structure = detect_market_structure(df)\n    swept = detect_liquidity_sweep(df)\n    ob_zone = find_nearest_order_block(df, direction=structure)\n    fvg_zone = find_nearest_fvg(df, direction=structure)\n    zone_state = premium_discount_zone(df)\n    inducement_clear = check_inducement_cleared(df)\n    signal = None\n    entry = tp_pct = sl_pct = None\n    if structure in ('bullish_bos', 'bullish_choch') and swept == 'sell_side_swept' \\\n       and zone_state == 'discount' and inducement_clear and (ob_zone or fvg_zone):\n        entry_zone = ob_zone or fvg_zone\n        signal = 'BTST_BUY'\n        entry = entry_zone['level']\n        sl_pct = distance_pct(entry, entry_zone['invalidation'])\n        tp_pct = distance_pct(entry, next_opposing_liquidity_pool(df))\n    elif structure in ('bearish_bos', 'bearish_choch') and swept == 'buy_side_swept' \\\n         and zone_state == 'premium' and inducement_clear and (ob_zone or fvg_zone):\n        entry_zone = ob_zone or fvg_zone\n        signal = 'STBT_SELL'\n        entry = entry_zone['level']\n        sl_pct = distance_pct(entry, entry_zone['invalidation'])\n        tp_pct = distance_pct(entry, next_opposing_liquidity_pool(df))\n    if signal is None:\n        return None\n    if combine_with_pillars and pillars_matrix:\n        score = sum(pillars_matrix.values())\n        if score < 3.0:\n            return None\n    return {\n        'signal': signal,\n        'entry': entry,\n        'tp_pct': tp_pct,\n        'sl_pct': sl_pct,\n        'reason': f'{structure} + {swept} + {zone_state} zone, OB/FVG confirmed'\n    }\n",
+    "clarification": {
+      "confirmed": true,
+      "confirmed_at": "2026-08-07T04:21:30.234025+00:00",
+      "target_summary": "Stocks Intraday/Scalping and Index Options (Nifty/BankNifty/Sensex).",
+      "pillar_summary": "SMC Structure Shifts (BOS/CHoCH), OB/FVG, Liquidity Sweeps, and OTE retracements.",
+      "confirmation_bar_summary": "High-conviction SMC entry filters.",
+      "gate_summary": "Both fundamentals and news gates enabled.",
+      "assumptions": [],
+      "plain_summary": "Detects institutional order block re-entries, FVG fills, and liquidity sweeps.",
+      "auto_confirmed_reason": "Custom SMC strategy card."
+    },
+    "created_at": "2026-08-07T04:21:30.234025+00:00",
+    "updated_at": "2026-08-07T04:37:23.073601+00:00",
+    "config_hash": "1b847995829e217498ec9908bec6f0ae32eb45f04d26a0783c49eda4a2d72c5f"
+  },
+  "vwap-pullback-v1": {
+    "id": "vwap-pullback-v1",
+    "name": "VWAP Pullback",
+    "description": "Buy Call on a bullish pullback to VWAP/EMA with an RSI reversal above 50.",
+    "target_scope": [
+      "STOCKS",
+      "NIFTY50",
+      "BANKNIFTY",
+      "SENSEX",
+      "GIFTNIFTY"
+    ],
+    "active_pillars": {
+      "Pillar 1: Futures OI": true,
+      "Pillar 2: Vol Persistence": true,
+      "Pillar 3: Relative Strength": true,
+      "Pillar 4: Volume Spike": true,
+      "Pillar 5: Marubozu Close": true,
+      "Pillar 6: Institutional Flow": true,
+      "Index: Marubozu Close": true,
+      "Index: Relative Strength": true,
+      "Index: Global Cues": true,
+      "Index: Macro News": true,
+      "Index: Derivatives Positioning": true,
+      "Index: Greeks Outlook": true
+    },
+    "required_weight_override": null,
+    "fundamentals_gate_enabled": true,
+    "news_gate_enabled": true,
+    "auto_paper_trade": false,
+    "is_active": true,
+    "is_builtin": false,
+    "scope_toggles": {
+      "stocks": true,
+      "indices": true
+    },
+    "clarification": {
+      "entry_conditions": "Triggers when technical score threshold (Default Tier) is met on NIFTY50, BANKNIFTY, SENSEX.",
+      "exit_conditions": "Target Profit (TP): Custom TP rule defined in Python code | Stop Loss (SL): Custom SL rule defined in Python code.",
+      "timeframe": "5m Intraday & Scalping / BTST",
+      "assumptions": [
+        "Assumes sufficient intraday liquidity for instant simulated fills.",
+        "Quality gates enforced if enabled; risk strictly capped per position."
+      ],
+      "target_summary": "Target universe: NIFTY50, BANKNIFTY, SENSEX.",
+      "pillar_summary": "Active technical pillars: 12 active.",
+      "confirmation_bar_summary": "Confirmation bar weight: Engine Default.",
+      "gate_summary": "Fundamentals gate: ON, News gate: ON.",
+      "plain_summary": "Strategy 'VWAP Pullback' scans NIFTY50, BANKNIFTY, SENSEX for institutional breakout setups.",
+      "confirmed": true,
+      "confirmed_at": null
+    },
+    "created_at": "2026-08-09T12:50:38.970656+00:00",
+    "updated_at": "2026-08-14T04:22:31.296332+00:00",
+    "config_hash": "cf513c24202e2799d75a3fdd4a53fbe58d58e62a09dd543c363f77026843bc9d",
+    "python_code": "# AlgoTrader Python Strategy Logic\n# Defines entry and exit rules for scanning\ndef evaluate_signal(df, pillars_matrix):\n    # Standard 5-pillar confirmation gate\n    score = sum(pillars_matrix.values())\n    if score >= 3.0:\n        return {'signal': 'BTST_BUY', 'tp_pct': 1.5, 'sl_pct': 0.75}\n    return {'signal': 'NEUTRAL'}\n"
+  },
+  "breakdown-spike-v1": {
+    "id": "breakdown-spike-v1",
+    "name": "Breakdown Spike",
+    "description": "Buy Put on a range breakdown confirmed by a 1.5x volume spike.",
+    "target_scope": [
+      "STOCKS",
+      "NIFTY50",
+      "BANKNIFTY",
+      "SENSEX",
+      "GIFTNIFTY"
+    ],
+    "active_pillars": {
+      "Pillar 1: Futures OI": true,
+      "Pillar 2: Vol Persistence": true,
+      "Pillar 3: Relative Strength": true,
+      "Pillar 4: Volume Spike": true,
+      "Pillar 5: Marubozu Close": true,
+      "Pillar 6: Institutional Flow": true,
+      "Index: Marubozu Close": true,
+      "Index: Relative Strength": true,
+      "Index: Global Cues": true,
+      "Index: Macro News": true,
+      "Index: Derivatives Positioning": true,
+      "Index: Greeks Outlook": true
+    },
+    "required_weight_override": null,
+    "fundamentals_gate_enabled": true,
+    "news_gate_enabled": true,
+    "auto_paper_trade": false,
+    "is_active": true,
+    "is_builtin": false,
+    "scope_toggles": {
+      "stocks": true,
+      "indices": true
+    },
+    "clarification": {
+      "entry_conditions": "Triggers when technical score threshold (Default Tier) is met on NIFTY50, BANKNIFTY, SENSEX.",
+      "exit_conditions": "Target Profit (TP): Custom TP rule defined in Python code | Stop Loss (SL): Custom SL rule defined in Python code.",
+      "timeframe": "5m Intraday & Scalping / BTST",
+      "assumptions": [
+        "Assumes sufficient intraday liquidity for instant simulated fills.",
+        "Quality gates enforced if enabled; risk strictly capped per position."
+      ],
+      "target_summary": "Target universe: NIFTY50, BANKNIFTY, SENSEX.",
+      "pillar_summary": "Active technical pillars: 12 active.",
+      "confirmation_bar_summary": "Confirmation bar weight: Engine Default.",
+      "gate_summary": "Fundamentals gate: ON, News gate: ON.",
+      "plain_summary": "Strategy 'Breakdown Spike' scans NIFTY50, BANKNIFTY, SENSEX for institutional breakout setups.",
+      "confirmed": true,
+      "confirmed_at": null
+    },
+    "created_at": "2026-08-09T12:50:38.970656+00:00",
+    "updated_at": "2026-08-14T04:22:50.645179+00:00",
+    "config_hash": "cf513c24202e2799d75a3fdd4a53fbe58d58e62a09dd543c363f77026843bc9d",
+    "python_code": "# AlgoTrader Python Strategy Logic\n# Defines entry and exit rules for scanning\ndef evaluate_signal(df, pillars_matrix):\n    # Standard 5-pillar confirmation gate\n    score = sum(pillars_matrix.values())\n    if score >= 3.0:\n        return {'signal': 'BTST_BUY', 'tp_pct': 1.5, 'sl_pct': 0.75}\n    return {'signal': 'NEUTRAL'}\n"
+  },
+  "orb-v1": {
+    "id": "orb-v1",
+    "name": "ORB",
+    "description": "Opening Range Breakout \u00e2\u20ac\u201d Buy Call/Put on a break of the first 30 minutes' high/low.",
+    "target_scope": [
+      "STOCKS",
+      "NIFTY50",
+      "BANKNIFTY",
+      "SENSEX",
+      "GIFTNIFTY"
+    ],
+    "active_pillars": {
+      "Pillar 1: Futures OI": true,
+      "Pillar 2: Vol Persistence": true,
+      "Pillar 3: Relative Strength": true,
+      "Pillar 4: Volume Spike": true,
+      "Pillar 5: Marubozu Close": true,
+      "Pillar 6: Institutional Flow": true,
+      "Index: Marubozu Close": true,
+      "Index: Relative Strength": true,
+      "Index: Global Cues": true,
+      "Index: Macro News": true,
+      "Index: Derivatives Positioning": true,
+      "Index: Greeks Outlook": true
+    },
+    "required_weight_override": null,
+    "fundamentals_gate_enabled": true,
+    "news_gate_enabled": true,
+    "auto_paper_trade": false,
+    "is_active": true,
+    "is_builtin": false,
+    "scope_toggles": {
+      "stocks": true,
+      "indices": true
+    },
+    "clarification": {
+      "entry_conditions": "Triggers when technical score threshold (Default Tier) is met on NIFTY50, BANKNIFTY, SENSEX.",
+      "exit_conditions": "Target Profit (TP): Custom TP rule defined in Python code | Stop Loss (SL): Custom SL rule defined in Python code.",
+      "timeframe": "5m Intraday & Scalping / BTST",
+      "assumptions": [
+        "Assumes sufficient intraday liquidity for instant simulated fills.",
+        "Quality gates enforced if enabled; risk strictly capped per position."
+      ],
+      "target_summary": "Target universe: NIFTY50, BANKNIFTY, SENSEX.",
+      "pillar_summary": "Active technical pillars: 12 active.",
+      "confirmation_bar_summary": "Confirmation bar weight: Engine Default.",
+      "gate_summary": "Fundamentals gate: ON, News gate: ON.",
+      "plain_summary": "Strategy 'ORB' scans NIFTY50, BANKNIFTY, SENSEX for institutional breakout setups.",
+      "confirmed": true,
+      "confirmed_at": null
+    },
+    "created_at": "2026-08-09T12:50:38.970656+00:00",
+    "updated_at": "2026-08-14T04:22:53.855690+00:00",
+    "config_hash": "cf513c24202e2799d75a3fdd4a53fbe58d58e62a09dd543c363f77026843bc9d",
+    "python_code": "# AlgoTrader Python Strategy Logic\n# Defines entry and exit rules for scanning\ndef evaluate_signal(df, pillars_matrix):\n    # Standard 5-pillar confirmation gate\n    score = sum(pillars_matrix.values())\n    if score >= 3.0:\n        return {'signal': 'BTST_BUY', 'tp_pct': 1.5, 'sl_pct': 0.75}\n    return {'signal': 'NEUTRAL'}\n"
+  },
+  "oi-surge-v1": {
+    "id": "oi-surge-v1",
+    "name": "OI Surge",
+    "description": "Buy 1-strike-OTM Call on a 15-min price surge with long OI build-up.",
+    "target_scope": [
+      "STOCKS",
+      "NIFTY50",
+      "BANKNIFTY",
+      "SENSEX",
+      "GIFTNIFTY"
+    ],
+    "active_pillars": {
+      "Pillar 1: Futures OI": true,
+      "Pillar 2: Vol Persistence": true,
+      "Pillar 3: Relative Strength": true,
+      "Pillar 4: Volume Spike": true,
+      "Pillar 5: Marubozu Close": true,
+      "Pillar 6: Institutional Flow": true,
+      "Index: Marubozu Close": true,
+      "Index: Relative Strength": true,
+      "Index: Global Cues": true,
+      "Index: Macro News": true,
+      "Index: Derivatives Positioning": true,
+      "Index: Greeks Outlook": true
+    },
+    "required_weight_override": null,
+    "fundamentals_gate_enabled": true,
+    "news_gate_enabled": true,
+    "auto_paper_trade": false,
+    "is_active": true,
+    "is_builtin": false,
+    "scope_toggles": {
+      "stocks": true,
+      "indices": true
+    },
+    "clarification": {
+      "confirmed": true,
+      "confirmed_at": "2026-08-09T12:50:38.970656+00:00",
+      "target_summary": "STOCKS",
+      "pillar_summary": "Rule-based condition chain (strategy_engine_rules.py), not the pillar matrix.",
+      "confirmation_bar_summary": "Fixed rule conditions from the intraday Strategy Engine spec.",
+      "gate_summary": "Fundamentals/news gates not applicable \u00e2\u20ac\u201d this is an intraday rule engine, not the BTST pillar model.",
+      "assumptions": [],
+      "plain_summary": "Buy 1-strike-OTM Call on a 15-min price surge with long OI build-up.",
+      "auto_confirmed_reason": "Built-in intraday Strategy Engine strategy \u00e2\u20ac\u201d no clarification needed."
+    },
+    "created_at": "2026-08-09T12:50:38.970656+00:00",
+    "updated_at": "2026-08-09T12:50:38.970656+00:00",
+    "config_hash": "0208c2a33469f12e5849050b968c7a609b29252a9c1d55167d48958f59a7edfe"
+  },
+  "death-cross-v1": {
+    "id": "death-cross-v1",
+    "name": "Death Cross",
+    "description": "Buy ATM Put on a 15-min 5/20 EMA death cross with short OI build-up.",
+    "target_scope": [
+      "STOCKS",
+      "NIFTY50",
+      "BANKNIFTY",
+      "SENSEX",
+      "GIFTNIFTY"
+    ],
+    "active_pillars": {
+      "Pillar 1: Futures OI": true,
+      "Pillar 2: Vol Persistence": true,
+      "Pillar 3: Relative Strength": true,
+      "Pillar 4: Volume Spike": true,
+      "Pillar 5: Marubozu Close": true,
+      "Pillar 6: Institutional Flow": true,
+      "Index: Marubozu Close": true,
+      "Index: Relative Strength": true,
+      "Index: Global Cues": true,
+      "Index: Macro News": true,
+      "Index: Derivatives Positioning": true,
+      "Index: Greeks Outlook": true
+    },
+    "required_weight_override": null,
+    "fundamentals_gate_enabled": true,
+    "news_gate_enabled": true,
+    "auto_paper_trade": false,
+    "is_active": true,
+    "is_builtin": false,
+    "scope_toggles": {
+      "stocks": true,
+      "indices": true
+    },
+    "clarification": {
+      "confirmed": true,
+      "confirmed_at": "2026-08-09T12:50:38.970656+00:00",
+      "target_summary": "STOCKS",
+      "pillar_summary": "Rule-based condition chain (strategy_engine_rules.py), not the pillar matrix.",
+      "confirmation_bar_summary": "Fixed rule conditions from the intraday Strategy Engine spec.",
+      "gate_summary": "Fundamentals/news gates not applicable \u00e2\u20ac\u201d this is an intraday rule engine, not the BTST pillar model.",
+      "assumptions": [],
+      "plain_summary": "Buy ATM Put on a 15-min 5/20 EMA death cross with short OI build-up.",
+      "auto_confirmed_reason": "Built-in intraday Strategy Engine strategy \u00e2\u20ac\u201d no clarification needed."
+    },
+    "created_at": "2026-08-09T12:50:38.970656+00:00",
+    "updated_at": "2026-08-09T12:50:38.970656+00:00",
+    "config_hash": "0208c2a33469f12e5849050b968c7a609b29252a9c1d55167d48958f59a7edfe"
+  },
+  "volatility-straddle-v1": {
+    "id": "volatility-straddle-v1",
+    "name": "Volatility Straddle",
+    "description": "Buy ATM Call + Put ahead of a high-impact event when IV is in its low percentile. Sensex excluded \u00e2\u20ac\u201d no live options data source exists for it.",
+    "target_scope": [
+      "STOCKS",
+      "NIFTY50",
+      "BANKNIFTY",
+      "SENSEX",
+      "GIFTNIFTY"
+    ],
+    "active_pillars": {
+      "Pillar 1: Futures OI": true,
+      "Pillar 2: Vol Persistence": true,
+      "Pillar 3: Relative Strength": true,
+      "Pillar 4: Volume Spike": true,
+      "Pillar 5: Marubozu Close": true,
+      "Pillar 6: Institutional Flow": true,
+      "Index: Marubozu Close": true,
+      "Index: Relative Strength": true,
+      "Index: Global Cues": true,
+      "Index: Macro News": true,
+      "Index: Derivatives Positioning": true,
+      "Index: Greeks Outlook": true
+    },
+    "required_weight_override": null,
+    "fundamentals_gate_enabled": true,
+    "news_gate_enabled": true,
+    "auto_paper_trade": false,
+    "is_active": true,
+    "is_builtin": false,
+    "scope_toggles": {
+      "stocks": true,
+      "indices": true
+    },
+    "clarification": {
+      "confirmed": true,
+      "confirmed_at": "2026-08-09T12:50:38.970656+00:00",
+      "target_summary": "STOCKS, NIFTY50, BANKNIFTY",
+      "pillar_summary": "Rule-based condition chain (strategy_engine_rules.py), not the pillar matrix.",
+      "confirmation_bar_summary": "Fixed rule conditions from the intraday Strategy Engine spec.",
+      "gate_summary": "Fundamentals/news gates not applicable \u00e2\u20ac\u201d this is an intraday rule engine, not the BTST pillar model.",
+      "assumptions": [],
+      "plain_summary": "Buy ATM Call + Put ahead of a high-impact event when IV is in its low percentile. Sensex excluded \u00e2\u20ac\u201d no live options data source exists for it.",
+      "auto_confirmed_reason": "Built-in intraday Strategy Engine strategy \u00e2\u20ac\u201d no clarification needed."
+    },
+    "created_at": "2026-08-09T12:50:38.970656+00:00",
+    "updated_at": "2026-08-09T12:50:38.970656+00:00",
+    "config_hash": "2db511f4db94c03664f52e7d9d607d3aba5aa647aa3a68156bafef8b514505d2"
+  }
+}

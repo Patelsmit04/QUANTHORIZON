@@ -60,13 +60,25 @@ def atomic_write_json(filepath: str, data: Any):
 
 
 def read_json(filepath: str, default: Any = None) -> Any:
-    if not os.path.exists(filepath):
-        return default
-    try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return default
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+
+    # Serverless fallback: ONLY on Vercel runtime if target in /tmp/data doesn't exist yet
+    if os.environ.get("VERCEL"):
+        try:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            bundled_path = os.path.join(base_dir, "data", os.path.basename(filepath))
+            if bundled_path != filepath and os.path.exists(bundled_path):
+                with open(bundled_path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+        except Exception:
+            pass
+
+    return default
 
 
 _file_locks: dict = {}

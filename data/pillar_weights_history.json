@@ -1,0 +1,219 @@
+[
+  {
+    "date": "2026-08-07",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 0,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0
+    }
+  },
+  {
+    "date": "2026-08-07",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 0,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0
+    }
+  },
+  {
+    "date": "2026-08-07",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 0,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0
+    }
+  },
+  {
+    "date": "2026-08-07",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 0,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0
+    }
+  },
+  {
+    "date": "2026-08-10",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 2,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-10",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 2,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-10",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 2,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-10",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 2,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-10",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 2,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-11",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 9,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-11",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 9,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-11",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 9,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-11",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 9,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-11",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 9,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-11",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 12,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-14",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 13,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  },
+  {
+    "date": "2026-08-14",
+    "action": "SKIPPED_INSUFFICIENT_SAMPLE",
+    "sample_size": 13,
+    "weights": {
+      "Pillar 1: Futures OI": 1.0,
+      "Pillar 2: Vol Persistence": 1.0,
+      "Pillar 3: Relative Strength": 1.0,
+      "Pillar 4: Volume Spike": 1.0,
+      "Pillar 5: Marubozu Close": 1.0,
+      "Pillar 6: Institutional Flow": 1.0
+    }
+  }
+]

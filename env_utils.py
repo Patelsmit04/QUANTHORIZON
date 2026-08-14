@@ -19,20 +19,30 @@ def load_env_with_fallback(base_dir: str) -> None:
 
 def _get_data_dir() -> str:
     """
-    10 modules each independently hardcoded DATA_DIR = "data" (a path relative to the
-    deployment's own directory). That's fine for `python app.py` on a persistent host, but
-    on Vercel the deployment bundle is read-only — only /tmp is writable — so every attempt
-    to create/open a file under "data/" crashed the app on import (sqlite3.OperationalError:
-    unable to open database file), a 500 on every single request. VERCEL=1 is set
-    automatically in that runtime; redirect to /tmp there instead of crashing.
-
-    Note /tmp on Vercel is ephemeral per-instance, not persistent across cold starts or
-    shared across concurrent instances — this makes the app importable and servable there,
-    it does not change the existing, separately-documented fact that the autonomous
-    scheduler doesn't run on serverless (see README's deployment note).
+    On Vercel, the repository root is read-only and only /tmp is writable.
+    Redirect DATA_DIR to /tmp/data and initialize it with bundled seed files
+    (last_market_scan.json, strategies.json, trade_history.json, event_calendar.json, etc.)
+    so serverless requests always serve the full pre-computed datasets and active strategies.
     """
     if os.environ.get("VERCEL"):
-        return "/tmp/data"
+        tmp_dir = "/tmp/data"
+        try:
+            os.makedirs(tmp_dir, exist_ok=True)
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            bundled_data_dir = os.path.join(base_dir, "data")
+            if os.path.exists(bundled_data_dir):
+                import shutil
+                for item in os.listdir(bundled_data_dir):
+                    src_file = os.path.join(bundled_data_dir, item)
+                    dst_file = os.path.join(tmp_dir, item)
+                    if os.path.isfile(src_file) and not os.path.exists(dst_file):
+                        try:
+                            shutil.copy2(src_file, dst_file)
+                        except Exception:
+                            pass
+        except Exception:
+            pass
+        return tmp_dir
     return "data"
 
 

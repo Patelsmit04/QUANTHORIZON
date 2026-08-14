@@ -1,9 +1,9 @@
 {
   "trades": [
     {
-      "id": "2026-08-11_RELIANCE",
-      "lock_date": "2026-08-11",
-      "lock_time": "17:14:00",
+      "id": "2026-08-14_RELIANCE",
+      "lock_date": "2026-08-14",
+      "lock_time": "09:23:28",
       "symbol": "RELIANCE",
       "raw_ticker": "RELIANCE.NS",
       "liquidity_tier": "TIER_1",
@@ -33,6 +33,41 @@
       "variance_error_pct": null,
       "accuracy_score_pct": null,
       "outcome": "PENDING"
+    },
+    {
+      "id": "2026-08-11_RELIANCE",
+      "lock_date": "2026-08-11",
+      "lock_time": "17:14:00",
+      "symbol": "RELIANCE",
+      "raw_ticker": "RELIANCE.NS",
+      "liquidity_tier": "TIER_1",
+      "confirmed_pillars_count": 3,
+      "confirmed_pillars": [],
+      "oi_magnitude": {},
+      "expiry_discount_applied": false,
+      "delivery_t1_validation": {},
+      "fundamental_quality": {},
+      "news_signal": {},
+      "depth_analysis": "",
+      "signal": "BTST (BUY)",
+      "option_type": "NONE",
+      "priority_level": "P1_HIGH",
+      "confidence_score": 85,
+      "close_price_325": 100.0,
+      "predicted_gap_pct": 1.5,
+      "day_high": 0.0,
+      "day_low": 0.0,
+      "vwap": 0.0,
+      "volume_spike": 1.0,
+      "rsi": 50.0,
+      "rank_reason": "",
+      "status": "COMPLETED",
+      "open_price_915": 78111.91,
+      "gap_pct": 78011.91,
+      "variance_error_pct": 78010.41,
+      "accuracy_score_pct": 0.0,
+      "outcome": "JACKPOT WIN",
+      "evaluated_at": "2026-08-14 09:16:36 IST"
     },
     {
       "id": "2026-08-07_GRASIM",
@@ -104,14 +139,14 @@
       "evaluated_at": "2026-08-10 10:30:22 IST"
     }
   ],
-  "total_trades": 1,
-  "wins": 0,
+  "total_trades": 2,
+  "wins": 1,
   "losses": 1,
   "neutrals": 0,
-  "win_rate_pct": 0.0,
-  "avg_gap_pct": -0.9,
-  "prediction_accuracy_pct": 50.5,
-  "avg_variance_error_pct": 3.3,
-  "last_updated": "2026-08-11 19:15:38 IST",
-  "jackpot_wins": 0
+  "win_rate_pct": 50.0,
+  "avg_gap_pct": 39005.51,
+  "prediction_accuracy_pct": 25.2,
+  "avg_variance_error_pct": 39006.86,
+  "last_updated": "2026-08-14 18:09:51 IST",
+  "jackpot_wins": 1
 }
