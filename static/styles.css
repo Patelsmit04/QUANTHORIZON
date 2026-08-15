@@ -4384,17 +4384,22 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
     transform: scale(1.08) !important;
 }
 
-/* Dedicated Pro HUD Legend Bar (Above Timeframe Row) */
+/* Dedicated Pro HUD Legend Bar (Fixed Height, No Jitter, Tabular Monospace Digits) */
 .chart-hud-legend-bar {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(11, 14, 20, 0.96)) !important;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(11, 14, 20, 0.98)) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 12px !important;
-    padding: 7px 14px !important;
+    padding: 8px 16px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    box-sizing: border-box !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 12px !important;
-    flex-wrap: wrap !important;
+    gap: 14px !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3) !important;
 }
 
@@ -4403,6 +4408,7 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
     align-items: center !important;
     gap: 8px !important;
     flex-shrink: 0 !important;
+    min-width: 140px !important;
 }
 
 .hud-interval-badge {
@@ -4414,27 +4420,49 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
     padding: 2px 7px !important;
     border-radius: 6px !important;
     text-transform: uppercase !important;
+    white-space: nowrap !important;
 }
 
 .hud-ohlc-group {
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, monospace !important;
-    font-size: 12px !important;
+    gap: 10px !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+    font-variant-numeric: tabular-nums !important;
+    -moz-font-feature-settings: "tnum";
+    -webkit-font-feature-settings: "tnum";
+    font-feature-settings: "tnum" 1;
+    font-size: 12.5px !important;
     color: #94a3b8 !important;
-    flex-wrap: wrap !important;
+    flex-shrink: 0 !important;
 }
 
 .hud-metric {
     display: inline-flex !important;
     align-items: baseline !important;
-    gap: 3px !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
+    min-width: 96px !important;
+    white-space: nowrap !important;
+    font-variant-numeric: tabular-nums !important;
+    font-feature-settings: "tnum" 1;
+}
+
+.hud-metric.hud-metric-vol {
+    min-width: 106px !important;
+}
+
+.hud-metric.hud-metric-change {
+    min-width: 86px !important;
+    justify-content: flex-end !important;
 }
 
 .hud-metric .hud-val {
     color: #ffffff !important;
     font-weight: 700 !important;
+    font-variant-numeric: tabular-nums !important;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: 0.2px !important;
 }
 
 .chart-pro-toolbar {
