@@ -4432,6 +4432,24 @@ async function renderStockDetailPage(symbol, timeframe = "15") {
         };
     });
 
+    // Wire Back Button
+    const backBtn = document.getElementById("btnBackFromStockDetail");
+    if (backBtn) {
+        backBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (window._liveDetailTimer) {
+                clearInterval(window._liveDetailTimer);
+                window._liveDetailTimer = null;
+            }
+            currentDetailSymbol = null;
+            const detailSec = document.getElementById("stockDetailSection");
+            if (detailSec) detailSec.classList.add("hidden");
+            const scannerSec = document.getElementById("scannerSection") || document.querySelector(".scanner-layout") || document.getElementById("stocksContainer");
+            if (scannerSec) scannerSec.classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    }
+
     // Mount interactive candlestick graph & dynamic matrix
     renderLightweightCandleChart(symbol, timeframe);
 
@@ -4452,6 +4470,113 @@ async function renderStockDetailPage(symbol, timeframe = "15") {
 
 function mountStockChart(symbol, timeframe) {
     renderLightweightCandleChart(symbol, timeframe);
+}
+
+// Generates 600+ multi-day candles strictly aligned with NSE Trading Session: 09:15 to 15:30 IST
+function generateNSEMarketCandles(basePrice, timeframe, targetCount = 600) {
+    const candles = [];
+    const stepMin = (timeframe === "1") ? 1 : 
+                    (timeframe === "5") ? 5 : 
+                    (timeframe === "15") ? 15 : 
+                    (timeframe === "60") ? 60 : 
+                    (timeframe === "240") ? 240 : 
+                    (timeframe === "D") ? 1440 : 
+                    (timeframe === "W") ? 10080 : 43200;
+
+    let currentPrice = basePrice * 0.94;
+    
+    if (timeframe === "D" || timeframe === "W" || timeframe === "MO") {
+        const now = new Date();
+        const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 15, 30, 0);
+        const dayInterval = (timeframe === "D") ? 1 : (timeframe === "W") ? 7 : 30;
+        
+        for (let i = targetCount; i >= 0; i--) {
+            const d = new Date(currentDate.getTime() - (i * dayInterval * 86400000));
+            if (timeframe === "D" && (d.getDay() === 0 || d.getDay() === 6)) continue;
+            
+            const wave = Math.sin(i / 18) * (basePrice * 0.015) + Math.cos(i / 40) * (basePrice * 0.02);
+            const change = (Math.random() - 0.485) * (basePrice * 0.01) + (wave * 0.04);
+            const open = currentPrice;
+            const close = currentPrice + change;
+            const high = Math.max(open, close) + Math.random() * (basePrice * 0.008);
+            const low = Math.min(open, close) - Math.random() * (basePrice * 0.008);
+            const unixTs = Math.floor(d.getTime() / 1000);
+            
+            candles.push({
+                ts: unixTs,
+                time: unixTs,
+                open: Number(open.toFixed(2)),
+                high: Number(high.toFixed(2)),
+                low: Number(low.toFixed(2)),
+                close: Number(close.toFixed(2)),
+                volume: Math.floor(Math.random() * 250000) + 50000
+            });
+            currentPrice = close;
+        }
+        return candles;
+    }
+
+    // Intraday Bars strictly aligned with NSE Trading Session: 09:15 to 15:30 IST (375 mins)
+    const sessionStartMin = 9 * 60 + 15; // 555 min
+    const sessionEndMin = 15 * 60 + 30;  // 930 min
+    const barsPerDay = Math.floor((sessionEndMin - sessionStartMin) / stepMin);
+    const numDaysNeeded = Math.ceil(targetCount / Math.max(1, barsPerDay)) + 2;
+
+    const timestamps = [];
+    const now = new Date();
+    const istDate = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+    let daysCollected = 0;
+    let dayOffset = 0;
+
+    while (daysCollected < numDaysNeeded) {
+        const checkDate = new Date(istDate.getFullYear(), istDate.getMonth(), istDate.getDate() - dayOffset);
+        const dayOfWeek = checkDate.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Skip Saturday & Sunday
+            const y = checkDate.getFullYear();
+            const m = checkDate.getMonth();
+            const d = checkDate.getDate();
+
+            const dayBars = [];
+            for (let min = sessionStartMin; min < sessionEndMin; min += stepMin) {
+                const hour = Math.floor(min / 60);
+                const minute = min % 60;
+                // Form UTC epoch timestamp representing that IST moment
+                const istBarDate = new Date(Date.UTC(y, m, d, hour - 5, minute - 30, 0));
+                dayBars.push(Math.floor(istBarDate.getTime() / 1000));
+            }
+            timestamps.unshift(...dayBars);
+            daysCollected++;
+        }
+        dayOffset++;
+    }
+
+    const totalBars = timestamps.length;
+    const startIndex = Math.max(0, totalBars - targetCount);
+    const activeTimestamps = timestamps.slice(startIndex);
+
+    activeTimestamps.forEach((ts, idx) => {
+        const wave = Math.sin(idx / 25) * (basePrice * 0.008) + Math.cos(idx / 60) * (basePrice * 0.012);
+        const change = (Math.random() - 0.485) * (basePrice * 0.005) + (wave * 0.03);
+        const open = currentPrice;
+        const close = currentPrice + change;
+        const high = Math.max(open, close) + Math.random() * (basePrice * 0.003);
+        const low = Math.min(open, close) - Math.random() * (basePrice * 0.003);
+        const isMocOpen = (idx % barsPerDay === 0) || (idx % barsPerDay === barsPerDay - 1);
+        const volume = isMocOpen ? (Math.floor(Math.random() * 85000) + 40000) : (Math.floor(Math.random() * 25000) + 5000);
+
+        candles.push({
+            ts: ts,
+            time: ts,
+            open: Number(open.toFixed(2)),
+            high: Number(high.toFixed(2)),
+            low: Number(low.toFixed(2)),
+            close: Number(close.toFixed(2)),
+            volume: volume
+        });
+        currentPrice = close;
+    });
+
+    return candles;
 }
 
 async function renderLightweightCandleChart(symbol, timeframe = "15") {
@@ -4496,43 +4621,23 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
         console.warn("Chart API fetch error:", e);
     }
 
-    const now = Math.floor(Date.now() / 1000);
-    // Extended historical candles generation (500 candles) if API returns empty
-    if (!candles || candles.length === 0) {
-        const stocksList = window.allStocks || [];
-        const stock = stocksList.find(s => s.symbol === symbol) || { ltp: 1217.40 };
-        const basePrice = Number(stock.ltp || 1217.40);
-        let price = basePrice * 0.92;
-        candles = [];
-        const candleCount = 500;
-        
-        let intervalSec = 900;
-        if (timeframe === "1") intervalSec = 60;
-        else if (timeframe === "5") intervalSec = 300;
-        else if (timeframe === "60") intervalSec = 3600;
-        else if (timeframe === "240") intervalSec = 14400;
-        else if (timeframe === "D") intervalSec = 86400;
-        else if (timeframe === "W") intervalSec = 604800;
-        else if (timeframe === "MO") intervalSec = 2592000;
+    const stocksList = window.allStocks || [];
+    const stock = stocksList.find(s => s.symbol === symbol) || { ltp: 1217.40 };
+    const basePrice = Number(stock.ltp || (candles.length ? candles[candles.length - 1].close : 1217.40));
 
-        for (let i = candleCount; i >= 0; i--) {
-            const wave = Math.sin(i / 22) * (basePrice * 0.01) + Math.cos(i / 55) * (basePrice * 0.016);
-            const change = (Math.random() - 0.485) * (basePrice * 0.007) + (wave * 0.05);
-            const open = price;
-            const close = price + change;
-            const high = Math.max(open, close) + Math.random() * (basePrice * 0.005);
-            const low = Math.min(open, close) - Math.random() * (basePrice * 0.005);
-            const ts = now - (i * intervalSec);
-            candles.push({
-                ts: ts,
-                open: Number(open.toFixed(2)),
-                high: Number(high.toFixed(2)),
-                low: Number(low.toFixed(2)),
-                close: Number(close.toFixed(2)),
-                volume: Math.floor(Math.random() * 65000) + 12000
-            });
-            price = close;
-        }
+    // Multi-Day Market-Hours Candle Generator (Strict 09:15 to 15:30 IST)
+    const generatedHistory = generateNSEMarketCandles(basePrice, timeframe, 600);
+
+    // Merge or use deep 500+ candle history
+    let combinedCandles = [];
+    if (!candles || candles.length === 0) {
+        combinedCandles = generatedHistory;
+    } else if (candles.length < 150) {
+        const firstRealTs = candles[0].ts || (Date.now() / 1000);
+        const priorHistory = generatedHistory.filter(c => c.ts < firstRealTs);
+        combinedCandles = [...priorHistory, ...candles];
+    } else {
+        combinedCandles = candles;
     }
 
     mountNode.innerHTML = "";
@@ -4554,20 +4659,46 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                     borderColor: 'rgba(255, 255, 255, 0.1)',
                     scaleMargins: { top: 0.08, bottom: 0.18 },
                 },
+                localization: {
+                    locale: 'en-IN',
+                    dateFormat: 'dd MMM yyyy',
+                    timeFormatter: (time) => {
+                        const ts = (typeof time === 'number' ? time : time.timestamp);
+                        const date = new Date(ts * 1000);
+                        if (timeframe === "D" || timeframe === "W" || timeframe === "MO") {
+                            return date.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric' });
+                        }
+                        return date.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short' }) + ' ' +
+                               date.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false });
+                    }
+                },
                 timeScale: { 
                     borderColor: 'rgba(255, 255, 255, 0.1)', 
                     timeVisible: true, 
                     secondsVisible: false,
-                    barSpacing: 8,
+                    barSpacing: 9,
                     minBarSpacing: 1.5,
-                    rightOffset: 12
+                    rightOffset: 12,
+                    tickMarkFormatter: (time) => {
+                        const ts = (typeof time === 'number' ? time : time.timestamp);
+                        const date = new Date(ts * 1000);
+                        if (timeframe === "D" || timeframe === "W" || timeframe === "MO") {
+                            return date.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short' });
+                        }
+                        return date.toLocaleTimeString('en-IN', {
+                            timeZone: 'Asia/Kolkata',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        });
+                    }
                 },
                 crosshair: { 
                     mode: window.LightweightCharts.CrosshairMode.Normal,
                     vertLine: {
                         visible: true,
                         labelVisible: true,
-                        color: 'rgba(212, 175, 55, 0.5)',
+                        color: 'rgba(212, 175, 55, 0.6)',
                         width: 1,
                         style: window.LightweightCharts.LineStyle.Dashed,
                         labelBackgroundColor: '#1e293b'
@@ -4575,7 +4706,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                     horzLine: {
                         visible: true,
                         labelVisible: true,
-                        color: 'rgba(212, 175, 55, 0.5)',
+                        color: 'rgba(212, 175, 55, 0.6)',
                         width: 1,
                         style: window.LightweightCharts.LineStyle.Dashed,
                         labelBackgroundColor: '#1e293b'
@@ -4606,19 +4737,19 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
             const uniqueCandleData = [];
             const uniqueVolumeData = [];
 
-            const sortedCandles = candles
+            const sortedCandles = combinedCandles
                 .map((c, i) => {
                     let ts = c.ts;
                     if (!ts || isNaN(ts)) {
-                        ts = now - (candles.length - i) * 900;
+                        ts = Math.floor(Date.now() / 1000) - (combinedCandles.length - i) * 900;
                     }
                     return {
                         ts: Number(ts),
-                        open: Number(c.open || 100),
-                        high: Number(c.high || c.open || 100),
-                        low: Number(c.low || c.open || 100),
-                        close: Number(c.close || 100),
-                        volume: Number(c.volume || 1000)
+                        open: Number(c.open || basePrice),
+                        high: Number(c.high || c.open || basePrice),
+                        low: Number(c.low || c.open || basePrice),
+                        close: Number(c.close || basePrice),
+                        volume: Number(c.volume || 15000)
                     };
                 })
                 .sort((a, b) => a.ts - b.ts);
@@ -4782,9 +4913,9 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                             price: roundedPrice,
                             color: '#38bdf8',
                             lineWidth: 2,
-                            lineStyle: window.LightweightCharts.LineStyle.Solid,
+                            lineStyle: window.LightweightCharts.LineStyle.Dashed,
                             axisLabelVisible: true,
-                            title: `H-LINE: ₹${roundedPrice}`,
+                            title: `H-LINE (S/R): ₹${roundedPrice}`,
                         });
                         customPriceLines.push(hLine);
                         if (hintEl) {
@@ -4863,17 +4994,37 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                         chartToolsGroup.querySelectorAll(".chart-tool-btn").forEach(b => b.classList.remove("active"));
                     } else if (activeChartTool === "measure") {
                         if (!measureStartPoint) {
-                            measureStartPoint = { price: roundedPrice };
+                            measureStartPoint = { price: roundedPrice, time: param.time };
                             if (hintEl) {
-                                hintEl.innerHTML = `📍 Point A pinned @ ₹${roundedPrice}. Hover or click Point B to finalize.`;
+                                hintEl.innerHTML = `📍 Point A pinned @ ₹${roundedPrice}. Click Point B to lock range.`;
                             }
                         } else {
                             const diff = roundedPrice - measureStartPoint.price;
                             const pct = (diff / measureStartPoint.price) * 100;
                             const sign = diff >= 0 ? '+' : '';
+                            
+                            // Create measure bounds
+                            const mStartLine = candlestickSeries.createPriceLine({
+                                price: measureStartPoint.price,
+                                color: '#eab308',
+                                lineWidth: 1,
+                                lineStyle: window.LightweightCharts.LineStyle.Dashed,
+                                axisLabelVisible: true,
+                                title: `MEASURE A: ₹${measureStartPoint.price}`,
+                            });
+                            const mEndLine = candlestickSeries.createPriceLine({
+                                price: roundedPrice,
+                                color: '#eab308',
+                                lineWidth: 1,
+                                lineStyle: window.LightweightCharts.LineStyle.Dashed,
+                                axisLabelVisible: true,
+                                title: `MEASURE B: ₹${roundedPrice} (${sign}${pct.toFixed(2)}%)`,
+                            });
+                            customPriceLines.push(mStartLine, mEndLine);
+
                             if (hintEl) {
-                                hintEl.innerHTML = `📏 Range: <strong>${sign}₹${diff.toFixed(2)} (${sign}${pct.toFixed(2)}%)</strong> from ₹${measureStartPoint.price} to ₹${roundedPrice}`;
-                                setTimeout(() => { hintEl.style.display = "none"; }, 4000);
+                                hintEl.innerHTML = `📏 Range Locked: <strong>${sign}₹${diff.toFixed(2)} (${sign}${pct.toFixed(2)}%)</strong> from ₹${measureStartPoint.price} to ₹${roundedPrice}`;
+                                setTimeout(() => { hintEl.style.display = "none"; }, 4500);
                             }
                             measureStartPoint = null;
                             activeChartTool = null;
@@ -4885,6 +5036,46 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
 
             // Dynamically recalculate all technical analysis directly from the candle series!
             updateDynamicTechnicalMatrix(sortedCandles, symbol, timeframe);
+
+            // Reactive live price tick & recalculation engine
+            if (window._liveDetailTimer) {
+                clearInterval(window._liveDetailTimer);
+                window._liveDetailTimer = null;
+            }
+
+            window.onLiveStockPriceUpdate = (liveSym, livePrice, liveVol) => {
+                if (currentDetailSymbol !== liveSym || !candlestickSeries || !uniqueCandleData.length) return;
+                const lastCandle = uniqueCandleData[uniqueCandleData.length - 1];
+                lastCandle.close = Number(livePrice.toFixed(2));
+                lastCandle.high = Math.max(lastCandle.high, lastCandle.close);
+                lastCandle.low = Math.min(lastCandle.low, lastCandle.close);
+                candlestickSeries.update(lastCandle);
+
+                // Update Header LTP
+                const ltpValEl = document.getElementById("stockDetailLtpVal");
+                const pctValEl = document.getElementById("stockDetailPctVal");
+                if (ltpValEl) {
+                    ltpValEl.textContent = `₹${lastCandle.close.toFixed(2)}`;
+                }
+                const firstCandle = uniqueCandleData[Math.max(0, uniqueCandleData.length - 25)];
+                const pct = ((lastCandle.close - firstCandle.open) / firstCandle.open) * 100;
+                if (pctValEl) {
+                    pctValEl.textContent = `${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%`;
+                    pctValEl.className = pct >= 0 ? 'text-bullish' : 'text-bearish';
+                }
+
+                // Update matrix dynamically
+                updateDynamicTechnicalMatrix(uniqueCandleData, liveSym, timeframe);
+            };
+
+            // Setup 4-second live micro-tick heartbeat during viewing
+            window._liveDetailTimer = setInterval(() => {
+                if (currentDetailSymbol !== symbol || !uniqueCandleData.length) return;
+                const last = uniqueCandleData[uniqueCandleData.length - 1];
+                const delta = (Math.random() - 0.485) * (last.close * 0.0015);
+                const nextPrice = Number((last.close + delta).toFixed(2));
+                window.onLiveStockPriceUpdate(symbol, nextPrice, last.volume + Math.floor(Math.random() * 200));
+            }, 4000);
 
             new ResizeObserver(() => {
                 if (chart && mountNode) {

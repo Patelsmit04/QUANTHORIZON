@@ -2924,11 +2924,24 @@ def get_chart_data(
         for _, row in recent_df.iterrows():
             row_ts = row['Datetime'] if 'Datetime' in row else (row['Date'] if 'Date' in row else row.name)
             try:
-                time_str = row_ts.strftime("%Y-%m-%d %H:%M") if yf_interval == "1d" else row_ts.strftime("%H:%M")
-                unix_ts = int(row_ts.timestamp())
+                # Proper IST timezone localization
+                if hasattr(row_ts, 'tzinfo') and row_ts.tzinfo is not None:
+                    ist_dt = row_ts.tz_convert('Asia/Kolkata')
+                    unix_ts = int(row_ts.timestamp())
+                    time_str = ist_dt.strftime("%Y-%m-%d %H:%M") if yf_interval in ["1d", "1wk", "1mo"] else ist_dt.strftime("%H:%M")
+                else:
+                    import pytz
+                    ist_tz = pytz.timezone('Asia/Kolkata')
+                    ts_obj = pd.to_datetime(row_ts)
+                    localized = ist_tz.localize(ts_obj) if ts_obj.tzinfo is None else ts_obj
+                    unix_ts = int(localized.timestamp())
+                    time_str = localized.strftime("%Y-%m-%d %H:%M") if yf_interval in ["1d", "1wk", "1mo"] else localized.strftime("%H:%M")
             except Exception:
                 time_str = str(row_ts)[:16]
-                unix_ts = None
+                try:
+                    unix_ts = int(pd.to_datetime(row_ts).timestamp())
+                except Exception:
+                    unix_ts = None
             
             candles.append({
                 "ts": unix_ts,
