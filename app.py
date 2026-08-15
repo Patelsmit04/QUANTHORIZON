@@ -2876,33 +2876,36 @@ def get_chart_data(
 
     # Timeframe mapping for yfinance
     interval_lower = interval.lower().strip()
-    yf_interval = "5m"
-    yf_period = "5d"
+    yf_interval = "15m"
+    yf_period = "60d"
 
-    if interval_lower in ["1", "1m"]:
+    if interval_lower in ["1", "1m", "1min"]:
         yf_interval = "1m"
         yf_period = "7d"
     elif interval_lower in ["2", "2m", "3", "3m"]:
         yf_interval = "2m"
-        yf_period = "7d"
-    elif interval_lower in ["5", "5m"]:
+        yf_period = "60d"
+    elif interval_lower in ["5", "5m", "5min"]:
         yf_interval = "5m"
-        yf_period = "7d"
-    elif interval_lower in ["15", "15m"]:
+        yf_period = "60d"
+    elif interval_lower in ["15", "15m", "15min"]:
         yf_interval = "15m"
-        yf_period = "1mo"
+        yf_period = "60d"
     elif interval_lower in ["60", "60m", "1h", "1hr"]:
         yf_interval = "60m"
-        yf_period = "3mo"
+        yf_period = "730d"
     elif interval_lower in ["240", "4h", "4hr"]:
         yf_interval = "60m"
-        yf_period = "6mo"
-    elif interval_lower in ["d", "1d", "day"]:
+        yf_period = "730d"
+    elif interval_lower in ["d", "1d", "day", "daily"]:
         yf_interval = "1d"
-        yf_period = "1y"
-    elif interval_lower in ["w", "1w", "1wk", "week"]:
+        yf_period = "5y"
+    elif interval_lower in ["w", "1w", "1wk", "week", "weekly"]:
         yf_interval = "1wk"
-        yf_period = "2y"
+        yf_period = "10y"
+    elif interval_lower in ["mo", "1mo", "1m_mo", "month", "monthly"]:
+        yf_interval = "1mo"
+        yf_period = "max"
 
     try:
         df = call_with_retry(
