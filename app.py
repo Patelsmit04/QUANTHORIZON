@@ -2899,10 +2899,10 @@ def get_chart_data(
         yf_period = "730d"
     elif interval_lower in ["d", "1d", "day", "daily"]:
         yf_interval = "1d"
-        yf_period = "5y"
+        yf_period = "10y"
     elif interval_lower in ["w", "1w", "1wk", "week", "weekly"]:
         yf_interval = "1wk"
-        yf_period = "10y"
+        yf_period = "max"
     elif interval_lower in ["mo", "1mo", "1m_mo", "month", "monthly"]:
         yf_interval = "1mo"
         yf_period = "max"
@@ -2919,29 +2919,32 @@ def get_chart_data(
             df.columns = df.columns.get_level_values(0)
         df = df.dropna()
 
+        # If 4h requested, resample 60m data to 4h
+        if interval_lower in ["240", "4h", "4hr"] and not df.empty:
+            df_4h = df.resample('4H').agg({
+                'Open': 'first',
+                'High': 'max',
+                'Low': 'min',
+                'Close': 'last',
+                'Volume': 'sum'
+            }).dropna()
+            if not df_4h.empty:
+                df = df_4h
+
         candles = []
         recent_df = df.reset_index()
         for _, row in recent_df.iterrows():
             row_ts = row['Datetime'] if 'Datetime' in row else (row['Date'] if 'Date' in row else row.name)
             try:
-                # Proper IST timezone localization
                 if hasattr(row_ts, 'tzinfo') and row_ts.tzinfo is not None:
-                    ist_dt = row_ts.tz_convert('Asia/Kolkata')
-                    unix_ts = int(row_ts.timestamp())
-                    time_str = ist_dt.strftime("%Y-%m-%d %H:%M") if yf_interval in ["1d", "1wk", "1mo"] else ist_dt.strftime("%H:%M")
+                    row_ts_ist = row_ts.tz_convert("Asia/Kolkata")
                 else:
-                    import pytz
-                    ist_tz = pytz.timezone('Asia/Kolkata')
-                    ts_obj = pd.to_datetime(row_ts)
-                    localized = ist_tz.localize(ts_obj) if ts_obj.tzinfo is None else ts_obj
-                    unix_ts = int(localized.timestamp())
-                    time_str = localized.strftime("%Y-%m-%d %H:%M") if yf_interval in ["1d", "1wk", "1mo"] else localized.strftime("%H:%M")
+                    row_ts_ist = pd.to_datetime(row_ts).tz_localize("UTC").tz_convert("Asia/Kolkata")
+                time_str = row_ts_ist.strftime("%Y-%m-%d") if yf_interval in ["1d", "1wk", "1mo"] else row_ts_ist.strftime("%H:%M")
+                unix_ts = int(row_ts.timestamp())
             except Exception:
                 time_str = str(row_ts)[:16]
-                try:
-                    unix_ts = int(pd.to_datetime(row_ts).timestamp())
-                except Exception:
-                    unix_ts = None
+                unix_ts = None
             
             candles.append({
                 "ts": unix_ts,
