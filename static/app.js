@@ -4468,10 +4468,10 @@ document.addEventListener("DOMContentLoaded", () => {
         connect();
     }
 
-    // Service Worker & Lock-Screen Alerts Controller (Phase 4)
+    // Service Worker & Lock-Screen Alerts Controller (Phase 4 — Integrated into Notification Panel)
     function initServiceWorkerAndPush() {
-        const pushBtn = document.getElementById("pushNotifBtn");
-        const pushBtnText = document.getElementById("pushNotifBtnText");
+        const toggleBtn = document.getElementById("pushNotifToggleBtn");
+        const toggleText = document.getElementById("pushNotifToggleText");
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js')
@@ -4482,41 +4482,48 @@ document.addEventListener("DOMContentLoaded", () => {
                 .catch(err => console.warn('[TRADEXO] ServiceWorker registration error:', err));
         }
 
-        if (!('Notification' in window)) {
-            if (pushBtn) pushBtn.style.display = 'none';
-            return;
-        }
-
-        if (Notification.permission === 'granted') {
-            if (pushBtn) {
-                pushBtn.classList.add('active');
-                if (pushBtnText) pushBtnText.textContent = 'ALERTS ON';
+        function updateToggleBtnState() {
+            if (!('Notification' in window)) {
+                if (toggleBtn) toggleBtn.style.display = 'none';
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                if (toggleBtn) {
+                    toggleBtn.classList.add('active');
+                    toggleBtn.innerHTML = '<i class="fa-solid fa-check"></i> ACTIVE';
+                }
+            } else {
+                if (toggleBtn) {
+                    toggleBtn.classList.remove('active');
+                    toggleBtn.textContent = 'ENABLE';
+                }
             }
         }
 
-        if (pushBtn) {
-            pushBtn.addEventListener('click', async () => {
+        updateToggleBtnState();
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', async () => {
                 if (Notification.permission === 'granted') {
-                    if (typeof showToast === 'function') showToast('Mobile lock-screen alerts are ACTIVE for Priority 1 setups & 3:30 PM lock.', 'info');
+                    if (typeof showToast === 'function') showToast('Lock-screen push alerts are ACTIVE for Priority 1 setups & 3:30 PM lock.', 'info');
                     return;
                 }
 
                 try {
                     const perm = await Notification.requestPermission();
+                    updateToggleBtnState();
                     if (perm === 'granted') {
-                        pushBtn.classList.add('active');
-                        if (pushBtnText) pushBtnText.textContent = 'ALERTS ON';
-                        if (typeof showToast === 'function') showToast('Lock-screen notifications enabled! You will receive high-conviction setup alerts.', 'success');
+                        if (typeof showToast === 'function') showToast('Lock-screen notifications enabled! You will receive high-conviction setup alerts on your device.', 'success');
                         
                         if (window.tradexoSwRegistration) {
                             window.tradexoSwRegistration.showNotification('TRADEXO Alerts Active', {
-                                body: 'You will receive instant alerts for Priority 1 BTST/STBT setups and 3:30 PM lock.',
+                                body: 'You will receive instant lock-screen alerts for Priority 1 BTST/STBT setups and 3:30 PM lock.',
                                 icon: '/static/icon-192.png',
                                 badge: '/static/favicon.png'
                             });
                         }
                     } else {
-                        if (typeof showToast === 'function') showToast('Notifications blocked in browser settings.', 'warning');
+                        if (typeof showToast === 'function') showToast('Notifications are blocked in your browser settings.', 'warning');
                     }
                 } catch (e) {
                     console.error('[TRADEXO] Notification permission error:', e);

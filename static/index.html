@@ -176,11 +176,6 @@
 
                 <!-- Right Header Chrome Buttons -->
                 <div class="header-actions">
-                    <button id="pushNotifBtn" class="btn btn-pill btn-secondary push-notif-btn" title="Enable Mobile Lock-Screen Push Alerts">
-                        <i class="fa-solid fa-mobile-screen"></i>
-                        <span id="pushNotifBtnText">ALERTS</span>
-                    </button>
-
                     <button id="winRateBtn" class="btn btn-pill btn-secondary winrate-topbar-btn" title="View BTST Win Rate Analytics">
                         <i class="fa-solid fa-trophy text-gold"></i>
                         <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
@@ -220,6 +215,18 @@
                 <div class="notif-panel-header">
                     <span>NOTIFICATIONS</span>
                     <button class="notif-mark-all-btn" id="notifMarkAllBtn">Mark all read</button>
+                </div>
+                <div class="notif-push-toggle-card">
+                    <div class="notif-push-toggle-content">
+                        <div class="notif-push-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+                        <div class="notif-push-text">
+                            <strong>Lock-Screen Alerts</strong>
+                            <span>Native phone alerts for Priority 1 setups</span>
+                        </div>
+                    </div>
+                    <button id="pushNotifToggleBtn" class="btn btn-sm btn-pill push-notif-switch" title="Toggle Lock-Screen Mobile Alerts">
+                        <span id="pushNotifToggleText">ENABLE</span>
+                    </button>
                 </div>
                 <div id="notifList"><div class="notif-empty">No notifications yet.</div></div>
             </div>

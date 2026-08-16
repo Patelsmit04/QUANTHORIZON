@@ -4778,20 +4778,78 @@ body.intro-active {
     100% { transform: scale(0.95); opacity: 0.7; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
-.push-notif-btn {
-    display: inline-flex;
+/* Push Notification Lock-Screen Switch inside Notification Panel */
+.notif-push-toggle-card {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    padding: 6px 12px;
+    justify-content: space-between;
+    padding: 10px 14px;
+    margin: 8px 10px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    gap: 12px;
 }
 
-.push-notif-btn.active {
+.notif-push-toggle-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notif-push-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     background: rgba(59, 130, 246, 0.15);
     color: #60a5fa;
-    border-color: rgba(59, 130, 246, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.notif-push-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.notif-push-text strong {
+    font-size: 0.78rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.notif-push-text span {
+    font-size: 0.68rem;
+    color: var(--ink-muted, #94a3b8);
+}
+
+.push-notif-switch {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.push-notif-switch:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+}
+
+.push-notif-switch.active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.4);
 }
 
 @media (max-width: 1023px) {
