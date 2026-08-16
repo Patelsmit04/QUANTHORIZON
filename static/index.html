@@ -238,7 +238,7 @@
                         <span class="section-page-subtitle">Live Accuracy, Priority Mix &amp; Today's Snapshot</span>
                     </h2>
                     <div class="dashboard-heading-actions">
-                        <button id="systemHealthBtn" class="btn btn-pill btn-secondary system-health-btn" title="View System Health & Forward-Testing Diagnostics">
+                        <button id="systemHealthBtn" class="btn btn-pill btn-secondary system-health-btn" onclick="window.openSystemHealthModal &amp;&amp; window.openSystemHealthModal()" title="View System Health &amp; Forward-Testing Diagnostics">
                             <span class="health-pulse-dot" id="systemHealthDot"></span>
                             <span id="systemHealthText">SYSTEM HEALTH</span>
                         </button>
@@ -1477,7 +1477,7 @@
     </div>
 
     <!-- ============================== SYSTEM HEALTH & FORWARD-TESTING DIAGNOSTICS MODAL ============================== -->
-    <div id="systemHealthModal" class="modal-backdrop hidden">
+    <div id="systemHealthModal" class="modal-overlay hidden">
         <div class="modal-card health-modal-card">
             <div class="modal-header">
                 <div>
@@ -1575,7 +1575,7 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=40.0.0"></script>
+    <script src="/static/app.js?v=40.0.1"></script>
 
 </body>
 </html>

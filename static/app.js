@@ -6154,18 +6154,50 @@ function initSystemHealthDiagnostics() {
     const downloadBtn = document.getElementById("downloadHealthReportBtn");
     const refreshBtn = document.getElementById("refreshHealthBtn");
 
-    if (healthBtn && healthModal) {
-        healthBtn.addEventListener("click", () => {
-            fetchSystemHealth();
-            healthModal.classList.remove("hidden");
+    window.openSystemHealthModal = function() {
+        fetchSystemHealth();
+        const m = document.getElementById("systemHealthModal");
+        if (m) {
+            m.classList.remove("hidden");
+            m.style.display = "flex";
+        }
+    };
+
+    window.closeSystemHealthModal = function() {
+        const m = document.getElementById("systemHealthModal");
+        if (m) {
+            m.classList.add("hidden");
+            m.style.display = "none";
+        }
+    };
+
+    if (healthBtn) {
+        healthBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.openSystemHealthModal();
         });
     }
 
-    if (closeBtn && healthModal) {
-        closeBtn.addEventListener("click", () => {
-            healthModal.classList.add("hidden");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.closeSystemHealthModal();
         });
     }
+
+    if (healthModal) {
+        healthModal.addEventListener("click", (e) => {
+            if (e.target === healthModal) {
+                window.closeSystemHealthModal();
+            }
+        });
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            window.closeSystemHealthModal();
+        }
+    });
 
     if (killSwitchBtn) {
         killSwitchBtn.addEventListener("click", async () => {
@@ -6228,5 +6260,6 @@ function initSystemHealthDiagnostics() {
 }
 
 initSystemHealthDiagnostics();
+
 
 
