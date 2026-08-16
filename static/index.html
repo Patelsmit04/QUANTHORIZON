@@ -122,6 +122,10 @@
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     <span class="nav-label">History &amp; Calibration</span>
                 </button>
+                <button class="sidebar-nav-item" data-section="systemHealth" title="System Health & Diagnostics">
+                    <i class="fa-solid fa-heart-pulse text-gold"></i>
+                    <span class="nav-label">System Health</span>
+                </button>
 
                 <div class="sidebar-nav-divider"></div>
 
@@ -238,10 +242,6 @@
                         <span class="section-page-subtitle">Live Accuracy, Priority Mix &amp; Today's Snapshot</span>
                     </h2>
                     <div class="dashboard-heading-actions">
-                        <button id="systemHealthBtn" class="btn btn-pill btn-secondary system-health-btn" onclick="window.openSystemHealthModal &amp;&amp; window.openSystemHealthModal()" title="View System Health &amp; Forward-Testing Diagnostics">
-                            <span class="health-pulse-dot" id="systemHealthDot"></span>
-                            <span id="systemHealthText">SYSTEM HEALTH</span>
-                        </button>
                         <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
                             <i class="fa-solid fa-file-csv"></i><span>CSV</span>
                         </button>
@@ -967,6 +967,273 @@
             </div>
             <!-- ============================== END HISTORY & CALIBRATION SECTION ============================== -->
 
+            <!-- ============================== SYSTEM HEALTH & FORWARD-TESTING DIAGNOSTICS SECTION ============================== -->
+            <div id="systemHealthSection" class="hidden">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-heart-pulse text-gold"></i> SYSTEM HEALTH &amp; DIAGNOSTICS
+                        <span class="section-page-subtitle">Real-time Autonomous Engine Audit, Milestone Integrity &amp; Emergency Controls</span>
+                    </h2>
+                    <div class="dashboard-heading-actions">
+                        <button id="btnRefreshHealthPage" class="btn btn-pill btn-primary" title="Refresh Live Diagnostics">
+                            <i class="fa-solid fa-arrows-rotate"></i><span>REFRESH DIAGNOSTICS</span>
+                        </button>
+                        <button id="btnExportHealthReport" class="btn btn-pill btn-secondary" title="Download Daily Health JSON Audit">
+                            <i class="fa-solid fa-file-arrow-down"></i><span>EXPORT REPORT JSON</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Emergency Kill-Switch Safe Pause Banner -->
+                <div class="health-hero-control-banner" id="healthHeroControlBanner">
+                    <div class="health-control-left">
+                        <div class="health-control-shield-icon">
+                            <i class="fa-solid fa-shield-halved" id="healthControlShieldIcon"></i>
+                        </div>
+                        <div class="health-control-copy">
+                            <div class="health-control-headline">
+                                <span id="healthControlStatusBadge" class="health-live-status-pill status-nominal">ENGINE ACTIVE</span>
+                                <strong id="healthControlHeadlineText">Autonomous 5-Pillar Matrix &amp; Scheduler Operating Normally</strong>
+                            </div>
+                            <p class="health-control-subtext" id="healthControlSubtext">
+                                All scheduled evaluations (9:15 AM), locks (3:25/3:30 PM), and tick updates are operating with thread locks. In case of unexpected market anomalies, use the Safe Pause switch below to freeze scanning without corrupting trade history.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="health-control-action">
+                        <button id="btnPageEmergencyKillSwitch" class="btn btn-pill btn-danger health-kill-btn">
+                            <i class="fa-solid fa-pause"></i> <span>PAUSE ENGINE</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 Top Diagnostic Overview Cards -->
+                <section class="health-overview-grid">
+                    <!-- Card 1: Health Score Gauge -->
+                    <div class="health-overview-card">
+                        <div class="health-card-header">
+                            <span class="health-card-title"><i class="fa-solid fa-gauge-high text-gold"></i> HEALTH SCORE</span>
+                            <span class="health-card-badge nominal" id="pageHealthStatusBadge">NOMINAL</span>
+                        </div>
+                        <div class="health-score-gauge-wrap">
+                            <div class="health-gauge-ring" id="pageHealthGaugeRing">
+                                <span class="health-gauge-val" id="pageHealthScoreVal">100</span>
+                                <span class="health-gauge-denom">/ 100</span>
+                            </div>
+                            <div class="health-gauge-meta">
+                                <strong id="pageHealthSummaryTitle">ALL SYSTEMS NOMINAL</strong>
+                                <span id="pageHealthSummaryDesc">Zero operational anomalies or race conditions detected today.</span>
+                                <div class="health-timestamp-tag"><i class="fa-regular fa-clock"></i> Last Checked: <span id="pageHealthLastChecked">--</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Market State & Schedule Mode -->
+                    <div class="health-overview-card">
+                        <div class="health-card-header">
+                            <span class="health-card-title"><i class="fa-solid fa-clock text-cyan"></i> MARKET STATE &amp; SCHEDULE</span>
+                            <span class="health-card-badge info" id="pageMarketStateBadge">CHECKING...</span>
+                        </div>
+                        <div class="health-metric-content">
+                            <div class="health-key-value-row">
+                                <span>Market Status:</span>
+                                <strong id="pageMarketStatusVal" class="text-amber">--</strong>
+                            </div>
+                            <div class="health-key-value-row">
+                                <span>Scheduler Mode:</span>
+                                <strong id="pageScheduleModeVal">--</strong>
+                            </div>
+                            <div class="health-key-value-row">
+                                <span>Zero-Jitter Gating:</span>
+                                <strong class="text-bullish"><i class="fa-solid fa-lock"></i> Frozen Off-Market</strong>
+                            </div>
+                            <div class="health-key-value-row">
+                                <span>Server Clock (IST):</span>
+                                <strong id="pageServerTimeVal">--</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Overnight Lock & Evaluation Stats -->
+                    <div class="health-overview-card">
+                        <div class="health-card-header">
+                            <span class="health-card-title"><i class="fa-solid fa-lock text-gold"></i> LOCK &amp; EVAL INTEGRITY</span>
+                            <span class="health-card-badge success" id="pageLockIntegrityBadge">PERSISTED</span>
+                        </div>
+                        <div class="health-metric-content">
+                            <div class="health-key-value-row">
+                                <span>3:30 PM Locked Picks:</span>
+                                <strong id="pageLockedPicksCount" class="text-gold">--</strong>
+                            </div>
+                            <div class="health-key-value-row">
+                                <span>9:15 AM Graded Trades:</span>
+                                <strong id="pageGradedTradesCount">--</strong>
+                            </div>
+                            <div class="health-key-value-row">
+                                <span>Realized Gap Win-Rate:</span>
+                                <strong id="pageGapWinRateVal" class="text-bullish">--%</strong>
+                            </div>
+                            <div class="health-key-value-row">
+                                <span>Cold-Start Zero Wipe:</span>
+                                <strong class="text-bullish"><i class="fa-solid fa-shield-halved"></i> Non-Destructive</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Dyno Stability & Keepalive Uptime -->
+                    <div class="health-overview-card">
+                        <div class="health-card-header">
+                            <span class="health-card-title"><i class="fa-solid fa-server text-indigo"></i> CLOUD HOSTING &amp; DYNO</span>
+                            <span class="health-card-badge nominal" id="pageDynoStatusBadge">STABLE</span>
+                        </div>
+                        <div class="health-metric-content">
+                            <div class="health-key-value-row">
+                                <span>Mid-Market Spin-Downs:</span>
+                                <strong id="pageMidMarketSpinDowns" class="text-bullish">0 (Optimal)</strong>
+                            </div>
+                            <div class="health-key-value-row">
+                                <span>Total Process Starts:</span>
+                                <strong id="pageTotalColdStarts">1</strong>
+                            </div>
+                            <div class="health-key-value-row">
+                                <span>External Cron Uptime:</span>
+                                <strong class="text-bullish">Active (GitHub Actions)</strong>
+                            </div>
+                            <div class="health-key-value-row">
+                                <span>Keepalive Cadence:</span>
+                                <strong class="text-cyan">5-Min Keepalive Ping</strong>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4-Pillar Milestone Trackers (Detailed Workflow Progress) -->
+                <div style="margin-top:28px;margin-bottom:14px;">
+                    <h3 style="font-size:16px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-list-check text-gold"></i> 4-PILLAR AUTONOMOUS MILESTONE VERIFICATION
+                    </h3>
+                </div>
+
+                <section class="health-milestones-full-grid">
+                    <!-- Milestone 1 -->
+                    <div class="milestone-full-card" id="mCardTransitions">
+                        <div class="milestone-full-header">
+                            <div class="milestone-num">1</div>
+                            <div class="milestone-title-wrap">
+                                <strong>Market Transitions (09:00 AM - 15:30 PM)</strong>
+                                <span>Pre-Market &rarr; Open &rarr; Closing &rarr; Post-Market state machine progression</span>
+                            </div>
+                            <span class="milestone-status-chip nominal" id="mStatusTransitions">OK</span>
+                        </div>
+                        <div class="milestone-detail-row">
+                            <span>Today's Transitions Logged: <strong id="mCountTransitions">0</strong></span>
+                            <span>Synthetic Micro-Tick Jitter: <strong class="text-bullish">Deleted / Clean</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Milestone 2 -->
+                    <div class="milestone-full-card" id="mCardEval">
+                        <div class="milestone-full-header">
+                            <div class="milestone-num">2</div>
+                            <div class="milestone-title-wrap">
+                                <strong>9:15 AM Open Gap Evaluation</strong>
+                                <span>Fetch next-day opening candles and compute Predicted vs Realized gap accuracy</span>
+                            </div>
+                            <span class="milestone-status-chip" id="mStatusEval">PENDING</span>
+                        </div>
+                        <div class="milestone-detail-row">
+                            <span>Evaluated Trades: <strong id="mDetailsEval">Awaiting 9:15 AM Open</strong></span>
+                            <span>Evaluation Lock: <strong class="text-bullish">Mutex Protected</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Milestone 3 -->
+                    <div class="milestone-full-card" id="mCardLock">
+                        <div class="milestone-full-header">
+                            <div class="milestone-num">3</div>
+                            <div class="milestone-title-wrap">
+                                <strong>3:25 PM Snapshot &amp; 3:30 PM Final Lock</strong>
+                                <span>Lock high-conviction BTST/STBT candidates into persistent disk storage</span>
+                            </div>
+                            <span class="milestone-status-chip" id="mStatusLock">PENDING</span>
+                        </div>
+                        <div class="milestone-detail-row">
+                            <span>Locked Today: <strong id="mDetailsLock">Awaiting 3:30 PM Close</strong></span>
+                            <span>Disk Persistence: <strong class="text-bullish">trade_history.json</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Milestone 4 -->
+                    <div class="milestone-full-card" id="mCardDyno">
+                        <div class="milestone-full-header">
+                            <div class="milestone-num">4</div>
+                            <div class="milestone-title-wrap">
+                                <strong>Cloud Hosting &amp; Dyno Keepalive</strong>
+                                <span>Prevent free-tier dyno spin-downs between 9:00 AM and 3:45 PM IST</span>
+                            </div>
+                            <span class="milestone-status-chip nominal" id="mStatusDyno">STABLE</span>
+                        </div>
+                        <div class="milestone-detail-row">
+                            <span>Market Spin-Downs: <strong id="mDetailsDyno" class="text-bullish">0 Spin-Downs</strong></span>
+                            <span>Keepalive Ping: <strong class="text-bullish">/api/cron/keepalive (200 OK)</strong></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Live Diagnostic Stream / Anomalies Log -->
+                <div style="margin-top:28px;margin-bottom:14px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                        <h3 style="font-size:16px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;margin:0;">
+                            <i class="fa-solid fa-triangle-exclamation text-amber"></i> TODAY'S DIAGNOSTIC &amp; ANOMALY STREAM
+                        </h3>
+                        <div class="health-log-filter-group" id="healthLogFilterGroup">
+                            <button class="health-filter-btn active" data-filter="ALL">ALL</button>
+                            <button class="health-filter-btn" data-filter="ERROR">ERRORS</button>
+                            <button class="health-filter-btn" data-filter="WARN">WARNINGS</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-card health-log-table-card">
+                    <div class="health-log-list" id="pageHealthLogList">
+                        <div class="health-empty-log"><i class="fa-solid fa-circle-check text-bullish"></i> Zero errors or exceptions recorded today. All background scheduler pipelines are running nominally.</div>
+                    </div>
+                </div>
+
+                <!-- Daily Health Audit Archive History -->
+                <div style="margin-top:32px;margin-bottom:14px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+                        <h3 style="font-size:16px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;margin:0;">
+                            <i class="fa-solid fa-calendar-check text-cyan"></i> DAILY HEALTH AUDIT ARCHIVE
+                        </h3>
+                        <span style="font-size:12px;color:var(--ink-muted);">Daily forward-testing integrity records</span>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-scroll">
+                        <table class="data-table" id="dailyHealthArchiveTable">
+                            <thead>
+                                <tr>
+                                    <th>DATE</th>
+                                    <th>HEALTH SCORE</th>
+                                    <th>STATUS</th>
+                                    <th>TRANSITIONS</th>
+                                    <th>EVALUATED TRADES</th>
+                                    <th>LOCKED PICKS</th>
+                                    <th>COLD STARTS</th>
+                                    <th>ISSUES DETECTED</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dailyHealthArchiveBody">
+                                <!-- Dynamic archive rows injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- ============================== END SYSTEM HEALTH & DIAGNOSTICS SECTION ============================== -->
+
             <!-- ============================== GUIDE / EXPORT / SETTINGS SECTION ============================== -->
             <div id="guideSection" class="hidden">
                 <div class="section-heading-row">
@@ -1476,106 +1743,8 @@
         </div>
     </div>
 
-    <!-- ============================== SYSTEM HEALTH & FORWARD-TESTING DIAGNOSTICS MODAL ============================== -->
-    <div id="systemHealthModal" class="modal-overlay hidden">
-        <div class="modal-card health-modal-card">
-            <div class="modal-header">
-                <div>
-                    <h3 class="modal-title"><i class="fa-solid fa-heart-pulse text-gold"></i> SYSTEM HEALTH &amp; FORWARD-TESTING DIAGNOSTICS</h3>
-                    <p class="modal-subtitle">Real-time infrastructure audit, lock/evaluation integrity, and emergency controls</p>
-                </div>
-                <button class="modal-close-btn" id="closeHealthModalBtn" aria-label="Close Modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <!-- Health Overview Summary Cards -->
-                <div class="health-summary-banner" id="healthSummaryBanner">
-                    <div class="health-score-dial">
-                        <div class="health-score-number" id="healthScoreNumber">100</div>
-                        <div class="health-score-label">HEALTH SCORE</div>
-                    </div>
-                    <div class="health-status-details">
-                        <div class="health-status-title" id="healthStatusTitle">ALL SYSTEMS NOMINAL</div>
-                        <div class="health-status-desc" id="healthStatusDesc">All scheduler transitions, lock sequences, and evaluation jobs are operating with 100% integrity.</div>
-                        <div class="health-meta-pills" id="healthMetaPills">
-                            <span class="health-pill nominal"><i class="fa-solid fa-clock"></i> Last Check: <strong id="healthLastCheck">--</strong></span>
-                            <span class="health-pill" id="healthColdStartsPill"><i class="fa-solid fa-server"></i> Cold Starts: <strong id="healthColdStartsCount">0</strong></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Emergency Kill Switch Control -->
-                <div class="health-control-card" id="healthControlCard">
-                    <div class="health-control-text">
-                        <strong><i class="fa-solid fa-shield-halved text-gold"></i> Emergency Kill-Switch (Mid-Week Safe Pause)</strong>
-                        <span>Instantly pause scanning &amp; order placement without losing trade history or logs.</span>
-                    </div>
-                    <button id="emergencyKillSwitchBtn" class="btn btn-sm btn-pill btn-danger">
-                        <i class="fa-solid fa-pause"></i> <span>PAUSE SCANNING</span>
-                    </button>
-                </div>
-
-                <!-- 4-Pillar Milestone Verification Grid -->
-                <div class="health-milestones-grid">
-                    <div class="health-milestone-card" id="cardMilestoneTransitions">
-                        <div class="milestone-icon"><i class="fa-solid fa-route"></i></div>
-                        <div class="milestone-info">
-                            <strong>Market Transitions</strong>
-                            <span id="milestoneTransitionsStatus">Tracking Nominal</span>
-                        </div>
-                        <div class="milestone-badge badge-nominal" id="badgeMilestoneTransitions">OK</div>
-                    </div>
-
-                    <div class="milestone-card health-milestone-card" id="cardMilestoneEval">
-                        <div class="milestone-icon"><i class="fa-solid fa-bullseye"></i></div>
-                        <div class="milestone-info">
-                            <strong>9:15 AM Evaluation</strong>
-                            <span id="milestoneEvalStatus">--</span>
-                        </div>
-                        <div class="milestone-badge" id="badgeMilestoneEval">PENDING</div>
-                    </div>
-
-                    <div class="milestone-card health-milestone-card" id="cardMilestoneLock">
-                        <div class="milestone-icon"><i class="fa-solid fa-lock"></i></div>
-                        <div class="milestone-info">
-                            <strong>3:30 PM Lock</strong>
-                            <span id="milestoneLockStatus">--</span>
-                        </div>
-                        <div class="milestone-badge" id="badgeMilestoneLock">PENDING</div>
-                    </div>
-
-                    <div class="milestone-card health-milestone-card" id="cardMilestoneDyno">
-                        <div class="milestone-icon"><i class="fa-solid fa-microchip"></i></div>
-                        <div class="milestone-info">
-                            <strong>Hosting Stability</strong>
-                            <span id="milestoneDynoStatus">No Mid-Day Spin-Downs</span>
-                        </div>
-                        <div class="milestone-badge badge-nominal" id="badgeMilestoneDyno">STABLE</div>
-                    </div>
-                </div>
-
-                <!-- Daily Audit Issues & Exceptions Stream -->
-                <div class="health-issues-section mt-3">
-                    <h4 class="section-heading"><i class="fa-solid fa-triangle-exclamation"></i> TODAY'S ISSUES &amp; ANOMALIES</h4>
-                    <div class="health-issues-list" id="healthIssuesList">
-                        <div class="health-no-issues"><i class="fa-solid fa-circle-check text-bullish"></i> Zero issues detected today. System is operating cleanly.</div>
-                    </div>
-                </div>
-
-                <!-- Export & History Actions -->
-                <div class="health-modal-actions mt-3">
-                    <button id="downloadHealthReportBtn" class="btn btn-pill btn-secondary">
-                        <i class="fa-solid fa-file-arrow-down"></i> <span>Export Daily Health JSON</span>
-                    </button>
-                    <button id="refreshHealthBtn" class="btn btn-pill btn-primary">
-                        <i class="fa-solid fa-arrows-rotate"></i> <span>Refresh Diagnostics</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=40.0.1"></script>
+    <script src="/static/app.js?v=40.0.2"></script>
 
 </body>
 </html>

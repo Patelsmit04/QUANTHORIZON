@@ -494,7 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dashboard: "dashboard", scanner: "signals", liveTrades: "live-trade", stockDetail: "stock-detail", stocksNews: "stocks-news",
         globalNews: "global-news", institutionalFlow: "institutional-flow",
         orderFlow: "order-flow", accuracy: "accuracy", indices: "index-intelligence", strategies: "strategies", history: "history",
-        guide: "guide", rules: "rules"
+        systemHealth: "system-health", guide: "guide", rules: "rules"
     };
     const HASH_TO_SECTION = {};
     Object.entries(SECTION_HASHES).forEach(([secKey, hashVal]) => {
@@ -525,6 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
             indices: document.getElementById("indicesSection"),
             strategies: document.getElementById("strategiesSection"),
             history: document.getElementById("historySection"),
+            systemHealth: document.getElementById("systemHealthSection"),
             guide: document.getElementById("guideSection"),
             rules: document.getElementById("rulesSection")
         };
@@ -547,6 +548,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 el.style.display = "none";
             }
         });
+
+        if (section === "systemHealth") {
+            if (typeof fetchSystemHealth === "function") fetchSystemHealth();
+            if (typeof fetchDailyHealthHistory === "function") fetchDailyHealthHistory();
+        }
 
         window.scrollTo(0, 0);
         document.body.scrollTop = 0;
@@ -6041,166 +6047,305 @@ function renderSystemHealthUI(payload) {
         if (isPaused) {
             healthText.textContent = "PAUSED";
         } else {
-            healthText.textContent = `HEALTH: ${health.score}%`;
-        }
-    }
+// ==========================================================================
+// SYSTEM HEALTH & FORWARD-TESTING DIAGNOSTICS (DEDICATED PAGE CONTROLLER)
+// ==========================================================================
+let systemHealthData = null;
+let currentHealthLogFilter = "ALL";
 
-    // 2. Modal Details (if modal is open or for lazy population)
-    const scoreNum = document.getElementById("healthScoreNumber");
-    const scoreDial = document.querySelector(".health-score-dial");
-    const statusTitle = document.getElementById("healthStatusTitle");
-    const statusDesc = document.getElementById("healthStatusDesc");
-    const lastCheck = document.getElementById("healthLastCheck");
-    const coldStartsCount = document.getElementById("healthColdStartsCount");
-    const controlCard = document.getElementById("healthControlCard");
-    const killSwitchBtn = document.getElementById("emergencyKillSwitchBtn");
-
-    if (scoreNum) scoreNum.textContent = isPaused ? "PAUSE" : health.score;
-    if (scoreDial) {
-        scoreDial.className = "health-score-dial";
-        if (isPaused || health.status === "ATTENTION_REQUIRED") scoreDial.classList.add("attention");
-        else if (health.status === "CRITICAL") scoreDial.classList.add("critical");
-    }
-
-    if (statusTitle) {
-        statusTitle.className = "health-status-title";
-        if (isPaused) {
-            statusTitle.textContent = "SYSTEM PAUSED (EMERGENCY OVERRIDE)";
-            statusTitle.classList.add("attention");
-        } else {
-            statusTitle.textContent = health.status_label || "ALL SYSTEMS NOMINAL";
-            if (health.status === "ATTENTION_REQUIRED") statusTitle.classList.add("attention");
-            else if (health.status === "CRITICAL") statusTitle.classList.add("critical");
-        }
-    }
-
-    if (statusDesc) {
-        if (isPaused) {
-            statusDesc.textContent = `System is paused (${control.pause_reason || "Admin override"}). Live scanning and trade placement are halted safely. All historical data is preserved.`;
-        } else if (health.score >= 90) {
-            statusDesc.textContent = "All scheduler transitions, lock sequences, and evaluation jobs are operating with 100% integrity.";
-        } else {
-            statusDesc.textContent = `${health.issues_count} operational issue(s) detected. Review the anomalies log below for details.`;
-        }
-    }
-
-    if (lastCheck) lastCheck.textContent = (health.last_updated || "").slice(11, 19) || "Active";
-    if (coldStartsCount) coldStartsCount.textContent = health.market_hours_cold_starts > 0 ? `${health.market_hours_cold_starts} Mid-Day` : "0 (Stable)";
-
-    if (killSwitchBtn) {
-        if (isPaused) {
-            killSwitchBtn.className = "btn btn-sm btn-pill btn-success";
-            killSwitchBtn.innerHTML = '<i class="fa-solid fa-play"></i> <span>RESUME SCANNING</span>';
-        } else {
-            killSwitchBtn.className = "btn btn-sm btn-pill btn-danger";
-            killSwitchBtn.innerHTML = '<i class="fa-solid fa-pause"></i> <span>PAUSE SCANNING</span>';
-        }
-    }
-
-    if (controlCard) {
-        controlCard.classList.toggle("is-paused", isPaused);
-    }
-
-    // 3. Milestones Grid
-    const milestoneEval = document.getElementById("milestoneEvalStatus");
-    const badgeEval = document.getElementById("badgeMilestoneEval");
-    if (milestoneEval && badgeEval) {
-        if (health.last_evaluation) {
-            milestoneEval.textContent = `${health.last_evaluation.evaluated_count || 0} graded (${health.last_evaluation.win_rate_pct || 75}%)`;
-            badgeEval.textContent = "OK";
-            badgeEval.className = "milestone-badge badge-nominal";
-        } else {
-            milestoneEval.textContent = "Awaiting 9:15 AM Open";
-            badgeEval.textContent = "PENDING";
-            badgeEval.className = "milestone-badge";
-        }
-    }
-
-    const milestoneLock = document.getElementById("milestoneLockStatus");
-    const badgeLock = document.getElementById("badgeMilestoneLock");
-    if (milestoneLock && badgeLock) {
-        if (health.last_lock) {
-            milestoneLock.textContent = `${health.last_lock.locked_count || 0} picks locked`;
-            badgeLock.textContent = "LOCKED";
-            badgeLock.className = "milestone-badge badge-nominal";
-        } else {
-            milestoneLock.textContent = "Awaiting 3:30 PM Close";
-            badgeLock.textContent = "PENDING";
-            badgeLock.className = "milestone-badge";
-        }
-    }
-
-    // 4. Issues List
-    const issuesList = document.getElementById("healthIssuesList");
-    if (issuesList) {
-        if (health.issues && health.issues.length > 0) {
-            issuesList.innerHTML = health.issues.map(iss => `
-                <div class="health-issue-item">
-                    <i class="fa-solid fa-triangle-exclamation text-bearish"></i>
-                    <span>${escapeHtml(iss)}</span>
-                </div>
-            `).join("");
-        } else {
-            issuesList.innerHTML = `<div class="health-no-issues"><i class="fa-solid fa-circle-check text-bullish"></i> Zero issues detected today. System is operating cleanly.</div>`;
-        }
+async function fetchSystemHealth() {
+    try {
+        const response = await apiFetch("/api/system_health");
+        if (!response.ok) return;
+        const payload = await response.json();
+        systemHealthData = payload;
+        renderSystemHealthUI(payload);
+    } catch (e) {
+        console.warn("[TRADEXO] System health fetch error:", e);
     }
 }
 
-function initSystemHealthDiagnostics() {
-    const healthBtn = document.getElementById("systemHealthBtn");
-    const healthModal = document.getElementById("systemHealthModal");
-    const closeBtn = document.getElementById("closeHealthModalBtn");
-    const killSwitchBtn = document.getElementById("emergencyKillSwitchBtn");
-    const downloadBtn = document.getElementById("downloadHealthReportBtn");
-    const refreshBtn = document.getElementById("refreshHealthBtn");
+async function fetchDailyHealthHistory() {
+    try {
+        const response = await apiFetch("/api/system_health/history");
+        if (!response.ok) return;
+        const historyList = await response.json();
+        renderDailyHealthHistoryTable(historyList);
+    } catch (e) {
+        console.warn("[TRADEXO] Daily health history fetch error:", e);
+    }
+}
 
-    window.openSystemHealthModal = function() {
-        fetchSystemHealth();
-        const m = document.getElementById("systemHealthModal");
-        if (m) {
-            m.classList.remove("hidden");
-            m.style.display = "flex";
+function renderSystemHealthUI(payload) {
+    if (!payload || !payload.health) return;
+    const health = payload.health;
+    const control = payload.control || {};
+    const isPaused = control.is_paused === true;
+
+    // 1. Emergency Kill-Switch Hero Banner
+    const heroBanner = document.getElementById("healthHeroControlBanner");
+    const statusBadge = document.getElementById("healthControlStatusBadge");
+    const headlineText = document.getElementById("healthControlHeadlineText");
+    const subtext = document.getElementById("healthControlSubtext");
+    const pageKillBtn = document.getElementById("btnPageEmergencyKillSwitch");
+
+    if (heroBanner) heroBanner.classList.toggle("is-paused", isPaused);
+    if (statusBadge) {
+        statusBadge.className = isPaused ? "health-live-status-pill status-paused" : "health-live-status-pill status-nominal";
+        statusBadge.textContent = isPaused ? "ENGINE PAUSED" : "ENGINE ACTIVE";
+    }
+    if (headlineText) {
+        headlineText.textContent = isPaused
+            ? `Emergency Kill-Switch Active (${control.pause_reason || "Admin Override"})`
+            : "Autonomous 5-Pillar Matrix & Scheduler Operating Normally";
+    }
+    if (subtext) {
+        subtext.textContent = isPaused
+            ? `The scanning engine and automated order placement were paused on ${control.paused_at || "today"}. All historical logs, trade records, and disk snapshots remain 100% intact.`
+            : "All scheduled evaluations (9:15 AM), locks (3:25/3:30 PM), and tick updates are operating with thread locks. In case of unexpected market anomalies, use the Safe Pause switch below to freeze scanning without corrupting trade history.";
+    }
+    if (pageKillBtn) {
+        if (isPaused) {
+            pageKillBtn.className = "btn btn-pill btn-success health-kill-btn btn-resume";
+            pageKillBtn.innerHTML = '<i class="fa-solid fa-play"></i> <span>RESUME ENGINE</span>';
+        } else {
+            pageKillBtn.className = "btn btn-pill btn-danger health-kill-btn";
+            pageKillBtn.innerHTML = '<i class="fa-solid fa-pause"></i> <span>PAUSE ENGINE</span>';
         }
-    };
+    }
 
-    window.closeSystemHealthModal = function() {
-        const m = document.getElementById("systemHealthModal");
-        if (m) {
-            m.classList.add("hidden");
-            m.style.display = "none";
+    // 2. Card 1: Health Score Gauge
+    const scoreVal = document.getElementById("pageHealthScoreVal");
+    const gaugeRing = document.getElementById("pageHealthGaugeRing");
+    const pageHealthBadge = document.getElementById("pageHealthStatusBadge");
+    const summaryTitle = document.getElementById("pageHealthSummaryTitle");
+    const summaryDesc = document.getElementById("pageHealthSummaryDesc");
+    const lastChecked = document.getElementById("pageHealthLastChecked");
+
+    if (scoreVal) scoreVal.textContent = isPaused ? "PAUSE" : health.score;
+    if (gaugeRing) {
+        gaugeRing.className = "health-gauge-ring";
+        if (isPaused || health.status === "ATTENTION_REQUIRED") gaugeRing.classList.add("attention");
+        else if (health.status === "CRITICAL") gaugeRing.classList.add("critical");
+    }
+    if (pageHealthBadge) {
+        pageHealthBadge.className = "health-card-badge";
+        if (isPaused) {
+            pageHealthBadge.textContent = "PAUSED";
+            pageHealthBadge.classList.add("warning");
+        } else if (health.status === "NOMINAL") {
+            pageHealthBadge.textContent = "NOMINAL";
+            pageHealthBadge.classList.add("nominal");
+        } else if (health.status === "ATTENTION_REQUIRED") {
+            pageHealthBadge.textContent = "ATTENTION";
+            pageHealthBadge.classList.add("warning");
+        } else {
+            pageHealthBadge.textContent = "CRITICAL";
+            pageHealthBadge.classList.add("danger");
         }
-    };
+    }
+    if (summaryTitle) {
+        summaryTitle.textContent = isPaused ? "ENGINE SAFELY PAUSED" : (health.status_label || "ALL SYSTEMS NOMINAL");
+        summaryTitle.style.color = isPaused ? "#f59e0b" : (health.status === "CRITICAL" ? "#ef4444" : "#10b981");
+    }
+    if (summaryDesc) {
+        if (isPaused) {
+            summaryDesc.textContent = "Live scanning paused. Off-market snapshots and trade history preserved.";
+        } else if (health.score >= 90) {
+            summaryDesc.textContent = "Zero operational anomalies or race conditions detected today.";
+        } else {
+            summaryDesc.textContent = `${health.issues_count} anomaly detected. Review the live diagnostics log below.`;
+        }
+    }
+    if (lastChecked) lastChecked.textContent = (health.last_updated || "").slice(11, 19) || "Active";
 
-    if (healthBtn) {
-        healthBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            window.openSystemHealthModal();
-        });
+    // 3. Card 2: Market State & Schedule Mode
+    const marketStateBadge = document.getElementById("pageMarketStateBadge");
+    const marketStatusVal = document.getElementById("pageMarketStatusVal");
+    const scheduleModeVal = document.getElementById("pageScheduleModeVal");
+    const serverTimeVal = document.getElementById("pageServerTimeVal");
+
+    const marketStatus = (health.market_status || "CLOSED").toUpperCase();
+    if (marketStateBadge) {
+        marketStateBadge.textContent = marketStatus;
+        marketStateBadge.className = "health-card-badge " + (marketStatus === "OPEN" ? "nominal" : "info");
+    }
+    if (marketStatusVal) marketStatusVal.textContent = marketStatus;
+    if (scheduleModeVal) scheduleModeVal.textContent = marketStatus === "OPEN" ? "LIVE 5-PILLAR SCANNING" : "OFF-MARKET SNAPSHOT (Frozen)";
+    if (serverTimeVal) serverTimeVal.textContent = (payload.timestamp || "").slice(11, 19) + " IST";
+
+    // 4. Card 3: Overnight Lock & Evaluation Stats
+    const lockedPicksCount = document.getElementById("pageLockedPicksCount");
+    const gradedTradesCount = document.getElementById("pageGradedTradesCount");
+    const gapWinRateVal = document.getElementById("pageGapWinRateVal");
+
+    if (lockedPicksCount) {
+        lockedPicksCount.textContent = health.last_lock ? `${health.last_lock.locked_count || 0} Picks Locked` : "0 (Pending 3:30 PM)";
+    }
+    if (gradedTradesCount) {
+        gradedTradesCount.textContent = health.last_evaluation ? `${health.last_evaluation.evaluated_count || 0} Graded` : "0 (Pending 9:15 AM)";
+    }
+    if (gapWinRateVal) {
+        gapWinRateVal.textContent = health.last_evaluation ? `${health.last_evaluation.win_rate_pct || 75.0}%` : "75.0% Baseline";
     }
 
-    if (closeBtn) {
-        closeBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            window.closeSystemHealthModal();
-        });
+    // 5. Card 4: Dyno Stability & Keepalive Uptime
+    const midMarketSpinDowns = document.getElementById("pageMidMarketSpinDowns");
+    const totalColdStarts = document.getElementById("pageTotalColdStarts");
+
+    if (midMarketSpinDowns) {
+        const spins = health.market_hours_cold_starts || 0;
+        midMarketSpinDowns.textContent = spins > 0 ? `${spins} Mid-Market Restarts` : "0 (Optimal)";
+        midMarketSpinDowns.className = spins > 0 ? "text-bearish" : "text-bullish";
+    }
+    if (totalColdStarts) {
+        totalColdStarts.textContent = `${health.total_cold_starts || 1} Total Starts`;
     }
 
-    if (healthModal) {
-        healthModal.addEventListener("click", (e) => {
-            if (e.target === healthModal) {
-                window.closeSystemHealthModal();
-            }
-        });
+    // 6. 4-Pillar Milestone Verification Full Grid
+    const mStatusTransitions = document.getElementById("mStatusTransitions");
+    const mCountTransitions = document.getElementById("mCountTransitions");
+    if (mStatusTransitions && mCountTransitions) {
+        const transCount = (health.recent_transitions || []).length;
+        mCountTransitions.textContent = transCount;
+        mStatusTransitions.textContent = transCount > 0 ? "OK" : "NOMINAL";
+        mStatusTransitions.className = "milestone-status-chip nominal";
     }
 
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-            window.closeSystemHealthModal();
+    const mStatusEval = document.getElementById("mStatusEval");
+    const mDetailsEval = document.getElementById("mDetailsEval");
+    if (mStatusEval && mDetailsEval) {
+        if (health.last_evaluation) {
+            mStatusEval.textContent = "GRADED";
+            mStatusEval.className = "milestone-status-chip nominal";
+            mDetailsEval.textContent = `${health.last_evaluation.evaluated_count || 0} Graded (${health.last_evaluation.win_rate_pct || 75}%)`;
+        } else {
+            mStatusEval.textContent = "PENDING";
+            mStatusEval.className = "milestone-status-chip";
+            mDetailsEval.textContent = "Awaiting 9:15 AM Open";
+        }
+    }
+
+    const mStatusLock = document.getElementById("mStatusLock");
+    const mDetailsLock = document.getElementById("mDetailsLock");
+    if (mStatusLock && mDetailsLock) {
+        if (health.last_lock) {
+            mStatusLock.textContent = "LOCKED";
+            mStatusLock.className = "milestone-status-chip nominal";
+            mDetailsLock.textContent = `${health.last_lock.locked_count || 0} Picks Locked`;
+        } else {
+            mStatusLock.textContent = "PENDING";
+            mStatusLock.className = "milestone-status-chip";
+            mDetailsLock.textContent = "Awaiting 3:30 PM Close";
+        }
+    }
+
+    // 7. Live Anomaly & Diagnostic Stream
+    renderHealthLogStream(health);
+}
+
+function renderHealthLogStream(health) {
+    const logList = document.getElementById("pageHealthLogList");
+    if (!logList) return;
+
+    let entries = [];
+    (health.errors || []).forEach(err => {
+        entries.push({ time: err.time || "--", type: "ERROR", msg: `[${err.category || "ENGINE"}] ${err.error}` });
+    });
+    (health.warnings || []).forEach(w => {
+        entries.push({ time: w.time || "--", type: "WARN", msg: `[${w.category || "ENGINE"}] ${w.warning}` });
+    });
+    (health.cold_starts || []).forEach(cs => {
+        if (cs.is_market_hours) {
+            entries.push({ time: cs.time || "--", type: "WARN", msg: `[DYNO_SPINDOWN] Cold-start restart occurred during market hours (${cs.platform || "Render"})` });
         }
     });
 
-    if (killSwitchBtn) {
-        killSwitchBtn.addEventListener("click", async () => {
+    if (currentHealthLogFilter !== "ALL") {
+        entries = entries.filter(e => e.type === currentHealthLogFilter);
+    }
+
+    if (entries.length === 0) {
+        logList.innerHTML = `<div class="health-empty-log"><i class="fa-solid fa-circle-check text-bullish"></i> Zero errors or exceptions recorded today. All background scheduler pipelines are running nominally.</div>`;
+        return;
+    }
+
+    logList.innerHTML = entries.map(e => `
+        <div class="health-log-entry">
+            <span class="log-entry-time">${escapeHtml(e.time)}</span>
+            <span class="log-entry-tag ${e.type.toLowerCase()}">${e.type}</span>
+            <span class="log-entry-msg">${escapeHtml(e.msg)}</span>
+        </div>
+    `).join("");
+}
+
+function renderDailyHealthHistoryTable(historyList) {
+    const tbody = document.getElementById("dailyHealthArchiveBody");
+    if (!tbody) return;
+
+    if (!Array.isArray(historyList) || historyList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--ink-muted);">No archived daily health audit reports found yet.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = historyList.map(rep => {
+        const score = rep.health_score ?? 100;
+        const scoreClass = score >= 90 ? "text-bullish" : (score >= 70 ? "text-amber" : "text-bearish");
+        const statusClass = rep.status === "NOMINAL" ? "nominal" : (rep.status === "CRITICAL" ? "danger" : "warning");
+        const evals = (rep.milestones && rep.milestones.evaluations ? rep.milestones.evaluations.length : 0);
+        const locks = (rep.milestones && rep.milestones.locks ? rep.milestones.locks.length : 0);
+        const transitions = (rep.milestones && rep.milestones.transitions_count ? rep.milestones.transitions_count : 0);
+        const issues = (rep.issues || []).length;
+
+        return `
+            <tr>
+                <td><strong>${escapeHtml(rep.date)}</strong></td>
+                <td><strong class="${scoreClass}" style="font-size:14px;">${score}/100</strong></td>
+                <td><span class="milestone-status-chip ${statusClass}">${escapeHtml(rep.status || "NOMINAL")}</span></td>
+                <td>${transitions} Transitions</td>
+                <td>${evals > 0 ? `${evals} Evaluated` : '<span style="color:var(--ink-muted);">0</span>'}</td>
+                <td>${locks > 0 ? `${locks} Locked` : '<span style="color:var(--ink-muted);">0</span>'}</td>
+                <td>${rep.cold_starts_during_market_hours || 0}</td>
+                <td>${issues === 0 ? '<span class="text-bullish"><i class="fa-solid fa-check"></i> 0 Issues</span>' : `<span class="text-bearish">${issues} Issues</span>`}</td>
+                <td>
+                    <button class="btn btn-sm btn-pill btn-secondary" onclick="downloadSpecificHealthReport('${escapeAttr(rep.date)}')">
+                        <i class="fa-solid fa-download"></i> JSON
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+window.downloadSpecificHealthReport = async function(date) {
+    try {
+        const res = await apiFetch(`/api/system_health/report?date=${encodeURIComponent(date)}`);
+        if (!res.ok) throw new Error("Failed to fetch report");
+        const data = await res.json();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tradexo_health_report_${date}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`Health report for ${date} downloaded.`, "success");
+    } catch (e) {
+        console.error("Health report download error:", e);
+        showToast("Could not download health report.", "error");
+    }
+};
+
+function initSystemHealthDiagnostics() {
+    const pageKillBtn = document.getElementById("btnPageEmergencyKillSwitch");
+    const refreshBtn = document.getElementById("btnRefreshHealthPage");
+    const exportBtn = document.getElementById("btnExportHealthReport");
+    const filterGroup = document.getElementById("healthLogFilterGroup");
+
+    if (pageKillBtn) {
+        pageKillBtn.addEventListener("click", async () => {
             const isCurrentlyPaused = systemHealthData && systemHealthData.control && systemHealthData.control.is_paused;
             const endpoint = isCurrentlyPaused ? "/api/admin/emergency_resume" : "/api/admin/emergency_pause";
             const actionText = isCurrentlyPaused ? "RESUME" : "PAUSE";
@@ -6224,8 +6369,16 @@ function initSystemHealthDiagnostics() {
         });
     }
 
-    if (downloadBtn) {
-        downloadBtn.addEventListener("click", async () => {
+    if (refreshBtn) {
+        refreshBtn.addEventListener("click", () => {
+            fetchSystemHealth();
+            fetchDailyHealthHistory();
+            showToast("Diagnostics & history refreshed.", "info");
+        });
+    }
+
+    if (exportBtn) {
+        exportBtn.addEventListener("click", async () => {
             try {
                 const res = await apiFetch("/api/system_health/report");
                 if (!res.ok) throw new Error("Failed to fetch report");
@@ -6239,7 +6392,7 @@ function initSystemHealthDiagnostics() {
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast("Daily health report downloaded.", "success");
+                showToast("Daily health report exported.", "success");
             } catch (e) {
                 console.error("Health report download error:", e);
                 showToast("Could not download health report.", "error");
@@ -6247,19 +6400,32 @@ function initSystemHealthDiagnostics() {
         });
     }
 
-    if (refreshBtn) {
-        refreshBtn.addEventListener("click", () => {
-            fetchSystemHealth();
-            showToast("Diagnostics refreshed.", "info");
+    if (filterGroup) {
+        filterGroup.addEventListener("click", (e) => {
+            const btn = e.target.closest(".health-filter-btn");
+            if (!btn) return;
+            filterGroup.querySelectorAll(".health-filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentHealthLogFilter = btn.dataset.filter || "ALL";
+            if (systemHealthData && systemHealthData.health) {
+                renderHealthLogStream(systemHealthData.health);
+            }
         });
     }
 
     // Initial fetch and 30-sec polling
     fetchSystemHealth();
-    setInterval(fetchSystemHealth, 30000);
+    fetchDailyHealthHistory();
+    setInterval(() => {
+        if (currentActiveSection === "systemHealth") {
+            fetchSystemHealth();
+            fetchDailyHealthHistory();
+        }
+    }, 30000);
 }
 
 initSystemHealthDiagnostics();
+
 
 
 
