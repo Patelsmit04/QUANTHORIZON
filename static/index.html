@@ -39,6 +39,22 @@
 </head>
 <body>
 
+    <!-- ============================== TRADEXO CINEMATIC INTRO OVERLAY (CLEAN SPLASH) ============================== -->
+    <div id="tradexoIntroOverlay" class="tradexo-intro-overlay" role="dialog" aria-modal="true" aria-label="TRADEXO Introduction Video">
+        <div class="intro-video-wrapper" id="introVideoWrapper">
+            <video id="tradexoIntroVideo"
+                   class="tradexo-intro-video"
+                   playsinline
+                   webkit-playsinline
+                   muted
+                   autoplay
+                   preload="auto">
+                <source src="/static/TRADXO_INTRO.mp4" type="video/mp4">
+                Your browser does not support HTML5 video.
+            </video>
+        </div>
+    </div>
+
     <!-- Live notification toasts (see /ws/live, wired in app.js) -->
     <div id="toastContainer"></div>
 
@@ -109,6 +125,10 @@
 
                 <div class="sidebar-nav-divider"></div>
 
+                <button class="sidebar-nav-item" id="sidebarWatchIntroBtn" title="Watch Intro Video">
+                    <i class="fa-solid fa-play text-gold"></i>
+                    <span class="nav-label">Watch Intro</span>
+                </button>
                 <button class="sidebar-nav-item" data-section="guide" title="Guide / Export / Settings">
                     <i class="fa-solid fa-gear"></i>
                     <span class="nav-label">Guide / Export / Settings</span>
@@ -936,6 +956,14 @@
                 </div>
 
                 <section class="guide-settings-grid">
+                    <div class="guide-step-box">
+                        <h4><i class="fa-solid fa-play text-gold"></i> Platform Intro Video</h4>
+                        <p>Watch the TRADEXO cinematic overview and feature walkthrough reel with full audio and animated 5-pillar highlights.</p>
+                        <button id="guideWatchIntroBtn" class="btn btn-pill btn-primary" style="margin-top:10px;width:100%;">
+                            <i class="fa-solid fa-play"></i> PLAY PLATFORM INTRO
+                        </button>
+                    </div>
+
                     <div class="guide-step-box">
                         <h4><i class="fa-solid fa-file-csv text-gold"></i> Export Watchlist</h4>
                         <p>Download the current filtered Signals Engine view as a CSV file — same data, same filters, same sort order you're looking at right now.</p>

@@ -288,8 +288,141 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     // -------------------------------------------------------------
+    // TRADEXO CINEMATIC INTRO VIDEO CONTROLLER (CLEAN 3s SPLASH)
+    // -------------------------------------------------------------
+    function initTradexoIntro() {
+        const overlay = document.getElementById("tradexoIntroOverlay");
+        const video = document.getElementById("tradexoIntroVideo");
+        const sidebarWatchIntroBtn = document.getElementById("sidebarWatchIntroBtn");
+        const guideWatchIntroBtn = document.getElementById("guideWatchIntroBtn");
+
+        if (!overlay || !video) return;
+
+        const INTRO_SESSION_KEY = "tradexo_intro_viewed_v2";
+        let isDismissed = false;
+        let safetyTimeout = null;
+
+        function dismissIntro() {
+            if (isDismissed) return;
+            isDismissed = true;
+            if (safetyTimeout) clearTimeout(safetyTimeout);
+
+            try {
+                sessionStorage.setItem(INTRO_SESSION_KEY, "true");
+            } catch (e) {}
+
+            document.body.classList.remove("intro-active");
+            overlay.classList.add("fade-out");
+
+            // Pause video and silence audio
+            setTimeout(() => {
+                try {
+                    video.pause();
+                } catch (e) {}
+                overlay.classList.add("hidden");
+                overlay.classList.remove("fade-out");
+            }, 500);
+        }
+
+        function launchIntro() {
+            isDismissed = false;
+            overlay.classList.remove("hidden", "fade-out");
+            document.body.classList.add("intro-active");
+
+            video.currentTime = 0;
+            video.muted = true; // Auto-play muted so all mobile/desktop browsers allow instant playback
+
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch((err) => {
+                    console.warn("Intro autoplay prevented, retrying muted:", err);
+                    video.muted = true;
+                    video.play().catch((e) => {
+                        console.warn("Intro video playback failed:", e);
+                        dismissIntro();
+                    });
+                });
+            }
+
+            // Auto-dismiss safety timeout: 4.5 seconds
+            if (safetyTimeout) clearTimeout(safetyTimeout);
+            safetyTimeout = setTimeout(() => {
+                if (!isDismissed) {
+                    dismissIntro();
+                }
+            }, 4500);
+        }
+
+        // When the 3s video finishes playing, immediately fade out and enter dashboard
+        video.addEventListener("ended", () => {
+            dismissIntro();
+        });
+
+        video.addEventListener("error", (err) => {
+            console.warn("Intro video load error:", err);
+            dismissIntro();
+        });
+
+        // Tap/click anywhere to skip immediately
+        overlay.addEventListener("click", () => {
+            dismissIntro();
+        });
+
+        // Keyboard shortcuts: any key (Escape, Space, Enter) skips immediately
+        window.addEventListener("keydown", (e) => {
+            if (overlay.classList.contains("hidden") || isDismissed) return;
+            if (e.key === "Escape" || e.key === "Enter" || e.key === " " || e.code === "Space") {
+                e.preventDefault();
+                dismissIntro();
+            }
+        });
+
+        // Touch swipe or tap skips immediately
+        overlay.addEventListener("touchend", () => {
+            if (!isDismissed) dismissIntro();
+        }, { passive: true });
+
+        // Sidebar and Guide "Watch Intro" triggers
+        if (sidebarWatchIntroBtn) {
+            sidebarWatchIntroBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (typeof closeMobileDrawer === "function") closeMobileDrawer();
+                launchIntro();
+            });
+        }
+        if (guideWatchIntroBtn) {
+            guideWatchIntroBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                launchIntro();
+            });
+        }
+
+        // Global trigger for manual invocation
+        window.replayTradexoIntro = function() {
+            launchIntro();
+        };
+
+        // Session check: play on first load of browser session
+        let hasSeenIntro = false;
+        try {
+            hasSeenIntro = sessionStorage.getItem(INTRO_SESSION_KEY) === "true";
+        } catch (e) {}
+
+        if (!hasSeenIntro) {
+            launchIntro();
+        } else {
+            overlay.classList.add("hidden");
+            document.body.classList.remove("intro-active");
+            try {
+                video.pause();
+            } catch (e) {}
+        }
+    }
+
+    // -------------------------------------------------------------
     // 1. INITIALIZATION & TIMERS
     // -------------------------------------------------------------
+    initTradexoIntro();
     fetchScanResults();
     fetchWinRatePerformance();
     setupAutoRefresh();

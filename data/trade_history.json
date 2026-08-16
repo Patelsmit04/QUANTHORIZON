@@ -1,6 +1,40 @@
 {
   "trades": [
     {
+      "id": "2026-08-15_RELIANCE",
+      "lock_date": "2026-08-15",
+      "lock_time": "09:47:58",
+      "symbol": "RELIANCE",
+      "raw_ticker": "RELIANCE.NS",
+      "liquidity_tier": "TIER_1",
+      "confirmed_pillars_count": 3,
+      "confirmed_pillars": [],
+      "oi_magnitude": {},
+      "expiry_discount_applied": false,
+      "delivery_t1_validation": {},
+      "fundamental_quality": {},
+      "news_signal": {},
+      "depth_analysis": "",
+      "signal": "BTST (BUY)",
+      "option_type": "NONE",
+      "priority_level": "P1_HIGH",
+      "confidence_score": 85,
+      "close_price_325": 100.0,
+      "predicted_gap_pct": 1.5,
+      "day_high": 0.0,
+      "day_low": 0.0,
+      "vwap": 0.0,
+      "volume_spike": 1.0,
+      "rsi": 50.0,
+      "rank_reason": "",
+      "status": "PENDING_EVALUATION",
+      "open_price_915": null,
+      "gap_pct": null,
+      "variance_error_pct": null,
+      "accuracy_score_pct": null,
+      "outcome": "PENDING"
+    },
+    {
       "id": "2026-08-14_RELIANCE",
       "lock_date": "2026-08-14",
       "lock_time": "09:23:28",
@@ -147,6 +181,6 @@
   "avg_gap_pct": 39005.51,
   "prediction_accuracy_pct": 25.2,
   "avg_variance_error_pct": 39006.86,
-  "last_updated": "2026-08-14 18:09:51 IST",
+  "last_updated": "2026-08-15 11:17:38 IST",
   "jackpot_wins": 1
 }

@@ -1,0 +1,118 @@
+[
+  {
+    "date": "2026-08-10",
+    "run_at": "2026-08-10T20:36:25.664412+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 8,
+    "archive_symbol_count": 14,
+    "symbols_only_in_live": [
+      "ARVSMART",
+      "DIAMONDYD",
+      "PGEL",
+      "PRSMJOHNSN",
+      "TRIDENT",
+      "VARROC"
+    ],
+    "symbols_only_in_archive": [
+      "APOLLOPIPE",
+      "ATALREAL",
+      "CAPILLARY",
+      "COMSYN",
+      "EIDPARRY",
+      "JGCHEM",
+      "MOTISONS",
+      "NELCO",
+      "RAMCOIND",
+      "RATNAVEER",
+      "SBCL",
+      "WEL"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "EMIL",
+        "live_net_value_cr": 96.7,
+        "archive_net_value_cr": 2.21
+      },
+      {
+        "symbol": "MVELECTRO",
+        "live_net_value_cr": -0.03,
+        "archive_net_value_cr": 8.52
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
+  },
+  {
+    "date": "2026-08-12",
+    "run_at": "2026-08-12T21:08:08.294832+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 14,
+    "archive_symbol_count": 14,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "CLEAN"
+  },
+  {
+    "date": "2026-08-13",
+    "run_at": "2026-08-13T19:37:54.365843+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 14,
+    "archive_symbol_count": 18,
+    "symbols_only_in_live": [
+      "AGARWALEYE",
+      "ARDEE",
+      "DOLPHIN",
+      "EMIL",
+      "FINCABLES",
+      "MARKSANS",
+      "ROLEXRINGS",
+      "SBC",
+      "SEITINVIT",
+      "SUMEETINDS",
+      "TENNIND",
+      "WANBURY"
+    ],
+    "symbols_only_in_archive": [
+      "APOLLOPIPE",
+      "ASIANTILES",
+      "GCSL",
+      "KERNEX",
+      "MIDHANI",
+      "MOREPENLAB",
+      "MOTISONS",
+      "MUNJALAU",
+      "NELCO",
+      "PRUDENT",
+      "RGL",
+      "RHETAN",
+      "SEAMECLTD",
+      "THYROCARE",
+      "URBANCO",
+      "YATRA"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "PANAMAPET",
+        "live_net_value_cr": -22.94,
+        "archive_net_value_cr": 0.01
+      },
+      {
+        "symbol": "RATNAVEER",
+        "live_net_value_cr": 0.02,
+        "archive_net_value_cr": 11.84
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
+  },
+  {
+    "date": "2026-08-14",
+    "run_at": "2026-08-14T19:57:19.080982+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 18,
+    "archive_symbol_count": 18,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "CLEAN"
+  }
+]
