@@ -5998,51 +5998,6 @@ function renderLiveTradeCards(activeSetups) {
 }
 
 // ==========================================================================
-// SYSTEM HEALTH & FORWARD-TESTING DIAGNOSTICS (PHASE 1 & 3)
-// ==========================================================================
-let systemHealthData = null;
-
-async function fetchSystemHealth() {
-    try {
-        const response = await apiFetch("/api/system_health");
-        if (!response.ok) return;
-        const payload = await response.json();
-        systemHealthData = payload;
-        renderSystemHealthUI(payload);
-    } catch (e) {
-        console.warn("[TRADEXO] System health fetch error:", e);
-    }
-}
-
-function renderSystemHealthUI(payload) {
-    if (!payload || !payload.health) return;
-    const health = payload.health;
-    const control = payload.control || {};
-    const isPaused = control.is_paused === true;
-
-    // 1. Dashboard Button & Pulse Dot
-    const healthBtn = document.getElementById("systemHealthBtn");
-    const healthDot = document.getElementById("systemHealthDot");
-    const healthText = document.getElementById("systemHealthText");
-
-    if (healthDot) {
-        healthDot.className = "health-pulse-dot";
-        if (isPaused) {
-            healthDot.classList.add("attention");
-        } else if (health.status === "NOMINAL") {
-            healthDot.classList.add("nominal");
-        } else if (health.status === "ATTENTION_REQUIRED") {
-            healthDot.classList.add("attention");
-        } else {
-            healthDot.classList.add("critical");
-        }
-    }
-
-    if (healthText) {
-        if (isPaused) {
-            healthText.textContent = "PAUSED";
-        } else {
-// ==========================================================================
 // SYSTEM HEALTH & FORWARD-TESTING DIAGNOSTICS (DEDICATED PAGE CONTROLLER)
 // ==========================================================================
 let systemHealthData = null;
@@ -6420,7 +6375,3 @@ function initSystemHealthDiagnostics() {
 }
 
 initSystemHealthDiagnostics();
-
-
-
-
