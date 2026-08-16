@@ -1,10 +1,18 @@
 {
   "today_date": "2026-08-16",
-  "cold_starts": [],
+  "cold_starts": [
+    {
+      "timestamp": "2026-08-16 21:15:37 IST",
+      "is_market_hours": false,
+      "details": {
+        "platform": "Render/Local"
+      }
+    }
+  ],
   "market_transitions": [],
   "evaluations": [],
   "locks": [],
   "errors": [],
   "warnings": [],
-  "last_health_check": "2026-08-16 20:46:05 IST"
+  "last_health_check": "2026-08-16 21:15:37 IST"
 }
