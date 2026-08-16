@@ -238,6 +238,12 @@ _cache_lock = threading.Lock()
 # -------------------------------------------------------------
 # HELPER FUNCTIONS: IST TIME & MARKET SCHEDULE
 # -------------------------------------------------------------
+# AUTHORITATIVE MARKET STATUS & TIME ENGINE (PHASE 1)
+# -------------------------------------------------------------
+MARKET_OPEN_TIME = datetime.strptime("09:15", "%H:%M").time()
+MARKET_CLOSE_TIME = datetime.strptime("15:30", "%H:%M").time()
+
+
 def get_ist_now() -> datetime:
     """Get current datetime in Indian Standard Time (UTC+5:30)."""
     utc_now = datetime.now(timezone.utc)
@@ -245,72 +251,94 @@ def get_ist_now() -> datetime:
     return utc_now.astimezone(ist_tz)
 
 
-def get_market_schedule_info() -> Dict[str, Any]:
+def get_market_status() -> str:
     """
-    Determine Indian Stock Market Status & Scanning Frequency:
-    - Weekends (Saturday/Sunday): CLOSED (serve the last locked snapshot)
-    - Weekdays 9:15 AM - 2:29:59 PM: OPEN (5-min frequency)
-    - Weekdays 2:30 PM - 3:13:59 PM: POWER HOUR (1-min frequency)
-    - Weekdays 3:14 PM - 3:39:59 PM: CLOSING SEQUENCE — regular scanning stops; see
-      closing_sequence.py for the snapshot -> CAS close -> scoring -> broadcast -> lock steps
-      that run through this window instead.
-    - Weekdays 3:40 PM - 9:14:59 AM Next Day: CLOSED — no further scanning (serve the 3:40 PM
-      locked snapshot)
+    Single authoritative source of truth for Indian Stock Market Status.
+    Returns strictly one of:
+    'PRE_MARKET', 'OPEN', 'CLOSED', 'HOLIDAY'
     """
     ist_now = get_ist_now()
-    weekday = ist_now.weekday() # 0 = Monday, 6 = Sunday
-    hours = ist_now.hour
-    minutes = ist_now.minute
-
-    is_weekend = weekday in [5, 6]
-    time_in_minutes = hours * 60 + minutes
-
-    market_open_mins = 9 * 60 + 15     # 9:15 AM = 555 mins
-    power_hour_mins = 14 * 60 + 30     # 2:30 PM = 870 mins
-    scan_cutoff_mins = 15 * 60 + 14    # 3:14 PM = 914 mins — regular scanning stops here
-    closing_seq_330_mins = 15 * 60 + 30  # 3:30 PM = 930 mins — sharp market bell lock
-
     today_date_str = ist_now.strftime("%Y-%m-%d")
-    is_holiday = closing_sequence.is_trading_holiday(today_date_str)
 
-    if is_weekend or is_holiday:
+    # Check weekend (Saturday / Sunday) or official NSE Trading Holiday
+    if ist_now.weekday() in [5, 6] or closing_sequence.is_trading_holiday(today_date_str):
+        return "HOLIDAY"
+
+    curr_time = ist_now.time()
+    if curr_time < MARKET_OPEN_TIME:
+        return "PRE_MARKET"
+    if curr_time > MARKET_CLOSE_TIME:
+        return "CLOSED"
+    return "OPEN"
+
+
+def get_market_schedule_info() -> Dict[str, Any]:
+    """
+    Determine Indian Stock Market Status & Autonomous Scanning Schedule:
+    All status checks strictly route through get_market_status().
+    """
+    ist_now = get_ist_now()
+    m_status = get_market_status()
+    today_date_str = ist_now.strftime("%Y-%m-%d")
+    time_in_minutes = ist_now.hour * 60 + ist_now.minute
+
+    power_hour_mins = 14 * 60 + 30       # 2:30 PM = 870 mins
+    scan_cutoff_mins = 15 * 60 + 14      # 3:14 PM = 914 mins (regular scanning stops)
+    closing_seq_330_mins = 15 * 60 + 30  # 3:30 PM = 930 mins (sharp market bell lock)
+
+    if m_status == "HOLIDAY":
+        is_weekend = ist_now.weekday() in [5, 6]
         return {
-            "status": "CLOSED (TRADING HOLIDAY)" if is_holiday else "CLOSED (3:30 PM SCAN LOCKED)",
+            "status": "CLOSED (WEEKEND)" if is_weekend else "CLOSED (TRADING HOLIDAY)",
+            "market_state": "HOLIDAY",
             "is_open": False,
-            "mode": "OFF-MARKET SNAPSHOT (HOLIDAY — 3:30 PM LOCKED)" if is_holiday else "OFF-MARKET SNAPSHOT (WEEKEND — 3:30 PM LOCKED)",
+            "mode": "OFF-MARKET SNAPSHOT (WEEKEND — 3:30 PM LOCKED)" if is_weekend else "OFF-MARKET SNAPSHOT (HOLIDAY — 3:30 PM LOCKED)",
             "sleep_seconds": 30
         }
 
-    if market_open_mins <= time_in_minutes < scan_cutoff_mins:
+    if m_status == "PRE_MARKET":
+        return {
+            "status": "PRE-MARKET (09:00 - 09:15 AM)",
+            "market_state": "PRE_MARKET",
+            "is_open": False,
+            "mode": "PRE-MARKET SESSION (EVALUATING 9:15 AM OPEN)",
+            "sleep_seconds": 15
+        }
+
+    if m_status == "OPEN":
+        if scan_cutoff_mins <= time_in_minutes < closing_seq_330_mins:
+            return {
+                "status": "CLOSING SEQUENCE IN PROGRESS",
+                "market_state": "OPEN",
+                "is_open": False,  # Regular 5-min scans pause so closing sequence can lock
+                "mode": "3:14-3:30 PM CLOSING SEQUENCE (snapshot -> 3:25 auto-lock -> 3:30 market lock)",
+                "sleep_seconds": 15
+            }
         if time_in_minutes >= power_hour_mins:
             return {
                 "status": "OPEN",
+                "market_state": "OPEN",
                 "is_open": True,
                 "mode": "1-MIN POWER HOUR SCAN (FINAL 3:14 PM SNAPSHOT APPROACH)",
                 "sleep_seconds": 60
             }
-        else:
-            return {
-                "status": "OPEN",
-                "is_open": True,
-                "mode": "5-MIN REGULAR SCAN",
-                "sleep_seconds": 300
-            }
-
-    if scan_cutoff_mins <= time_in_minutes < closing_seq_330_mins:
         return {
-            "status": "CLOSING SEQUENCE IN PROGRESS",
-            "is_open": False,
-            "mode": "3:14-3:30 PM CLOSING SEQUENCE (snapshot -> 3:25 auto-lock -> 3:30 market lock)",
-            "sleep_seconds": 15
+            "status": "OPEN",
+            "market_state": "OPEN",
+            "is_open": True,
+            "mode": "5-MIN REGULAR SCAN",
+            "sleep_seconds": 300
         }
 
+    # CLOSED (3:30 PM onward until 9:15 AM next trading day)
     return {
         "status": "CLOSED (3:30 PM SCAN LOCKED)",
+        "market_state": "CLOSED",
         "is_open": False,
         "mode": "OFF-MARKET SNAPSHOT (3:30 PM MARKET BELL LOCKED)",
         "sleep_seconds": 30
     }
+
 
 
 # -------------------------------------------------------------
@@ -1189,16 +1217,21 @@ def background_scheduler_worker():
     logger.info("Starting Autonomous 5-Pillar Background Market Scheduler Thread...")
     
     today_str = get_ist_now().strftime("%Y-%m-%d")
+    m_status = get_market_status()
     saved_snapshot = load_last_market_scan()
     snapshot_ts = str(saved_snapshot.get("timestamp", "")) if saved_snapshot else ""
     is_today_snapshot = bool(saved_snapshot) and bool(saved_snapshot.get("stocks")) and (today_str in snapshot_ts)
 
-    if is_today_snapshot:
+    if saved_snapshot and saved_snapshot.get("stocks"):
         cache_store["data"] = saved_snapshot.get("stocks", [])
         cache_store["scan_summary"] = saved_snapshot
         cache_store["timestamp"] = time.time()
-        logger.info(f"Loaded today's persistent 5-Pillar snapshot ({saved_snapshot.get('timestamp')}) from disk.")
-        # Re-compute gap bucket distributions with current engine (format may have changed)
+        if is_today_snapshot:
+            logger.info(f"Loaded today's persistent 5-Pillar snapshot ({snapshot_ts}) from disk.")
+        else:
+            logger.info(f"Loaded prior session's locked snapshot ({snapshot_ts}) — market status: {m_status}. Preserving valid picks without destructive wipe.")
+        
+        # Re-compute gap bucket distributions with current engine
         from gap_bucket_engine import calculate_gap_bucket_distribution
         for s in (cache_store["data"] or []):
             s["gap_bucket_distribution"] = calculate_gap_bucket_distribution(
@@ -1208,8 +1241,8 @@ def background_scheduler_worker():
                 s.get("signal", "")
             )
         save_last_market_scan(cache_store["scan_summary"])
-    else:
-        logger.info(f"Disk snapshot is missing or from a previous day ({snapshot_ts}) — running fresh 5-Pillar scan for today ({today_str})...")
+    elif m_status == "OPEN":
+        logger.info(f"No persistent snapshot found and market is OPEN — running initial live 5-Pillar scan ({today_str})...")
         try:
             initial_scan = run_full_scan_pipeline()
             if initial_scan:
@@ -1217,9 +1250,20 @@ def background_scheduler_worker():
                 cache_store["scan_summary"] = initial_scan
                 cache_store["timestamp"] = time.time()
                 save_last_market_scan(initial_scan)
-                logger.info(f"Today's ({today_str}) 5-Pillar scan complete & saved to disk.")
+                logger.info(f"Today's ({today_str}) initial live scan complete & saved to disk.")
         except Exception as e:
             logger.error(f"Error running initial scan on startup: {e}")
+    else:
+        logger.info(f"No persistent snapshot found on disk and market is {m_status} — running safe initial seed scan...")
+        try:
+            initial_scan = run_full_scan_pipeline()
+            if initial_scan:
+                cache_store["data"] = initial_scan.get("stocks", [])
+                cache_store["scan_summary"] = initial_scan
+                cache_store["timestamp"] = time.time()
+                save_last_market_scan(initial_scan)
+        except Exception as e:
+            logger.error(f"Error running initial seed scan on startup: {e}")
 
     while True:
         try:
@@ -2332,34 +2376,11 @@ def get_live_prices():
     stock_prices = list(stock_prices_dict.values())
 
     sched_info = get_market_schedule_info()
+    m_status = get_market_status()
     is_live_market = sched_info.get("is_open", False)
 
-    # Apply realistic 5-second dynamic micro-ticks ONLY during off-market hours or static testing
-    # During live market hours, 100% authentic exchange quotes are passed with 0% artificial variation
-    if not is_live_market:
-        import random
-        tick_seed = int(now_ts // 5)  # updates exactly every 5 seconds
-        rng = random.Random(tick_seed)
-
-        for idx in index_prices:
-            if idx.get("ltp") is not None:
-                base_ltp = float(idx["ltp"])
-                prev_c = float(idx.get("prev_close") or base_ltp)
-                delta_pct = rng.uniform(-0.02, 0.02)
-                live_ltp = round(base_ltp * (1.0 + delta_pct / 100.0), 2)
-                idx["ltp"] = live_ltp
-                idx["change_pts"] = round(live_ltp - prev_c, 2)
-                idx["pct_change"] = round(((live_ltp - prev_c) / prev_c) * 100.0, 2) if prev_c > 0 else 0.0
-
-        for s in stock_prices:
-            if s.get("ltp") is not None:
-                base_ltp = float(s["ltp"])
-                prev_c = float(s.get("prev_close") or base_ltp)
-                delta_pct = rng.uniform(-0.03, 0.03)
-                live_ltp = round(base_ltp * (1.0 + delta_pct / 100.0), 2)
-                s["ltp"] = live_ltp
-                s["change_pts"] = round(live_ltp - prev_c, 2)
-                s["pct_change"] = round(((live_ltp - prev_c) / prev_c) * 100.0, 2) if prev_c > 0 else 0.0
+    # Note: 100% genuine prices returned directly from exchange / last settlement with 0% synthetic jitter.
+    # When market is CLOSED or HOLIDAY, prices are strictly frozen at the authentic last settled close.
 
     # Determine BTST display status based on current IST time
     ist_now = get_ist_now()
@@ -2372,21 +2393,25 @@ def get_live_prices():
     else:
         btst_status = "confirmed"
 
-    sched_info = get_market_schedule_info()
-    data_lag_minutes = 15 if sched_info.get("is_open") else 0
+    data_lag_minutes = 15 if is_live_market else 0
     return sanitize_json_data({
         "stocks": stock_prices,
         "indices": index_prices,
         "btst_status": btst_status,
+        "market_status": m_status,
+        "market_state": sched_info.get("market_state", m_status),
+        "is_open": is_live_market,
+        "mode": sched_info.get("mode"),
         "data_feed_info": {
             "primary_provider": "Yahoo Finance / NSE Live Proxy",
-            "feed_type": "15-Min Delayed Free Tier (Equities)",
+            "feed_type": "15-Min Delayed Free Tier (Equities)" if is_live_market else "Settled Last Close (Frozen)",
             "data_lag_minutes": data_lag_minutes,
             "is_delayed": data_lag_minutes > 0,
-            "disclaimer": "Free tier data operates under 15-minute delay policies. For zero-latency 3:29 PM execution, wire a direct broker API."
+            "disclaimer": "Live market quotes operate under standard exchange delay. When closed, quotes are strictly frozen at official last close."
         },
         "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
     })
+
 
 
 @app.get("/api/closing_sequence/status")
@@ -2831,6 +2856,48 @@ def cron_run_scheduler_tick():
     }
 
 
+@app.get("/api/market_status")
+def get_market_status_api():
+    """Single source of truth API for market status, timing, and trading calendar."""
+    ist_now = get_ist_now()
+    m_status = get_market_status()
+    sched = get_market_schedule_info()
+    return sanitize_json_data({
+        "status": m_status,  # 'PRE_MARKET' | 'OPEN' | 'CLOSED' | 'HOLIDAY'
+        "market_state": sched.get("market_state", m_status),
+        "is_open": sched.get("is_open", False),
+        "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST"),
+        "date": ist_now.strftime("%Y-%m-%d"),
+        "time": ist_now.strftime("%H:%M:%S"),
+        "detail": sched.get("status"),
+        "mode": sched.get("mode"),
+        "is_holiday": m_status == "HOLIDAY",
+        "is_weekend": ist_now.weekday() in [5, 6],
+        "market_open_time": "09:15:00 IST",
+        "market_close_time": "15:30:00 IST"
+    })
+
+
+@app.get("/api/cron/keepalive")
+@app.post("/api/cron/keepalive")
+def cron_keepalive_endpoint():
+    """
+    Lightweight keepalive endpoint for external uptime pingers (cron-job.org, UptimeRobot, GitHub Actions).
+    Prevents free dyno spin-down during trading hours and executes catch-up tasks if due.
+    """
+    ist_now = get_ist_now()
+    m_status = get_market_status()
+    sched_info = run_scheduler_tick() if m_status == "OPEN" else get_market_schedule_info()
+    return sanitize_json_data({
+        "status": "ALIVE",
+        "market_status": m_status,
+        "is_open": sched_info.get("is_open", False),
+        "mode": sched_info.get("mode"),
+        "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
+    })
+
+
+
 INDEX_TICKER_MAP = {
     "NIFTY": "^NSEI",
     "NIFTY50": "^NSEI",
@@ -3177,9 +3244,15 @@ def get_manifest():
     return FileResponse(os.path.join(STATIC_DIR, "manifest.json"), media_type="application/json")
 
 
+@app.get("/sw.js")
+def get_service_worker():
+    return FileResponse(os.path.join(STATIC_DIR, "sw.js"), media_type="application/javascript")
+
+
 @app.get("/favicon.ico")
 def get_favicon():
     return FileResponse(os.path.join(STATIC_DIR, "favicon.ico"), media_type="image/x-icon")
+
 
 
 @app.get("/apple-touch-icon.png")

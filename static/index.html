@@ -164,10 +164,23 @@
                     </div>
                 </div>
 
+                <div class="topbar-market-badge-wrap">
+                    <div id="topbarMarketStatusBadge" class="market-status-pill market-status-closed" title="Authoritative Indian Stock Market Status">
+                        <span class="status-pulse-dot"></span>
+                        <span id="topbarMarketStatusText">MARKET CLOSED</span>
+                        <span id="topbarMarketStatusTime" class="market-status-sub">(LAST CLOSE FROZEN)</span>
+                    </div>
+                </div>
+
                 <div class="topbar-spacer"></div>
 
                 <!-- Right Header Chrome Buttons -->
                 <div class="header-actions">
+                    <button id="pushNotifBtn" class="btn btn-pill btn-secondary push-notif-btn" title="Enable Mobile Lock-Screen Push Alerts">
+                        <i class="fa-solid fa-mobile-screen"></i>
+                        <span id="pushNotifBtnText">ALERTS</span>
+                    </button>
+
                     <button id="winRateBtn" class="btn btn-pill btn-secondary winrate-topbar-btn" title="View BTST Win Rate Analytics">
                         <i class="fa-solid fa-trophy text-gold"></i>
                         <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>

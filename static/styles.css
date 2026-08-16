@@ -4690,6 +4690,117 @@ body.intro-active {
     background: #000;
 }
 
+/* ==========================================================================
+   MARKET STATUS BADGE & PUSH ALERTS STYLING (PHASE 1 - 4)
+   ========================================================================== */
+.topbar-market-badge-wrap {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 12px;
+}
+
+.market-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: all 0.25s ease;
+    border: 1px solid transparent;
+}
+
+.market-status-pill .status-pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.market-status-pill .market-status-sub {
+    font-size: 0.68rem;
+    font-weight: 500;
+    opacity: 0.8;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+/* Status States */
+.market-status-open {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.market-status-open .status-pulse-dot {
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: marketPulse 1.8s infinite;
+}
+
+.market-status-closed {
+    background: rgba(148, 163, 184, 0.1);
+    color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.25);
+}
+
+.market-status-closed .status-pulse-dot {
+    background: #64748b;
+}
+
+.market-status-holiday {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.market-status-holiday .status-pulse-dot {
+    background: #f59e0b;
+}
+
+.market-status-premarket {
+    background: rgba(59, 130, 246, 0.12);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.market-status-premarket .status-pulse-dot {
+    background: #3b82f6;
+    animation: marketPulse 1.8s infinite;
+}
+
+@keyframes marketPulse {
+    0% { transform: scale(0.95); opacity: 0.7; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+    70% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); opacity: 0.7; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.push-notif-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 6px 12px;
+}
+
+.push-notif-btn.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+@media (max-width: 1023px) {
+    .topbar-market-badge-wrap {
+        display: none !important;
+    }
+}
+
+
 
 
 

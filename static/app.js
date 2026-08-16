@@ -824,6 +824,82 @@ document.addEventListener("DOMContentLoaded", () => {
         if (textEl) textEl.textContent = text;
     }
 
+    // Authoritative Market Status UI Synchronization (Phase 1 & 2)
+    function updateMarketStatusBadge(data) {
+        if (!data) return;
+        const rawStatus = (data.market_status || data.status || "").toUpperCase();
+        const isOpen = data.is_open === true || rawStatus === "OPEN";
+        const isHoliday = rawStatus.includes("HOLIDAY") || rawStatus.includes("WEEKEND");
+        const isPreMarket = rawStatus.includes("PRE_MARKET") || rawStatus.includes("PRE-MARKET");
+
+        const topbarBadge = document.getElementById("topbarMarketStatusBadge");
+        const topbarText = document.getElementById("topbarMarketStatusText");
+        const topbarTime = document.getElementById("topbarMarketStatusTime");
+
+        const scannerStatusText = document.getElementById("marketStatusText");
+        const scannerStatusDot = document.getElementById("statusDot");
+        const scannerTimer = document.getElementById("marketTimer");
+
+        if (topbarBadge) {
+            topbarBadge.className = "market-status-pill";
+            if (isOpen) {
+                topbarBadge.classList.add("market-status-open");
+                if (topbarText) topbarText.textContent = "MARKET LIVE";
+                if (topbarTime) topbarTime.textContent = "(09:15 - 15:30 IST)";
+            } else if (isPreMarket) {
+                topbarBadge.classList.add("market-status-premarket");
+                if (topbarText) topbarText.textContent = "PRE-MARKET";
+                if (topbarTime) topbarTime.textContent = "(09:00 - 09:15 IST)";
+            } else if (isHoliday) {
+                topbarBadge.classList.add("market-status-holiday");
+                if (topbarText) topbarText.textContent = "MARKET CLOSED";
+                if (topbarTime) topbarTime.textContent = "(HOLIDAY / SETTLED)";
+            } else {
+                topbarBadge.classList.add("market-status-closed");
+                if (topbarText) topbarText.textContent = "MARKET CLOSED";
+                if (topbarTime) topbarTime.textContent = "(LAST CLOSE FROZEN)";
+            }
+        }
+
+        if (scannerStatusText) {
+            if (isOpen) {
+                scannerStatusText.textContent = "MARKET OPEN";
+                scannerStatusText.style.color = "var(--bullish-green, #10b981)";
+            } else if (isPreMarket) {
+                scannerStatusText.textContent = "PRE-MARKET SESSION";
+                scannerStatusText.style.color = "var(--primary, #3b82f6)";
+            } else if (isHoliday) {
+                scannerStatusText.textContent = "TRADING HOLIDAY";
+                scannerStatusText.style.color = "var(--gold, #f59e0b)";
+            } else {
+                scannerStatusText.textContent = "MARKET CLOSED";
+                scannerStatusText.style.color = "var(--ink-muted, #94a3b8)";
+            }
+        }
+
+        if (scannerStatusDot) {
+            if (isOpen) {
+                scannerStatusDot.classList.add("live-pulse");
+                scannerStatusDot.style.background = "var(--bullish-green, #10b981)";
+            } else if (isPreMarket) {
+                scannerStatusDot.classList.add("live-pulse");
+                scannerStatusDot.style.background = "var(--primary, #3b82f6)";
+            } else {
+                scannerStatusDot.classList.remove("live-pulse");
+                scannerStatusDot.style.background = isHoliday ? "var(--gold, #f59e0b)" : "var(--ink-muted, #64748b)";
+            }
+        }
+
+        if (scannerTimer) {
+            if (isOpen) {
+                scannerTimer.textContent = data.scan_mode || "LIVE 5-PILLAR MATRIX SCANNING";
+            } else {
+                const timeStr = data.timestamp ? ` (as of ${data.timestamp})` : "";
+                scannerTimer.textContent = `OFF-MARKET SNAPSHOT • LAST CLOSE FROZEN${timeStr}`;
+            }
+        }
+    }
+
     async function fetchScanResults(forceRefresh = false) {
         try {
             if (forceRefresh) {
@@ -844,37 +920,11 @@ document.addEventListener("DOMContentLoaded", () => {
             
             allStocks = data.stocks || [];
             updateSummaryMetrics(data);
+            updateMarketStatusBadge(data);
 
             // Only re-render scanner DOM table/cards if the user is ALREADY on the scanner/dashboard page!
             if (currentActiveSection === "scanner" || currentActiveSection === "dashboard") {
                 filterAndRenderTable();
-            }
-            
-            const marketStatusText = document.getElementById("marketStatusText");
-            const statusDot = document.getElementById("statusDot");
-            const marketTimer = document.getElementById("marketTimer");
-
-            if (marketStatusText) {
-                marketStatusText.textContent = data.market_status || "CLOSED";
-                marketStatusText.style.color = data.market_status === "OPEN" ? "var(--bullish-green)" : "var(--bearish-red)";
-            }
-
-            if (statusDot) {
-                if (data.market_status === "OPEN") {
-                    statusDot.classList.add("live-pulse");
-                    statusDot.style.background = "var(--bullish-green)";
-                } else {
-                    statusDot.classList.remove("live-pulse");
-                    statusDot.style.background = "var(--bearish-red)";
-                }
-            }
-
-            if (marketTimer) {
-                let scanText = data.scan_mode || "OFF-MARKET SNAPSHOT (3:30 PM Scan Locked)";
-                if (data.data_feed_info && data.data_feed_info.is_delayed) {
-                    scanText += " • [15M DELAYED FEED]";
-                }
-                marketTimer.textContent = scanText;
             }
             
             if (lastSyncTime) {
@@ -1060,6 +1110,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await apiFetch('/api/live_prices');
             if (!response.ok) return;
             const data = await response.json();
+
+            // Synchronize Market Status Badge & Subtext
+            updateMarketStatusBadge(data);
 
             // Update BTST status
             if (data.btst_status) lastBtstStatus = data.btst_status;
@@ -4384,13 +4437,26 @@ document.addEventListener("DOMContentLoaded", () => {
                             fetchScanResults();
                             fetchTickerIndices();
                             fetchLiveTradesSection();
-                        } else if (data.type === "INTRADAY_SETUP" || data.type === "SETUP_TRIGGER") {
-                            const sym = data.symbol || "UNKNOWN";
-                            const sig = data.signal || "SETUP";
-                            const msg = `⚡ INTRADAY SETUP ALERT: ${sym} (${sig})`;
+                        } else if (data.type === "INTRADAY_SETUP" || data.type === "SETUP_TRIGGER" || data.type === "notification") {
+                            const sym = data.symbol || (data.payload && data.payload.symbol) || "PRIORITY SETUP";
+                            const sig = data.signal || (data.payload && data.payload.signal) || "High Conviction Setup";
+                            const title = data.title || `⚡ TRADEXO Alert: ${sym}`;
+                            const msg = data.message || `${sym} (${sig}) — 5-Pillar Breakout Detected`;
                             showToast(msg, "success");
-                            if ("Notification" in window && Notification.permission === "granted") {
-                                new Notification("TRADEXO Intraday Setup", { body: msg, icon: "/static/logo.png" });
+
+                            // Trigger Mobile Lock-Screen Notification via Service Worker (PWA)
+                            if (window.tradexoSwRegistration && 'showNotification' in window.tradexoSwRegistration) {
+                                window.tradexoSwRegistration.showNotification(title, {
+                                    body: msg,
+                                    icon: '/static/icon-192.png',
+                                    badge: '/static/favicon.png',
+                                    vibrate: [200, 100, 200],
+                                    tag: `tradexo-${sym}-${Date.now()}`,
+                                    renotify: true,
+                                    data: { url: '/' }
+                                });
+                            } else if ("Notification" in window && Notification.permission === "granted") {
+                                new Notification(title, { body: msg, icon: "/static/icon-192.png" });
                             }
                             fetchLiveTradesSection();
                         }
@@ -4402,9 +4468,64 @@ document.addEventListener("DOMContentLoaded", () => {
         connect();
     }
 
-    if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission();
+    // Service Worker & Lock-Screen Alerts Controller (Phase 4)
+    function initServiceWorkerAndPush() {
+        const pushBtn = document.getElementById("pushNotifBtn");
+        const pushBtnText = document.getElementById("pushNotifBtnText");
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => {
+                    console.log('[TRADEXO] ServiceWorker registered with scope:', reg.scope);
+                    window.tradexoSwRegistration = reg;
+                })
+                .catch(err => console.warn('[TRADEXO] ServiceWorker registration error:', err));
+        }
+
+        if (!('Notification' in window)) {
+            if (pushBtn) pushBtn.style.display = 'none';
+            return;
+        }
+
+        if (Notification.permission === 'granted') {
+            if (pushBtn) {
+                pushBtn.classList.add('active');
+                if (pushBtnText) pushBtnText.textContent = 'ALERTS ON';
+            }
+        }
+
+        if (pushBtn) {
+            pushBtn.addEventListener('click', async () => {
+                if (Notification.permission === 'granted') {
+                    if (typeof showToast === 'function') showToast('Mobile lock-screen alerts are ACTIVE for Priority 1 setups & 3:30 PM lock.', 'info');
+                    return;
+                }
+
+                try {
+                    const perm = await Notification.requestPermission();
+                    if (perm === 'granted') {
+                        pushBtn.classList.add('active');
+                        if (pushBtnText) pushBtnText.textContent = 'ALERTS ON';
+                        if (typeof showToast === 'function') showToast('Lock-screen notifications enabled! You will receive high-conviction setup alerts.', 'success');
+                        
+                        if (window.tradexoSwRegistration) {
+                            window.tradexoSwRegistration.showNotification('TRADEXO Alerts Active', {
+                                body: 'You will receive instant alerts for Priority 1 BTST/STBT setups and 3:30 PM lock.',
+                                icon: '/static/icon-192.png',
+                                badge: '/static/favicon.png'
+                            });
+                        }
+                    } else {
+                        if (typeof showToast === 'function') showToast('Notifications blocked in browser settings.', 'warning');
+                    }
+                } catch (e) {
+                    console.error('[TRADEXO] Notification permission error:', e);
+                }
+            });
+        }
     }
+
+    initServiceWorkerAndPush();
 
     window.openStockChartModal = openStockModal;
 

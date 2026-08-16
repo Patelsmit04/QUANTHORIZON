@@ -1281,6 +1281,13 @@
         object-position: center !important;
         background: #000 !important;
     }
+
+    /* Hide topbar market status badge on mobile screens to maximize header space */
+    .topbar-market-badge-wrap,
+    #topbarMarketStatusBadge {
+        display: none !important;
+    }
 }
+
 
 

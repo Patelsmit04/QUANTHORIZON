@@ -60,14 +60,30 @@ SCORING_MINS = 15 * 60 + 32          # 3:32 PM
 BROADCAST_MINS = 15 * 60 + 33        # 3:33 PM
 LOCK_MINS = 15 * 60 + 30             # 3:30 PM (Market Closing Bell Lock)
 
-NSE_TRADING_HOLIDAYS_2026 = {
-    "2026-01-26", "2026-03-06", "2026-03-25", "2026-04-03", "2026-04-14",
-    "2026-05-01", "2026-08-15", "2026-10-02", "2026-10-24", "2026-11-12", "2026-12-25"
+# Comprehensive Official NSE Trading Holidays (2025 - 2027)
+NSE_TRADING_HOLIDAYS = {
+    # 2025
+    "2025-01-26", "2025-02-26", "2025-03-14", "2025-03-31", "2025-04-10",
+    "2025-04-14", "2025-04-18", "2025-05-01", "2025-06-07", "2025-08-15",
+    "2025-08-27", "2025-10-02", "2025-10-21", "2025-10-22", "2025-11-05", "2025-12-25",
+    # 2026
+    "2026-01-26", "2026-03-03", "2026-03-06", "2026-03-25", "2026-03-26",
+    "2026-04-03", "2026-04-14", "2026-05-01", "2026-05-28", "2026-06-17",
+    "2026-08-15", "2026-10-02", "2026-10-20", "2026-10-24", "2026-11-10",
+    "2026-11-12", "2026-11-24", "2026-12-25",
+    # 2027
+    "2027-01-26", "2027-03-23", "2027-03-26", "2027-04-14", "2027-05-01",
+    "2027-08-15", "2027-10-02", "2027-11-01", "2027-11-09", "2027-12-25"
 }
 
+NSE_TRADING_HOLIDAYS_2026 = NSE_TRADING_HOLIDAYS
+
 def is_trading_holiday(today_date_str: str) -> bool:
-    """Returns True if today is a scheduled NSE trading holiday."""
-    return today_date_str in NSE_TRADING_HOLIDAYS_2026
+    """Returns True if given date string (YYYY-MM-DD) is a scheduled NSE trading holiday."""
+    if not today_date_str:
+        return False
+    clean_date = str(today_date_str).strip()[:10]
+    return clean_date in NSE_TRADING_HOLIDAYS
 
 _EMPTY_STATE = {
     "date": None, "snapshot_done": False, "auto_lock_25_done": False, "final_bell_30_done": False,

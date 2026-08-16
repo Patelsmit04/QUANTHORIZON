@@ -1,23 +1,22 @@
-name: QuantHorizon Market-Hours Cron
+name: TRADEXO Market-Hours Cron & Keepalive
 
-# Vercel's serverless deployment has no persistent process, so background_scheduler_worker and
-# evaluation_scheduler_worker (app.py) never run there — see the "Deployment note" in README.md.
-# This workflow is the external trigger that replaces them: it hits the app's own
-# /api/cron/scan and /api/cron/evaluate routes (app.py) on a schedule, over plain HTTPS, so the
-# same code those threads would run locally still runs on the deployed app. Requires two repo
-# secrets: QUANTHORIZON_APP_URL (e.g. https://quanthorizon.vercel.app) and
-# QUANTHORIZON_API_KEY (same value set in the Vercel project's env vars — both endpoints are
-# gated behind it via require_api_key so a public URL can't be hit to force expensive scans).
-#
-# GitHub free-tier caveats worth knowing: scheduled runs can silently lag a few minutes behind
-# the exact cron time under GitHub's own load, and GitHub auto-disables a schedule after 60
-# days with no commits to the repo (re-enable from the Actions tab if that happens).
+# Free hosting tiers (Render, Vercel) spin down after 15 min or have serverless execution.
+# This workflow acts as the authoritative external cron trigger to ensure time-critical jobs
+# execute without failure:
+# 1. 09:16 AM IST: Prior-day BTST/STBT opening gap evaluation & accuracy auto-upgrade
+# 2. 03:25 PM IST: Pre-close 3:25 PM candidate auto-lock
+# 3. 03:30 PM IST: Sharp market bell lock & CAS settlement reconciliation
+# 4. Every 5 min (08:30 AM - 03:45 PM IST weekdays): Live 5-pillar scanner tick & dyno keepalive
 
 on:
   schedule:
-    # 9:15 AM IST prior-day BTST/STBT evaluation + accuracy/win-rate refresh (03:45 UTC), weekdays.
-    - cron: "45 3 * * 1-5"
-    # Live scan / closing-sequence tick every 5 min, ~8:30 AM-4:25 PM IST (03:00-10:55 UTC), weekdays.
+    # 9:16 AM IST (03:46 UTC) — 9:15 AM opening gap evaluation + win-rate refresh, weekdays
+    - cron: "46 3 * * 1-5"
+    # 3:25 PM IST (09:55 UTC) — 3:25 PM BTST/STBT auto-lock snapshot
+    - cron: "55 9 * * 1-5"
+    # 3:30 PM IST (10:00 UTC) — 3:30 PM market closing bell lock
+    - cron: "0 10 * * 1-5"
+    # Every 5 min during market hours (03:00 - 10:15 UTC = 08:30 AM - 03:45 PM IST), weekdays
     - cron: "*/5 3-10 * * 1-5"
   workflow_dispatch:
     inputs:
@@ -25,7 +24,7 @@ on:
         description: "Endpoint to trigger manually"
         type: choice
         default: scan
-        options: [scan, evaluate]
+        options: [scan, evaluate, lock_picks, keepalive]
 
 jobs:
   trigger:
@@ -36,30 +35,47 @@ jobs:
         id: pick
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "path=/api/cron/${{ inputs.endpoint }}" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.schedule }}" = "45 3 * * 1-5" ]; then
+            if [ "${{ inputs.endpoint }}" = "lock_picks" ]; then
+              echo "path=/api/lock_picks" >> "$GITHUB_OUTPUT"
+            elif [ "${{ inputs.endpoint }}" = "keepalive" ]; then
+              echo "path=/api/cron/keepalive" >> "$GITHUB_OUTPUT"
+            else
+              echo "path=/api/cron/${{ inputs.endpoint }}" >> "$GITHUB_OUTPUT"
+            fi
+          elif [ "${{ github.event.schedule }}" = "46 3 * * 1-5" ]; then
             echo "path=/api/cron/evaluate" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "55 9 * * 1-5" ] || [ "${{ github.event.schedule }}" = "0 10 * * 1-5" ]; then
+            echo "path=/api/lock_picks" >> "$GITHUB_OUTPUT"
           else
             echo "path=/api/cron/scan" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Call the endpoint
         env:
-          APP_BASE_URL: ${{ secrets.QUANTHORIZON_APP_URL }}
-          API_KEY: ${{ secrets.QUANTHORIZON_API_KEY }}
+          APP_BASE_URL: ${{ secrets.QUANTHORIZON_APP_URL || secrets.TRADEXO_APP_URL }}
+          API_KEY: ${{ secrets.QUANTHORIZON_API_KEY || secrets.TRADEXO_API_KEY }}
           ENDPOINT_PATH: ${{ steps.pick.outputs.path }}
         run: |
-          if [ -z "$APP_BASE_URL" ] || [ -z "$API_KEY" ]; then
-            echo "::error::QUANTHORIZON_APP_URL and/or QUANTHORIZON_API_KEY repo secrets are not set."
+          if [ -z "$APP_BASE_URL" ]; then
+            echo "::error::QUANTHORIZON_APP_URL / TRADEXO_APP_URL repo secret is not set."
             exit 1
           fi
-          echo "POST ${APP_BASE_URL}${ENDPOINT_PATH}"
+          echo "Triggering: POST ${APP_BASE_URL}${ENDPOINT_PATH}"
+          
+          # Include API key header if configured
+          AUTH_HEADER=""
+          if [ -n "$API_KEY" ]; then
+            AUTH_HEADER="-H X-API-Key:${API_KEY}"
+          fi
+
           http_code=$(curl -sS --max-time 180 -X POST "${APP_BASE_URL}${ENDPOINT_PATH}" \
-            -H "X-API-Key: ${API_KEY}" \
+            $AUTH_HEADER \
             -o response.json -w "%{http_code}")
-          echo "HTTP ${http_code}"
-          cat response.json
+          
+          echo "HTTP Response: ${http_code}"
+          cat response.json || true
           if [ "$http_code" -ge 400 ]; then
             echo "::error::Cron trigger failed with HTTP ${http_code}"
             exit 1
           fi
+
