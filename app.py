@@ -65,6 +65,8 @@ from clarification_service import ClarificationUnavailableError
 from clarification_budget import get_budget_status
 from strategy_manager import DEFAULT_STRATEGY_ID, get_strategy, list_strategies, compute_effective_pillar_multipliers
 from execution_provider import execute_signal, get_paper_trades, get_paper_performance, get_staged_orders
+import system_health_monitor as health_monitor
+import system_control
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -74,6 +76,12 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app_instance: FastAPI):
+    # Log process startup / cold start for daily audit
+    try:
+        health_monitor.log_cold_start({"platform": "Vercel" if os.environ.get("VERCEL") else "Render/Local"})
+    except Exception as e:
+        logger.warning(f"Failed to log startup cold start: {e}")
+
     if not os.environ.get("VERCEL"):
         ws_broadcast.capture_event_loop()
         thread = threading.Thread(target=background_scheduler_worker, daemon=True)
@@ -401,6 +409,10 @@ class TradeHistoryManager:
     @staticmethod
     def lock_btst_picks(candidate_stocks: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Lock today's 3:30 PM BTST/STBT picks (P1 High Conviction and P2 Medium) into persistent history."""
+        if system_control.is_system_paused():
+            logger.warning("[SYSTEM CONTROL] lock_btst_picks skipped because system is PAUSED.")
+            return {"locked_count": 0, "total_today_locked": 0, "message": "System is paused via emergency kill-switch."}
+
         # M8 audit fix: the whole load-mutate-save cycle is locked — the 3:40 PM auto-lock
         # thread and a manual POST /api/lock_picks used to be able to both load the same
         # pre-mutation store and each save their own version, silently discarding whichever
@@ -459,6 +471,13 @@ class TradeHistoryManager:
 
             TradeHistoryManager._recalculate_metrics(store)
             TradeHistoryManager.save_data(store)
+
+            try:
+                symbols_locked = [s.get("symbol") for s in valid_picks][:new_locked_count]
+                health_monitor.log_lock_event("BTST_330_LOCK", new_locked_count, symbols_locked)
+            except Exception as e:
+                logger.warning(f"Failed to log lock event to health monitor: {e}")
+
             return {
                 "locked_count": new_locked_count,
                 "total_today_locked": sum(1 for t in store["trades"] if t.get("lock_date") == today_date)
@@ -545,6 +564,15 @@ class TradeHistoryManager:
         if evaluated_count > 0:
             TradeHistoryManager._recalculate_metrics(store)
             TradeHistoryManager.save_data(store)
+            try:
+                health_monitor.log_evaluation_event(
+                    evaluated_count,
+                    store.get("wins", 0),
+                    store.get("losses", 0),
+                    store.get("win_rate_pct", 75.0)
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log evaluation event to health monitor: {e}")
 
         return {"evaluated_count": evaluated_count, "summary": store}
 
@@ -2895,6 +2923,69 @@ def cron_keepalive_endpoint():
         "mode": sched_info.get("mode"),
         "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
     })
+
+
+# -------------------------------------------------------------
+# SYSTEM HEALTH & MONITORING SAFETY NET (Phase 1 & 3)
+# -------------------------------------------------------------
+@app.get("/api/system_health")
+def api_get_system_health():
+    """
+    Returns real-time operational health summary, score (0-100), issues list,
+    and emergency control status for the 30-second daily dashboard audit.
+    """
+    health_summary = health_monitor.get_system_health_summary()
+    control_state = system_control.get_system_control_state()
+    return sanitize_json_data({
+        "health": health_summary,
+        "control": control_state,
+        "timestamp": get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST")
+    })
+
+
+@app.get("/api/system_health/report")
+def api_get_daily_health_report(date: Optional[str] = Query(None)):
+    """
+    Generates and returns the daily health audit report for today or a specific date.
+    """
+    return sanitize_json_data(health_monitor.generate_daily_health_report(date))
+
+
+@app.get("/api/system_health/history")
+def api_get_health_reports_history():
+    """
+    Returns archive of all past daily health audit reports.
+    """
+    return sanitize_json_data(health_monitor.get_all_daily_reports())
+
+
+@app.post("/api/admin/emergency_pause")
+def api_emergency_pause(reason: str = Query("Manual Admin Override")):
+    """
+    Emergency kill-switch: pauses live scanning and trade execution mid-week
+    without losing data or corrupting existing trade history.
+    """
+    state = system_control.pause_system(reason=reason, paused_by="Admin")
+    health_monitor.log_system_error("SYSTEM_CONTROL", f"Emergency Pause triggered: {reason}")
+    return sanitize_json_data({
+        "status": "PAUSED",
+        "message": f"System has been paused: {reason}",
+        "control": state
+    })
+
+
+@app.post("/api/admin/emergency_resume")
+def api_emergency_resume():
+    """
+    Resumes scanning and trade operations after an emergency pause.
+    """
+    state = system_control.resume_system(resumed_by="Admin")
+    return sanitize_json_data({
+        "status": "ACTIVE",
+        "message": "System operations resumed.",
+        "control": state
+    })
+
 
 
 

@@ -238,6 +238,10 @@
                         <span class="section-page-subtitle">Live Accuracy, Priority Mix &amp; Today's Snapshot</span>
                     </h2>
                     <div class="dashboard-heading-actions">
+                        <button id="systemHealthBtn" class="btn btn-pill btn-secondary system-health-btn" title="View System Health & Forward-Testing Diagnostics">
+                            <span class="health-pulse-dot" id="systemHealthDot"></span>
+                            <span id="systemHealthText">SYSTEM HEALTH</span>
+                        </button>
                         <button id="exportCsvBtn" class="btn btn-pill btn-secondary" title="Export Watchlist to CSV">
                             <i class="fa-solid fa-file-csv"></i><span>CSV</span>
                         </button>
@@ -1467,6 +1471,104 @@
                 </div>
                 <div class="stock-chart-wrapper">
                     <div id="modalChartContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================== SYSTEM HEALTH & FORWARD-TESTING DIAGNOSTICS MODAL ============================== -->
+    <div id="systemHealthModal" class="modal-backdrop hidden">
+        <div class="modal-card health-modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title"><i class="fa-solid fa-heart-pulse text-gold"></i> SYSTEM HEALTH &amp; FORWARD-TESTING DIAGNOSTICS</h3>
+                    <p class="modal-subtitle">Real-time infrastructure audit, lock/evaluation integrity, and emergency controls</p>
+                </div>
+                <button class="modal-close-btn" id="closeHealthModalBtn" aria-label="Close Modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Health Overview Summary Cards -->
+                <div class="health-summary-banner" id="healthSummaryBanner">
+                    <div class="health-score-dial">
+                        <div class="health-score-number" id="healthScoreNumber">100</div>
+                        <div class="health-score-label">HEALTH SCORE</div>
+                    </div>
+                    <div class="health-status-details">
+                        <div class="health-status-title" id="healthStatusTitle">ALL SYSTEMS NOMINAL</div>
+                        <div class="health-status-desc" id="healthStatusDesc">All scheduler transitions, lock sequences, and evaluation jobs are operating with 100% integrity.</div>
+                        <div class="health-meta-pills" id="healthMetaPills">
+                            <span class="health-pill nominal"><i class="fa-solid fa-clock"></i> Last Check: <strong id="healthLastCheck">--</strong></span>
+                            <span class="health-pill" id="healthColdStartsPill"><i class="fa-solid fa-server"></i> Cold Starts: <strong id="healthColdStartsCount">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Kill Switch Control -->
+                <div class="health-control-card" id="healthControlCard">
+                    <div class="health-control-text">
+                        <strong><i class="fa-solid fa-shield-halved text-gold"></i> Emergency Kill-Switch (Mid-Week Safe Pause)</strong>
+                        <span>Instantly pause scanning &amp; order placement without losing trade history or logs.</span>
+                    </div>
+                    <button id="emergencyKillSwitchBtn" class="btn btn-sm btn-pill btn-danger">
+                        <i class="fa-solid fa-pause"></i> <span>PAUSE SCANNING</span>
+                    </button>
+                </div>
+
+                <!-- 4-Pillar Milestone Verification Grid -->
+                <div class="health-milestones-grid">
+                    <div class="health-milestone-card" id="cardMilestoneTransitions">
+                        <div class="milestone-icon"><i class="fa-solid fa-route"></i></div>
+                        <div class="milestone-info">
+                            <strong>Market Transitions</strong>
+                            <span id="milestoneTransitionsStatus">Tracking Nominal</span>
+                        </div>
+                        <div class="milestone-badge badge-nominal" id="badgeMilestoneTransitions">OK</div>
+                    </div>
+
+                    <div class="milestone-card health-milestone-card" id="cardMilestoneEval">
+                        <div class="milestone-icon"><i class="fa-solid fa-bullseye"></i></div>
+                        <div class="milestone-info">
+                            <strong>9:15 AM Evaluation</strong>
+                            <span id="milestoneEvalStatus">--</span>
+                        </div>
+                        <div class="milestone-badge" id="badgeMilestoneEval">PENDING</div>
+                    </div>
+
+                    <div class="milestone-card health-milestone-card" id="cardMilestoneLock">
+                        <div class="milestone-icon"><i class="fa-solid fa-lock"></i></div>
+                        <div class="milestone-info">
+                            <strong>3:30 PM Lock</strong>
+                            <span id="milestoneLockStatus">--</span>
+                        </div>
+                        <div class="milestone-badge" id="badgeMilestoneLock">PENDING</div>
+                    </div>
+
+                    <div class="milestone-card health-milestone-card" id="cardMilestoneDyno">
+                        <div class="milestone-icon"><i class="fa-solid fa-microchip"></i></div>
+                        <div class="milestone-info">
+                            <strong>Hosting Stability</strong>
+                            <span id="milestoneDynoStatus">No Mid-Day Spin-Downs</span>
+                        </div>
+                        <div class="milestone-badge badge-nominal" id="badgeMilestoneDyno">STABLE</div>
+                    </div>
+                </div>
+
+                <!-- Daily Audit Issues & Exceptions Stream -->
+                <div class="health-issues-section mt-3">
+                    <h4 class="section-heading"><i class="fa-solid fa-triangle-exclamation"></i> TODAY'S ISSUES &amp; ANOMALIES</h4>
+                    <div class="health-issues-list" id="healthIssuesList">
+                        <div class="health-no-issues"><i class="fa-solid fa-circle-check text-bullish"></i> Zero issues detected today. System is operating cleanly.</div>
+                    </div>
+                </div>
+
+                <!-- Export & History Actions -->
+                <div class="health-modal-actions mt-3">
+                    <button id="downloadHealthReportBtn" class="btn btn-pill btn-secondary">
+                        <i class="fa-solid fa-file-arrow-down"></i> <span>Export Daily Health JSON</span>
+                    </button>
+                    <button id="refreshHealthBtn" class="btn btn-pill btn-primary">
+                        <i class="fa-solid fa-arrows-rotate"></i> <span>Refresh Diagnostics</span>
+                    </button>
                 </div>
             </div>
         </div>

@@ -1,0 +1,37 @@
+{
+  "is_paused": false,
+  "pause_reason": null,
+  "paused_at": "2026-08-16 20:45:53 IST",
+  "paused_by": "Admin",
+  "last_resumed_at": "2026-08-16 20:46:05 IST",
+  "last_resumed_by": "Init",
+  "history": [
+    {
+      "action": "PAUSE",
+      "timestamp": "2026-08-16 20:45:27 IST",
+      "by": "Tester",
+      "reason": "Dry Run Emergency Test"
+    },
+    {
+      "action": "RESUME",
+      "timestamp": "2026-08-16 20:45:27 IST",
+      "by": "Tester"
+    },
+    {
+      "action": "PAUSE",
+      "timestamp": "2026-08-16 20:45:53 IST",
+      "by": "Admin",
+      "reason": "Test"
+    },
+    {
+      "action": "RESUME",
+      "timestamp": "2026-08-16 20:45:53 IST",
+      "by": "Admin"
+    },
+    {
+      "action": "RESUME",
+      "timestamp": "2026-08-16 20:46:05 IST",
+      "by": "Init"
+    }
+  ]
+}
