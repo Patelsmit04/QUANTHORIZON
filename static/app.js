@@ -298,7 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!overlay || !video) return;
 
-        const INTRO_SESSION_KEY = "tradexo_intro_viewed_v2";
+        const INTRO_SESSION_KEY = "tradexo_intro_viewed_v3";
         let isDismissed = false;
         let safetyTimeout = null;
 
@@ -313,74 +313,73 @@ document.addEventListener("DOMContentLoaded", () => {
 
             document.body.classList.remove("intro-active");
             overlay.classList.add("fade-out");
+            overlay.classList.add("hidden");
+            overlay.style.display = "none";
+            overlay.style.visibility = "hidden";
+            overlay.style.pointerEvents = "none";
 
             // Pause video and silence audio
-            setTimeout(() => {
-                try {
-                    video.pause();
-                } catch (e) {}
-                overlay.classList.add("hidden");
-                overlay.classList.remove("fade-out");
-            }, 500);
+            try {
+                video.pause();
+                video.currentTime = 0;
+            } catch (e) {}
         }
 
         function launchIntro() {
             isDismissed = false;
             overlay.classList.remove("hidden", "fade-out");
+            overlay.style.display = "flex";
+            overlay.style.visibility = "visible";
+            overlay.style.pointerEvents = "auto";
             document.body.classList.add("intro-active");
 
-            video.currentTime = 0;
-            video.muted = true; // Auto-play muted so all mobile/desktop browsers allow instant playback
-
-            const playPromise = video.play();
-            if (playPromise !== undefined) {
-                playPromise.catch((err) => {
-                    console.warn("Intro autoplay prevented, retrying muted:", err);
-                    video.muted = true;
-                    video.play().catch((e) => {
-                        console.warn("Intro video playback failed:", e);
-                        dismissIntro();
+            try {
+                video.currentTime = 0;
+                video.muted = true; // Auto-play muted so all mobile/desktop browsers allow instant playback
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch((err) => {
+                        console.warn("Intro autoplay prevented, retrying muted:", err);
+                        video.muted = true;
+                        video.play().catch((e) => {
+                            console.warn("Intro video playback failed:", e);
+                            dismissIntro();
+                        });
                     });
-                });
+                }
+            } catch (e) {
+                console.warn("Launch intro error:", e);
+                dismissIntro();
             }
 
-            // Auto-dismiss safety timeout: 4.5 seconds
+            // Unconditional safety timeout: 3.5 seconds max
             if (safetyTimeout) clearTimeout(safetyTimeout);
             safetyTimeout = setTimeout(() => {
-                if (!isDismissed) {
-                    dismissIntro();
-                }
-            }, 4500);
+                dismissIntro();
+            }, 3500);
         }
 
-        // When the 3s video finishes playing, immediately fade out and enter dashboard
-        video.addEventListener("ended", () => {
-            dismissIntro();
-        });
-
-        video.addEventListener("error", (err) => {
-            console.warn("Intro video load error:", err);
-            dismissIntro();
-        });
-
-        // Tap/click anywhere to skip immediately
-        overlay.addEventListener("click", () => {
-            dismissIntro();
-        });
-
-        // Keyboard shortcuts: any key (Escape, Space, Enter) skips immediately
-        window.addEventListener("keydown", (e) => {
-            if (overlay.classList.contains("hidden") || isDismissed) return;
-            if (e.key === "Escape" || e.key === "Enter" || e.key === " " || e.code === "Space") {
-                e.preventDefault();
+        // When the 3s video finishes playing or progresses near end, dismiss immediately
+        video.addEventListener("ended", dismissIntro);
+        video.addEventListener("timeupdate", () => {
+            if (video.duration && video.currentTime >= video.duration - 0.2) {
                 dismissIntro();
             }
         });
+        video.addEventListener("error", dismissIntro);
+        video.addEventListener("stalled", () => {
+            setTimeout(dismissIntro, 1000);
+        });
 
-        // Touch swipe or tap skips immediately
-        overlay.addEventListener("touchend", () => {
-            if (!isDismissed) dismissIntro();
-        }, { passive: true });
+        // Tap/click anywhere to skip immediately
+        overlay.addEventListener("click", dismissIntro);
+        overlay.addEventListener("touchstart", dismissIntro, { passive: true });
+
+        // Keyboard shortcuts: any key (Escape, Space, Enter) skips immediately
+        window.addEventListener("keydown", (e) => {
+            if (isDismissed) return;
+            dismissIntro();
+        });
 
         // Sidebar and Guide "Watch Intro" triggers
         if (sidebarWatchIntroBtn) {
@@ -402,7 +401,7 @@ document.addEventListener("DOMContentLoaded", () => {
             launchIntro();
         };
 
-        // Session check: play on first load of browser session
+        // Session check: play only on first load of browser session
         let hasSeenIntro = false;
         try {
             hasSeenIntro = sessionStorage.getItem(INTRO_SESSION_KEY) === "true";
@@ -411,11 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!hasSeenIntro) {
             launchIntro();
         } else {
-            overlay.classList.add("hidden");
-            document.body.classList.remove("intro-active");
-            try {
-                video.pause();
-            } catch (e) {}
+            dismissIntro();
         }
     }
 
