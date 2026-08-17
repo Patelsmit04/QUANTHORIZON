@@ -9,9 +9,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Set working directory
 WORKDIR /app
 
-# Install essential system dependencies
+# Install essential system dependencies and build tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    gcc \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency requirements first to utilize Docker layer caching
@@ -27,5 +29,9 @@ COPY . .
 # Expose container port (Back4app default port is 8080 or dynamic $PORT)
 EXPOSE 8080
 
+# Healthcheck for container platforms
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
+
 # Start FastAPI application using uvicorn on 0.0.0.0 with dynamic $PORT
-CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}"]
+CMD ["sh", "-c", "python -m uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}"]

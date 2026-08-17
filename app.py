@@ -2966,6 +2966,16 @@ def cron_keepalive_endpoint():
     })
 
 
+@app.get("/health")
+@app.get("/api/health")
+def api_health_check():
+    return {
+        "status": "healthy",
+        "service": "TRADEXO Engine",
+        "timestamp": get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST")
+    }
+
+
 # -------------------------------------------------------------
 # SYSTEM HEALTH & MONITORING SAFETY NET (Phase 1 & 3)
 # -------------------------------------------------------------
