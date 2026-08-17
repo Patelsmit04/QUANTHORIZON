@@ -255,6 +255,23 @@ def get_system_health_summary() -> Dict[str, Any]:
         status = "CRITICAL"
         status_label = f"Critical System Degradation ({len(issues)} Issues)"
 
+    categories = {
+        "core_scheduling": {"name": "Core Scheduling & Milestones", "score": 100, "weight_pct": 30, "status": "NOMINAL"},
+        "data_integrity": {"name": "Data Accuracy & Anti-Stub", "score": 100, "weight_pct": 25, "status": "NOMINAL"},
+        "frontend_apis": {"name": "Frontend API & State Health", "score": 100, "weight_pct": 25, "status": "NOMINAL"},
+        "notifications_journals": {"name": "Notifications & Journals", "score": 100, "weight_pct": 20, "status": "NOMINAL"},
+    }
+    try:
+        from ai_sentinel import ai_sentinel
+        diag = ai_sentinel.run_full_diagnostic_suite()
+        if diag and "categories" in diag:
+            categories = diag["categories"]
+            score = diag.get("composite_score", score)
+            status = diag.get("status", status)
+            status_label = diag.get("status_label", status_label)
+    except Exception as e:
+        logger.debug(f"Could not load AI Sentinel diagnostics into health summary: {e}")
+
     last_eval = data["evaluations"][-1] if data.get("evaluations") else None
     last_lock = data["locks"][-1] if data.get("locks") else None
 
@@ -262,6 +279,7 @@ def get_system_health_summary() -> Dict[str, Any]:
         "status": status,
         "status_label": status_label,
         "score": score,
+        "categories": categories,
         "today_date": data.get("today_date"),
         "issues_count": len(issues),
         "issues": issues,

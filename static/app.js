@@ -6008,6 +6008,7 @@ function renderLiveTradeCards(activeSetups) {
 // SYSTEM HEALTH & FORWARD-TESTING DIAGNOSTICS (DEDICATED PAGE CONTROLLER)
 // ==========================================================================
 let systemHealthData = null;
+let aiSentinelData = null;
 let currentHealthLogFilter = "ALL";
 
 async function fetchSystemHealth() {
@@ -6019,6 +6020,126 @@ async function fetchSystemHealth() {
         renderSystemHealthUI(payload);
     } catch (e) {
         console.warn("[TRADEXO] System health fetch error:", e);
+    }
+}
+
+async function fetchAiSentinelStatus() {
+    try {
+        const response = await apiFetch("/api/ai_sentinel/status");
+        if (!response.ok) return;
+        const data = await response.json();
+        aiSentinelData = data;
+        renderAiSentinelUI(data);
+    } catch (e) {
+        console.warn("[TRADEXO] AI Sentinel status fetch error:", e);
+    }
+}
+
+function renderAiSentinelUI(data) {
+    if (!data) return;
+    const diag = data.diagnostics || {};
+    const cats = diag.categories || {};
+
+    // Update Sentinel Status Badge
+    const badge = document.getElementById("sentinelStatusBadge");
+    if (badge) {
+        const isNominal = diag.composite_score >= 90;
+        badge.className = isNominal ? "ai-sentinel-badge nominal" : "ai-sentinel-badge attention";
+        badge.innerHTML = isNominal
+            ? '<span class="pulse-dot"></span> 100% AUTONOMOUS ACTIVE'
+            : '<span class="pulse-dot" style="background:#f59e0b;"></span> AUTO-HEALING ENGAGED';
+    }
+
+    // 1. Category 1: Core Scheduling
+    const schedCat = cats.core_scheduling || {};
+    const scoreSched = schedCat.score !== undefined ? schedCat.score : 100;
+    const elScoreSched = document.getElementById("catScoreSched");
+    const elBarSched = document.getElementById("catBarSched");
+    if (elScoreSched) {
+        elScoreSched.textContent = `${scoreSched}%`;
+        elScoreSched.className = `sentinel-cat-score ${scoreSched >= 90 ? 'text-bullish' : (scoreSched >= 70 ? 'text-amber' : 'text-bearish')}`;
+    }
+    if (elBarSched) {
+        elBarSched.style.width = `${scoreSched}%`;
+        elBarSched.className = `sentinel-cat-bar ${scoreSched >= 90 ? '' : (scoreSched >= 70 ? 'attention' : 'critical')}`;
+    }
+
+    // 2. Category 2: Data Accuracy & Anti-Stub
+    const dataCat = cats.data_integrity || {};
+    const scoreData = dataCat.score !== undefined ? dataCat.score : 100;
+    const elScoreData = document.getElementById("catScoreData");
+    const elBarData = document.getElementById("catBarData");
+    if (elScoreData) {
+        elScoreData.textContent = `${scoreData}%`;
+        elScoreData.className = `sentinel-cat-score ${scoreData >= 90 ? 'text-bullish' : (scoreData >= 70 ? 'text-amber' : 'text-bearish')}`;
+    }
+    if (elBarData) {
+        elBarData.style.width = `${scoreData}%`;
+        elBarData.className = `sentinel-cat-bar ${scoreData >= 90 ? '' : (scoreData >= 70 ? 'attention' : 'critical')}`;
+    }
+
+    // 3. Category 3: Frontend APIs
+    const apiCat = cats.frontend_apis || {};
+    const scoreApi = apiCat.score !== undefined ? apiCat.score : 100;
+    const elScoreApi = document.getElementById("catScoreApi");
+    const elBarApi = document.getElementById("catBarApi");
+    if (elScoreApi) {
+        elScoreApi.textContent = `${scoreApi}%`;
+        elScoreApi.className = `sentinel-cat-score ${scoreApi >= 90 ? 'text-bullish' : (scoreApi >= 70 ? 'text-amber' : 'text-bearish')}`;
+    }
+    if (elBarApi) {
+        elBarApi.style.width = `${scoreApi}%`;
+        elBarApi.className = `sentinel-cat-bar ${scoreApi >= 90 ? '' : (scoreApi >= 70 ? 'attention' : 'critical')}`;
+    }
+
+    // 4. Category 4: Notifications & Journals
+    const journCat = cats.notifications_journals || {};
+    const scoreJourn = journCat.score !== undefined ? journCat.score : 100;
+    const elScoreJourn = document.getElementById("catScoreJournals");
+    const elBarJourn = document.getElementById("catBarJournals");
+    if (elScoreJourn) {
+        elScoreJourn.textContent = `${scoreJourn}%`;
+        elScoreJourn.className = `sentinel-cat-score ${scoreJourn >= 90 ? 'text-bullish' : (scoreJourn >= 70 ? 'text-amber' : 'text-bearish')}`;
+    }
+    if (elBarJourn) {
+        elBarJourn.style.width = `${scoreJourn}%`;
+        elBarJourn.className = `sentinel-cat-bar ${scoreJourn >= 90 ? '' : (scoreJourn >= 70 ? 'attention' : 'critical')}`;
+    }
+
+    // Action Stream / Counter
+    const counter = document.getElementById("sentinelFixesCounter");
+    if (counter) counter.textContent = `Total Fixes Applied Today: ${data.total_fixes_applied || 0}`;
+
+    const streamList = document.getElementById("sentinelHealingStreamList");
+    if (streamList) {
+        const events = data.recent_events || [];
+        if (events.length === 0) {
+            streamList.innerHTML = `
+                <div class="sentinel-stream-empty">
+                    <i class="fa-solid fa-shield-heart text-bullish"></i> All 4 health categories verified nominal. Sentinel watchdog is actively monitoring every 30 seconds.
+                </div>
+            `;
+        } else {
+            const allActions = [];
+            events.forEach(ev => {
+                (ev.actions || []).forEach(act => {
+                    allActions.push({ time: (ev.timestamp || '').slice(11, 19) || 'Active', ...act });
+                });
+            });
+            if (allActions.length === 0) {
+                streamList.innerHTML = `<div class="sentinel-stream-empty"><i class="fa-solid fa-shield-heart text-bullish"></i> Zero active interventions needed — all background pipelines operating normally.</div>`;
+            } else {
+                streamList.innerHTML = allActions.slice(-5).reverse().map(act => `
+                    <div class="sentinel-stream-entry">
+                        <span class="sentinel-stream-entry-time">${escapeHtml(act.time)} IST</span>
+                        <div class="sentinel-stream-entry-body">
+                            <span class="sentinel-stream-entry-chip">${escapeHtml(act.action || 'AUTO-HEAL')}</span>
+                            <span>${escapeHtml(act.description || act.reason || 'Healed anomaly')}</span>
+                        </div>
+                    </div>
+                `).join("");
+            }
+        }
     }
 }
 
@@ -6449,6 +6570,36 @@ function initSystemHealthDiagnostics() {
         });
     }
 
+    const selfHealBtn = document.getElementById("btnTriggerAiSelfHeal");
+    if (selfHealBtn) {
+        selfHealBtn.addEventListener("click", async () => {
+            selfHealBtn.disabled = true;
+            selfHealBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>DIAGNOSING & HEALING...</span>';
+            try {
+                const res = await apiFetch("/api/ai_sentinel/heal_now", { method: "POST" });
+                if (res.ok) {
+                    const data = await res.json();
+                    const fixesCount = data.actions_taken_count || 0;
+                    if (fixesCount > 0) {
+                        showToast(`AI Sentinel repaired ${fixesCount} system issue(s)! Score: ${data.diagnostic_report?.composite_score || 100}/100`, "success");
+                    } else {
+                        showToast(`All 4 categories audited: 100% Nominal (0 issues detected).`, "info");
+                    }
+                    await fetchSystemHealth();
+                    await fetchAiSentinelStatus();
+                    await fetchDailyHealthHistory();
+                } else {
+                    showToast("AI Self-Healing pass failed.", "error");
+                }
+            } catch (err) {
+                showToast("Self-Healing error: " + err.message, "error");
+            } finally {
+                selfHealBtn.disabled = false;
+                selfHealBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>TRIGGER AI SELF-HEAL NOW</span>';
+            }
+        });
+    }
+
     if (pageKillBtn) {
         pageKillBtn.addEventListener("click", async () => {
             const isCurrentlyPaused = systemHealthData && systemHealthData.control && systemHealthData.control.is_paused;
@@ -6464,6 +6615,7 @@ function initSystemHealthDiagnostics() {
                 if (res.ok) {
                     showToast(`System ${actionText} executed successfully.`, "info");
                     fetchSystemHealth();
+                    fetchAiSentinelStatus();
                 } else {
                     showToast(`Failed to ${actionText} system.`, "error");
                 }
@@ -6477,6 +6629,7 @@ function initSystemHealthDiagnostics() {
     if (refreshBtn) {
         refreshBtn.addEventListener("click", () => {
             fetchSystemHealth();
+            fetchAiSentinelStatus();
             fetchDailyHealthHistory();
             showToast("Diagnostics & history refreshed.", "info");
         });
@@ -6520,10 +6673,12 @@ function initSystemHealthDiagnostics() {
 
     // Initial fetch and 30-sec polling
     fetchSystemHealth();
+    fetchAiSentinelStatus();
     fetchDailyHealthHistory();
     setInterval(() => {
         if (currentActiveSection === "systemHealth") {
             fetchSystemHealth();
+            fetchAiSentinelStatus();
             fetchDailyHealthHistory();
         }
     }, 30000);

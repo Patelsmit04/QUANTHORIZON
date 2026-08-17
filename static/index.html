@@ -33,8 +33,8 @@
     </script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=40.0.6">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=40.0.6">
+    <link rel="stylesheet" href="/static/styles.css?v=40.0.7">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=40.0.7">
 
 </head>
 <body>
@@ -1118,6 +1118,95 @@
                     </div>
                 </section>
 
+                <!-- ==================== TRADEXO AI SENTINEL & AUTO-HEALING PANEL ==================== -->
+                <div class="ai-sentinel-master-card" id="aiSentinelMasterCard" style="margin-top:24px;margin-bottom:24px;">
+                    <div class="ai-sentinel-header">
+                        <div class="ai-sentinel-title-wrap">
+                            <div class="ai-sentinel-icon-glow">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div>
+                                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                                    <h3 class="ai-sentinel-heading">AUTONOMOUS AI SENTINEL &amp; AUTO-HEALER</h3>
+                                    <span class="ai-sentinel-badge nominal" id="sentinelStatusBadge">
+                                        <span class="pulse-dot"></span> 100% AUTONOMOUS ACTIVE
+                                    </span>
+                                </div>
+                                <p class="ai-sentinel-subheading">
+                                    Continuous zero-cost watchdog diagnosing and auto-repairing data accuracy, scheduler milestones, API health, and file integrity 24/7.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="ai-sentinel-actions-wrap">
+                            <button id="btnTriggerAiSelfHeal" class="btn btn-pill btn-primary sentinel-heal-btn">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>TRIGGER AI SELF-HEAL NOW</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4 Category Health Verification Mini-Grid -->
+                    <div class="sentinel-category-grid">
+                        <div class="sentinel-cat-card" id="sentinelCatSched">
+                            <div class="sentinel-cat-header">
+                                <span class="sentinel-cat-title"><i class="fa-solid fa-calendar-check text-cyan"></i> Core Lifecycle</span>
+                                <span class="sentinel-cat-score text-bullish" id="catScoreSched">100%</span>
+                            </div>
+                            <div class="sentinel-cat-bar-wrap">
+                                <div class="sentinel-cat-bar" id="catBarSched" style="width:100%;"></div>
+                            </div>
+                            <div class="sentinel-cat-desc" id="catDescSched">9:15 Eval &bull; 3:30 Lock &bull; State Machine</div>
+                        </div>
+
+                        <div class="sentinel-cat-card" id="sentinelCatData">
+                            <div class="sentinel-cat-header">
+                                <span class="sentinel-cat-title"><i class="fa-solid fa-database text-gold"></i> Data Accuracy</span>
+                                <span class="sentinel-cat-score text-bullish" id="catScoreData">100%</span>
+                            </div>
+                            <div class="sentinel-cat-bar-wrap">
+                                <div class="sentinel-cat-bar" id="catBarData" style="width:100%;"></div>
+                            </div>
+                            <div class="sentinel-cat-desc" id="catDescData">Anti-Stub &bull; Price Delta &bull; 5-Pillars</div>
+                        </div>
+
+                        <div class="sentinel-cat-card" id="sentinelCatApi">
+                            <div class="sentinel-cat-header">
+                                <span class="sentinel-cat-title"><i class="fa-solid fa-network-wired text-indigo"></i> Frontend APIs</span>
+                                <span class="sentinel-cat-score text-bullish" id="catScoreApi">100%</span>
+                            </div>
+                            <div class="sentinel-cat-bar-wrap">
+                                <div class="sentinel-cat-bar" id="catBarApi" style="width:100%;"></div>
+                            </div>
+                            <div class="sentinel-cat-desc" id="catDescApi">Scanner &bull; Order Flow &bull; History &bull; Veto</div>
+                        </div>
+
+                        <div class="sentinel-cat-card" id="sentinelCatJournals">
+                            <div class="sentinel-cat-header">
+                                <span class="sentinel-cat-title"><i class="fa-solid fa-bell text-amber"></i> Notifications &amp; DB</span>
+                                <span class="sentinel-cat-score text-bullish" id="catScoreJournals">100%</span>
+                            </div>
+                            <div class="sentinel-cat-bar-wrap">
+                                <div class="sentinel-cat-bar" id="catBarJournals" style="width:100%;"></div>
+                            </div>
+                            <div class="sentinel-cat-desc" id="catDescJournals">Signal Journal &bull; WS Bridge &bull; Bell Alerts</div>
+                        </div>
+                    </div>
+
+                    <!-- Live Auto-Healing Stream / Activity Log -->
+                    <div class="sentinel-healing-stream-wrap" id="sentinelHealingStreamWrap">
+                        <div class="sentinel-stream-header">
+                            <span class="sentinel-stream-title"><i class="fa-solid fa-bolt-lightning text-gold"></i> AI Auto-Healing Action Stream</span>
+                            <span class="sentinel-stream-counter" id="sentinelFixesCounter">Total Fixes Applied Today: 0</span>
+                        </div>
+                        <div class="sentinel-stream-list" id="sentinelHealingStreamList">
+                            <div class="sentinel-stream-empty">
+                                <i class="fa-solid fa-shield-heart text-bullish"></i> All 4 health categories verified nominal. Sentinel watchdog is actively monitoring every 30 seconds.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ==================== END TRADEXO AI SENTINEL ==================== -->
+
                 <!-- Active Issues & Diagnostic Explanations Panel -->
                 <div id="healthActiveIssuesCard" class="health-active-issues-card" style="display:none;margin-bottom:24px;">
                     <!-- Dynamically rendered by renderSystemHealthPage -->
@@ -1761,7 +1850,7 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=40.0.6"></script>
+    <script src="/static/app.js?v=40.0.7"></script>
 
 </body>
 </html>

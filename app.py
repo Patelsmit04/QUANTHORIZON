@@ -106,6 +106,12 @@ async def lifespan(app_instance: FastAPI):
             logger.info("Intraday Strategy Engine started on app startup.")
         except Exception as e:
             logger.warning(f"Could not start Intraday Strategy Engine on startup: {e}")
+        try:
+            from ai_sentinel import ai_sentinel
+            ai_sentinel.start_background_sentinel()
+            logger.info("Autonomous TRADEXO AI Sentinel watchdog started on app startup.")
+        except Exception as e:
+            logger.warning(f"Could not start AI Sentinel on startup: {e}")
     yield
     shutdown_event.set()
 
@@ -3017,6 +3023,44 @@ def api_emergency_resume():
         "status": "ACTIVE",
         "message": "System operations resumed.",
         "control": state
+    })
+
+
+# -------------------------------------------------------------
+# AUTONOMOUS AI SENTINEL & SELF-HEALING ENGINE ENDPOINTS
+# -------------------------------------------------------------
+@app.get("/api/ai_sentinel/status")
+def api_get_ai_sentinel_status():
+    """
+    Returns AI Sentinel status, category health scores, and recent auto-healing actions.
+    """
+    from ai_sentinel import ai_sentinel
+    return sanitize_json_data(ai_sentinel.get_sentinel_status())
+
+
+@app.get("/api/ai_sentinel/heal_now")
+@app.post("/api/ai_sentinel/heal_now")
+def api_trigger_ai_self_heal(trigger: str = Query("manual_ui")):
+    """
+    Triggers an immediate full diagnostic suite and sequenced self-healing pass.
+    Idempotent and callable by both the dashboard UI and external heartbeat crons.
+    """
+    from ai_sentinel import ai_sentinel
+    result = ai_sentinel.run_self_healing_pass(trigger=trigger)
+    return sanitize_json_data(result)
+
+
+@app.post("/api/ai_sentinel/toggle", dependencies=[Depends(require_api_key)])
+def api_toggle_ai_sentinel(enabled: bool = Query(True)):
+    """
+    Enables or disables autonomous background self-healing.
+    """
+    from ai_sentinel import ai_sentinel
+    ai_sentinel.set_enabled(enabled)
+    return sanitize_json_data({
+        "status": "SUCCESS",
+        "is_enabled": ai_sentinel.is_enabled(),
+        "message": f"AI Sentinel autonomous self-healing is now {'ENABLED' if enabled else 'DISABLED'}."
     })
 
 

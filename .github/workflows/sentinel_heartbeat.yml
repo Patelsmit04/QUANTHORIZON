@@ -1,0 +1,41 @@
+name: TRADEXO AI Sentinel Heartbeat & Auto-Healer
+
+# Continuous zero-cost external watchdog heartbeat.
+# Pings the AI Sentinel self-healing endpoint to guarantee dyno wake-up
+# and automated error recovery even if the local in-process worker was idle.
+
+on:
+  schedule:
+    # Every 10 minutes between 08:30 AM - 04:00 PM IST (03:00 - 10:30 UTC), Monday through Friday
+    - cron: "*/10 3-10 * * 1-5"
+    # Once at 09:18 AM IST (03:48 UTC) to guarantee post-open gap evaluation backfill
+    - cron: "48 3 * * 1-5"
+    # Once at 03:35 PM IST (10:05 UTC) to guarantee post-close snapshot reconciliation
+    - cron: "5 10 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  ai_sentinel_heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Trigger AI Sentinel Self-Healing Pass
+        env:
+          APP_BASE_URL: ${{ secrets.TRADEXO_APP_URL || secrets.QUANTHORIZON_APP_URL }}
+        run: |
+          if [ -z "$APP_BASE_URL" ]; then
+            echo "TRADEXO_APP_URL / QUANTHORIZON_APP_URL secret is not set. Skipping external ping."
+            exit 0
+          fi
+          URL="${APP_BASE_URL%/}/api/ai_sentinel/heal_now?trigger=github_actions_cron"
+          echo "Pinging AI Sentinel: $URL"
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$URL" --max-time 60 || true)
+          HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          echo "Status: $HTTP_CODE"
+          echo "Result: $HTTP_BODY"
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "AI Sentinel heartbeat & auto-heal succeeded."
+          else
+            echo "Warning: AI Sentinel heartbeat returned status $HTTP_CODE."
+          fi
