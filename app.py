@@ -3423,18 +3423,20 @@ if __name__ == "__main__":
     except Exception:
         pass
 
+    host = os.environ.get("HOST", "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1")
+    port = int(os.environ.get("PORT", 8000))
+
     print("\n" + "=" * 64)
     print("  [+] AlgoTrader TRADEXO Dashboard is Running!")
-    print("  [>] Open Dashboard Link: http://127.0.0.1:8000")
-    print("  [>] Local Server: http://localhost:8000")
+    print(f"  [>] Server URL: http://{host}:{port}")
     print("  [>] Press CTRL+C in terminal to stop server immediately")
     print("=" * 64 + "\n", flush=True)
 
     try:
         uvicorn.run(
             app,
-            host="127.0.0.1",
-            port=8000,
+            host=host,
+            port=port,
             log_level="info"
         )
     except (KeyboardInterrupt, SystemExit):
