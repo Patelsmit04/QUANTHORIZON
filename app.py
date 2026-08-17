@@ -94,6 +94,18 @@ async def lifespan(app_instance: FastAPI):
         closing_thread.start()
         premarket_thread = threading.Thread(target=premarket_scheduler_worker, daemon=True)
         premarket_thread.start()
+        try:
+            from smc_scanner import smc_scanner
+            smc_scanner.start_background_worker()
+            logger.info("Continuous Multi-Timeframe SMC Scanner started on app startup.")
+        except Exception as e:
+            logger.warning(f"Could not start SMC Scanner on startup: {e}")
+        try:
+            from strategy_engine import strategy_engine
+            strategy_engine.start_background_worker()
+            logger.info("Intraday Strategy Engine started on app startup.")
+        except Exception as e:
+            logger.warning(f"Could not start Intraday Strategy Engine on startup: {e}")
     yield
     shutdown_event.set()
 
@@ -3306,30 +3318,6 @@ async def ws_live(websocket: WebSocket):
         ws_broadcast.unregister(websocket)
 
 
-@app.on_event("startup")
-def start_smc_scanner_on_startup():
-    try:
-        from smc_scanner import smc_scanner
-        smc_scanner.start_background_worker()
-        logger.info("Continuous Multi-Timeframe SMC Scanner started on app startup.")
-    except Exception as e:
-        logger.warning(f"Could not start SMC Scanner on startup: {e}")
-
-
-@app.on_event("startup")
-def start_strategy_engine_on_startup():
-    # Gated like the main scheduler (lifespan(), above) — a serverless cold start has no
-    # business spinning up a background thread that dies with the instance.
-    if os.environ.get("VERCEL"):
-        return
-    try:
-        from strategy_engine import strategy_engine
-        strategy_engine.start_background_worker()
-        logger.info("Intraday Strategy Engine started on app startup.")
-    except Exception as e:
-        logger.warning(f"Could not start Intraday Strategy Engine on startup: {e}")
-
-
 @app.get("/manifest.json")
 def get_manifest():
     return FileResponse(os.path.join(STATIC_DIR, "manifest.json"), media_type="application/json")
@@ -3388,40 +3376,7 @@ def serve_spa_fallback(full_path: str):
 
 if __name__ == "__main__":
     import uvicorn
-    import signal
-    import sys
     import os
-
-    # Native Windows Console Control Handler — intercepts Ctrl+C at OS Kernel level
-    if sys.platform == "win32":
-        try:
-            import ctypes
-            import ctypes.wintypes
-
-            PHANDLER_ROUTINE = ctypes.WINFUNCTYPE(ctypes.wintypes.BOOL, ctypes.wintypes.DWORD)
-
-            def _win_ctrl_handler(ctrl_type):
-                if ctrl_type in (0, 1, 2, 5, 6):  # CTRL_C_EVENT, CTRL_BREAK_EVENT, CTRL_CLOSE_EVENT
-                    print("\n[!] Ctrl+C received via Windows Kernel — shutting down immediately.", flush=True)
-                    shutdown_event.set()
-                    os._exit(0)
-                return False
-
-            _win_handler_ref = PHANDLER_ROUTINE(_win_ctrl_handler)
-            ctypes.windll.kernel32.SetConsoleCtrlHandler(_win_handler_ref, True)
-        except Exception:
-            pass
-
-    def _force_exit(sig, frame):
-        print("\n[!] Shutting down TRADEXO Server immediately...", flush=True)
-        shutdown_event.set()
-        os._exit(0)
-
-    try:
-        signal.signal(signal.SIGINT, _force_exit)
-        signal.signal(signal.SIGTERM, _force_exit)
-    except Exception:
-        pass
 
     host = os.environ.get("HOST", "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1")
     port = int(os.environ.get("PORT", 8000))
@@ -3429,12 +3384,12 @@ if __name__ == "__main__":
     print("\n" + "=" * 64)
     print("  [+] AlgoTrader TRADEXO Dashboard is Running!")
     print(f"  [>] Server URL: http://{host}:{port}")
-    print("  [>] Press CTRL+C in terminal to stop server immediately")
+    print("  [>] Press CTRL+C in terminal to stop server")
     print("=" * 64 + "\n", flush=True)
 
     try:
         uvicorn.run(
-            app,
+            "app:app",
             host=host,
             port=port,
             log_level="info"
@@ -3442,4 +3397,3 @@ if __name__ == "__main__":
     except (KeyboardInterrupt, SystemExit):
         print("\n[!] Server stopped cleanly by user.", flush=True)
         shutdown_event.set()
-        os._exit(0)
