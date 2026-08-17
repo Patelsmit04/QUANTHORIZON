@@ -90,7 +90,7 @@ function getStockLogoHTML(symbol) {
 }
 window.getStockLogoHTML = getStockLogoHTML;
 
-document.addEventListener("DOMContentLoaded", () => {
+function initTradexoDashboard() {
     // Application State
     window.allStocks = [];
     let allStocks = window.allStocks;
@@ -293,17 +293,18 @@ document.addEventListener("DOMContentLoaded", () => {
     function initTradexoIntro() {
         const overlay = document.getElementById("tradexoIntroOverlay");
         const video = document.getElementById("tradexoIntroVideo");
+        const introSkipBtn = document.getElementById("introSkipBtn");
         const sidebarWatchIntroBtn = document.getElementById("sidebarWatchIntroBtn");
         const guideWatchIntroBtn = document.getElementById("guideWatchIntroBtn");
 
         if (!overlay || !video) return;
 
         const INTRO_SESSION_KEY = "tradexo_intro_viewed_v3";
-        let isDismissed = false;
+        let isDismissed = true;
         let safetyTimeout = null;
 
         function dismissIntro() {
-            if (isDismissed) return;
+            if (isDismissed && overlay.classList.contains("hidden")) return;
             isDismissed = true;
             if (safetyTimeout) clearTimeout(safetyTimeout);
 
@@ -312,8 +313,8 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (e) {}
 
             document.body.classList.remove("intro-active");
-            overlay.classList.add("fade-out");
-            overlay.classList.add("hidden");
+            overlay.classList.remove("active");
+            overlay.classList.add("fade-out", "hidden");
             overlay.style.display = "none";
             overlay.style.visibility = "hidden";
             overlay.style.pointerEvents = "none";
@@ -328,6 +329,7 @@ document.addEventListener("DOMContentLoaded", () => {
         function launchIntro() {
             isDismissed = false;
             overlay.classList.remove("hidden", "fade-out");
+            overlay.classList.add("active");
             overlay.style.display = "flex";
             overlay.style.visibility = "visible";
             overlay.style.pointerEvents = "auto";
@@ -359,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 3500);
         }
 
-        // When the 3s video finishes playing or progresses near end, dismiss immediately
+        // When the video finishes playing or errors, dismiss immediately
         video.addEventListener("ended", dismissIntro);
         video.addEventListener("timeupdate", () => {
             if (video.duration && video.currentTime >= video.duration - 0.2) {
@@ -368,8 +370,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         video.addEventListener("error", dismissIntro);
         video.addEventListener("stalled", () => {
-            setTimeout(dismissIntro, 1000);
+            setTimeout(dismissIntro, 500);
         });
+
+        // Skip button handler
+        if (introSkipBtn) {
+            introSkipBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                dismissIntro();
+            });
+        }
 
         // Tap/click anywhere to skip immediately
         overlay.addEventListener("click", dismissIntro);
@@ -401,17 +411,8 @@ document.addEventListener("DOMContentLoaded", () => {
             launchIntro();
         };
 
-        // Session check: play only on first load of browser session
-        let hasSeenIntro = false;
-        try {
-            hasSeenIntro = sessionStorage.getItem(INTRO_SESSION_KEY) === "true";
-        } catch (e) {}
-
-        if (!hasSeenIntro) {
-            launchIntro();
-        } else {
-            dismissIntro();
-        }
+        // Ensure overlay is dismissed by default so dashboard displays immediately with zero black screen
+        dismissIntro();
     }
 
     // -------------------------------------------------------------
@@ -4598,7 +4599,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     initWebSocket();
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTradexoDashboard);
+} else {
+    initTradexoDashboard();
+}
 
 let cachedLiveTradeSetups = [];
 
