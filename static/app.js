@@ -4011,6 +4011,7 @@ function initTradexoDashboard() {
         toastContainer.appendChild(el);
         setTimeout(() => el.remove(), 7000);
     }
+    window.showToast = showToast;
 
     async function refreshNotifBadgeFromServer() {
         try {
@@ -6510,10 +6511,10 @@ window.downloadSpecificHealthReport = async function(date) {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast(`Health report for ${date} downloaded.`, "success");
+        window.showToast(`Health report for ${date} downloaded.`, "success");
     } catch (e) {
         console.error("Health report download error:", e);
-        showToast("Could not download health report.", "error");
+        window.showToast("Could not download health report.", "error");
     }
 };
 
@@ -6532,14 +6533,14 @@ function initSystemHealthDiagnostics() {
             try {
                 const res = await apiFetch("/api/scan/run_now", { method: "POST" });
                 if (res.ok) {
-                    showToast("Full market scan completed successfully!", "success");
+                    window.showToast("Full market scan completed successfully!", "success");
                     await fetchScanResults(true);
                     await fetchSystemHealth();
                 } else {
-                    showToast("Scan trigger failed.", "error");
+                    window.showToast("Scan trigger failed.", "error");
                 }
             } catch (err) {
-                showToast("Scan error: " + err.message, "error");
+                window.showToast("Scan error: " + err.message, "error");
             } finally {
                 runScanBtn.disabled = false;
                 runScanBtn.innerHTML = '<i class="fa-solid fa-bolt"></i><span>FORCE SCAN NOW</span>';
@@ -6555,14 +6556,14 @@ function initSystemHealthDiagnostics() {
                 const res = await apiFetch("/api/evaluate_picks", { method: "POST" });
                 if (res.ok) {
                     const data = await res.json();
-                    showToast(`Evaluation complete: ${data.evaluated_count || 0} trades graded.`, "success");
+                    window.showToast(`Evaluation complete: ${data.evaluated_count || 0} trades graded.`, "success");
                     await fetchSystemHealth();
                     await fetchDailyHealthHistory();
                 } else {
-                    showToast("Evaluation trigger failed.", "error");
+                    window.showToast("Evaluation trigger failed.", "error");
                 }
             } catch (err) {
-                showToast("Evaluation error: " + err.message, "error");
+                window.showToast("Evaluation error: " + err.message, "error");
             } finally {
                 evalBtn.disabled = false;
                 evalBtn.innerHTML = '<i class="fa-solid fa-calculator"></i><span>EVALUATE PICKS</span>';
@@ -6581,18 +6582,18 @@ function initSystemHealthDiagnostics() {
                     const data = await res.json();
                     const fixesCount = data.actions_taken_count || 0;
                     if (fixesCount > 0) {
-                        showToast(`AI Sentinel repaired ${fixesCount} system issue(s)! Score: ${data.diagnostic_report?.composite_score || 100}/100`, "success");
+                        window.showToast(`AI Sentinel repaired ${fixesCount} system issue(s)! Score: ${data.diagnostic_report?.composite_score || 100}/100`, "success");
                     } else {
-                        showToast(`All 4 categories audited: 100% Nominal (0 issues detected).`, "info");
+                        window.showToast(`All 4 categories audited: 100% Nominal (0 issues detected).`, "info");
                     }
                     await fetchSystemHealth();
                     await fetchAiSentinelStatus();
                     await fetchDailyHealthHistory();
                 } else {
-                    showToast("AI Self-Healing pass failed.", "error");
+                    window.showToast("AI Self-Healing pass failed.", "error");
                 }
             } catch (err) {
-                showToast("Self-Healing error: " + err.message, "error");
+                window.showToast("Self-Healing error: " + err.message, "error");
             } finally {
                 selfHealBtn.disabled = false;
                 selfHealBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>TRIGGER AI SELF-HEAL NOW</span>';
@@ -6613,15 +6614,15 @@ function initSystemHealthDiagnostics() {
             try {
                 const res = await apiFetch(endpoint, { method: "POST" });
                 if (res.ok) {
-                    showToast(`System ${actionText} executed successfully.`, "info");
+                    window.showToast(`System ${actionText} executed successfully.`, "info");
                     fetchSystemHealth();
                     fetchAiSentinelStatus();
                 } else {
-                    showToast(`Failed to ${actionText} system.`, "error");
+                    window.showToast(`Failed to ${actionText} system.`, "error");
                 }
             } catch (e) {
                 console.error("[TRADEXO] Emergency control error:", e);
-                showToast("Network error executing control.", "error");
+                window.showToast("Network error executing control.", "error");
             }
         });
     }
@@ -6631,7 +6632,7 @@ function initSystemHealthDiagnostics() {
             fetchSystemHealth();
             fetchAiSentinelStatus();
             fetchDailyHealthHistory();
-            showToast("Diagnostics & history refreshed.", "info");
+            window.showToast("Diagnostics & history refreshed.", "info");
         });
     }
 
@@ -6650,10 +6651,10 @@ function initSystemHealthDiagnostics() {
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast("Daily health report exported.", "success");
+                window.showToast("Daily health report exported.", "success");
             } catch (e) {
                 console.error("Health report download error:", e);
-                showToast("Could not download health report.", "error");
+                window.showToast("Could not download health report.", "error");
             }
         });
     }

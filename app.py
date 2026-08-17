@@ -19,6 +19,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 from env_utils import load_env_with_fallback, DATA_DIR, shutdown_event
 load_env_with_fallback(BASE_DIR)
 
+APP_PORT = int(os.environ.get("PORT", 8000))
+
 from net_utils import call_with_retry
 from candle_utils import fetch_post_lock_candles
 import closing_sequence

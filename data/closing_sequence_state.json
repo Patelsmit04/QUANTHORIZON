@@ -6,10 +6,13 @@
   "cas_close_done": true,
   "scoring_done": true,
   "broadcast_done": true,
-  "lock_done": false,
+  "lock_done": true,
   "snapshot_picks": [],
   "cas_close_prices": {},
-  "lock_result": null,
+  "lock_result": {
+    "locked_count": 0,
+    "total_today_locked": 1
+  },
   "lock_timestamp": null,
   "btst_status": "confirmed"
 }

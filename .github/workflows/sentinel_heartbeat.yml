@@ -27,15 +27,34 @@ jobs:
             echo "TRADEXO_APP_URL / QUANTHORIZON_APP_URL secret is not set. Skipping external ping."
             exit 0
           fi
-          URL="${APP_BASE_URL%/}/api/ai_sentinel/heal_now?trigger=github_actions_cron"
-          echo "Pinging AI Sentinel: $URL"
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$URL" --max-time 60 || true)
-          HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
-          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-          echo "Status: $HTTP_CODE"
-          echo "Result: $HTTP_BODY"
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "AI Sentinel heartbeat & auto-heal succeeded."
+          BASE="${APP_BASE_URL%/}"
+          
+          echo "Step 1: Pinging Keepalive endpoint to ensure dyno is awake..."
+          curl -s -X GET "$BASE/api/cron/keepalive" --max-time 30 || true
+
+          echo "Step 2: Triggering AI Sentinel Self-Healing pass (with retry)..."
+          URL="$BASE/api/ai_sentinel/heal_now?trigger=github_actions_cron"
+          SUCCESS=0
+          for ATTEMPT in 1 2 3; do
+            echo "Attempt $ATTEMPT: GET $URL"
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$URL" --max-time 60 || true)
+            HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+            HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+            echo "Status: $HTTP_CODE"
+            echo "Result: $HTTP_BODY"
+            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+              echo "AI Sentinel heartbeat & auto-heal succeeded on attempt $ATTEMPT."
+              SUCCESS=1
+              break
+            else
+              echo "Attempt $ATTEMPT returned status $HTTP_CODE. Waiting 10s before retry..."
+              sleep 10
+            fi
+          done
+
+          if [ "$SUCCESS" -eq 1 ]; then
+            exit 0
           else
-            echo "Warning: AI Sentinel heartbeat returned status $HTTP_CODE."
+            echo "Warning: AI Sentinel heartbeat failed after 3 attempts."
+            exit 1
           fi

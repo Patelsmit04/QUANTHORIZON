@@ -1,71 +1,38 @@
 {
   "2026-08-16": {
     "date": "2026-08-16",
-    "generated_at": "2026-08-16 20:45:53 IST",
-    "health_score": 90,
-    "status": "NOMINAL",
-    "status_label": "All Systems Nominal",
-    "issues": [
-      "1 operational exception(s) logged today"
-    ],
+    "generated_at": "2026-08-17 18:26:50 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
     "milestones": {
-      "evaluations": [
-        {
-          "timestamp": "2026-08-16 20:45:27 IST",
-          "evaluated_count": 6,
-          "wins": 5,
-          "losses": 1,
-          "win_rate_pct": 83.3,
-          "status": "SUCCESS",
-          "details": {
-            "mock": true,
-            "notes": "Dry run gap evaluation"
-          }
-        }
-      ],
-      "locks": [
-        {
-          "timestamp": "2026-08-16 20:45:27 IST",
-          "lock_type": "BTST_330_LOCK",
-          "locked_count": 5,
-          "symbols": [
-            "RELIANCE",
-            "TCS",
-            "INFY",
-            "BHARTIARTL",
-            "HDFCBANK"
-          ],
-          "details": {
-            "mock": true
-          }
-        }
-      ],
-      "transitions_count": 2,
+      "evaluations": [],
+      "locks": [],
+      "transitions_count": 0,
       "cold_starts_count": 1,
       "market_hours_cold_starts": 0
     },
-    "errors_count": 1,
-    "errors": [
-      {
-        "timestamp": "2026-08-16 20:45:27 IST",
-        "component": "SIMULATION_TEST",
-        "message": "Test artificial exception to verify safety net detection",
-        "trace": ""
-      }
-    ],
-    "market_transitions": [
-      {
-        "timestamp": "2026-08-16 20:45:27 IST",
-        "from_status": "PRE_MARKET",
-        "to_status": "OPEN",
-        "mode": "LIVE 5-PILLAR SCANNING"
-      },
-      {
-        "timestamp": "2026-08-16 20:45:27 IST",
-        "from_status": "OPEN",
-        "to_status": "CLOSED",
-        "mode": "OFF-MARKET SNAPSHOT (3:30 PM Scan Locked)"
-      }
-    ]
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "previous": {
+    "date": "previous",
+    "generated_at": "2026-08-17 20:03:10 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [],
+      "locks": [],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
   }
 }

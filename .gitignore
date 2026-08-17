@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 data/*.tmp
 data/*.lock
+data/*.bak
 !data/strategies.json
 !data/last_market_scan.json
 !data/trade_history.json

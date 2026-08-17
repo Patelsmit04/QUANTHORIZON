@@ -1,0 +1,271 @@
+{
+  "events": [
+    {
+      "timestamp": "2026-08-17 18:54:36 IST",
+      "trigger": "test_run",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 75.0,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 75.0% win rate) and reconciled milestone."
+        }
+      ],
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-17 19:01:29 IST",
+      "trigger": "pytest_1",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 75.0,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 75.0% win rate) and reconciled milestone."
+        }
+      ],
+      "resulting_score": 91,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-17 19:05:56 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 2,
+          "action": "CLEAR_STALE_LOCK",
+          "file": "news_refresh.lock",
+          "age_seconds": 305,
+          "description": "Safely removed orphaned lock news_refresh.lock (305s old) to unblock background tasks."
+        }
+      ],
+      "resulting_score": 91,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-17 20:01:28 IST",
+      "trigger": "test_cli",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 13,
+          "symbols": [
+            "ITC",
+            "LT",
+            "TATASTEEL",
+            "CAMS",
+            "CDSL",
+            "IEX",
+            "JIOFIN",
+            "LTF",
+            "METROPOLIS",
+            "SUNPHARMA",
+            "TCS",
+            "ADANIENSOL",
+            "TATATECH"
+          ],
+          "description": "Auto-locked 13 high-conviction candidates (['ITC', 'LT', 'TATASTEEL']) into persistent journal.",
+          "verified": true
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-17 20:03:08 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 75.0,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 75.0% win rate) and reconciled milestone."
+        }
+      ],
+      "resulting_score": 91,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-17 20:02:59 IST",
+      "trigger": "pytest_1",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 75.0,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 75.0% win rate) and reconciled milestone.",
+          "verified": true,
+          "accuracy_pipeline_check": {
+            "status": "PASS",
+            "pre_total": 4,
+            "post_total": 4,
+            "delta": 0,
+            "expected": 0,
+            "tolerance": 2
+          }
+        },
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ITC",
+            "LT",
+            "TATASTEEL",
+            "CAMS",
+            "CDSL",
+            "IEX",
+            "JIOFIN",
+            "LTF",
+            "METROPOLIS",
+            "SUNPHARMA",
+            "TCS",
+            "ADANIENSOL",
+            "TATATECH"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ITC', 'LT', 'TATASTEEL']) into persistent journal.",
+          "verified": true
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-17 20:04:11 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 1,
+          "action": "SAFE_JSON_REPAIR",
+          "file": "system_health_log.json",
+          "backup": "system_health_log.json.corrupted.20260817_200411.bak",
+          "description": "Atomically repaired corrupted/missing system_health_log.json with verified default schema."
+        },
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 75.0,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 75.0% win rate) and reconciled milestone."
+        }
+      ],
+      "resulting_score": 91,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-17 20:04:12 IST",
+      "trigger": "pytest_1",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 75.0,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 75.0% win rate) and reconciled milestone.",
+          "verified": true,
+          "accuracy_pipeline_check": {
+            "status": "PASS",
+            "pre_total": 4,
+            "post_total": 4,
+            "delta": 0,
+            "expected": 0,
+            "tolerance": 2
+          }
+        },
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ITC",
+            "LT",
+            "TATASTEEL",
+            "CAMS",
+            "CDSL",
+            "IEX",
+            "JIOFIN",
+            "LTF",
+            "METROPOLIS",
+            "SUNPHARMA",
+            "TCS",
+            "ADANIENSOL",
+            "TATATECH"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ITC', 'LT', 'TATASTEEL']) into persistent journal.",
+          "verified": true
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-17 20:06:10 IST",
+      "trigger": "pytest_1",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 75.0,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 75.0% win rate) and reconciled milestone.",
+          "verified": true,
+          "accuracy_pipeline_check": {
+            "status": "PASS",
+            "pre_total": 4,
+            "post_total": 4,
+            "delta": 0,
+            "expected": 0,
+            "tolerance": 2
+          }
+        },
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ITC",
+            "LT",
+            "TATASTEEL",
+            "CAMS",
+            "CDSL",
+            "IEX",
+            "JIOFIN",
+            "LTF",
+            "METROPOLIS",
+            "SUNPHARMA",
+            "TCS",
+            "ADANIENSOL",
+            "TATATECH"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ITC', 'LT', 'TATASTEEL']) into persistent journal.",
+          "verified": true
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    }
+  ],
+  "total_fixes_applied": 13,
+  "last_healing_pass": "2026-08-17 20:06:10 IST",
+  "last_score": 100,
+  "last_all_verified": true
+}
