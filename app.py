@@ -105,6 +105,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 
 @app.middleware("http")
 async def add_no_cache_headers_for_static(request: Request, call_next):
@@ -3302,9 +3305,6 @@ async def ws_live(websocket: WebSocket):
     finally:
         ws_broadcast.unregister(websocket)
 
-
-STATIC_DIR = os.path.join(BASE_DIR, "static")
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.on_event("startup")
 def start_smc_scanner_on_startup():
