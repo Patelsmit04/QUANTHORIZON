@@ -30,14 +30,14 @@ logger = logging.getLogger("SystemHealthMonitor")
 HEALTH_LOG_FILE = os.path.join(DATA_DIR, "system_health_log.json")
 DAILY_REPORTS_FILE = os.path.join(DATA_DIR, "daily_health_reports.json")
 
-_health_lock = threading.Lock()
+_health_lock = threading.RLock()
 
 
 def _get_today_date_str() -> str:
     return get_ist_now().strftime("%Y-%m-%d")
 
 
-def _load_health_data() -> Dict[str, Any]:
+def _load_health_data(check_rollover: bool = True) -> Dict[str, Any]:
     default = {
         "today_date": _get_today_date_str(),
         "cold_starts": [],
@@ -52,9 +52,14 @@ def _load_health_data() -> Dict[str, Any]:
         return default
     try:
         data = read_json(HEALTH_LOG_FILE, default=default)
-        if data.get("today_date") != _get_today_date_str():
-            # Archive previous day's report before rolling over if not yet done
-            generate_daily_health_report(data.get("today_date", "previous"))
+        if check_rollover and data.get("today_date") != _get_today_date_str():
+            old_date = data.get("today_date", "previous")
+            # Write new day immediately to break recursion
+            _save_health_data(default)
+            try:
+                _archive_day_report(old_date, data)
+            except Exception as e:
+                logger.warning(f"Could not archive rollover report: {e}")
             data = default
         return data
     except Exception as e:
@@ -232,36 +237,31 @@ def get_system_health_summary() -> Dict[str, Any]:
     }
 
 
-def generate_daily_health_report(target_date: Optional[str] = None) -> Dict[str, Any]:
-    """
-    Builds a definitive daily audit report for the given date and saves it to daily_health_reports.json.
-    """
-    target_date = target_date or _get_today_date_str()
-    summary = get_system_health_summary()
-    
-    with _health_lock:
-        health_data = _load_health_data()
+def _archive_day_report(target_date: str, health_data: Dict[str, Any]) -> Dict[str, Any]:
+    err_count = len(health_data.get("errors", []))
+    market_cold_starts = [cs for cs in health_data.get("cold_starts", []) if cs.get("is_market_hours")]
+    score = max(0, 100 - min(30, err_count * 10) - min(25, len(market_cold_starts) * 15))
+    status = "OPTIMAL" if score >= 90 else ("DEGRADED" if score >= 70 else "CRITICAL")
+    status_label = "Optimal" if score >= 90 else ("Degraded" if score >= 70 else "Critical")
 
     report = {
         "date": target_date,
         "generated_at": get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST"),
-        "health_score": summary["score"],
-        "status": summary["status"],
-        "status_label": summary["status_label"],
-        "issues": summary["issues"],
+        "health_score": score,
+        "status": status,
+        "status_label": status_label,
+        "issues": [],
         "milestones": {
             "evaluations": health_data.get("evaluations", []),
             "locks": health_data.get("locks", []),
             "transitions_count": len(health_data.get("market_transitions", [])),
             "cold_starts_count": len(health_data.get("cold_starts", [])),
-            "market_hours_cold_starts": summary["market_hours_cold_starts"]
+            "market_hours_cold_starts": len(market_cold_starts)
         },
-        "errors_count": len(health_data.get("errors", [])),
+        "errors_count": err_count,
         "errors": health_data.get("errors", []),
         "market_transitions": health_data.get("market_transitions", [])
     }
-
-    # Save to persistent history
     reports_archive = read_json(DAILY_REPORTS_FILE, default={})
     reports_archive[target_date] = report
     try:
@@ -269,8 +269,17 @@ def generate_daily_health_report(target_date: Optional[str] = None) -> Dict[str,
         logger.info(f"[HEALTH] Daily health report archived for {target_date}")
     except Exception as e:
         logger.error(f"Failed to archive daily health report: {e}")
-
     return report
+
+
+def generate_daily_health_report(target_date: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Builds a definitive daily audit report for the given date and saves it to daily_health_reports.json.
+    """
+    target_date = target_date or _get_today_date_str()
+    with _health_lock:
+        health_data = _load_health_data(check_rollover=False)
+    return _archive_day_report(target_date, health_data)
 
 
 def get_all_daily_reports() -> Dict[str, Any]:
