@@ -5376,6 +5376,191 @@ body.intro-active {
     }
 }
 
+/* ==========================================================================
+   ACTIVE HEALTH ISSUES & DIAGNOSTIC FINDINGS PANEL
+   ========================================================================== */
+.health-active-issues-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: var(--radius-lg, 14px);
+    padding: 20px 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(245, 158, 11, 0.15);
+    backdrop-filter: blur(12px);
+}
+
+.health-active-issues-card.critical {
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 8px 32px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(239, 68, 68, 0.2);
+}
+
+.health-active-issues-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.health-active-issues-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.health-active-issues-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.health-active-issues-card.critical .health-active-issues-icon {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.health-active-issues-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #f59e0b;
+    margin: 0;
+}
+
+.health-active-issues-card.critical .health-active-issues-title {
+    color: #ef4444;
+}
+
+.health-active-issues-subtitle {
+    font-size: 0.72rem;
+    color: var(--ink-muted, #94a3b8);
+    display: block;
+    margin-top: 2px;
+}
+
+.health-issue-item {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+}
+
+.health-issue-item:last-child {
+    margin-bottom: 0;
+}
+
+.health-issue-item:hover {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.health-issue-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.health-issue-item-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.health-issue-item-body {
+    font-size: 0.76rem;
+    color: #cbd5e1;
+    line-height: 1.45;
+    margin-bottom: 10px;
+}
+
+.health-issue-item-meta-box {
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    line-height: 1.45;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+    border-left: 3px solid #f59e0b;
+}
+
+.health-issue-item-meta-box.critical {
+    border-left-color: #ef4444;
+}
+
+.health-issue-meta-row strong {
+    color: #e2e8f0;
+    margin-right: 4px;
+}
+
+.health-issue-action-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.health-issue-btn {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+.health-issue-btn:hover {
+    background: rgba(245, 158, 11, 0.25);
+    border-color: #f59e0b;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.health-issue-pill {
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.health-issue-pill.critical {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
 
 
 

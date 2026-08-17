@@ -6111,10 +6111,21 @@ function renderSystemHealthUI(payload) {
         } else if (health.score >= 90) {
             summaryDesc.textContent = "Zero operational anomalies or race conditions detected today.";
         } else {
-            summaryDesc.textContent = `${health.issues_count} anomaly detected. Review the live diagnostics log below.`;
+            summaryDesc.textContent = `${health.issues_count} anomaly detected. Review the active findings breakdown below.`;
         }
     }
     if (lastChecked) lastChecked.textContent = (health.last_updated || "").slice(11, 19) || "Active";
+
+    // Card 1: Issues Pills
+    const issuesPillsContainer = document.getElementById("pageHealthIssuesPills");
+    if (issuesPillsContainer) {
+        const issues = health.issues || [];
+        if (issues.length === 0) {
+            issuesPillsContainer.innerHTML = '<span class="health-issue-pill" style="background:rgba(16,185,129,0.15);color:#10b981;border-color:rgba(16,185,129,0.3);"><i class="fa-solid fa-check"></i> 0 Issues</span>';
+        } else {
+            issuesPillsContainer.innerHTML = issues.map(iss => `<span class="health-issue-pill"><i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(iss)}</span>`).join("");
+        }
+    }
 
     // 3. Card 2: Market State & Schedule Mode
     const marketStateBadge = document.getElementById("pageMarketStateBadge");
@@ -6159,7 +6170,97 @@ function renderSystemHealthUI(payload) {
         totalColdStarts.textContent = `${health.total_cold_starts || 1} Total Starts`;
     }
 
-    // 6. 4-Pillar Milestone Verification Full Grid
+    // 6. Active Diagnostic Issues Panel
+    const activeIssuesCard = document.getElementById("healthActiveIssuesCard");
+    if (activeIssuesCard) {
+        const issuesDetail = health.issues_detail || [];
+        if (issuesDetail.length === 0) {
+            activeIssuesCard.style.display = "block";
+            activeIssuesCard.className = "health-active-issues-card";
+            activeIssuesCard.style.borderColor = "rgba(16,185,129,0.35)";
+            activeIssuesCard.style.boxShadow = "0 8px 32px rgba(16,185,129,0.1)";
+            activeIssuesCard.innerHTML = `
+                <div class="health-active-issues-header" style="border-bottom:none;margin-bottom:0;padding-bottom:0;">
+                    <div class="health-active-issues-header-left">
+                        <div class="health-active-issues-icon" style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);color:#10b981;">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <h4 class="health-active-issues-title" style="color:#10b981;">ALL HEALTH CHECKS NOMINAL (0 ACTIVE ISSUES)</h4>
+                            <span class="health-active-issues-subtitle">All scheduled milestones, market transitions, and thread locks are operating optimally.</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            activeIssuesCard.style.display = "block";
+            const isCritical = health.status === "CRITICAL";
+            activeIssuesCard.className = "health-active-issues-card" + (isCritical ? " critical" : "");
+            activeIssuesCard.style.borderColor = "";
+            activeIssuesCard.style.boxShadow = "";
+            activeIssuesCard.innerHTML = `
+                <div class="health-active-issues-header">
+                    <div class="health-active-issues-header-left">
+                        <div class="health-active-issues-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <h4 class="health-active-issues-title">ACTIVE DIAGNOSTIC FINDINGS (${issuesDetail.length} ITEM${issuesDetail.length > 1 ? 'S' : ''})</h4>
+                            <span class="health-active-issues-subtitle">Specific factors reducing today's forward-testing health score (${health.score}/100)</span>
+                        </div>
+                    </div>
+                    <span class="health-card-badge ${isCritical ? 'danger' : 'warning'}" style="font-size:0.7rem;padding:4px 10px;">
+                        ${isCritical ? 'CRITICAL ATTENTION' : 'ATTENTION REQUIRED'}
+                    </span>
+                </div>
+                <div class="health-issues-list-wrap">
+                    ${issuesDetail.map(item => `
+                        <div class="health-issue-item">
+                            <div class="health-issue-item-header">
+                                <div class="health-issue-item-title">
+                                    <i class="fa-solid fa-circle-exclamation ${item.severity === 'CRITICAL' ? 'text-bearish' : 'text-amber'}"></i>
+                                    <span>${escapeHtml(item.title)}</span>
+                                </div>
+                                <span class="health-issue-pill ${item.severity === 'CRITICAL' ? 'critical' : ''}">${escapeHtml(item.severity || 'ATTENTION')}</span>
+                            </div>
+                            <div class="health-issue-item-body">
+                                ${escapeHtml(item.description || '')}
+                            </div>
+                            <div class="health-issue-item-meta-box ${item.severity === 'CRITICAL' ? 'critical' : ''}">
+                                <div class="health-issue-meta-row">
+                                    <strong><i class="fa-solid fa-circle-question"></i> Root Cause:</strong>
+                                    <span>${escapeHtml(item.reason || 'Not specified')}</span>
+                                </div>
+                                ${item.recommendation ? `
+                                    <div class="health-issue-meta-row">
+                                        <strong><i class="fa-solid fa-lightbulb text-gold"></i> Remedy / Expected Behavior:</strong>
+                                        <span>${escapeHtml(item.recommendation)}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="health-issue-action-bar">
+                                ${item.action_target === 'evaluate_picks' ? `
+                                    <button class="health-issue-btn" onclick="document.getElementById('btnHealthEvalNow')?.click();">
+                                        <i class="fa-solid fa-calculator"></i> ${escapeHtml(item.action_label || 'Evaluate Picks Now')}
+                                    </button>
+                                ` : (item.action_target === 'run_scan' ? `
+                                    <button class="health-issue-btn" onclick="document.getElementById('btnHealthRunScanNow')?.click();">
+                                        <i class="fa-solid fa-bolt"></i> ${escapeHtml(item.action_label || 'Run Scan Now')}
+                                    </button>
+                                ` : `
+                                    <button class="health-issue-btn" onclick="document.getElementById('btnRefreshHealthPage')?.click();">
+                                        <i class="fa-solid fa-arrows-rotate"></i> Refresh Diagnostics
+                                    </button>
+                                `)}
+                            </div>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+        }
+    }
+
+    // 7. 4-Pillar Milestone Verification Full Grid
     const mStatusTransitions = document.getElementById("mStatusTransitions");
     const mCountTransitions = document.getElementById("mCountTransitions");
     if (mStatusTransitions && mCountTransitions) {
@@ -6197,7 +6298,7 @@ function renderSystemHealthUI(payload) {
         }
     }
 
-    // 7. Live Anomaly & Diagnostic Stream
+    // 8. Live Anomaly & Diagnostic Stream
     renderHealthLogStream(health);
 }
 
@@ -6297,9 +6398,56 @@ window.downloadSpecificHealthReport = async function(date) {
 
 function initSystemHealthDiagnostics() {
     const pageKillBtn = document.getElementById("btnPageEmergencyKillSwitch");
+    const runScanBtn = document.getElementById("btnHealthRunScanNow");
+    const evalBtn = document.getElementById("btnHealthEvalNow");
     const refreshBtn = document.getElementById("btnRefreshHealthPage");
     const exportBtn = document.getElementById("btnExportHealthReport");
     const filterGroup = document.getElementById("healthLogFilterGroup");
+
+    if (runScanBtn) {
+        runScanBtn.addEventListener("click", async () => {
+            runScanBtn.disabled = true;
+            runScanBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>SCANNING...</span>';
+            try {
+                const res = await apiFetch("/api/scan/run_now", { method: "POST" });
+                if (res.ok) {
+                    showToast("Full market scan completed successfully!", "success");
+                    await fetchScanResults(true);
+                    await fetchSystemHealth();
+                } else {
+                    showToast("Scan trigger failed.", "error");
+                }
+            } catch (err) {
+                showToast("Scan error: " + err.message, "error");
+            } finally {
+                runScanBtn.disabled = false;
+                runScanBtn.innerHTML = '<i class="fa-solid fa-bolt"></i><span>FORCE SCAN NOW</span>';
+            }
+        });
+    }
+
+    if (evalBtn) {
+        evalBtn.addEventListener("click", async () => {
+            evalBtn.disabled = true;
+            evalBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>EVALUATING...</span>';
+            try {
+                const res = await apiFetch("/api/evaluate_picks", { method: "POST" });
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast(`Evaluation complete: ${data.evaluated_count || 0} trades graded.`, "success");
+                    await fetchSystemHealth();
+                    await fetchDailyHealthHistory();
+                } else {
+                    showToast("Evaluation trigger failed.", "error");
+                }
+            } catch (err) {
+                showToast("Evaluation error: " + err.message, "error");
+            } finally {
+                evalBtn.disabled = false;
+                evalBtn.innerHTML = '<i class="fa-solid fa-calculator"></i><span>EVALUATE PICKS</span>';
+            }
+        });
+    }
 
     if (pageKillBtn) {
         pageKillBtn.addEventListener("click", async () => {

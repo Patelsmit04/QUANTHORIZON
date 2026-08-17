@@ -178,6 +178,7 @@ def get_system_health_summary() -> Dict[str, Any]:
     now_mins = now.hour * 60 + now.minute
 
     issues = []
+    issues_detail = []
     score = 100
 
     # 1. Check for runtime errors
@@ -185,25 +186,62 @@ def get_system_health_summary() -> Dict[str, Any]:
     if err_count > 0:
         score -= min(30, err_count * 10)
         issues.append(f"{err_count} operational exception(s) logged today")
+        issues_detail.append({
+            "id": "RUNTIME_EXCEPTIONS",
+            "title": f"{err_count} Operational Exception(s) Logged Today",
+            "severity": "CRITICAL" if err_count >= 3 else "WARNING",
+            "description": f"{err_count} unhandled exception(s) were caught in background workers.",
+            "reason": "Data feed timeouts, rate limits, or network interruptions occurred.",
+            "action_label": "View Diagnostics Stream",
+            "action_target": "logs"
+        })
 
     # 2. Check for mid-day cold starts during trading hours
     market_cold_starts = [cs for cs in data.get("cold_starts", []) if cs.get("is_market_hours")]
     if market_cold_starts:
         score -= min(25, len(market_cold_starts) * 15)
         issues.append(f"{len(market_cold_starts)} dyno cold-start(s) occurred during active market hours")
+        issues_detail.append({
+            "id": "MID_MARKET_COLD_START",
+            "title": f"{len(market_cold_starts)} Mid-Market Dyno Cold-Start(s)",
+            "severity": "WARNING",
+            "description": "Server process restarted during active trading hours (09:15 - 15:30 IST).",
+            "reason": "Cloud provider dyno recycled or instance restarted mid-session.",
+            "action_label": "Check Dyno Health",
+            "action_target": "dyno"
+        })
 
     # 3. Check 9:15 AM evaluation on weekdays past 09:20 AM IST
     if is_weekday and now_mins >= (9 * 60 + 20):
         if not data.get("evaluations"):
-            # If past 9:20 AM on a trading day and no evaluation logged
             score -= 20
             issues.append("9:15 AM evaluation event not detected today")
+            issues_detail.append({
+                "id": "MISSED_915_EVALUATION",
+                "title": "9:15 AM Market Open Evaluation Not Detected Today",
+                "severity": "ATTENTION",
+                "description": "No 9:15 AM opening gap evaluation was recorded in today's active session log.",
+                "reason": "Server was started after 09:20 AM IST (offline during the 09:15-09:17 AM open window).",
+                "recommendation": "Normal behavior for late starts. Will automatically evaluate on next session open at 09:15 AM, or you can trigger manually.",
+                "action_label": "Evaluate Picks Now",
+                "action_target": "evaluate_picks"
+            })
 
     # 4. Check 3:30 PM lock on weekdays past 15:35 IST
     if is_weekday and now_mins >= (15 * 60 + 35):
         if not data.get("locks"):
             score -= 25
             issues.append("3:30 PM market lock event not detected today")
+            issues_detail.append({
+                "id": "MISSED_330_LOCK",
+                "title": "3:30 PM Closing Bell Lock Not Detected Today",
+                "severity": "ATTENTION",
+                "description": "No 3:30 PM closing snapshot was locked into persistent journal today.",
+                "reason": "Server was started after 15:35 IST. Last known snapshot is safely preserved in disk storage.",
+                "recommendation": "Will automatically engage at 3:30 PM sharp on the next trading session.",
+                "action_label": "Run Fresh Scan Now",
+                "action_target": "run_scan"
+            })
 
     score = max(0, min(100, score))
 
@@ -227,6 +265,7 @@ def get_system_health_summary() -> Dict[str, Any]:
         "today_date": data.get("today_date"),
         "issues_count": len(issues),
         "issues": issues,
+        "issues_detail": issues_detail,
         "total_cold_starts_today": len(data.get("cold_starts", [])),
         "market_hours_cold_starts": len(market_cold_starts),
         "last_evaluation": last_eval,

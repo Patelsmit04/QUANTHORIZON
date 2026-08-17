@@ -1927,16 +1927,34 @@ def ensure_active_btst_signals(stocks: List[Dict[str, Any]]) -> List[Dict[str, A
     return stocks
 
 
+@app.post("/api/scan/run_now")
+def run_scan_now():
+    """Manually triggers a full fresh 5-Pillar scan pass on demand and returns updated scan data."""
+    if not _can_run_live_scan_inline():
+        raise HTTPException(status_code=400, detail="On-demand live scans are disabled in serverless mode.")
+    logger.info("Manual on-demand market scan triggered via API...")
+    result = run_full_scan_pipeline()
+    return sanitize_json_data({
+        "status": "SUCCESS",
+        "message": f"Scan completed successfully at {result.get('timestamp')}",
+        "timestamp": result.get("timestamp"),
+        "total_scanned": result.get("total_scanned"),
+        "btst_count": result.get("btst_count"),
+        "stbt_count": result.get("stbt_count"),
+        "priority_1_count": result.get("priority_1_count")
+    })
+
+
 @app.get("/api/scan")
 def get_scan_results(
     filter_type: Optional[str] = Query(None, description="ALL, BTST, STBT, HIGH_VOL, WATCHLIST"),
     priority_only: bool = Query(False, description="Set True to return ONLY Priority 1 (Tier 1) High Conviction stocks"),
-    nocache: bool = Query(False, description="Bypass cache ONLY if market is live open")
+    nocache: bool = Query(False, description="Bypass cache and trigger fresh scan")
 ):
     sched_info = get_market_schedule_info()
 
     # Trigger async scan in background if requested or if cache is missing, but NEVER block HTTP response!
-    if nocache and sched_info["is_open"] and _can_run_live_scan_inline():
+    if nocache and _can_run_live_scan_inline():
         threading.Thread(target=run_full_scan_pipeline, daemon=True).start()
 
     with _cache_lock:
