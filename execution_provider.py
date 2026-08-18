@@ -11,7 +11,7 @@ the deliberate scope for this pass (see the project's own design notes on why):
     fire live retail algo orders through a generic broker API key without that in place.
   - EXECUTION_MODE below is hardcoded to "PAPER". There is no code path in this file that
     calls a real broker network endpoint — going live means writing a new BrokerAdapter
-    subclass (e.g. ZerodhaKiteAdapter) that plugs into place_order(), and deliberately
+    subclass (e.g. AngelOneAdapter) that plugs into place_order(), and deliberately
     swapping the mode, once real credentials + registration are actually in place. Nothing
     here does that swap automatically.
 

@@ -2092,7 +2092,7 @@ function initTradexoDashboard() {
             }
 
             const modalOfSource = document.getElementById("modalOfSource");
-            if (modalOfSource) modalOfSource.textContent = `Source: ${ofData.data_source || 'Zerodha Kite Connect (5L Depth)'}`;
+            if (modalOfSource) modalOfSource.textContent = `Source: ${ofData.data_source || 'SmartAPI WebSocket (5L Depth)'}`;
 
             const modalOfReason = document.getElementById("modalOfReason");
             if (modalOfReason) modalOfReason.textContent = ofVeto.reason || "3:15-3:25 PM order flow evaluation complete.";
@@ -2796,7 +2796,7 @@ function initTradexoDashboard() {
     if (btnRefreshInstitutionalFlow) btnRefreshInstitutionalFlow.addEventListener("click", fetchInstitutionalFlowSection);
 
     // -------------------------------------------------------------
-    // DEDICATED ORDER FLOW VETO PAGE (Zerodha Kite Connect 3:15-3:25 PM)
+    // DEDICATED ORDER FLOW VETO PAGE (3:15-3:25 PM Closing Aggression)
     // -------------------------------------------------------------
     const orderFlowSection = document.getElementById("orderFlowSection");
     const orderFlowNavBadge = document.getElementById("orderFlowNavBadge");
@@ -2824,12 +2824,10 @@ function initTradexoDashboard() {
             const ofPageConfirmedCount = document.getElementById("ofPageConfirmedCount");
             const ofPageVetoedCount = document.getElementById("ofPageVetoedCount");
 
-            if (ofPageFeedStatus) ofPageFeedStatus.textContent = (data.feed_health && data.feed_health.feed_mode || "KITE CONNECT").toUpperCase();
+            if (ofPageFeedStatus) ofPageFeedStatus.textContent = (data.feed_health && data.feed_health.feed_mode || "SMARTAPI STREAM").toUpperCase();
             if (ofPageFeedDetail) {
                 let msg = data.feed_health && data.feed_health.message ? data.feed_health.message : "5-Level Depth WebSocket Stream";
-                if (msg.includes("Kite Access Token expired")) {
-                    msg = "Kite Auth Required — Feed Down";
-                } else if (msg.length > 50) {
+                if (msg.length > 50) {
                     msg = msg.substring(0, 47) + "...";
                 }
                 ofPageFeedDetail.textContent = msg;
@@ -2914,9 +2912,7 @@ function initTradexoDashboard() {
         const simBadgeHtml = isSimulated ? `<span class="badge" style="font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;background:rgba(245,158,11,0.18);color:var(--gold);border:1px solid rgba(245,158,11,0.35);" title="Operating in Fallback Inferred Simulator Mode">SIMULATED DATA</span>` : "";
 
         let displayReason = veto.reason || "Closing aggression analysis complete.";
-        if (displayReason.includes("Kite Access Token expired")) {
-            displayReason = "Kite Connect Auth Required — Feed Down";
-        } else if (displayReason.length > 80) {
+        if (displayReason.length > 80) {
             displayReason = displayReason.substring(0, 77) + "...";
         }
 

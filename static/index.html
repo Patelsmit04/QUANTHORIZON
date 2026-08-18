@@ -771,7 +771,7 @@
             <div id="orderFlowSection" class="hidden">
                 <div class="section-heading-row">
                     <h2 class="section-page-title"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW
-                        <span class="section-page-subtitle">Zerodha Kite 3:15–3:25 PM Closing Aggression &amp; 5-Level Depth Analysis</span>
+                        <span class="section-page-subtitle">3:15–3:25 PM Closing Aggression &amp; 5-Level Depth Analysis</span>
                     </h2>
                 </div>
 
@@ -779,7 +779,7 @@
                 <div class="stats-overview-grid" style="margin-top:16px;margin-bottom:16px;">
                     <div class="stat-card">
                         <div class="stat-card-title"><i class="fa-solid fa-plug"></i> FEED STATUS</div>
-                        <div class="stat-card-value text-gold" id="ofPageFeedStatus">KITE CONNECT</div>
+                        <div class="stat-card-value text-gold" id="ofPageFeedStatus">SMARTAPI STREAM</div>
                         <div class="stat-card-footer" id="ofPageFeedDetail">5-Level Depth WebSocket Stream</div>
                     </div>
                     <div class="stat-card">
@@ -824,7 +824,7 @@
                     </div>
                     <h3 style="font-family: var(--font-heading); font-size: 18px; font-weight: 800; color: var(--ink-primary); margin-bottom: 6px;">No Active Order Flow Setups Found</h3>
                     <p style="font-size: 12px; color: var(--ink-secondary); max-width: 480px; line-height: 1.6; margin-bottom: 16px;">
-                        Zerodha Kite 5-Level Depth closing aggression &amp; tick-rule delta monitoring active window is <strong>3:15 PM – 3:25 PM IST</strong>. Outside the closing window, candidates build dynamically.
+                        5-Level Depth closing aggression &amp; tick-rule delta monitoring active window is <strong>3:15 PM – 3:25 PM IST</strong>. Outside the closing window, candidates build dynamically.
                     </p>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
                         <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--bullish); border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">
@@ -1001,7 +1001,7 @@
 
                 <div class="paper-trade-notice">
                     <i class="fa-solid fa-circle-info"></i>
-                    <span>All strategy execution is PAPER/SIMULATED only — no real broker order placement is executed (Kite Connect is used read-only for market data &amp; tick-rule order flow analysis).</span>
+                    <span>All strategy execution is PAPER/SIMULATED only — no real broker order placement is executed (Market data &amp; tick-rule order flow are streamed read-only).</span>
                 </div>
 
                 <section class="strategy-grid" id="strategyGrid">
@@ -1497,7 +1497,7 @@
 
                     <div class="guide-step-box">
                         <h4><i class="fa-solid fa-circle-info text-gold"></i> About This Build</h4>
-                        <p>TRADEXO is a paper/simulated research engine — no real broker order placement is executed (Kite Connect is used read-only for live market data &amp; tick-rule delta analysis). All quantitative rules, thresholds, and scoring logic are identical across desktop and mobile.</p>
+                        <p>TRADEXO is a paper/simulated research engine — no real broker order placement is executed (SmartAPI stream is used read-only for live market data &amp; tick-rule delta analysis). All quantitative rules, thresholds, and scoring logic are identical across desktop and mobile.</p>
                     </div>
                 </section>
             </div>
@@ -1907,7 +1907,7 @@
                 </div>
 
                 <!-- Order Flow Veto Panel (3:15-3:25 PM Closing Aggression) -->
-                <h4 class="section-heading mt-4"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW VETO LAYER (3:15-3:25 PM KITE CONNECT)</h4>
+                <h4 class="section-heading mt-4"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW VETO LAYER (3:15-3:25 PM LIVE FEED)</h4>
                 <div id="modalOrderFlowPanel" class="order-flow-panel-box" style="background:var(--glass-bg-soft);border:1px solid var(--gridline);border-radius:12px;padding:14px;margin-bottom:16px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
                         <div style="display:flex;align-items:center;gap:8px;">
@@ -1915,7 +1915,7 @@
                             <span id="modalOfHealthBadge" style="font-size:11px;font-weight:700;color:var(--bullish-green);"><i class="fa-solid fa-circle" style="font-size:8px;"></i> Ticker Live</span>
                         </div>
                         <div style="font-size:10px;font-weight:700;color:var(--ink-secondary);" id="modalOfSource">
-                            Source: Zerodha Kite Connect (5-Level Depth)
+                            Source: SmartAPI WebSocket (5-Level Depth)
                         </div>
                     </div>
                     <div style="font-size:12px;color:var(--ink-secondary);margin-bottom:12px;" id="modalOfReason">

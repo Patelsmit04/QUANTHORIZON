@@ -29,7 +29,7 @@ A quantitative algorithmic trading and market intelligence platform for the Indi
   - Authentic exchange quotes during market hours with off-market simulated dynamic micro-ticks.
 - **Multi-Timeframe SMC Scanner Engine (`smc_scanner.py`)**: Continuous background scanning across 1m, 3m, 5m, 15m, 1h, 4h, and 1d candles.
 - **9:15 AM Opening Gap Calibration Engine**: Grades yesterday's 3:25 PM picks against actual 9:15 AM opening ticks, calculating Prediction Variance Error, Accuracy Score %, and Jackpot/Win/Loss distribution.
-- **Zerodha Kite Order Flow & Staged Orders (`zerodha_order_flow_provider.py`)**: 3:15–3:25 PM closing aggression order flow tracking and structured broker order slips.
+- **SmartAPI Live Order Flow & Synthetic CVD (`synthetic_cvd_engine.py`)**: 3:15–3:25 PM closing aggression order flow tracking and structured broker order slips.
 - **Web Audio API Sound Synthesis**: Dual-frequency 587.33 Hz ($D_5$) to 880.00 Hz ($A_5$) sine wave chimes for real-time alerts.
 
 ---
@@ -43,7 +43,7 @@ A quantitative algorithmic trading and market intelligence platform for the Indi
 5. **Stocks News (`stocksNews`)**: Universe-wide stock news NLP sentiment analysis.
 6. **Global & Macro News (`globalNews`)**: S&P 500, India VIX, macro catalysts, and interest rate monitor.
 7. **Institutional Flow (`institutionalFlow`)**: Real-time NSE Bulk/Block deal tracker and FII/DII net flows.
-8. **Order Flow (`orderFlow`)**: Zerodha Kite tick-level closing aggression and delta volume analysis.
+8. **Order Flow (`orderFlow`)**: SmartAPI WebSocket tick-level closing aggression and synthetic delta volume analysis.
 9. **Accuracy & Win Rate (`accuracy`)**: Split accuracy performance (Stocks vs Indices) and win-rate trends.
 10. **History & Calibration (`history`)**: Historical ledger of locked trades and 9:15 AM realized gap scores.
 11. **Guide / Export / Settings (`guide`)**: Data export tools, manual controls, and platform documentation.
@@ -110,7 +110,7 @@ Access the dashboard at **http://127.0.0.1:8000**.
 | `/api/notifications` | `GET` | Strategy alerts, unread counts, and notification journal |
 | `/api/strategies` | `GET/POST` | Strategy management CRUD and activation toggles |
 | `/api/chart/{symbol}` | `GET` | Interactive candlestick OHLC data |
-| `/api/order_flow_all` | `GET` | Zerodha Kite order flow aggression analysis |
+| `/api/order_flow_all` | `GET` | SmartAPI / Tick-Rule order flow aggression analysis |
 | `/api/lock_picks` | `POST` | Manually triggers the 3:25 PM pick lock sequence |
 | `/api/evaluate_picks`| `POST` | Manually triggers 9:15 AM gap accuracy evaluation |
 | `/ws/live` | `WebSocket` | Real-time push stream for alerts, locks, and sequence steps |

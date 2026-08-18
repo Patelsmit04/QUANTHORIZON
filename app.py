@@ -2238,15 +2238,26 @@ def get_smc_backtest_report():
 
 @app.get("/api/order_flow/health")
 def get_order_flow_health():
-    """Returns pre-market token validity & health status for Zerodha Kite Connect API integration."""
-    from zerodha_order_flow_provider import check_kite_token_validity
-    return sanitize_json_data(check_kite_token_validity())
+    """Returns live stream validity & health status for Angel One / Synthetic CVD integration."""
+    import angel_one_provider as aop
+    from angel_ws_stream import angel_ws_stream
+    ws_status = angel_ws_stream.get_status()
+    session_status = aop.check_angel_session()
+    return sanitize_json_data({
+        "status": "ACTIVE" if (ws_status.get("connected") or session_status.get("logged_in")) else "SIMULATED_FALLBACK",
+        "valid": True,
+        "feed_mode": "ANGEL ONE WEBSOCKET" if ws_status.get("connected") else "SYNTHETIC INFERRED SIMULATOR",
+        "ws_connected": ws_status.get("connected", False),
+        "total_ticks": ws_status.get("total_ticks_processed", 0),
+        "subscribed_count": ws_status.get("subscribed_count", 0),
+        "message": "Live Angel One Level 2 feed active." if ws_status.get("connected") else "Operating in synthetic tick-rule inferred mode."
+    })
 
 
 @app.get("/api/order_flow/{symbol}")
 def get_symbol_order_flow(symbol: str):
     """Returns 3:15-3:25 PM order flow mini-bars, 5-level depth imbalance, and veto evaluation for a symbol."""
-    from zerodha_order_flow_provider import get_order_flow_data
+    from synthetic_cvd_engine import get_order_flow_data
     from order_flow_analyzer import check_closing_aggression
     clean_sym = symbol.replace(".NS", "").upper()
     of_data = get_order_flow_data(clean_sym)
@@ -2261,12 +2272,12 @@ def get_symbol_order_flow(symbol: str):
 @app.get("/api/order_flow_all")
 def get_all_order_flow():
     """Returns 3:15-3:25 PM order flow evaluation, 5-level depth imbalance, and mini-bars for all scanned stocks."""
-    from zerodha_order_flow_provider import get_order_flow_data, check_kite_token_validity
+    from synthetic_cvd_engine import get_order_flow_data
     from order_flow_analyzer import check_closing_aggression
+    from angel_ws_stream import angel_ws_stream
 
-    token_status = check_kite_token_validity()
-    is_feed_expired = (not token_status.get("valid", False)) and (token_status.get("status") == "EXPIRED_OR_INVALID")
-    is_simulated = token_status.get("status") == "PLACEHOLDER"
+    ws_status = angel_ws_stream.get_status()
+    is_live = ws_status.get("connected", False)
 
     scan_data = cache_store.get("scan_summary") or load_last_market_scan() or {}
     stocks = scan_data.get("stocks", [])
@@ -2277,22 +2288,8 @@ def get_all_order_flow():
         if not sym:
             continue
         of_data = get_order_flow_data(sym)
-        if is_feed_expired:
-            veto_eval = {
-                "verdict": "insufficient_data",
-                "reason": f"Kite Access Token expired or invalid — feed down ({token_status.get('message', '')}).",
-                "directional_bars_count": 0,
-                "depth_confirms": False,
-                "breadth_ok": False,
-                "confirms_day_trend": False
-            }
-        else:
-            veto_eval = check_closing_aggression(sym, of_data)
-
+        veto_eval = check_closing_aggression(sym, of_data)
         of_dict = of_data.to_dict()
-        if is_simulated:
-            of_dict["data_source"] = "INFERRED_SIMULATOR"
-            of_dict["is_simulated"] = True
 
         results.append({
             "symbol": sym,
@@ -2306,13 +2303,17 @@ def get_all_order_flow():
             "order_flow_data": of_dict
         })
 
-    confirmed_cnt = 0 if is_feed_expired else sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed")
-    vetoed_cnt = 0 if is_feed_expired else sum(1 for r in results if r["veto_evaluation"].get("verdict") == "vetoed")
-    against_trend_cnt = 0 if is_feed_expired else sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed_against_trend")
-    insufficient_cnt = len(results) if is_feed_expired else sum(1 for r in results if r["veto_evaluation"].get("verdict") == "insufficient_data")
+    confirmed_cnt = sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed")
+    vetoed_cnt = sum(1 for r in results if r["veto_evaluation"].get("verdict") == "vetoed")
+    against_trend_cnt = sum(1 for r in results if r["veto_evaluation"].get("verdict") == "confirmed_against_trend")
+    insufficient_cnt = sum(1 for r in results if r["veto_evaluation"].get("verdict") == "insufficient_data")
 
     return sanitize_json_data({
-        "feed_health": token_status,
+        "feed_health": {
+            "status": "ACTIVE" if is_live else "SIMULATED",
+            "feed_mode": "SMARTAPI WEBSOCKET" if is_live else "TICK-RULE SIMULATOR",
+            "ws_connected": is_live
+        },
         "total_evaluated": len(results),
         "confirmed_count": confirmed_cnt,
         "vetoed_count": vetoed_cnt,
