@@ -141,6 +141,8 @@ async def lifespan(app_instance: FastAPI):
         eval_thread.start()
         live_ticker_thread = threading.Thread(target=live_price_ticker_worker, daemon=True)
         live_ticker_thread.start()
+        gift_ticker_thread = threading.Thread(target=gift_nifty_live_ticker_worker, daemon=True, name="GiftNiftyTickerWorker")
+        gift_ticker_thread.start()
         closing_thread = threading.Thread(target=closing_sequence_worker, daemon=True)
         closing_thread.start()
         premarket_thread = threading.Thread(target=premarket_scheduler_worker, daemon=True)
@@ -1520,7 +1522,54 @@ def run_scheduler_tick() -> Dict[str, Any]:
 
 
 # -------------------------------------------------------------
-# DEDICATED 10-SECOND LIVE PRICE TICKER WORKER THREAD
+# DEDICATED 1-SECOND GIFT NIFTY LIVE TICKER WORKER THREAD
+# -------------------------------------------------------------
+def gift_nifty_live_ticker_worker():
+    """
+    Dedicated 1-second real-time ticker worker for GIFT Nifty (Sessions 1 & 2).
+    Session 1: 06:15 AM - 03:40 PM IST | Session 2: 03:58 PM - 04:00 AM IST.
+    Writes directly to fast_cache and broadcasts WebSocket events every 1 second.
+    """
+    logger.info("Starting Dedicated 1-Second GIFT Nifty Live Ticker Worker Thread...")
+    while not shutdown_event.is_set():
+        try:
+            ist_now = get_ist_now()
+            from index_scoring import is_gift_nifty_trading_active, fetch_gift_nifty_live
+            is_gift_active, gift_session, gift_meta = is_gift_nifty_trading_active(ist_now)
+
+            if is_gift_active:
+                gift_live = fetch_gift_nifty_live()
+                if gift_live:
+                    fast_cache.set("index:GIFTNIFTY:quote", gift_live)
+
+                    current_indices = cache_store.get("index_data") or []
+                    idx_dict = {idx.get("index_name"): idx for idx in current_indices if isinstance(idx, dict)}
+                    idx_dict["GIFTNIFTY"] = gift_live
+                    cache_store["index_data"] = list(idx_dict.values())
+
+                    live_map = cache_store.get("live_prices_map") or {}
+                    live_map["GIFTNIFTY"] = {
+                        "symbol": "GIFTNIFTY",
+                        "ltp": gift_live.get("ltp"),
+                        "prev_close": gift_live.get("prev_close"),
+                        "change_pts": gift_live.get("change_pts"),
+                        "pct_change": gift_live.get("pct_change"),
+                        "session_info": gift_meta
+                    }
+                    cache_store["live_prices_map"] = live_map
+                    ws_broadcast.broadcast_sync({
+                        "type": "index_tick",
+                        "index": gift_live,
+                        "session": gift_session
+                    })
+        except Exception as gift_ex:
+            logger.debug(f"[GIFTNiftyWorker] Fast tick notice: {gift_ex}")
+
+        time.sleep(1)
+
+
+# -------------------------------------------------------------
+# DEDICATED DOMESTIC LIVE PRICE TICKER WORKER THREAD
 # -------------------------------------------------------------
 def live_price_ticker_worker():
     """
@@ -1542,41 +1591,6 @@ def live_price_ticker_worker():
             ist_now = get_ist_now()
             today_date = ist_now.strftime("%Y-%m-%d")
             now_time = time.time()
-
-            from index_scoring import is_gift_nifty_trading_active, fetch_gift_nifty_live
-            is_gift_active, gift_session, gift_meta = is_gift_nifty_trading_active(ist_now)
-
-            # -------------------------------------------------------------
-            # DEDICATED 5-SECOND GIFT NIFTY LIVE TICKER (SESSIONS 1 & 2)
-            # Session 1: 06:15 AM - 03:40 PM IST | Session 2: 03:58 PM - 04:00 AM IST
-            # Never locked or stopped when domestic equity market closes at 3:30 PM.
-            # -------------------------------------------------------------
-            if is_gift_active or first_run:
-                try:
-                    gift_live = fetch_gift_nifty_live()
-                    if gift_live:
-                        current_indices = cache_store.get("index_data") or []
-                        idx_dict = {idx.get("index_name"): idx for idx in current_indices if isinstance(idx, dict)}
-                        idx_dict["GIFTNIFTY"] = gift_live
-                        cache_store["index_data"] = list(idx_dict.values())
-
-                        live_map = cache_store.get("live_prices_map") or {}
-                        live_map["GIFTNIFTY"] = {
-                            "symbol": "GIFTNIFTY",
-                            "ltp": gift_live.get("ltp"),
-                            "prev_close": gift_live.get("prev_close"),
-                            "change_pts": gift_live.get("change_pts"),
-                            "pct_change": gift_live.get("pct_change"),
-                            "session_info": gift_meta
-                        }
-                        cache_store["live_prices_map"] = live_map
-                        ws_broadcast.broadcast_sync({
-                            "type": "index_tick",
-                            "index": gift_live,
-                            "session": gift_session
-                        })
-                except Exception as gift_ex:
-                    logger.debug(f"[LiveTickerWorker] GIFT Nifty fast tick warning: {gift_ex}")
 
             # Regular Equity Market Ticker (09:15 AM - 03:30 PM IST)
             if sched_info["is_open"] or first_run or "live_prices_map" not in cache_store:
@@ -2520,6 +2534,25 @@ def get_live_prices():
                     "pct_change": idx.get("pct_change"),
                     "prev_close": idx.get("prev_close"),
                 })
+
+    # Guarantee GIFTNIFTY is in index_prices from fast_cache
+    if not any(p.get("index_name") == "GIFTNIFTY" for p in index_prices):
+        gift_q = fast_cache.get("index:GIFTNIFTY:quote")
+        if not gift_q:
+            try:
+                from index_scoring import fetch_gift_nifty_live
+                gift_q = fetch_gift_nifty_live()
+            except Exception:
+                pass
+        if gift_q and isinstance(gift_q, dict):
+            index_prices.append({
+                "index_name": "GIFTNIFTY",
+                "display_name": "GIFT NIFTY",
+                "ltp": gift_q.get("ltp"),
+                "change_pts": gift_q.get("change_pts"),
+                "pct_change": gift_q.get("pct_change"),
+                "prev_close": gift_q.get("prev_close"),
+            })
 
     # 2. Stock prices: check fast_cache, cache_store, and persisted scan
     stock_prices_dict = {}

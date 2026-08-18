@@ -204,14 +204,27 @@ def is_gift_nifty_trading_active(ist_now: Optional[datetime] = None) -> Tuple[bo
 
 _last_gift_nifty_cache: Optional[Dict[str, Any]] = None
 _last_gift_nifty_time: float = 0.0
+_mc_session: Optional[Any] = None
+
+
+def _get_mc_session():
+    global _mc_session
+    if _mc_session is None:
+        _mc_session = requests.Session()
+        _mc_session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Connection': 'keep-alive',
+        })
+    return _mc_session
 
 
 def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
     """
     Fetch live Gift Nifty price & change with multi-provider resiliency:
-    Primary: Moneycontrol live index HTML scraper (wrapped in call_with_retry)
+    Primary: Moneycontrol live index HTML scraper with connection pooling
     Secondary: Yahoo Finance (GIFTNIFTY=F)
-    Maintains cached latest known price so feeds never return placeholder zeroes or lock unexpectedly.
+    Writes to fast_cache for zero-latency 1-second frontend delivery.
     """
     global _last_gift_nifty_cache, _last_gift_nifty_time
     now_ts = time.time()
@@ -219,13 +232,10 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
     is_active, session_code, session_meta = is_gift_nifty_trading_active(ist_now)
 
     url = "https://www.moneycontrol.com/indian-indices/gift-nifty-500000.html"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
-    }
 
     def _fetch_mc():
-        resp = requests.get(url, headers=headers, timeout=6)
+        s = _get_mc_session()
+        resp = s.get(url, timeout=3.5)
         resp.raise_for_status()
         html_str = resp.text
         p1 = r'>GIFT NIFTY</a>.*?</td>\s*<td>([\d,]+\.?\d*)</td>\s*<td><span class="([^"]+)">([-\d,]+\.?\d*)</span></td>\s*<td><span class="[^"]+">\(([-\d,]+\.?\d*)%\)</span>'
@@ -252,7 +262,7 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
         return None
 
     try:
-        mc_res = call_with_retry(_fetch_mc, label="Moneycontrol GIFT Nifty Scrape", retries=1, timeout=6.0)
+        mc_res = call_with_retry(_fetch_mc, label="Moneycontrol GIFT Nifty Scrape", retries=1, timeout=4.0)
         if mc_res:
             ltp, change_pts, pct_change = mc_res
             sig = "BTST (BUY)" if pct_change > 0.2 else ("STBT (SELL)" if pct_change < -0.2 else "NEUTRAL")
@@ -293,6 +303,13 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
             }
             _last_gift_nifty_cache = result
             _last_gift_nifty_time = now_ts
+
+            try:
+                from cache_layer import cache as fast_cache
+                fast_cache.set("index:GIFTNIFTY:quote", result)
+            except Exception:
+                pass
+
             return result
     except Exception as e:
         logger.debug(f"Moneycontrol GIFT Nifty scrape warning: {e}. Trying Yahoo Finance fallback...")

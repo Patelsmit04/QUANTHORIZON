@@ -4603,9 +4603,265 @@
         "healed_by": "AISentinel",
         "trigger": "auto_reconciliation"
       }
+    },
+    {
+      "timestamp": "2026-08-18 23:29:55 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:29:56 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 23:30:28 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:30:28 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 23:31:03 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:31:03 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 23:31:35 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:31:35 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 23:32:09 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:32:10 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 23:32:46 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:32:48 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 23:33:31 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:33:34 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 23:34:21 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:34:22 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
     }
   ],
   "errors": [],
   "warnings": [],
-  "last_health_check": "2026-08-18 23:29:23 IST"
+  "last_health_check": "2026-08-18 23:34:22 IST"
 }
