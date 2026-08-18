@@ -1767,10 +1767,13 @@ function initTradexoDashboard() {
                                 <div style="display: flex; gap: 8px; width: 100%; margin-top: 2px;">${bars}</div>
                             </div>
 
-                            <!-- Row 3: Single Styled View Details Button -->
-                            <div style="text-align: center; width: 100%;">
-                                <button class="btn btn-card-details" onclick="openStockModal('${escapeAttr(stock.symbol)}')" style="width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.5px; background: rgba(255, 255, 255, 0.04); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 999px; cursor: pointer; transition: all 0.2s ease;">
-                                    <i class="fa-solid fa-chart-line"></i> VIEW DETAILS
+                            <!-- Row 3: Action Buttons (View Details + Trade) -->
+                            <div style="display: flex; gap: 8px; width: 100%; align-items: center;">
+                                <button class="btn btn-card-details" onclick="openStockModal('${escapeAttr(stock.symbol)}')" style="flex: 1; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 700; background: rgba(255, 255, 255, 0.04); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 999px; cursor: pointer; transition: all 0.2s ease;">
+                                    <i class="fa-solid fa-chart-line"></i> DETAILS
+                                </button>
+                                <button class="btn btn-gold" onclick="event.stopPropagation(); openOrderTicketModal({ symbol: '${escapeAttr(stock.symbol)}', entry_price: ${stock.ltp || 100}, signal: '${escapeAttr(sigText)}', tp1: ${stock.target_1 || 0}, tp2: ${stock.target_2 || 0}, sl: ${stock.stop_loss || 0} })" style="flex: 1; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 800; border-radius: 999px; cursor: pointer; transition: all 0.2s ease;">
+                                    <i class="fa-solid fa-bolt"></i> TRADE
                                 </button>
                             </div>
 
@@ -2127,6 +2130,24 @@ function initTradexoDashboard() {
                         `;
                     }).join("");
                 }
+            }
+
+            // Attach Trade button handler in Stock Detail Drawer
+            const modalTradeBtn = document.getElementById("modalTradeBtn");
+            if (modalTradeBtn) {
+                modalTradeBtn.onclick = () => {
+                    if (stockModal) stockModal.classList.add("hidden");
+                    if (typeof openOrderTicketModal === "function") {
+                        openOrderTicketModal({
+                            symbol: summary.symbol || symbol,
+                            entry_price: summary.ltp || 100.0,
+                            signal: summary.signal || "BTST (BUY)",
+                            tp1: summary.target_1 || (summary.ltp * 1.02),
+                            tp2: summary.target_2 || (summary.ltp * 1.04),
+                            sl: summary.stop_loss || (summary.ltp * 0.985)
+                        });
+                    }
+                };
             }
 
             renderModalCandleChart(data.recent_candles || [], summary.vwap);
@@ -6070,7 +6091,10 @@ function getInstrumentLotSize(symbol) {
 window.openOrderTicketModal = function(setup) {
     currentOrderTicketSetup = setup || {};
     const modal = document.getElementById("orderTicketModal");
-    if (!modal) return;
+    if (!modal) {
+        console.error("Order Ticket Modal not found");
+        return;
+    }
 
     const sym = setup.symbol || "RELIANCE";
     const sig = setup.signal || "BTST (BUY)";
@@ -6114,6 +6138,7 @@ window.openOrderTicketModal = function(setup) {
     recalculateOrderTicketSizing();
 
     modal.classList.remove("hidden");
+    modal.style.display = "flex";
 };
 
 function setOrderExecutionMode(mode) {
@@ -6215,9 +6240,15 @@ function initOrderTicketEventListeners() {
     const closeBtn = document.getElementById("closeOrderTicketBtn");
     const modal = document.getElementById("orderTicketModal");
     if (closeBtn && modal) {
-        closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+        closeBtn.addEventListener("click", () => {
+            modal.classList.add("hidden");
+            modal.style.display = "none";
+        });
         modal.addEventListener("click", (e) => {
-            if (e.target === modal) modal.classList.add("hidden");
+            if (e.target === modal) {
+                modal.classList.add("hidden");
+                modal.style.display = "none";
+            }
         });
     }
 
@@ -6317,6 +6348,7 @@ function initOrderTicketEventListeners() {
                     const data = await res.json();
                     if (typeof showToast === 'function') showToast(`Order Executed: ${sym} (${qty} shares @ ₹${data.entry_price})`, 'success');
                     modal.classList.add("hidden");
+                    modal.style.display = "none";
                     fetchPaperPortfolio();
                 } else {
                     const err = await res.json();
@@ -6342,15 +6374,22 @@ window.openEditPositionModal = function(posId, tp1, tp2, sl, symbol) {
     document.getElementById("editPosSlInput").value = Number(sl || 0).toFixed(2);
 
     modal.classList.remove("hidden");
+    modal.style.display = "flex";
 };
 
 function initEditPositionEventListeners() {
     const closeBtn = document.getElementById("closeEditPosBtn");
     const modal = document.getElementById("editPositionModal");
     if (closeBtn && modal) {
-        closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+        closeBtn.addEventListener("click", () => {
+            modal.classList.add("hidden");
+            modal.style.display = "none";
+        });
         modal.addEventListener("click", (e) => {
-            if (e.target === modal) modal.classList.add("hidden");
+            if (e.target === modal) {
+                modal.classList.add("hidden");
+                modal.style.display = "none";
+            }
         });
     }
 
@@ -6377,6 +6416,7 @@ function initEditPositionEventListeners() {
                 if (res.ok) {
                     if (typeof showToast === 'function') showToast('Position levels updated successfully!', 'success');
                     modal.classList.add("hidden");
+                    modal.style.display = "none";
                     fetchPaperPortfolio();
                 } else {
                     const err = await res.json();

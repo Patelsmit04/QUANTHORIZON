@@ -69,6 +69,13 @@ from strategy_manager import DEFAULT_STRATEGY_ID, get_strategy, list_strategies,
 from execution_provider import execute_signal, get_paper_trades, get_paper_performance, get_staged_orders
 import system_health_monitor as health_monitor
 import system_control
+from cache_layer import cache as fast_cache
+import angel_one_provider
+from angel_ws_stream import angel_ws_stream
+import nse_scraper_workers
+
+# Shutdown event for NSE scraper workers
+_nse_worker_stop = threading.Event()
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -86,6 +93,46 @@ async def lifespan(app_instance: FastAPI):
 
     if not os.environ.get("VERCEL"):
         ws_broadcast.capture_event_loop()
+
+        # ─── Angel One SmartAPI + WebSocket Stream (Primary Live Feed) ───
+        try:
+            if angel_one_provider.is_configured():
+                logger.info("Angel One SmartAPI configured — initializing login + scrip master...")
+                smart_api = angel_one_provider.angel_login()
+                if smart_api:
+                    scrip_count = angel_one_provider.load_scrip_master()
+                    logger.info(f"Scrip Master loaded: {scrip_count} instruments.")
+                    angel_ws_stream.start()
+                    logger.info("Angel One WebSocket 2.0 stream started (primary live feed).")
+                else:
+                    logger.warning("Angel One login failed — falling back to yfinance polling.")
+            else:
+                logger.info(
+                    "Angel One SmartAPI not configured (set ANGEL_API_KEY, ANGEL_CLIENT_ID, "
+                    "ANGEL_PASSWORD, ANGEL_TOTP_SECRET in .env). Using yfinance polling fallback."
+                )
+        except Exception as e:
+            logger.warning(f"Angel One startup error (non-fatal, fallback active): {e}")
+
+        # ─── NSE Scraper Workers (Option Chain + Block Deals) ───
+        try:
+            oc_thread = threading.Thread(
+                target=nse_scraper_workers.run_option_chain_worker,
+                args=(_nse_worker_stop,), daemon=True, name="NSEOptionChainWorker"
+            )
+            oc_thread.start()
+            logger.info("NSE Option Chain scraper worker started (3-min cycle).")
+
+            bd_thread = threading.Thread(
+                target=nse_scraper_workers.run_block_deal_worker,
+                args=(_nse_worker_stop,), daemon=True, name="NSEBlockDealWorker"
+            )
+            bd_thread.start()
+            logger.info("NSE Block Deal scraper worker started (2:25 PM + 3:20 PM IST).")
+        except Exception as e:
+            logger.warning(f"NSE scraper workers startup error (non-fatal): {e}")
+
+        # ─── Existing Background Workers ───
         thread = threading.Thread(target=background_scheduler_worker, daemon=True)
         thread.start()
         eval_thread = threading.Thread(target=evaluation_scheduler_worker, daemon=True)
@@ -121,6 +168,9 @@ async def lifespan(app_instance: FastAPI):
         except Exception as e:
             logger.warning(f"Could not start Golden Path monitor: {e}")
     yield
+    # Shutdown all workers
+    _nse_worker_stop.set()
+    angel_ws_stream.stop()
     shutdown_event.set()
 
 
@@ -1472,12 +1522,13 @@ def run_scheduler_tick() -> Dict[str, Any]:
 # -------------------------------------------------------------
 def live_price_ticker_worker():
     """
-    Lightweight 10-second background ticker worker that runs continuously to update live LTP,
-    change_pts, and pct_change for indices and 210 F&O stocks in memory.
-    Index ticks refresh every 10s (with instant NSE Live fallback), stock ticks refresh every 25s.
-    Prevents Yahoo Finance IP rate limiting while keeping live marquee tape ultra-responsive.
+    FALLBACK live price ticker worker — only active when Angel One WebSocket is unavailable.
+    Uses yfinance polling (5-25s intervals) to update LTP/change for indices and F&O stocks.
+    Writes to BOTH cache_store (legacy) and fast_cache (new zero-latency cache layer).
+    When Angel One WebSocket IS connected, this worker still runs but its writes are
+    superseded by the 1-second WebSocket ticks in fast_cache.
     """
-    logger.info("Starting Dedicated Live Price Ticker Worker Thread...")
+    logger.info("Starting Dedicated Live Price Ticker Worker Thread (yfinance fallback)...")
     first_run = True
     daily_prev_closes: Dict[str, float] = {}
     last_daily_fetch_date: Optional[str] = None
@@ -1604,6 +1655,9 @@ def live_price_ticker_worker():
 
                     if idx_dict:
                         cache_store["index_data"] = list(idx_dict.values())
+                        # Also write to fast_cache for zero-latency API layer
+                        for ic, id_data in idx_dict.items():
+                            fast_cache.set(f"index:{ic}:quote", id_data)
 
                     # 2. Update Stock Ticks Every 5 Seconds
                     if now_time - last_stock_fetch_time >= 5.0:
@@ -1651,6 +1705,9 @@ def live_price_ticker_worker():
 
                             cache_store["live_prices_map"] = live_map
                             cache_store["live_prices_timestamp"] = time.time()
+                            # Also write to fast_cache for zero-latency API layer
+                            for sym_key, sym_data in live_map.items():
+                                fast_cache.set(f"stock:{sym_key}:quote", sym_data)
                 except Exception as e:
                     logger.warning(f"[LiveTickerWorker] Fast price tick warning: {e}")
 
@@ -2426,29 +2483,45 @@ def get_live_prices():
     and pct_change for all indices and stocks in <5ms without blocking HTTP worker threads."""
     now_ts = time.time()
 
-    # 1. Index prices from cache or default fallback
-    index_data = cache_store.get("index_data") or []
-    if not index_data:
-        index_data = [
-            {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24500.00, "change_pts": 125.40, "pct_change": 0.52, "prev_close": 24374.60},
-            {"index_name": "BANKNIFTY", "display_name": "BANKNIFTY", "ltp": 57500.00, "change_pts": 340.10, "pct_change": 0.60, "prev_close": 57159.90},
-            {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 80200.00, "change_pts": 410.20, "pct_change": 0.52, "prev_close": 79789.80},
-            {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24560.00, "change_pts": 145.00, "pct_change": 0.60, "prev_close": 24415.00},
-        ]
-
+    # 1. Index prices: check fast_cache first, then cache_store, then fallback
     index_prices = []
-    for idx in index_data:
-        if isinstance(idx, dict):
-            index_prices.append({
-                "index_name": idx.get("index_name", ""),
-                "display_name": idx.get("display_name", idx.get("index_name", "")),
-                "ltp": idx.get("ltp"),
-                "change_pts": idx.get("change_pts"),
-                "pct_change": idx.get("pct_change"),
-                "prev_close": idx.get("prev_close"),
-            })
+    fast_indices = fast_cache.get_index_quotes_snapshot()
+    if fast_indices:
+        for idx in fast_indices:
+            if isinstance(idx, dict):
+                index_prices.append({
+                    "index_name": idx.get("index_name", ""),
+                    "display_name": idx.get("display_name", idx.get("index_name", "")),
+                    "ltp": idx.get("ltp"),
+                    "change_pts": idx.get("change_pts"),
+                    "pct_change": idx.get("pct_change"),
+                    "prev_close": idx.get("prev_close"),
+                })
+    else:
+        index_data = cache_store.get("index_data") or []
+        if not index_data:
+            index_data = [
+                {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24500.00, "change_pts": 125.40, "pct_change": 0.52, "prev_close": 24374.60},
+                {"index_name": "BANKNIFTY", "display_name": "BANKNIFTY", "ltp": 57500.00, "change_pts": 340.10, "pct_change": 0.60, "prev_close": 57159.90},
+                {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 80200.00, "change_pts": 410.20, "pct_change": 0.52, "prev_close": 79789.80},
+                {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24560.00, "change_pts": 145.00, "pct_change": 0.60, "prev_close": 24415.00},
+            ]
 
-    # 2. Stock prices from cache_store or persisted last_market_scan
+        for idx in index_data:
+            if isinstance(idx, dict):
+                index_prices.append({
+                    "index_name": idx.get("index_name", ""),
+                    "display_name": idx.get("display_name", idx.get("index_name", "")),
+                    "ltp": idx.get("ltp"),
+                    "change_pts": idx.get("change_pts"),
+                    "pct_change": idx.get("pct_change"),
+                    "prev_close": idx.get("prev_close"),
+                })
+
+    # 2. Stock prices: check fast_cache, cache_store, and persisted scan
+    stock_prices_dict = {}
+
+    # Seed with persisted scan / cache_store
     stock_data = cache_store.get("data")
     if not stock_data:
         try:
@@ -2458,9 +2531,6 @@ def get_live_prices():
                 cache_store["data"] = stock_data
         except Exception:
             stock_data = []
-
-    live_map = cache_store.get("live_prices_map") or {}
-    stock_prices_dict = {}
 
     if stock_data:
         for s in stock_data:
@@ -2474,6 +2544,8 @@ def get_live_prices():
                     "prev_close": s.get("prev_close"),
                 }
 
+    # Overlay live_prices_map
+    live_map = cache_store.get("live_prices_map") or {}
     if live_map:
         for sym, s in live_map.items():
             if isinstance(s, dict):
@@ -2483,6 +2555,20 @@ def get_live_prices():
                     "change_pts": s.get("change_pts"),
                     "pct_change": s.get("pct_change"),
                     "prev_close": s.get("prev_close"),
+                }
+
+    # Overlay real-time fast_cache quotes (from Angel One WebSocket stream)
+    fast_quotes = fast_cache.get_stock_quotes_snapshot()
+    if fast_quotes:
+        for fq in fast_quotes:
+            if isinstance(fq, dict) and fq.get("symbol"):
+                sym = fq["symbol"]
+                stock_prices_dict[sym] = {
+                    "symbol": sym,
+                    "ltp": fq.get("ltp"),
+                    "change_pts": fq.get("change_pts"),
+                    "pct_change": fq.get("pct_change"),
+                    "prev_close": fq.get("prev_close"),
                 }
 
     stock_prices = list(stock_prices_dict.values())
@@ -2524,6 +2610,38 @@ def get_live_prices():
         "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
     })
 
+
+@app.get("/api/option-chain/{index_name}")
+def get_cached_option_chain(index_name: str):
+    """Zero-latency endpoint for index option chain — returns cached snapshot (<5ms)."""
+    clean_name = index_name.upper().strip()
+    # Map synonyms: NIFTY50 -> NIFTY, BANKNIFTY -> BANKNIFTY
+    mapped_key = "NIFTY" if clean_name in ("NIFTY", "NIFTY50", "^NSEI") else clean_name
+    chain = fast_cache.get(f"oc:{mapped_key}:chain")
+    if not chain:
+        # Fallback to direct fetch
+        try:
+            from options_chain_provider import fetch_index_option_chain
+            chain = fetch_index_option_chain(clean_name)
+        except Exception as e:
+            logger.warning(f"Option chain fallback error for {index_name}: {e}")
+
+    if not chain:
+        raise HTTPException(status_code=404, detail=f"Option chain data currently unavailable for {index_name}")
+
+    return sanitize_json_data(chain)
+
+
+@app.get("/api/block-deals")
+def get_cached_block_deals():
+    """Zero-latency endpoint for ₹25+ Crore institutional block deals — returns cached snapshot."""
+    deals = fast_cache.get("block_deals:today", [])
+    return sanitize_json_data({
+        "deals": deals,
+        "count": len(deals),
+        "total_value_cr": round(sum(d.get("value_cr", 0) for d in deals), 2),
+        "as_of": get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST")
+    })
 
 
 @app.get("/api/closing_sequence/status")

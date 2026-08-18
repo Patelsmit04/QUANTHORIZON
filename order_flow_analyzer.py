@@ -11,7 +11,7 @@ Detects:
 
 import logging
 from typing import Dict, Any
-from zerodha_order_flow_provider import OrderFlowData
+from synthetic_cvd_engine import OrderFlowData
 
 logger = logging.getLogger("OrderFlowAnalyzer")
 

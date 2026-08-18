@@ -125,5 +125,99 @@
     "symbols_only_in_archive": [],
     "value_mismatches": [],
     "status": "CLEAN"
+  },
+  {
+    "date": "2026-08-18",
+    "run_at": "2026-08-18T21:10:00.435779+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 16,
+    "archive_symbol_count": null,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "ARCHIVE_UNAVAILABLE"
+  },
+  {
+    "date": "2026-08-18",
+    "run_at": "2026-08-18T21:12:38.899112+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 16,
+    "archive_symbol_count": null,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "ARCHIVE_UNAVAILABLE"
+  },
+  {
+    "date": "2026-08-18",
+    "run_at": "2026-08-18T21:16:02.554516+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 16,
+    "archive_symbol_count": 16,
+    "symbols_only_in_live": [
+      "DHOOTTRANS",
+      "EMBASSY",
+      "EXPLEOSOL",
+      "LASERPOWER",
+      "LEAPIND",
+      "MOLBIO",
+      "MOREPENLAB",
+      "PONNIERODE",
+      "TFCILTD",
+      "VIKRAMSOLR",
+      "VINYAS"
+    ],
+    "symbols_only_in_archive": [
+      "ATALREAL",
+      "CYIENT",
+      "ICIL",
+      "JINDRILL",
+      "NELCO",
+      "NXT-INFRA",
+      "PAYTM",
+      "SBC",
+      "SOUTHWEST",
+      "SUBEXLTD",
+      "WELINV"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "KERNEX",
+        "live_net_value_cr": 6.61,
+        "archive_net_value_cr": -0.87
+      },
+      {
+        "symbol": "MOTISONS",
+        "live_net_value_cr": 1.1,
+        "archive_net_value_cr": -17.82
+      },
+      {
+        "symbol": "RATNAVEER",
+        "live_net_value_cr": -16.57,
+        "archive_net_value_cr": 1.54
+      },
+      {
+        "symbol": "STYLEBAAZA",
+        "live_net_value_cr": 0.0,
+        "archive_net_value_cr": -42.16
+      },
+      {
+        "symbol": "ZAGGLE",
+        "live_net_value_cr": 11.54,
+        "archive_net_value_cr": 32.06
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
+  },
+  {
+    "date": "2026-08-18",
+    "run_at": "2026-08-18T21:15:17.384177+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 16,
+    "archive_symbol_count": null,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "ARCHIVE_UNAVAILABLE"
   }
 ]

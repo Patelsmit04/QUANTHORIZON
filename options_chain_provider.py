@@ -52,6 +52,18 @@ def fetch_index_option_chain(index_name: str) -> Optional[Dict[str, Any]]:
         logger.warning(f"[{index_name}] No verified NSE option-chain source for this index — skipping (not faking data).")
         return None
 
+    # Cache-first: check fast_cache (populated by nse_scraper_workers every 3 min)
+    try:
+        from cache_layer import cache as fast_cache
+        # NSE scraper uses "NIFTY"/"BANKNIFTY" keys; this function uses "NIFTY50"/"BANKNIFTY"
+        cache_key = f"oc:{nse_symbol}:chain"
+        cached = fast_cache.get(cache_key)
+        if cached and isinstance(cached, dict) and cached.get("strikes"):
+            logger.debug(f"Option chain served from fast_cache: {index_name}")
+            return cached
+    except Exception:
+        pass
+
     client = _get_client()
     if client is None:
         return None

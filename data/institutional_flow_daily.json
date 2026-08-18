@@ -6949,8 +6949,8 @@
         "as_of": "2026-08-18T17:36:00.911339+05:30"
       }
     },
-    "last_checkpoint": "final_check",
-    "last_updated": "2026-08-18T17:44:16.227163+05:30",
+    "last_checkpoint": "eod_archive",
+    "last_updated": "2026-08-18T21:16:02.811316+05:30",
     "deals_by_checkpoint": {
       "live_trigger": [
         {
@@ -7979,6 +7979,840 @@
           "deal_date": "17-Aug-2026",
           "as_of": "2026-08-18T17:44:16.179527+05:30"
         }
+      ],
+      "eod_archive": [
+        {
+          "symbol": "PAYTM",
+          "side": "SELL",
+          "value_cr": 2948.944,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "SELL",
+          "value_cr": 2948.944,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 435.9684,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 422.0854,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 346.1651,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 222.5895,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 211.0839,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "NXT-INFRA",
+          "side": "SELL",
+          "value_cr": 200.6696,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "NXT-INFRA",
+          "side": "BUY",
+          "value_cr": 199.0014,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 142.7643,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 99.0098,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 92.7973,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 88.2682,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 88.2682,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 84.4336,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 70.9856,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 70.6146,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ICIL",
+          "side": "SELL",
+          "value_cr": 66.6717,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ICIL",
+          "side": "BUY",
+          "value_cr": 66.6165,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 63.3252,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 63.123,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 62.7624,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 62.7098,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 50.0826,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "BUY",
+          "value_cr": 49.7349,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "SELL",
+          "value_cr": 49.3912,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 46.9458,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "CYIENT",
+          "side": "SELL",
+          "value_cr": 45.4783,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 37.6574,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 37.5863,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 37.3791,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 36.9138,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "BUY",
+          "value_cr": 32.944,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 31.2617,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 31.2469,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 31.1902,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 30.702,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 29.1669,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 29.1669,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "MOTISONS",
+          "side": "SELL",
+          "value_cr": 29.1597,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 27.4206,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "MOTISONS",
+          "side": "BUY",
+          "value_cr": 27.3085,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "STYLEBAAZA",
+          "side": "SELL",
+          "value_cr": 26.8234,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 26.7651,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 26.753,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "NELCO",
+          "side": "SELL",
+          "value_cr": 26.6079,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 26.173,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 23.794,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 21.5219,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 21.4906,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "SELL",
+          "value_cr": 20.4841,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "BUY",
+          "value_cr": 20.3369,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "BUY",
+          "value_cr": 19.646,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "KERNEX",
+          "side": "BUY",
+          "value_cr": 18.9197,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "KERNEX",
+          "side": "SELL",
+          "value_cr": 18.8746,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "SELL",
+          "value_cr": 18.776,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 18.4244,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "KERNEX",
+          "side": "SELL",
+          "value_cr": 18.3219,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 17.7841,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 17.7393,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "WELINV",
+          "side": "BUY",
+          "value_cr": 17.4743,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "KERNEX",
+          "side": "BUY",
+          "value_cr": 17.407,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "SUBEXLTD",
+          "side": "BUY",
+          "value_cr": 16.6461,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "BUY",
+          "value_cr": 16.5708,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 16.0569,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "SELL",
+          "value_cr": 15.833,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "STYLEBAAZA",
+          "side": "SELL",
+          "value_cr": 15.341,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "SELL",
+          "value_cr": 15.2071,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "MOTISONS",
+          "side": "SELL",
+          "value_cr": 14.904,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 14.7445,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "BUY",
+          "value_cr": 14.4314,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 13.8159,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 13.2444,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "SOUTHWEST",
+          "side": "SELL",
+          "value_cr": 12.9235,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 12.8905,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 12.8548,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "MOTISONS",
+          "side": "SELL",
+          "value_cr": 12.6076,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "BUY",
+          "value_cr": 12.5495,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 12.5247,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 12.5,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 12.5,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "NELCO",
+          "side": "BUY",
+          "value_cr": 12.4543,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 12.2829,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "BUY",
+          "value_cr": 12.0904,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "SELL",
+          "value_cr": 12.0897,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "SELL",
+          "value_cr": 11.9435,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 11.8237,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "MOTISONS",
+          "side": "BUY",
+          "value_cr": 11.5463,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "NELCO",
+          "side": "SELL",
+          "value_cr": 11.5085,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 11.4258,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 11.4181,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "NELCO",
+          "side": "BUY",
+          "value_cr": 11.4179,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "SELL",
+          "value_cr": 11.2645,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 11.0527,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 11.0047,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "SUBEXLTD",
+          "side": "SELL",
+          "value_cr": 10.6941,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ATALREAL",
+          "side": "SELL",
+          "value_cr": 10.4577,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "SELL",
+          "value_cr": 10.3995,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "JINDRILL",
+          "side": "BUY",
+          "value_cr": 10.389,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "SBC",
+          "side": "BUY",
+          "value_cr": 10.3494,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "BUY",
+          "value_cr": 10.2857,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ATALREAL",
+          "side": "SELL",
+          "value_cr": 10.1605,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "ATALREAL",
+          "side": "BUY",
+          "value_cr": 10.0473,
+          "deal_type": "bulk",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        },
+        {
+          "symbol": "PAYTM",
+          "side": "BUY",
+          "value_cr": 10.0004,
+          "deal_type": "block",
+          "deal_date": "18-AUG-2026",
+          "as_of": "2026-08-18T21:16:02.798434+05:30"
+        }
       ]
     },
     "final_check": {
@@ -8205,6 +9039,233 @@
         "dominant_side": "SELL",
         "tier": "MODERATE",
         "as_of": "2026-08-18T17:44:16.179527+05:30"
+      }
+    },
+    "eod_archive": {
+      "ATALREAL": {
+        "symbol": "ATALREAL",
+        "buy_value_cr": 10.05,
+        "sell_value_cr": 20.62,
+        "buy_count": 1,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -10.57,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "ICIL": {
+        "symbol": "ICIL",
+        "buy_value_cr": 66.62,
+        "sell_value_cr": 66.67,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.06,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "JINDRILL": {
+        "symbol": "JINDRILL",
+        "buy_value_cr": 297.59,
+        "sell_value_cr": 294.98,
+        "buy_count": 12,
+        "sell_count": 12,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 2.61,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "KERNEX": {
+        "symbol": "KERNEX",
+        "buy_value_cr": 36.33,
+        "sell_value_cr": 37.2,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.87,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "MOTISONS": {
+        "symbol": "MOTISONS",
+        "buy_value_cr": 38.85,
+        "sell_value_cr": 56.67,
+        "buy_count": 2,
+        "sell_count": 3,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -17.82,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "NELCO": {
+        "symbol": "NELCO",
+        "buy_value_cr": 23.87,
+        "sell_value_cr": 38.12,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -14.24,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "NXT-INFRA": {
+        "symbol": "NXT-INFRA",
+        "buy_value_cr": 199.0,
+        "sell_value_cr": 200.67,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -1.67,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "RATNAVEER": {
+        "symbol": "RATNAVEER",
+        "buy_value_cr": 99.19,
+        "sell_value_cr": 97.65,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.54,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "SBC": {
+        "symbol": "SBC",
+        "buy_value_cr": 10.35,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.35,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "SUBEXLTD": {
+        "symbol": "SUBEXLTD",
+        "buy_value_cr": 16.65,
+        "sell_value_cr": 10.69,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 5.95,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "WELINV": {
+        "symbol": "WELINV",
+        "buy_value_cr": 17.47,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 17.47,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "ZAGGLE": {
+        "symbol": "ZAGGLE",
+        "buy_value_cr": 89.4,
+        "sell_value_cr": 57.34,
+        "buy_count": 5,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 32.06,
+        "dominant_side": "BUY",
+        "tier": "MODERATE",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "CYIENT": {
+        "symbol": "CYIENT",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 45.48,
+        "buy_count": 0,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -45.48,
+        "dominant_side": "SELL",
+        "tier": "MODERATE",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "PAYTM": {
+        "symbol": "PAYTM",
+        "buy_value_cr": 2912.47,
+        "sell_value_cr": 5897.89,
+        "buy_count": 33,
+        "sell_count": 2,
+        "deal_types": [
+          "block",
+          "bulk"
+        ],
+        "net_value_cr": -2985.42,
+        "dominant_side": "SELL",
+        "tier": "STRONG",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "SOUTHWEST": {
+        "symbol": "SOUTHWEST",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 12.92,
+        "buy_count": 0,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -12.92,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
+      },
+      "STYLEBAAZA": {
+        "symbol": "STYLEBAAZA",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 42.16,
+        "buy_count": 0,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -42.16,
+        "dominant_side": "SELL",
+        "tier": "MODERATE",
+        "as_of": "2026-08-18T21:16:02.798434+05:30"
       }
     }
   }

@@ -1865,7 +1865,12 @@
                     <h2 id="modalSymbol">RELIANCE</h2>
                     <span id="modalSignalBadge" class="badge">BTST (BUY)</span>
                 </div>
-                <button id="closeModalBtn" class="modal-close-btn">&times;</button>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <button id="modalTradeBtn" class="btn btn-sm btn-pill btn-gold" style="font-weight:800;padding:6px 16px;">
+                        <i class="fa-solid fa-bolt"></i> TRADE
+                    </button>
+                    <button id="closeModalBtn" class="modal-close-btn">&times;</button>
+                </div>
             </div>
 
             <div class="modal-body">
@@ -1877,7 +1882,7 @@
                     </div>
                     <div class="modal-metrics-grid">
                         <div class="metric-item">
-                            <span class="lbl">RANK & TIER</span>
+                            <span class="lbl">RANK &amp; TIER</span>
                             <span id="modalRankTier" class="val text-amber">#1 (TIER 1)</span>
                         </div>
                         <div class="metric-item">
@@ -1961,6 +1966,8 @@
                 </div>
             </div>
         </div>
+    </div>
+
     <!-- ============================== INSTITUTIONAL ORDER TICKET MODAL ============================== -->
     <div id="orderTicketModal" class="modal-overlay hidden" style="z-index: 1000000;">
         <div class="modal-card" style="max-width: 480px; width: 100%; border: 1px solid rgba(245, 158, 11, 0.35); box-shadow: 0 20px 60px rgba(0,0,0,0.85); background: #0c1017;">
