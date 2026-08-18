@@ -4537,6 +4537,8 @@ function initTradexoDashboard() {
                     console.error('[TRADEXO] Notification permission error:', e);
                 }
             });
+        }
+
         const sendTestAlertBtn = document.getElementById("sendTestAlertBtn");
         if (sendTestAlertBtn) {
             sendTestAlertBtn.addEventListener("click", async () => {

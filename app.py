@@ -3658,7 +3658,7 @@ if __name__ == "__main__":
 
     try:
         uvicorn.run(
-            "app:app",
+            app,
             host=host,
             port=port,
             log_level="info"
