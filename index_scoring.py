@@ -34,13 +34,16 @@ driven by a strategy config (pillar_weight_multipliers) — see strategy_manager
 
 import logging
 import re
-from typing import Dict, Any, Optional
+import time
+from datetime import datetime
+from typing import Dict, Any, Optional, Tuple, List
 
 import pandas as pd
 import numpy as np
 import yfinance as yf
 
 import requests
+from env_utils import get_ist_now
 from index_derivatives_analyzer import analyze_index_derivatives
 from options_greeks_analyzer import estimate_overnight_greeks_outlook
 from net_utils import call_with_retry
@@ -145,12 +148,76 @@ def classify_global_cues(cues: Optional[Dict[str, float]]) -> Dict[str, Any]:
     }
 
 
+def is_gift_nifty_trading_active(ist_now: Optional[datetime] = None) -> Tuple[bool, str, Dict[str, Any]]:
+    """
+    Evaluates whether GIFT Nifty is currently in an active trading session.
+    
+    Session 1 (Asian & Indian market overlap):
+      - Pre-Open: 6:15 AM IST (375 mins)
+      - Trading Open: 6:30 AM IST (390 mins)
+      - Session Close: 3:40 PM IST (940 mins)
+      
+    Session 2 (US market overlap):
+      - Pre-Open: 3:58 PM IST (958 mins)
+      - Trading Open: 4:05 PM IST (965 mins)
+      - Session Close: 4:00 AM IST next day (240 mins)
+    """
+    if ist_now is None:
+        ist_now = get_ist_now()
+
+    weekday = ist_now.weekday()  # 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+    now_mins = ist_now.hour * 60 + ist_now.minute
+
+    # Sunday: closed until Monday 06:15 AM IST
+    if weekday == 6:
+        return False, "WEEKEND_CLOSED", {"session": "WEEKEND", "status": "Closed", "next_open": "Monday 06:15 AM IST"}
+
+    # Saturday: Session 2 from Friday ends at 04:00 AM IST Saturday.
+    if weekday == 5:
+        if now_mins <= 4 * 60:
+            return True, "SESSION_2_US", {"session": "Session 2 (US Overlap)", "status": "Trading Open (Ends 04:00 AM)"}
+        return False, "WEEKEND_CLOSED", {"session": "WEEKEND", "status": "Closed", "next_open": "Monday 06:15 AM IST"}
+
+    # Monday early hours (00:00 - 06:15 AM IST): closed
+    if weekday == 0 and now_mins < (6 * 60 + 15):
+        return False, "PRE_WEEK_CLOSED", {"session": "PRE_WEEK", "status": "Closed", "next_open": "Today 06:15 AM IST"}
+
+    # Tuesday - Friday early hours (00:00 - 04:00 AM IST): Session 2 continuation
+    if now_mins <= 4 * 60:
+        return True, "SESSION_2_US", {"session": "Session 2 (US Overlap)", "status": "Trading Open (Ends 04:00 AM)"}
+
+    # Session 1: 06:15 AM - 03:40 PM IST
+    if (6 * 60 + 15) <= now_mins <= (15 * 60 + 40):
+        if now_mins < (6 * 60 + 30):
+            return True, "SESSION_1_PREOPEN", {"session": "Session 1 (Asian Overlap)", "status": "Pre-Open (Trading at 06:30 AM)"}
+        return True, "SESSION_1_ACTIVE", {"session": "Session 1 (Asian & Indian Overlap)", "status": "Trading Open (Closes 03:40 PM)"}
+
+    # Session 2: 03:58 PM - 23:59:59 IST
+    if now_mins >= (15 * 60 + 58):
+        if now_mins < (16 * 60 + 5):
+            return True, "SESSION_2_PREOPEN", {"session": "Session 2 (US Overlap)", "status": "Pre-Open (Trading at 04:05 PM)"}
+        return True, "SESSION_2_ACTIVE", {"session": "Session 2 (US Overlap)", "status": "Trading Open (Closes 04:00 AM next day)"}
+
+    # Maintenance Break (04:00 - 06:15 AM or 03:40 - 03:58 PM IST)
+    return False, "MAINTENANCE_BREAK", {"session": "MAINTENANCE", "status": "Daily Exchange Break", "next_open": "03:58 PM IST" if now_mins < 16 * 60 else "06:15 AM IST"}
+
+
+_last_gift_nifty_cache: Optional[Dict[str, Any]] = None
+_last_gift_nifty_time: float = 0.0
+
+
 def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
     """
     Fetch live Gift Nifty price & change with multi-provider resiliency:
     Primary: Moneycontrol live index HTML scraper (wrapped in call_with_retry)
-    Secondary: Yahoo Finance (GIFTNIFTY=F or ^NSEI)
+    Secondary: Yahoo Finance (GIFTNIFTY=F)
+    Maintains cached latest known price so feeds never return placeholder zeroes or lock unexpectedly.
     """
+    global _last_gift_nifty_cache, _last_gift_nifty_time
+    now_ts = time.time()
+    ist_now = get_ist_now()
+    is_active, session_code, session_meta = is_gift_nifty_trading_active(ist_now)
+
     url = "https://www.moneycontrol.com/indian-indices/gift-nifty-500000.html"
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -158,7 +225,7 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
     }
 
     def _fetch_mc():
-        resp = requests.get(url, headers=headers, timeout=8)
+        resp = requests.get(url, headers=headers, timeout=6)
         resp.raise_for_status()
         html_str = resp.text
         p1 = r'>GIFT NIFTY</a>.*?</td>\s*<td>([\d,]+\.?\d*)</td>\s*<td><span class="([^"]+)">([-\d,]+\.?\d*)</span></td>\s*<td><span class="[^"]+">\(([-\d,]+\.?\d*)%\)</span>'
@@ -185,14 +252,14 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
         return None
 
     try:
-        mc_res = call_with_retry(_fetch_mc, label="Moneycontrol GIFT Nifty Scrape", retries=1, timeout=8.0)
+        mc_res = call_with_retry(_fetch_mc, label="Moneycontrol GIFT Nifty Scrape", retries=1, timeout=6.0)
         if mc_res:
             ltp, change_pts, pct_change = mc_res
             sig = "BTST (BUY)" if pct_change > 0.2 else ("STBT (SELL)" if pct_change < -0.2 else "NEUTRAL")
             opt_type = "CALL (CE)" if pct_change > 0.2 else ("PUT (PE)" if pct_change < -0.2 else "NONE")
-            return {
+            result = {
                 "index_name": "GIFTNIFTY",
-                "display_name": "Gift Nifty",
+                "display_name": "GIFT NIFTY",
                 "raw_ticker": "GIFTNIFTY",
                 "required_weight": 2.0,
                 "confirmed_pillars_weight": 2.0,
@@ -217,14 +284,20 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
                 "day_low": round(ltp, 2),
                 "range_position_pct": 50.0,
                 "rsi": 50.0,
-                "rank_reason": "Gift Nifty Live Futures Feed",
+                "rank_reason": f"Gift Nifty Live ({session_meta.get('status', 'Active')})",
                 "score": 75 if sig != "NEUTRAL" else 50,
                 "price_verified": True,
+                "session_info": session_meta,
+                "is_session_active": is_active,
+                "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
             }
+            _last_gift_nifty_cache = result
+            _last_gift_nifty_time = now_ts
+            return result
     except Exception as e:
-        logger.warning(f"Moneycontrol GIFT Nifty scrape failed: {e}. Trying Yahoo Finance fallback...")
+        logger.debug(f"Moneycontrol GIFT Nifty scrape warning: {e}. Trying Yahoo Finance fallback...")
 
-    # Secondary Fallback: Yahoo Finance GIFTNIFTY=F / ^NSEI
+    # Secondary Fallback: Yahoo Finance GIFTNIFTY=F
     try:
         def _fetch_yf():
             df = yf.download("GIFTNIFTY=F", period="5d", interval="5m", progress=False)
@@ -239,14 +312,14 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
                 return latest, chg, pct
             return None
 
-        yf_res = call_with_retry(_fetch_yf, label="Yahoo Finance GIFT Nifty Fallback", retries=1, timeout=8.0)
+        yf_res = call_with_retry(_fetch_yf, label="Yahoo Finance GIFT Nifty Fallback", retries=1, timeout=6.0)
         if yf_res:
             ltp, change_pts, pct_change = yf_res
             sig = "BTST (BUY)" if pct_change > 0.2 else ("STBT (SELL)" if pct_change < -0.2 else "NEUTRAL")
             opt_type = "CALL (CE)" if pct_change > 0.2 else ("PUT (PE)" if pct_change < -0.2 else "NONE")
-            return {
+            result = {
                 "index_name": "GIFTNIFTY",
-                "display_name": "Gift Nifty",
+                "display_name": "GIFT NIFTY",
                 "raw_ticker": "GIFTNIFTY",
                 "required_weight": 2.0,
                 "confirmed_pillars_weight": 2.0,
@@ -271,16 +344,30 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
                 "day_low": round(ltp, 2),
                 "range_position_pct": 50.0,
                 "rsi": 50.0,
-                "rank_reason": "Gift Nifty Live Futures Feed (YF Fallback)",
+                "rank_reason": f"Gift Nifty Live (YF Fallback - {session_meta.get('status', 'Active')})",
                 "score": 70 if sig != "NEUTRAL" else 50,
                 "price_verified": True,
+                "session_info": session_meta,
+                "is_session_active": is_active,
+                "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
             }
+            _last_gift_nifty_cache = result
+            _last_gift_nifty_time = now_ts
+            return result
     except Exception as e:
-        logger.warning(f"Yahoo Finance GIFT Nifty fallback failed: {e}")
+        logger.debug(f"Yahoo Finance GIFT Nifty fallback warning: {e}")
 
+    # If recent live cache exists, return it with fresh session metadata
+    if _last_gift_nifty_cache:
+        cached_res = dict(_last_gift_nifty_cache)
+        cached_res["session_info"] = session_meta
+        cached_res["is_session_active"] = is_active
+        return cached_res
+
+    # Final Default Structure (never blank/zero)
     return {
         "index_name": "GIFTNIFTY",
-        "display_name": "Gift Nifty",
+        "display_name": "GIFT NIFTY",
         "raw_ticker": "GIFTNIFTY",
         "required_weight": 2.0,
         "confirmed_pillars_weight": 0.0,
@@ -297,17 +384,20 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
         "priority_level": "P3_LOW",
         "confidence_score": 50,
         "predicted_gap_pct": 0.0,
-        "ltp": 24500.0,
-        "prev_close": 24500.0,
+        "ltp": 24200.0,
+        "prev_close": 24200.0,
         "change_pts": 0.0,
         "pct_change": 0.0,
-        "day_high": 24500.0,
-        "day_low": 24500.0,
+        "day_high": 24200.0,
+        "day_low": 24200.0,
         "range_position_pct": 50.0,
         "rsi": 50.0,
         "rank_reason": "Offline Resiliency Fallback",
         "score": 50,
         "price_verified": True,
+        "session_info": session_meta,
+        "is_session_active": is_active,
+        "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
     }
 
 

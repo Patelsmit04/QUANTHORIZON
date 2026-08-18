@@ -1,18 +1,10 @@
 {
   "today_date": "2026-08-18",
-  "cold_starts": [
-    {
-      "timestamp": "2026-08-18 18:33:35 IST",
-      "is_market_hours": false,
-      "details": {
-        "platform": "Render/Local"
-      }
-    }
-  ],
+  "cold_starts": [],
   "market_transitions": [],
   "evaluations": [
     {
-      "timestamp": "2026-08-18 18:30:44 IST",
+      "timestamp": "2026-08-18 18:58:38 IST",
       "evaluated_count": 0,
       "wins": 0,
       "losses": 0,
@@ -26,14 +18,14 @@
   ],
   "locks": [
     {
-      "timestamp": "2026-08-18 18:30:45 IST",
+      "timestamp": "2026-08-18 18:58:39 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-18 18:30:45 IST",
+      "timestamp": "2026-08-18 18:58:39 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
@@ -58,14 +50,14 @@
       }
     },
     {
-      "timestamp": "2026-08-18 18:30:53 IST",
+      "timestamp": "2026-08-18 18:58:47 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-18 18:30:53 IST",
+      "timestamp": "2026-08-18 18:58:47 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
@@ -90,14 +82,14 @@
       }
     },
     {
-      "timestamp": "2026-08-18 18:31:00 IST",
+      "timestamp": "2026-08-18 18:58:54 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-18 18:31:01 IST",
+      "timestamp": "2026-08-18 18:58:55 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
@@ -122,110 +114,7 @@
       }
     },
     {
-      "timestamp": "2026-08-18 18:33:42 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-18 18:33:42 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "AUROPHARMA",
-        "BOSCHLTD",
-        "MFSL",
-        "NBCC",
-        "PETRONET",
-        "PIDILITIND",
-        "BHARTIARTL",
-        "INFY",
-        "PFIZER",
-        "NYKAA",
-        "PAGEIND",
-        "PAYTM",
-        "TMPV",
-        "ULTRACEMCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-18 18:34:17 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-18 18:34:17 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "AUROPHARMA",
-        "BOSCHLTD",
-        "MFSL",
-        "NBCC",
-        "PETRONET",
-        "PIDILITIND",
-        "BHARTIARTL",
-        "INFY",
-        "PFIZER",
-        "NYKAA",
-        "PAGEIND",
-        "PAYTM",
-        "TMPV",
-        "ULTRACEMCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-18 18:35:42 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-18 18:37:51 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "AUROPHARMA",
-        "BOSCHLTD",
-        "MFSL",
-        "NBCC",
-        "PETRONET",
-        "PIDILITIND",
-        "BHARTIARTL",
-        "INFY",
-        "PFIZER",
-        "NYKAA",
-        "PAGEIND",
-        "PAYTM",
-        "TMPV",
-        "ULTRACEMCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-18 18:39:16 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-18 18:41:24 IST",
+      "timestamp": "2026-08-18 18:59:10 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
@@ -252,5 +141,5 @@
   ],
   "errors": [],
   "warnings": [],
-  "last_health_check": "2026-08-18 18:41:24 IST"
+  "last_health_check": "2026-08-18 18:59:10 IST"
 }

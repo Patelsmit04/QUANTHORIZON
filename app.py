@@ -1490,6 +1490,42 @@ def live_price_ticker_worker():
             today_date = ist_now.strftime("%Y-%m-%d")
             now_time = time.time()
 
+            from index_scoring import is_gift_nifty_trading_active, fetch_gift_nifty_live
+            is_gift_active, gift_session, gift_meta = is_gift_nifty_trading_active(ist_now)
+
+            # -------------------------------------------------------------
+            # DEDICATED 5-SECOND GIFT NIFTY LIVE TICKER (SESSIONS 1 & 2)
+            # Session 1: 06:15 AM - 03:40 PM IST | Session 2: 03:58 PM - 04:00 AM IST
+            # Never locked or stopped when domestic equity market closes at 3:30 PM.
+            # -------------------------------------------------------------
+            if is_gift_active or first_run:
+                try:
+                    gift_live = fetch_gift_nifty_live()
+                    if gift_live:
+                        current_indices = cache_store.get("index_data") or []
+                        idx_dict = {idx.get("index_name"): idx for idx in current_indices if isinstance(idx, dict)}
+                        idx_dict["GIFTNIFTY"] = gift_live
+                        cache_store["index_data"] = list(idx_dict.values())
+
+                        live_map = cache_store.get("live_prices_map") or {}
+                        live_map["GIFTNIFTY"] = {
+                            "symbol": "GIFTNIFTY",
+                            "ltp": gift_live.get("ltp"),
+                            "prev_close": gift_live.get("prev_close"),
+                            "change_pts": gift_live.get("change_pts"),
+                            "pct_change": gift_live.get("pct_change"),
+                            "session_info": gift_meta
+                        }
+                        cache_store["live_prices_map"] = live_map
+                        ws_broadcast.broadcast_sync({
+                            "type": "index_tick",
+                            "index": gift_live,
+                            "session": gift_session
+                        })
+                except Exception as gift_ex:
+                    logger.debug(f"[LiveTickerWorker] GIFT Nifty fast tick warning: {gift_ex}")
+
+            # Regular Equity Market Ticker (09:15 AM - 03:30 PM IST)
             if sched_info["is_open"] or first_run or "live_prices_map" not in cache_store:
                 first_run = False
                 try:
@@ -1507,7 +1543,7 @@ def live_price_ticker_worker():
                         daily_prev_closes = _get_daily_prev_closes(all_t)
                         last_daily_fetch_date = today_date
 
-                    # 1. Update Index Ticks Every 5 Seconds
+                    # 1. Update Domestic Index Ticks Every 5 Seconds
                     idx_download_df = call_with_retry(
                         lambda: yf.download(tickers=list(idx_ticker_map.keys()), period="2d", interval="1m", group_by="ticker", progress=False, threads=True),
                         label="live index 5s ticker download",
@@ -1540,7 +1576,6 @@ def live_price_ticker_worker():
                                 if chain and chain.get("verified") and chain.get("underlying_value"):
                                     nse_underlying = float(chain["underlying_value"])
                                     if nse_underlying > 0:
-                                        # Use NSE underlying spot value directly if yfinance is missing or outdated
                                         if ltp is None or abs(ltp - nse_underlying) > 1000.0:
                                             ltp = nse_underlying
                             except Exception as ex:
