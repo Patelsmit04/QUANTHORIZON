@@ -114,6 +114,12 @@ async def lifespan(app_instance: FastAPI):
             logger.info("Autonomous TRADEXO AI Sentinel watchdog started on app startup.")
         except Exception as e:
             logger.warning(f"Could not start AI Sentinel on startup: {e}")
+        try:
+            from golden_path_logger import golden_path_monitor
+            golden_path_monitor.start()
+            logger.info("Golden Path live data verification monitor started on app startup.")
+        except Exception as e:
+            logger.warning(f"Could not start Golden Path monitor: {e}")
     yield
     shutdown_event.set()
 
@@ -1423,8 +1429,10 @@ def run_scheduler_tick() -> Dict[str, Any]:
             if step_ran:
                 logger.info(f"[Closing Sequence] Ran step: {step_ran}")
 
-        if cache_store["scan_summary"] is None:
-            logger.info("Initial off-market startup with empty cache. Running single snapshot scan...")
+        scan_summary = cache_store.get("scan_summary")
+        is_scan_stale = scan_summary is None or (today_date not in str(scan_summary.get("timestamp", "")))
+        if is_scan_stale and ist_now.weekday() not in [5, 6] and time_in_mins < (15 * 60 + 14):
+            logger.info("Scan summary is empty or stale from prior day. Running fresh snapshot scan...")
             run_full_scan_pipeline()
 
         # Once-daily fundamentals refresh (off-market hours only — fundamentals don't
@@ -2974,6 +2982,26 @@ def api_health_check():
         "service": "TRADEXO Engine",
         "timestamp": get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST")
     }
+
+
+@app.get("/api/golden_path/status")
+def api_get_golden_path_status():
+    """Returns real-time Golden Path data fidelity logs and accuracy telemetry."""
+    from golden_path_logger import golden_path_monitor
+    return sanitize_json_data(golden_path_monitor.get_summary())
+
+
+@app.post("/api/golden_path/probe_now")
+def api_trigger_golden_path_probe():
+    """Manually triggers an on-demand Golden Path accuracy probe."""
+    from golden_path_logger import golden_path_monitor
+    res = golden_path_monitor.execute_accuracy_probe()
+    golden_path_monitor._record_probe(res)
+    return sanitize_json_data({
+        "status": "SUCCESS",
+        "probe": res,
+        "summary": golden_path_monitor.get_summary()
+    })
 
 
 # -------------------------------------------------------------

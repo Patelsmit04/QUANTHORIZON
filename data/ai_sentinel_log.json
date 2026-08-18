@@ -262,10 +262,208 @@
       "all_verified": true,
       "resulting_score": 100,
       "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-18 18:18:57 IST",
+      "trigger": "phase1_diag",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 3,
+          "action": "AUTO_REFRESH_MARKET_SCAN",
+          "timestamp": "2026-08-18 18:21:23 IST",
+          "total_scanned": 210,
+          "description": "Refreshed full 5-Pillar scan for 210 stocks (6 BTST / 8 STBT).",
+          "verified": true
+        },
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 14,
+          "win_rate_pct": 33.3,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (14 trades graded, 33.3% win rate) and reconciled milestone.",
+          "verified": true,
+          "accuracy_pipeline_check": {
+            "status": "PASS",
+            "pre_total": 4,
+            "post_total": 18,
+            "delta": 14,
+            "expected": 14,
+            "tolerance": 2
+          }
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 94,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-18 18:28:56 IST",
+      "trigger": "pytest_1",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 33.3,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 33.3% win rate) and reconciled milestone.",
+          "verified": true,
+          "accuracy_pipeline_check": {
+            "status": "PASS",
+            "pre_total": 18,
+            "post_total": 18,
+            "delta": 0,
+            "expected": 0,
+            "tolerance": 2
+          }
+        },
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 14,
+          "symbols": [
+            "AUROPHARMA",
+            "BOSCHLTD",
+            "MFSL",
+            "NBCC",
+            "PETRONET",
+            "PIDILITIND",
+            "BHARTIARTL",
+            "INFY",
+            "PFIZER",
+            "NYKAA",
+            "PAGEIND",
+            "PAYTM",
+            "TMPV",
+            "ULTRACEMCO"
+          ],
+          "description": "Auto-locked 14 high-conviction candidates (['AUROPHARMA', 'BOSCHLTD', 'MFSL']) into persistent journal.",
+          "verified": true
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-18 18:30:34 IST",
+      "trigger": "pytest_1",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 33.3,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 33.3% win rate) and reconciled milestone.",
+          "verified": true,
+          "accuracy_pipeline_check": {
+            "status": "PASS",
+            "pre_total": 18,
+            "post_total": 18,
+            "delta": 0,
+            "expected": 0,
+            "tolerance": 2
+          }
+        },
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "AUROPHARMA",
+            "BOSCHLTD",
+            "MFSL",
+            "NBCC",
+            "PETRONET",
+            "PIDILITIND",
+            "BHARTIARTL",
+            "INFY",
+            "PFIZER",
+            "NYKAA",
+            "PAGEIND",
+            "PAYTM",
+            "TMPV",
+            "ULTRACEMCO"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['AUROPHARMA', 'BOSCHLTD', 'MFSL']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-18 18:30:53 IST",
+      "trigger": "pytest_2",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "AUROPHARMA",
+            "BOSCHLTD",
+            "MFSL",
+            "NBCC",
+            "PETRONET",
+            "PIDILITIND",
+            "BHARTIARTL",
+            "INFY",
+            "PFIZER",
+            "NYKAA",
+            "PAGEIND",
+            "PAYTM",
+            "TMPV",
+            "ULTRACEMCO"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['AUROPHARMA', 'BOSCHLTD', 'MFSL']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-18 18:31:00 IST",
+      "trigger": "pytest_expanded_test",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "AUROPHARMA",
+            "BOSCHLTD",
+            "MFSL",
+            "NBCC",
+            "PETRONET",
+            "PIDILITIND",
+            "BHARTIARTL",
+            "INFY",
+            "PFIZER",
+            "NYKAA",
+            "PAGEIND",
+            "PAYTM",
+            "TMPV",
+            "ULTRACEMCO"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['AUROPHARMA', 'BOSCHLTD', 'MFSL']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
     }
   ],
-  "total_fixes_applied": 13,
-  "last_healing_pass": "2026-08-17 20:06:10 IST",
+  "total_fixes_applied": 21,
+  "last_healing_pass": "2026-08-18 18:31:00 IST",
   "last_score": 100,
-  "last_all_verified": true
+  "last_all_verified": false
 }

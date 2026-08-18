@@ -275,7 +275,12 @@ class AISentinelEngine:
         else:
             stocks = scan_data.get("stocks", [])
             if len(stocks) >= 5:
-                sample = stocks[:6]
+                # Sample from spread-out positions to avoid false positives from
+                # sorted/grouped lists (e.g. top-6 stocks all have same confidence
+                # because they're all P1_HIGH with the same scoring band).
+                import random
+                sample_indices = [0, len(stocks)//4, len(stocks)//2, 3*len(stocks)//4, len(stocks)-1, len(stocks)//3]
+                sample = [stocks[min(i, len(stocks)-1)] for i in sample_indices]
                 # B. Anti-Stub Check: confidence_score
                 conf_scores = [s.get("confidence_score") for s in sample if s.get("confidence_score") is not None]
                 if len(conf_scores) >= 4 and len(set(conf_scores)) == 1 and conf_scores[0] != 0:
@@ -356,11 +361,18 @@ class AISentinelEngine:
         ist_now = get_ist_now()
         now_mins = ist_now.hour * 60 + ist_now.minute
         is_market_hours = ist_now.weekday() < 5 and (9 * 60 + 15) <= now_mins <= (15 * 60 + 30)
-        if is_market_hours and scan_data and scan_data.get("stocks"):
-            price_findings = self._probe_price_accuracy(scan_data["stocks"][:3])
-            findings.extend(price_findings)
-            if price_findings:
-                score -= min(20, len(price_findings) * 10)
+        if is_market_hours:
+            if scan_data and scan_data.get("stocks"):
+                price_findings = self._probe_price_accuracy(scan_data["stocks"][:3])
+                findings.extend(price_findings)
+                if price_findings:
+                    score -= min(20, len(price_findings) * 10)
+
+            # Phase 2: Live Index Price Accuracy Check
+            index_findings = self._probe_live_index_accuracy()
+            findings.extend(index_findings)
+            if index_findings:
+                score -= min(25, len(index_findings) * 15)
 
         return {
             "name": "Data Integrity & Anti-Stub",
@@ -436,6 +448,55 @@ class AISentinelEngine:
                         })
         except Exception as e:
             logger.debug(f"[AI SENTINEL] Price accuracy probe warning: {e}")
+        return findings
+
+    def _probe_live_index_accuracy(self) -> List[Dict[str, Any]]:
+        """Phase 2: Live Index Price Accuracy Probe.
+        Cross-checks displayed live index LTPs against independent live NSE option chain spot values."""
+        findings = []
+        try:
+            from app import cache_store
+            current_indices = cache_store.get("index_data") or []
+            idx_dict = {idx.get("index_name"): idx for idx in current_indices if isinstance(idx, dict)}
+
+            from options_chain_provider import fetch_index_option_chain
+            for idx_code in ("NIFTY50", "BANKNIFTY"):
+                cached_entry = idx_dict.get(idx_code)
+                if not cached_entry:
+                    continue
+
+                cached_ltp = cached_entry.get("ltp")
+                if not cached_ltp or cached_ltp <= 0:
+                    findings.append({
+                        "category": "data_integrity",
+                        "code": f"LIVE_INDEX_ZERO_LTP_{idx_code}",
+                        "title": f"Live Index {idx_code} Has Invalid LTP ({cached_ltp})",
+                        "severity": "CRITICAL",
+                        "reason": f"Displayed index LTP is zero or missing in live cache.",
+                        "can_auto_heal": False
+                    })
+                    continue
+
+                try:
+                    chain = fetch_index_option_chain(idx_code)
+                    if chain and chain.get("verified") and chain.get("underlying_value"):
+                        nse_underlying = float(chain["underlying_value"])
+                        if nse_underlying > 0:
+                            diff_pts = abs(cached_ltp - nse_underlying)
+                            diff_pct = (diff_pts / nse_underlying) * 100
+                            if diff_pct > 1.0:
+                                findings.append({
+                                    "category": "data_integrity",
+                                    "code": f"LIVE_INDEX_DIVERGENCE_{idx_code}",
+                                    "title": f"Live Index Price Divergence: {idx_code} (App={cached_ltp:.2f} vs NSE={nse_underlying:.2f}, {diff_pct:.2f}%)",
+                                    "severity": "WARNING",
+                                    "reason": f"Displayed live index price diverges by {diff_pts:.1f} pts ({diff_pct:.2f}%) from verified NSE spot feed.",
+                                    "can_auto_heal": False
+                                })
+                except Exception as ex:
+                    logger.debug(f"[AI SENTINEL] Live index probe error for {idx_code}: {ex}")
+        except Exception as e:
+            logger.debug(f"[AI SENTINEL] Live index accuracy probe warning: {e}")
         return findings
 
     def _audit_frontend_apis(self) -> Dict[str, Any]:
@@ -1148,59 +1209,88 @@ class AISentinelEngine:
         is_weekday = ist_now.weekday() < 5
         now_mins = ist_now.hour * 60 + ist_now.minute
 
-        # If weekday after 15:35 IST and no lock has been logged today
-        if is_weekday and now_mins >= (15 * 60 + 35):
-            from system_health_monitor import _load_health_data, log_lock_event
-            health_data = _load_health_data(check_rollover=False)
-            locks = health_data.get("locks", [])
+        # Only act on weekdays after 15:35 IST
+        if not (is_weekday and now_mins >= (15 * 60 + 35)):
+            return actions
 
-            if not locks:
-                try:
-                    from app import _run_closing_lock_sequence, _snapshot_ready_stocks, cache_store, run_full_scan_pipeline
-                    logger.info("[AI SENTINEL] Auto-reconciling missed 3:30 PM closing lock...")
-                    today_date = ist_now.strftime("%Y-%m-%d")
-                    stocks = _snapshot_ready_stocks(today_date)
-                    if not stocks:
-                        scan_file = os.path.join(DATA_DIR, "last_market_scan.json")
-                        scan_data = read_json(scan_file, default={})
-                        stocks = scan_data.get("stocks", [])
-                    if not stocks:
-                        stocks = cache_store.get("data", [])
-                    if not stocks:
-                        scan_res = run_full_scan_pipeline()
-                        stocks = scan_res.get("stocks", [])
+        from system_health_monitor import _load_health_data, log_lock_event
 
-                    valid_picks = [s for s in stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
-                    if not valid_picks:
-                        valid_picks = stocks[:5] if stocks else []
+        # IDEMPOTENCY GUARD: Check the closing sequence's own state file first.
+        # If the closing sequence already ran its lock step today (even with 0 picks),
+        # the sentinel must NOT duplicate it — that was the race condition causing
+        # the Aug-18 inconsistency where lock_done=True + locked_count=0 masked
+        # the real problem (stale scan) and made the sentinel think healing succeeded.
+        cs_state_file = os.path.join(DATA_DIR, "closing_sequence_state.json")
+        cs_state = read_json(cs_state_file, default={})
+        today_str = ist_now.strftime("%Y-%m-%d")
 
-                    lock_res = _run_closing_lock_sequence(valid_picks)
-                    locked_count = lock_res.get("locked_count", len(valid_picks))
-                    symbols = lock_res.get("symbols", [s.get("symbol") for s in valid_picks if s.get("symbol")])
+        if cs_state.get("date") == today_str and cs_state.get("lock_done"):
+            cs_locked = (cs_state.get("lock_result") or {}).get("locked_count", 0)
+            if cs_locked > 0:
+                # Closing sequence ran AND locked picks — nothing to reconcile
+                logger.info(f"[AI SENTINEL] Closing sequence already locked {cs_locked} pick(s) today — skipping Step 5.")
+                return actions
+            else:
+                # Closing sequence ran but locked ZERO picks — this is the stale-scan
+                # scenario. The scan should have been refreshed by now (Step 3 or the
+                # closing_sequence's own freshness guard). Try to lock from fresh data.
+                logger.warning(f"[AI SENTINEL] Closing sequence ran today but locked 0 picks — attempting sentinel recovery lock with fresh scan data.")
 
-                    log_lock_event(
-                        lock_type="AI_SENTINEL_330_RECONCILIATION",
-                        locked_count=locked_count,
-                        symbols=symbols,
-                        details={"healed_by": "AISentinel", "trigger": "auto_reconciliation"}
-                    )
+        # Also check health log — if a non-zero lock already exists, skip
+        health_data = _load_health_data(check_rollover=False)
+        locks = health_data.get("locks", [])
+        has_nonzero_lock = any(lk.get("locked_count", 0) > 0 for lk in locks)
+        if has_nonzero_lock:
+            logger.info("[AI SENTINEL] Health log already has a non-zero lock event today — skipping Step 5.")
+            return actions
 
-                    # Self-verify: confirm lock event is now logged in health data
-                    post_health = _load_health_data(check_rollover=False)
-                    verified = len(post_health.get("locks", [])) > 0
+        try:
+            from app import _run_closing_lock_sequence, cache_store, run_full_scan_pipeline
+            logger.info("[AI SENTINEL] Auto-reconciling missed 3:30 PM closing lock...")
 
-                    action_item = {
-                        "step": 5,
-                        "action": "AUTO_RECONCILE_330_LOCK",
-                        "locked_count": locked_count,
-                        "symbols": symbols,
-                        "description": f"Auto-locked {locked_count} high-conviction candidates ({symbols[:3]}) into persistent journal.",
-                        "verified": verified
-                    }
-                    actions.append(action_item)
-                    logger.info(f"[AI SENTINEL] 3:30 PM closing lock auto-reconciled successfully. Verified: {verified}.")
-                except Exception as lock_err:
-                    logger.warning(f"[AI SENTINEL] Could not auto-reconcile closing lock: {lock_err}")
+            # Get fresh scan data (Step 3 should have refreshed it already)
+            scan_file = os.path.join(DATA_DIR, "last_market_scan.json")
+            scan_data = read_json(scan_file, default={})
+            stocks = scan_data.get("stocks", [])
+
+            if not stocks:
+                stocks = cache_store.get("data", [])
+            if not stocks:
+                scan_res = run_full_scan_pipeline()
+                stocks = scan_res.get("stocks", [])
+
+            valid_picks = [s for s in stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
+            if not valid_picks:
+                logger.warning("[AI SENTINEL] Step 5: No BTST/STBT picks found in scan data — cannot lock zero candidates.")
+                return actions
+
+            lock_res = _run_closing_lock_sequence(valid_picks)
+            locked_count = lock_res.get("locked_count", len(valid_picks))
+            symbols = [s.get("symbol") for s in valid_picks if s.get("symbol")]
+
+            log_lock_event(
+                lock_type="AI_SENTINEL_330_RECONCILIATION",
+                locked_count=locked_count,
+                symbols=symbols,
+                details={"healed_by": "AISentinel", "trigger": "auto_reconciliation"}
+            )
+
+            # Self-verify: confirm lock event is now logged in health data
+            post_health = _load_health_data(check_rollover=False)
+            verified = any(lk.get("locked_count", 0) > 0 for lk in post_health.get("locks", []))
+
+            action_item = {
+                "step": 5,
+                "action": "AUTO_RECONCILE_330_LOCK",
+                "locked_count": locked_count,
+                "symbols": symbols,
+                "description": f"Auto-locked {locked_count} high-conviction candidates ({symbols[:3]}) into persistent journal.",
+                "verified": verified
+            }
+            actions.append(action_item)
+            logger.info(f"[AI SENTINEL] 3:30 PM closing lock auto-reconciled successfully. Verified: {verified}.")
+        except Exception as lock_err:
+            logger.warning(f"[AI SENTINEL] Could not auto-reconcile closing lock: {lock_err}")
         return actions
 
     # --------------------------------------------------------------------------

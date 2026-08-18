@@ -1,5 +1,5 @@
 {
-  "date": "2026-08-17",
+  "date": "2026-08-18",
   "snapshot_done": true,
   "auto_lock_25_done": true,
   "final_bell_30_done": true,
@@ -11,7 +11,7 @@
   "cas_close_prices": {},
   "lock_result": {
     "locked_count": 0,
-    "total_today_locked": 1
+    "total_today_locked": 0
   },
   "lock_timestamp": null,
   "btst_status": "confirmed"

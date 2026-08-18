@@ -111,18 +111,37 @@ def get_today_state(today_date: str) -> Dict[str, Any]:
 
 
 def _step_snapshot(state: Dict[str, Any], get_current_stocks: Callable[[], List[Dict[str, Any]]]) -> None:
+    from env_utils import get_ist_now as _get_ist_now
+
+    # Guard: if the cached scan is from a previous day, force a refresh BEFORE
+    # snapshotting — otherwise we freeze stale candidates and the entire closing
+    # sequence locks zero picks.  This was the root cause of the Aug-18 failure:
+    # process ran 24h+ without a fresh scan, so snapshot_picks was [].
+    today_str = _get_ist_now().strftime("%Y-%m-%d")
+    scan_data = read_json(os.path.join(DATA_DIR, "last_market_scan.json"), default={})
+    scan_ts = scan_data.get("timestamp", "")
+    if today_str not in scan_ts:
+        logger.warning(f"[Closing Sequence] Scan is stale (from '{scan_ts}') — forcing refresh before snapshot.")
+        try:
+            from app import run_full_scan_pipeline
+            refresh_res = run_full_scan_pipeline()
+            logger.info(f"[Closing Sequence] Pre-snapshot scan refresh completed: {refresh_res.get('total_scanned', 0)} stocks.")
+        except Exception as e:
+            logger.warning(f"[Closing Sequence] Pre-snapshot scan refresh failed: {e}")
+
     current_stocks = get_current_stocks() or []
     candidates = [s for s in current_stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
 
     if not candidates:
+        # Fallback: try reading directly from the (now possibly refreshed) scan file
         try:
-            from scoring_engine import run_full_scan_pipeline
-            logger.info("[Closing Sequence] Initial snapshot candidate list empty — running fallback scan pipeline...")
-            scan_res = run_full_scan_pipeline()
-            fresh_stocks = scan_res.get("stocks", [])
+            fresh_scan = read_json(os.path.join(DATA_DIR, "last_market_scan.json"), default={})
+            fresh_stocks = fresh_scan.get("stocks", [])
             candidates = [s for s in fresh_stocks if "BTST" in s.get("signal", "") or "STBT" in s.get("signal", "")]
             if not candidates and fresh_stocks:
                 candidates = fresh_stocks[:5]
+            if candidates:
+                logger.info(f"[Closing Sequence] Recovered {len(candidates)} candidate(s) from scan file fallback.")
         except Exception as e:
             logger.warning(f"[Closing Sequence] Fallback candidate scan failed: {e}")
 

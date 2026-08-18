@@ -34,5 +34,68 @@
     "errors_count": 0,
     "errors": [],
     "market_transitions": []
+  },
+  "2026-08-17": {
+    "date": "2026-08-17",
+    "generated_at": "2026-08-18 17:30:25 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-08-17 20:06:19 IST",
+          "evaluated_count": 0,
+          "wins": 0,
+          "losses": 0,
+          "win_rate_pct": 75.0,
+          "status": "SUCCESS",
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_backfill"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-08-17 20:06:20 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-08-17 20:06:21 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "ITC",
+            "LT",
+            "TATASTEEL",
+            "CAMS",
+            "CDSL",
+            "IEX",
+            "JIOFIN",
+            "LTF",
+            "METROPOLIS",
+            "SUNPHARMA",
+            "TCS",
+            "ADANIENSOL",
+            "TATATECH"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
   }
 }

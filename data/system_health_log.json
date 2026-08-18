@@ -1,14 +1,14 @@
 {
-  "today_date": "2026-08-17",
+  "today_date": "2026-08-18",
   "cold_starts": [],
   "market_transitions": [],
   "evaluations": [
     {
-      "timestamp": "2026-08-17 20:06:19 IST",
+      "timestamp": "2026-08-18 18:30:44 IST",
       "evaluated_count": 0,
       "wins": 0,
       "losses": 0,
-      "win_rate_pct": 75.0,
+      "win_rate_pct": 33.3,
       "status": "SUCCESS",
       "details": {
         "healed_by": "AISentinel",
@@ -18,30 +18,95 @@
   ],
   "locks": [
     {
-      "timestamp": "2026-08-17 20:06:20 IST",
+      "timestamp": "2026-08-18 18:30:45 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-17 20:06:21 IST",
+      "timestamp": "2026-08-18 18:30:45 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "ITC",
-        "LT",
-        "TATASTEEL",
-        "CAMS",
-        "CDSL",
-        "IEX",
-        "JIOFIN",
-        "LTF",
-        "METROPOLIS",
-        "SUNPHARMA",
-        "TCS",
-        "ADANIENSOL",
-        "TATATECH"
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 18:30:53 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 18:30:53 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 18:31:00 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 18:31:01 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -51,5 +116,5 @@
   ],
   "errors": [],
   "warnings": [],
-  "last_health_check": "2026-08-17 20:06:21 IST"
+  "last_health_check": "2026-08-18 18:31:01 IST"
 }
