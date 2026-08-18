@@ -96,20 +96,22 @@ async def lifespan(app_instance: FastAPI):
 
         # ─── Angel One SmartAPI + WebSocket Stream (Primary Live Feed) ───
         try:
+            if angel_one_provider.has_api_key():
+                scrip_count = angel_one_provider.load_scrip_master()
+                logger.info(f"Angel One Scrip Master loaded: {scrip_count} instruments indexed.")
+
             if angel_one_provider.is_configured():
-                logger.info("Angel One SmartAPI configured — initializing login + scrip master...")
+                logger.info("Angel One SmartAPI credentials present — initializing login...")
                 smart_api = angel_one_provider.angel_login()
                 if smart_api:
-                    scrip_count = angel_one_provider.load_scrip_master()
-                    logger.info(f"Scrip Master loaded: {scrip_count} instruments.")
                     angel_ws_stream.start()
                     logger.info("Angel One WebSocket 2.0 stream started (primary live feed).")
                 else:
                     logger.warning("Angel One login failed — falling back to yfinance polling.")
             else:
                 logger.info(
-                    "Angel One SmartAPI not configured (set ANGEL_API_KEY, ANGEL_CLIENT_ID, "
-                    "ANGEL_PASSWORD, ANGEL_TOTP_SECRET in .env). Using yfinance polling fallback."
+                    "Angel One running in Hybrid Free Data Mode (Fast In-Memory Cache + NSE Direct Scrapers + Live Ticker Feed). "
+                    "For full 1-second WebSocket streaming, also provide ANGEL_CLIENT_ID, ANGEL_PASSWORD, and ANGEL_TOTP_SECRET."
                 )
         except Exception as e:
             logger.warning(f"Angel One startup error (non-fatal, fallback active): {e}")

@@ -1,9 +1,9 @@
 {
-  "total_probes": 83,
-  "matching_probes": 83,
+  "total_probes": 84,
+  "matching_probes": 84,
   "divergent_probes": 0,
   "accuracy_rate_pct": 100.0,
-  "last_probe_time": "2026-08-18 23:26:26 IST",
+  "last_probe_time": "2026-08-18 23:27:26 IST",
   "recent_probes": [
     {
       "timestamp": "2026-08-18 18:28:19 IST",
@@ -1812,6 +1812,28 @@
     {
       "timestamp": "2026-08-18 23:26:26 IST",
       "latency_ms": 774.0,
+      "has_divergence": false,
+      "indices": {
+        "NIFTY50": {
+          "app_ltp": null,
+          "ref_spot": 24154.9,
+          "diff_pts": null,
+          "diff_pct": null,
+          "status": "NO_REF_DATA"
+        },
+        "BANKNIFTY": {
+          "app_ltp": null,
+          "ref_spot": 57262.4,
+          "diff_pts": null,
+          "diff_pct": null,
+          "status": "NO_REF_DATA"
+        }
+      },
+      "cached_stocks_sample": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:27:26 IST",
+      "latency_ms": 1206.2,
       "has_divergence": false,
       "indices": {
         "NIFTY50": {

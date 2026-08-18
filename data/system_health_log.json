@@ -4411,9 +4411,105 @@
         "healed_by": "AISentinel",
         "trigger": "auto_reconciliation"
       }
+    },
+    {
+      "timestamp": "2026-08-18 23:26:38 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:26:39 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 23:27:11 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:27:12 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 23:27:44 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 23:27:44 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
     }
   ],
   "errors": [],
   "warnings": [],
-  "last_health_check": "2026-08-18 23:26:30 IST"
+  "last_health_check": "2026-08-18 23:27:44 IST"
 }

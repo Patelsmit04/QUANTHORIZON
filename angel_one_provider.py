@@ -28,10 +28,10 @@ from env_utils import DATA_DIR
 logger = logging.getLogger("AngelOneProvider")
 
 # ─── Credentials from .env ───────────────────────────────────
-ANGEL_API_KEY = os.environ.get("ANGEL_API_KEY", "").strip()
-ANGEL_CLIENT_ID = os.environ.get("ANGEL_CLIENT_ID", "").strip()
-ANGEL_PASSWORD = os.environ.get("ANGEL_PASSWORD", "").strip()
-ANGEL_TOTP_SECRET = os.environ.get("ANGEL_TOTP_SECRET", "").strip()
+ANGEL_API_KEY = (os.environ.get("ANGEL_API_KEY") or os.environ.get("ANGLE_API_KEY") or "").strip()
+ANGEL_CLIENT_ID = (os.environ.get("ANGEL_CLIENT_ID") or os.environ.get("ANGLE_CLIENT_ID") or "").strip()
+ANGEL_PASSWORD = (os.environ.get("ANGEL_PASSWORD") or os.environ.get("ANGLE_PASSWORD") or "").strip()
+ANGEL_TOTP_SECRET = (os.environ.get("ANGEL_TOTP_SECRET") or os.environ.get("ANGLE_TOTP_SECRET") or "").strip()
 
 # ─── Module State ────────────────────────────────────────────
 _smart_api = None          # SmartConnect instance
@@ -49,8 +49,13 @@ SCRIP_MASTER_URL = "https://margincalculator.angelbroking.com/OpenAPI_File/files
 
 
 def is_configured() -> bool:
-    """Check if Angel One credentials are present in environment."""
+    """Check if full Angel One SmartAPI login credentials are present in environment."""
     return bool(ANGEL_API_KEY and ANGEL_CLIENT_ID and ANGEL_PASSWORD and ANGEL_TOTP_SECRET)
+
+
+def has_api_key() -> bool:
+    """Check if at least the Angel One API key is configured."""
+    return bool(ANGEL_API_KEY)
 
 
 def angel_login() -> Optional[Any]:
