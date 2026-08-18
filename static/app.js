@@ -2,6 +2,8 @@
  * BTST SCANNER — DASHBOARD JAVASCRIPT APPLICATION ENGINE (AUTONOMOUS BACKGROUND SCANNER)
  */
 var lastBtstStatus = "pre_btst";
+var currentActiveSection = "scanner";
+window.currentActiveSection = "scanner";
 
 // M9 audit fix: native fetch() has no timeout, and nothing in this file attached one to any
 // of its ~18 call sites — a hung backend left "SCANNING..." (or an equivalent stuck state) up
@@ -288,7 +290,7 @@ function initTradexoDashboard() {
     ];
 
     // -------------------------------------------------------------
-    // TRADEXO CINEMATIC INTRO VIDEO CONTROLLER (CLEAN 3s SPLASH)
+    // TRADEXO CINEMATIC INTRO VIDEO CONTROLLER
     // -------------------------------------------------------------
     function initTradexoIntro() {
         const overlay = document.getElementById("tradexoIntroOverlay");
@@ -326,18 +328,19 @@ function initTradexoDashboard() {
             } catch (e) {}
         }
 
-        function launchIntro() {
+        function launchIntro(isUserInitiated = false) {
             isDismissed = false;
             overlay.classList.remove("hidden", "fade-out");
             overlay.classList.add("active");
             overlay.style.display = "flex";
             overlay.style.visibility = "visible";
             overlay.style.pointerEvents = "auto";
+            overlay.style.opacity = "1";
             document.body.classList.add("intro-active");
 
             try {
                 video.currentTime = 0;
-                video.muted = true; // Auto-play muted so all mobile/desktop browsers allow instant playback
+                video.muted = !isUserInitiated; // Unmuted if user clicked 'Watch Intro', muted if auto-played
                 const playPromise = video.play();
                 if (playPromise !== undefined) {
                     playPromise.catch((err) => {
@@ -345,32 +348,25 @@ function initTradexoDashboard() {
                         video.muted = true;
                         video.play().catch((e) => {
                             console.warn("Intro video playback failed:", e);
-                            dismissIntro();
                         });
                     });
                 }
             } catch (e) {
                 console.warn("Launch intro error:", e);
-                dismissIntro();
             }
 
-            // Unconditional safety timeout: 3.5 seconds max
+            // Safety timeout: 25 seconds max
             if (safetyTimeout) clearTimeout(safetyTimeout);
             safetyTimeout = setTimeout(() => {
                 dismissIntro();
-            }, 3500);
+            }, 25000);
         }
 
         // When the video finishes playing or errors, dismiss immediately
         video.addEventListener("ended", dismissIntro);
-        video.addEventListener("timeupdate", () => {
-            if (video.duration && video.currentTime >= video.duration - 0.2) {
-                dismissIntro();
-            }
-        });
-        video.addEventListener("error", dismissIntro);
-        video.addEventListener("stalled", () => {
-            setTimeout(dismissIntro, 500);
+        video.addEventListener("error", (e) => {
+            console.warn("Intro video error:", e);
+            dismissIntro();
         });
 
         // Skip button handler
@@ -382,37 +378,53 @@ function initTradexoDashboard() {
         }
 
         // Tap/click anywhere to skip immediately
-        overlay.addEventListener("click", dismissIntro);
-        overlay.addEventListener("touchstart", dismissIntro, { passive: true });
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay || e.target === video || e.target.closest("#introVideoWrapper")) {
+                dismissIntro();
+            }
+        });
 
         // Keyboard shortcuts: any key (Escape, Space, Enter) skips immediately
         window.addEventListener("keydown", (e) => {
             if (isDismissed) return;
-            dismissIntro();
+            if (e.key === "Escape" || e.key === " " || e.key === "Enter") {
+                dismissIntro();
+            }
         });
 
         // Sidebar and Guide "Watch Intro" triggers
         if (sidebarWatchIntroBtn) {
             sidebarWatchIntroBtn.addEventListener("click", (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 if (typeof closeMobileDrawer === "function") closeMobileDrawer();
-                launchIntro();
+                launchIntro(true);
             });
         }
         if (guideWatchIntroBtn) {
             guideWatchIntroBtn.addEventListener("click", (e) => {
                 e.preventDefault();
-                launchIntro();
+                e.stopPropagation();
+                launchIntro(true);
             });
         }
 
         // Global trigger for manual invocation
         window.replayTradexoIntro = function() {
-            launchIntro();
+            launchIntro(true);
         };
 
-        // Ensure overlay is dismissed by default so dashboard displays immediately with zero black screen
-        dismissIntro();
+        // Check if user has viewed the intro in this session
+        let viewed = false;
+        try {
+            viewed = sessionStorage.getItem(INTRO_SESSION_KEY) === "true";
+        } catch (e) {}
+
+        if (!viewed) {
+            launchIntro(false);
+        } else {
+            dismissIntro();
+        }
     }
 
     // -------------------------------------------------------------
@@ -502,13 +514,15 @@ function initTradexoDashboard() {
     HASH_TO_SECTION["paper-trading"] = "paperTrading";
     HASH_TO_SECTION["paper_trading"] = "paperTrading";
     let suppressHashUpdate = false;
-    let currentActiveSection = "scanner";
+    currentActiveSection = "scanner";
+    window.currentActiveSection = "scanner";
 
     // Unified Section Switcher — #sidebarNav is the single nav source for both the desktop
     // rail and the mobile drawer (see appSidebar above), so only one active-state loop is needed.
     function switchSection(section, opts = {}) {
         if (!section) return;
         currentActiveSection = section;
+        window.currentActiveSection = section;
 
         // Dynamic fallback lookup for section DOM nodes
         const sections = {
@@ -4557,6 +4571,8 @@ function initTradexoDashboard() {
     }
 
     initServiceWorkerAndPush();
+    if (typeof initOrderTicketEventListeners === "function") initOrderTicketEventListeners();
+    if (typeof initEditPositionEventListeners === "function") initEditPositionEventListeners();
 
     const resetPaperAccountBtn = document.getElementById("resetPaperAccountBtn");
     if (resetPaperAccountBtn) {
@@ -6023,7 +6039,7 @@ function renderLiveTradeCards(activeSetups) {
                         <button class="btn btn-sm btn-pill btn-secondary" onclick="openStockChartModal('${s.symbol}')">
                             <i class="fa-solid fa-chart-line text-gold"></i> CHART
                         </button>
-                        <button class="btn btn-sm btn-pill btn-gold" onclick="handlePlacePaperOrder('${s.symbol}', ${s.entry_price || 100}, '${sigLabel}', ${tp1 || 0}, ${tp2 || 0}, ${sl || 0})">
+                        <button class="btn btn-sm btn-pill btn-gold" onclick="openOrderTicketModal({ symbol: '${s.symbol}', entry_price: ${s.entry_price || 100}, signal: '${sigLabel}', tp1: ${tp1 || 0}, tp2: ${tp2 || 0}, sl: ${sl || 0} })">
                             <i class="fa-solid fa-bolt"></i> TRADE
                         </button>
                     </div>
@@ -6034,37 +6050,344 @@ function renderLiveTradeCards(activeSetups) {
 }
 
 // ==========================================================================
-// PAPER TRADING & VIRTUAL PORTFOLIO (Issue 7 Implementation)
+// INSTITUTIONAL ORDER TICKET & PAPER TRADING ENGINE
 // ==========================================================================
-window.handlePlacePaperOrder = async function(symbol, entryPrice, signal, tp1, tp2, sl) {
-    try {
-        if (typeof showToast === 'function') showToast(`Executing Paper Trade for ${symbol}...`, 'info');
-        const res = await apiFetch("/api/paper_trading/order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                symbol: symbol,
-                entry_price: parseFloat(entryPrice) || 100.0,
-                signal: signal || "BTST (BUY)",
-                quantity: 50,
-                target_price_1: parseFloat(tp1) || 0,
-                target_price_2: parseFloat(tp2) || 0,
-                stop_loss: parseFloat(sl) || 0
-            })
-        });
-        if (res.ok) {
-            const data = await res.json();
-            if (typeof showToast === 'function') showToast(`Position Opened: ${symbol} (50 shares @ ₹${entryPrice})`, 'success');
-            fetchPaperPortfolio();
-        } else {
-            const err = await res.json();
-            if (typeof showToast === 'function') showToast(err.detail || 'Order execution failed', 'error');
-        }
-    } catch (e) {
-        console.error("Failed to execute paper order:", e);
-        if (typeof showToast === 'function') showToast('Order placement network error', 'error');
+let currentOrderTicketSetup = null;
+let currentExecutionMode = "MARKET";
+let currentSizingMethod = "RISK";
+let currentRiskPct = 1.0;
+let virtualAccountEquity = 1000000.0;
+
+function getInstrumentLotSize(symbol) {
+    const s = String(symbol || '').toUpperCase().trim();
+    if (s.includes("BANKNIFTY") || s.includes("BANKEX")) return 15;
+    if (s.includes("FINNIFTY") || s.includes("NIFTY")) return 25;
+    if (s.includes("SENSEX")) return 10;
+    if (s.includes("MIDCPNIFTY")) return 50;
+    return 1;
+}
+
+window.openOrderTicketModal = function(setup) {
+    currentOrderTicketSetup = setup || {};
+    const modal = document.getElementById("orderTicketModal");
+    if (!modal) return;
+
+    const sym = setup.symbol || "RELIANCE";
+    const sig = setup.signal || "BTST (BUY)";
+    const ltp = Number(setup.entry_price || setup.ltp || 100.0);
+    const tp1 = Number(setup.tp1 || (ltp * 1.02));
+    const tp2 = Number(setup.tp2 || (ltp * 1.04));
+    const sl = Number(setup.sl || (ltp * 0.985));
+
+    const isBull = sig.includes("BUY") || sig.includes("BTST") || sig.includes("CALL");
+    const badgeEl = document.getElementById("orderTicketActionBadge");
+    if (badgeEl) {
+        badgeEl.className = isBull ? "badge badge-bullish" : "badge badge-bearish";
+        badgeEl.textContent = isBull ? "BUY (CALL / LONG)" : "SELL (PUT / SHORT)";
     }
+
+    const symEl = document.getElementById("orderTicketSymbol");
+    if (symEl) symEl.textContent = sym;
+
+    const ltpEl = document.getElementById("orderTicketLiveLtp");
+    if (ltpEl) {
+        ltpEl.textContent = `₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+        ltpEl.className = isBull ? "text-bullish" : "text-bearish";
+    }
+
+    const lotSize = getInstrumentLotSize(sym);
+    const lotBadge = document.getElementById("orderLotSizeBadge");
+    if (lotBadge) lotBadge.textContent = lotSize > 1 ? `LOT SIZE: ${lotSize}` : `EQUITY (1x)`;
+
+    const tpInput = document.getElementById("orderTargetPriceInput");
+    if (tpInput) tpInput.value = tp1.toFixed(2);
+
+    const slInput = document.getElementById("orderStopLossInput");
+    if (slInput) slInput.value = sl.toFixed(2);
+
+    const limitInput = document.getElementById("orderLimitPriceInput");
+    if (limitInput) limitInput.value = ltp.toFixed(2);
+
+    // Default modes
+    setOrderExecutionMode("MARKET");
+    setSizingMode("RISK");
+    recalculateOrderTicketSizing();
+
+    modal.classList.remove("hidden");
 };
+
+function setOrderExecutionMode(mode) {
+    currentExecutionMode = mode;
+    const mktBtn = document.getElementById("orderTypeMarketBtn");
+    const lmtBtn = document.getElementById("orderTypeLimitBtn");
+    const limitRow = document.getElementById("orderLimitPriceRow");
+
+    if (mode === "MARKET") {
+        if (mktBtn) { mktBtn.classList.add("btn-gold", "active"); mktBtn.classList.remove("btn-secondary"); }
+        if (lmtBtn) { lmtBtn.classList.add("btn-secondary"); lmtBtn.classList.remove("btn-gold", "active"); }
+        if (limitRow) limitRow.classList.add("hidden");
+    } else {
+        if (lmtBtn) { lmtBtn.classList.add("btn-gold", "active"); lmtBtn.classList.remove("btn-secondary"); }
+        if (mktBtn) { mktBtn.classList.add("btn-secondary"); mktBtn.classList.remove("btn-gold", "active"); }
+        if (limitRow) limitRow.classList.remove("hidden");
+    }
+    recalculateOrderTicketSummary();
+}
+
+function setSizingMode(method) {
+    currentSizingMethod = method;
+    const rskBtn = document.getElementById("sizingModeRiskBtn");
+    const fxdBtn = document.getElementById("sizingModeFixedBtn");
+    const presetRow = document.getElementById("riskPercentPresetRow");
+
+    if (method === "RISK") {
+        if (rskBtn) { rskBtn.classList.add("btn-gold", "active"); rskBtn.classList.remove("btn-secondary"); }
+        if (fxdBtn) { fxdBtn.classList.add("btn-secondary"); fxdBtn.classList.remove("btn-gold", "active"); }
+        if (presetRow) presetRow.style.display = "grid";
+        recalculateOrderTicketSizing();
+    } else {
+        if (fxdBtn) { fxdBtn.classList.add("btn-gold", "active"); fxdBtn.classList.remove("btn-secondary"); }
+        if (rskBtn) { rskBtn.classList.add("btn-secondary"); rskBtn.classList.remove("btn-gold", "active"); }
+        if (presetRow) presetRow.style.display = "none";
+        recalculateOrderTicketSummary();
+    }
+}
+
+function recalculateOrderTicketSizing() {
+    if (!currentOrderTicketSetup) return;
+    const sym = currentOrderTicketSetup.symbol || "RELIANCE";
+    const lotSize = getInstrumentLotSize(sym);
+    const ltp = Number(currentOrderTicketSetup.entry_price || 100.0);
+    const slInput = document.getElementById("orderStopLossInput");
+    const sl = slInput ? parseFloat(slInput.value) || (ltp * 0.985) : (ltp * 0.985);
+
+    const riskPerShare = Math.max(0.5, Math.abs(ltp - sl));
+    const riskCapital = (virtualAccountEquity * currentRiskPct) / 100.0;
+    let computedQty = Math.max(1, Math.floor(riskCapital / riskPerShare));
+
+    // Snap to lot size
+    if (lotSize > 1) {
+        computedQty = Math.max(lotSize, Math.round(computedQty / lotSize) * lotSize);
+    }
+
+    const qtyInput = document.getElementById("orderQuantityInput");
+    if (qtyInput) {
+        qtyInput.value = computedQty;
+        qtyInput.step = lotSize;
+    }
+
+    recalculateOrderTicketSummary();
+}
+
+function recalculateOrderTicketSummary() {
+    const qtyInput = document.getElementById("orderQuantityInput");
+    const limitInput = document.getElementById("orderLimitPriceInput");
+    const slInput = document.getElementById("orderStopLossInput");
+
+    const qty = parseInt(qtyInput?.value || 1, 10);
+    const ltp = Number(currentOrderTicketSetup?.entry_price || 100.0);
+    const price = currentExecutionMode === "LIMIT" ? (parseFloat(limitInput?.value) || ltp) : ltp;
+    const sl = parseFloat(slInput?.value) || (price * 0.985);
+
+    const tradeVal = price * qty;
+    const riskAmt = Math.abs(price - sl) * qty;
+    const riskPct = virtualAccountEquity > 0 ? ((riskAmt / virtualAccountEquity) * 100).toFixed(2) : "0.00";
+    
+    // Flat ₹20 brokerage + 0.1% simulated STT
+    const charges = 20.0 + (tradeVal * 0.001);
+    const totalMargin = tradeVal + 20.0;
+
+    const valEl = document.getElementById("orderEstTradeValue");
+    if (valEl) valEl.textContent = `₹${tradeVal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+
+    const riskEl = document.getElementById("orderEstRiskAmount");
+    if (riskEl) riskEl.textContent = `₹${riskAmt.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})} (${riskPct}% Account Risk)`;
+
+    const chgEl = document.getElementById("orderEstCharges");
+    if (chgEl) chgEl.textContent = `₹${charges.toFixed(2)} (₹20 Flat + 0.1% STT)`;
+
+    const marginEl = document.getElementById("orderTotalMarginRequired");
+    if (marginEl) marginEl.textContent = `₹${totalMargin.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+}
+
+// Global Order Ticket Event Listeners
+function initOrderTicketEventListeners() {
+    const closeBtn = document.getElementById("closeOrderTicketBtn");
+    const modal = document.getElementById("orderTicketModal");
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.add("hidden");
+        });
+    }
+
+    const mktBtn = document.getElementById("orderTypeMarketBtn");
+    const lmtBtn = document.getElementById("orderTypeLimitBtn");
+    if (mktBtn) mktBtn.addEventListener("click", () => setOrderExecutionMode("MARKET"));
+    if (lmtBtn) lmtBtn.addEventListener("click", () => setOrderExecutionMode("LIMIT"));
+
+    const rskBtn = document.getElementById("sizingModeRiskBtn");
+    const fxdBtn = document.getElementById("sizingModeFixedBtn");
+    if (rskBtn) rskBtn.addEventListener("click", () => setSizingMode("RISK"));
+    if (fxdBtn) fxdBtn.addEventListener("click", () => setSizingMode("FIXED"));
+
+    // Risk preset buttons
+    document.querySelectorAll(".risk-preset-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            document.querySelectorAll(".risk-preset-btn").forEach(b => {
+                b.classList.remove("btn-gold", "active");
+                b.classList.add("btn-secondary");
+            });
+            const t = e.currentTarget;
+            t.classList.add("btn-gold", "active");
+            t.classList.remove("btn-secondary");
+            currentRiskPct = parseFloat(t.dataset.risk) || 1.0;
+            recalculateOrderTicketSizing();
+        });
+    });
+
+    const qtyInput = document.getElementById("orderQuantityInput");
+    if (qtyInput) qtyInput.addEventListener("input", recalculateOrderTicketSummary);
+
+    const slInput = document.getElementById("orderStopLossInput");
+    if (slInput) slInput.addEventListener("input", () => {
+        if (currentSizingMethod === "RISK") recalculateOrderTicketSizing();
+        else recalculateOrderTicketSummary();
+    });
+
+    const limitInput = document.getElementById("orderLimitPriceInput");
+    if (limitInput) limitInput.addEventListener("input", recalculateOrderTicketSummary);
+
+    // Lot plus / minus buttons
+    const minusBtn = document.getElementById("orderLotMinusBtn");
+    const plusBtn = document.getElementById("orderLotPlusBtn");
+    if (minusBtn && qtyInput) {
+        minusBtn.addEventListener("click", () => {
+            const sym = currentOrderTicketSetup?.symbol || "RELIANCE";
+            const lot = getInstrumentLotSize(sym);
+            let val = parseInt(qtyInput.value, 10) || lot;
+            val = Math.max(lot, val - lot);
+            qtyInput.value = val;
+            recalculateOrderTicketSummary();
+        });
+    }
+    if (plusBtn && qtyInput) {
+        plusBtn.addEventListener("click", () => {
+            const sym = currentOrderTicketSetup?.symbol || "RELIANCE";
+            const lot = getInstrumentLotSize(sym);
+            let val = parseInt(qtyInput.value, 10) || lot;
+            val += lot;
+            qtyInput.value = val;
+            recalculateOrderTicketSummary();
+        });
+    }
+
+    // Confirm Paper Trade Submit
+    const confirmBtn = document.getElementById("confirmPaperTradeBtn");
+    if (confirmBtn) {
+        confirmBtn.addEventListener("click", async () => {
+            if (!currentOrderTicketSetup) return;
+            const sym = currentOrderTicketSetup.symbol || "RELIANCE";
+            const sig = currentOrderTicketSetup.signal || "BTST (BUY)";
+            const qty = parseInt(document.getElementById("orderQuantityInput")?.value || 1, 10);
+            const ltp = Number(currentOrderTicketSetup.entry_price || 100.0);
+            const limitPrice = currentExecutionMode === "LIMIT" ? (parseFloat(document.getElementById("orderLimitPriceInput")?.value) || ltp) : ltp;
+            const tp1 = parseFloat(document.getElementById("orderTargetPriceInput")?.value) || (ltp * 1.02);
+            const sl = parseFloat(document.getElementById("orderStopLossInput")?.value) || (ltp * 0.985);
+
+            try {
+                if (typeof showToast === 'function') showToast(`Routing ${currentExecutionMode} Order for ${sym}...`, 'info');
+                const res = await apiFetch("/api/paper_trading/order", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        symbol: sym,
+                        signal: sig,
+                        order_type: sig.includes("SELL") || sig.includes("PUT") ? "SELL" : "BUY",
+                        execution_mode: currentExecutionMode,
+                        entry_price: limitPrice,
+                        quantity: qty,
+                        target_price_1: tp1,
+                        target_price_2: Number(currentOrderTicketSetup.tp2 || (tp1 * 1.02)),
+                        stop_loss: sl
+                    })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (typeof showToast === 'function') showToast(`Order Executed: ${sym} (${qty} shares @ ₹${data.entry_price})`, 'success');
+                    modal.classList.add("hidden");
+                    fetchPaperPortfolio();
+                } else {
+                    const err = await res.json();
+                    if (typeof showToast === 'function') showToast(err.detail || 'Order execution rejected', 'error');
+                }
+            } catch (e) {
+                console.error("Order submission error:", e);
+                if (typeof showToast === 'function') showToast('Order placement network error', 'error');
+            }
+        });
+    }
+}
+
+// Position Editing Modal Controller
+window.openEditPositionModal = function(posId, tp1, tp2, sl, symbol) {
+    const modal = document.getElementById("editPositionModal");
+    if (!modal) return;
+
+    document.getElementById("editPosIdInput").value = posId;
+    document.getElementById("editPosTitle").textContent = `MODIFY TARGET & SL: ${symbol}`;
+    document.getElementById("editPosTp1Input").value = Number(tp1 || 0).toFixed(2);
+    document.getElementById("editPosTp2Input").value = Number(tp2 || 0).toFixed(2);
+    document.getElementById("editPosSlInput").value = Number(sl || 0).toFixed(2);
+
+    modal.classList.remove("hidden");
+};
+
+function initEditPositionEventListeners() {
+    const closeBtn = document.getElementById("closeEditPosBtn");
+    const modal = document.getElementById("editPositionModal");
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => modal.classList.add("hidden"));
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) modal.classList.add("hidden");
+        });
+    }
+
+    const saveBtn = document.getElementById("saveEditPosBtn");
+    if (saveBtn) {
+        saveBtn.addEventListener("click", async () => {
+            const posId = document.getElementById("editPosIdInput")?.value;
+            const tp1 = parseFloat(document.getElementById("editPosTp1Input")?.value) || 0;
+            const tp2 = parseFloat(document.getElementById("editPosTp2Input")?.value) || 0;
+            const sl = parseFloat(document.getElementById("editPosSlInput")?.value) || 0;
+
+            try {
+                if (typeof showToast === 'function') showToast(`Updating position ${posId}...`, 'info');
+                const res = await apiFetch(`/api/paper_trading/update/${posId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        target_price_1: tp1,
+                        target_price_2: tp2,
+                        stop_loss: sl
+                    })
+                });
+
+                if (res.ok) {
+                    if (typeof showToast === 'function') showToast('Position levels updated successfully!', 'success');
+                    modal.classList.add("hidden");
+                    fetchPaperPortfolio();
+                } else {
+                    const err = await res.json();
+                    if (typeof showToast === 'function') showToast(err.detail || 'Failed to update position', 'error');
+                }
+            } catch (e) {
+                console.error("Update position error:", e);
+            }
+        });
+    }
+}
 
 window.handleClosePaperPosition = async function(posId) {
     try {
@@ -6075,7 +6398,7 @@ window.handleClosePaperPosition = async function(posId) {
         });
         if (res.ok) {
             const data = await res.json();
-            if (typeof showToast === 'function') showToast(`Position Closed: ${data.symbol} | PnL: ₹${data.realized_pnl} (${data.realized_pnl_pct}%)`, 'success');
+            if (typeof showToast === 'function') showToast(`Position Closed: ${data.symbol} | Net PnL: ₹${data.realized_pnl} (${data.realized_pnl_pct}%)`, 'success');
             fetchPaperPortfolio();
         } else {
             const err = await res.json();
@@ -6121,6 +6444,10 @@ async function fetchPaperPortfolio() {
         const acc = data.account || {};
         const openPos = data.open_positions || [];
         const closedTrades = data.closed_trades || [];
+
+        virtualAccountEquity = acc.total_equity || 1000000.0;
+        const eqHint = document.getElementById("orderVirtualEquityHint");
+        if (eqHint) eqHint.textContent = `Account: ₹${virtualAccountEquity.toLocaleString('en-IN', {maximumFractionDigits:0})}`;
 
         if (totalEqEl) totalEqEl.textContent = `₹${(acc.total_equity || 1000000).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
         if (cashBalEl) cashBalEl.textContent = `₹${(acc.cash_balance || 1000000).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
@@ -6171,9 +6498,14 @@ async function fetchPaperPortfolio() {
                             <td class="text-bearish">₹${Number(p.stop_loss || 0).toFixed(2)}</td>
                             <td><strong class="${pnlClass}">${pnl >= 0 ? '+' : ''}₹${pnl.toFixed(2)} (${pnlPct.toFixed(2)}%)</strong></td>
                             <td>
-                                <button class="btn btn-xs btn-pill btn-secondary" onclick="handleClosePaperPosition('${p.id}')">
-                                    <i class="fa-solid fa-xmark text-bearish"></i> CLOSE
-                                </button>
+                                <div style="display:flex;gap:6px;">
+                                    <button class="btn btn-xs btn-pill btn-secondary" onclick="openEditPositionModal('${p.id}', ${p.target_price_1 || 0}, ${p.target_price_2 || 0}, ${p.stop_loss || 0}, '${p.symbol}')">
+                                        <i class="fa-solid fa-pen-to-square text-cyan"></i> EDIT
+                                    </button>
+                                    <button class="btn btn-xs btn-pill btn-secondary" onclick="handleClosePaperPosition('${p.id}')">
+                                        <i class="fa-solid fa-xmark text-bearish"></i> CLOSE
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `;
@@ -6884,7 +7216,7 @@ function initSystemHealthDiagnostics() {
     fetchAiSentinelStatus();
     fetchDailyHealthHistory();
     setInterval(() => {
-        if (currentActiveSection === "systemHealth") {
+        if ((typeof currentActiveSection !== "undefined" && currentActiveSection === "systemHealth") || window.currentActiveSection === "systemHealth") {
             fetchSystemHealth();
             fetchAiSentinelStatus();
             fetchDailyHealthHistory();

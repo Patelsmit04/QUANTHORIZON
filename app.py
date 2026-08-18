@@ -2885,8 +2885,9 @@ def api_get_paper_portfolio():
 
 
 @app.post("/api/paper_trading/order")
+@app.post("/api/paper-trade/execute")
 def api_execute_paper_order(payload: Dict[str, Any] = Body(...)):
-    """Places and opens a new virtual paper trade position."""
+    """Places and opens a new virtual paper trade position with dynamic sizing and cost modeling."""
     import paper_trading_service
     result = paper_trading_service.execute_paper_order(payload)
     if not result.get("ok"):
@@ -2897,12 +2898,22 @@ def api_execute_paper_order(payload: Dict[str, Any] = Body(...)):
         notif = log_notification(
             notif_type="paper_trade_executed",
             title=f"Paper Trade Executed: {result.get('symbol')}",
-            message=f"Opened {result.get('quantity')} shares @ ₹{result.get('entry_price', 0):.2f}",
+            message=f"Opened {result.get('quantity')} shares @ ₹{result.get('entry_price', 0):.2f} ({result.get('execution_mode', 'MARKET')})",
             payload=result
         )
         ws_broadcast.broadcast_sync({"type": "notification", **notif})
     except Exception as e:
         logger.warning(f"Notification broadcast failed: {e}")
+    return sanitize_json_data(result)
+
+
+@app.post("/api/paper_trading/update/{position_id}")
+def api_update_paper_position(position_id: str, payload: Dict[str, Any] = Body(...)):
+    """Updates Target 1, Target 2, or Stop Loss for an open virtual position."""
+    import paper_trading_service
+    result = paper_trading_service.update_paper_position(position_id, payload)
+    if not result.get("ok"):
+        raise HTTPException(status_code=400, detail=result.get("error", "Position update failed"))
     return sanitize_json_data(result)
 
 

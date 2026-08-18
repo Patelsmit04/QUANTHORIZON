@@ -1961,6 +1961,141 @@
                 </div>
             </div>
         </div>
+    <!-- ============================== INSTITUTIONAL ORDER TICKET MODAL ============================== -->
+    <div id="orderTicketModal" class="modal-overlay hidden" style="z-index: 1000000;">
+        <div class="modal-card" style="max-width: 480px; width: 100%; border: 1px solid rgba(245, 158, 11, 0.35); box-shadow: 0 20px 60px rgba(0,0,0,0.85); background: #0c1017;">
+            <div class="modal-header" style="border-bottom: 1px solid var(--gridline); padding-bottom: 12px;">
+                <div class="modal-title-group" style="display:flex;align-items:center;gap:10px;">
+                    <span id="orderTicketActionBadge" class="badge badge-bullish" style="font-size:12px;font-weight:800;padding:4px 10px;">BUY (CE)</span>
+                    <h2 id="orderTicketSymbol" style="font-size:20px;font-weight:900;letter-spacing:0.5px;color:#fff;margin:0;">RELIANCE</h2>
+                </div>
+                <button id="closeOrderTicketBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 18px 0 6px 0;">
+                <!-- Live Price Bar -->
+                <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);padding:10px 14px;border-radius:8px;border:1px solid var(--gridline);margin-bottom:16px;">
+                    <span style="font-size:12px;color:var(--ink-muted);font-weight:600;">LIVE MARKET LTP:</span>
+                    <strong id="orderTicketLiveLtp" class="text-bullish" style="font-size:18px;font-family:monospace;font-weight:800;">₹2,500.00</strong>
+                </div>
+
+                <!-- Execution Mode Toggle (MARKET / LIMIT) -->
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:6px;display:block;">ORDER TYPE</label>
+                    <div style="display:grid;grid-template-columns: 1fr 1fr;gap:8px;" id="orderExecutionTypeGroup">
+                        <button type="button" class="btn btn-sm btn-gold active" id="orderTypeMarketBtn" style="font-weight:700;">MARKET (Slippage Simulation)</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="orderTypeLimitBtn" style="font-weight:700;">LIMIT</button>
+                    </div>
+                </div>
+
+                <!-- Limit Price Row (conditionally visible) -->
+                <div id="orderLimitPriceRow" class="hidden" style="margin-bottom:14px;">
+                    <label style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin-bottom:6px;display:block;">LIMIT ENTRY PRICE (₹)</label>
+                    <input type="number" id="orderLimitPriceInput" class="input-dark" style="width:100%;font-size:14px;font-weight:700;" step="0.05" />
+                </div>
+
+                <!-- Sizing Mode Toggle (Fixed QTY vs Risk %) -->
+                <div style="margin-bottom:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <label style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin:0;">POSITION SIZING METHOD</label>
+                        <span id="orderVirtualEquityHint" style="font-size:11px;color:var(--gold);font-weight:700;">Account: ₹10,00,000</span>
+                    </div>
+                    <div style="display:grid;grid-template-columns: 1fr 1fr;gap:8px;margin-bottom:8px;">
+                        <button type="button" class="btn btn-xs btn-gold active" id="sizingModeRiskBtn" style="font-weight:700;">RISK % ALLOCATION</button>
+                        <button type="button" class="btn btn-xs btn-secondary" id="sizingModeFixedBtn" style="font-weight:700;">FIXED QUANTITY</button>
+                    </div>
+                    
+                    <!-- Risk % Presets -->
+                    <div id="riskPercentPresetRow" style="display:grid;grid-template-columns: repeat(4, 1fr);gap:6px;margin-bottom:10px;">
+                        <button type="button" class="btn btn-xs btn-secondary risk-preset-btn" data-risk="0.5">0.5% (₹5k)</button>
+                        <button type="button" class="btn btn-xs btn-gold active risk-preset-btn" data-risk="1.0">1.0% (₹10k)</button>
+                        <button type="button" class="btn btn-xs btn-secondary risk-preset-btn" data-risk="2.0">2.0% (₹20k)</button>
+                        <button type="button" class="btn btn-xs btn-secondary risk-preset-btn" data-risk="3.0">3.0% (₹30k)</button>
+                    </div>
+                </div>
+
+                <!-- Quantity and Lot Size input -->
+                <div style="margin-bottom:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <label style="font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;margin:0;">QUANTITY (SHARES / LOTS)</label>
+                        <span id="orderLotSizeBadge" class="badge badge-gold" style="font-size:10px;padding:2px 6px;">LOT: 1</span>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <input type="number" id="orderQuantityInput" class="input-dark" style="flex:1;font-size:15px;font-weight:800;color:#fff;" min="1" step="1" value="50" />
+                        <button type="button" class="btn btn-sm btn-secondary" id="orderLotMinusBtn" style="padding:0 14px;font-weight:800;">-</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="orderLotPlusBtn" style="padding:0 14px;font-weight:800;">+</button>
+                    </div>
+                </div>
+
+                <!-- Target & Stop Loss Inputs -->
+                <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;margin-bottom:16px;">
+                    <div>
+                        <label style="font-size:11px;font-weight:700;color:var(--bullish-green);text-transform:uppercase;margin-bottom:4px;display:block;">TARGET (TP1 / TP2)</label>
+                        <input type="number" id="orderTargetPriceInput" class="input-dark text-bullish" style="width:100%;font-weight:700;" step="0.05" />
+                    </div>
+                    <div>
+                        <label style="font-size:11px;font-weight:700;color:var(--bearish-red);text-transform:uppercase;margin-bottom:4px;display:block;">STOP LOSS (SL)</label>
+                        <input type="number" id="orderStopLossInput" class="input-dark text-bearish" style="width:100%;font-weight:700;" step="0.05" />
+                    </div>
+                </div>
+
+                <!-- Live Margin & Cost Estimation Breakdown -->
+                <div style="background:rgba(0,0,0,0.4);border:1px solid var(--gridline);border-radius:8px;padding:12px;margin-bottom:18px;font-size:12px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                        <span style="color:var(--ink-muted);">Est. Trade Value:</span>
+                        <strong style="color:#fff;" id="orderEstTradeValue">₹0.00</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                        <span style="color:var(--ink-muted);">Risk at Stop Loss:</span>
+                        <strong class="text-bearish" id="orderEstRiskAmount">₹0.00 (0.0%)</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                        <span style="color:var(--ink-muted);">Simulated Costs (₹20 Flat + 0.1% STT):</span>
+                        <span style="color:var(--gold);" id="orderEstCharges">₹22.50</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding-top:6px;border-top:1px dashed var(--gridline);">
+                        <span style="color:#fff;font-weight:700;">Total Margin Required:</span>
+                        <strong style="color:var(--gold);font-size:14px;" id="orderTotalMarginRequired">₹0.00</strong>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" id="confirmPaperTradeBtn" class="btn btn-gold btn-block" style="padding:14px;font-size:14px;font-weight:900;letter-spacing:0.5px;border-radius:8px;">
+                    <i class="fa-solid fa-bolt"></i> CONFIRM PAPER TRADE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================== POSITION SL / TP EDIT MODAL ============================== -->
+    <div id="editPositionModal" class="modal-overlay hidden" style="z-index: 1000000;">
+        <div class="modal-card" style="max-width: 420px; width: 100%; border: 1px solid var(--cyan); background: #0c1017;">
+            <div class="modal-header">
+                <div class="modal-title-group" style="display:flex;align-items:center;gap:10px;">
+                    <h3 id="editPosTitle" style="font-size:16px;font-weight:800;color:#fff;margin:0;">MODIFY TARGET &amp; SL</h3>
+                </div>
+                <button id="closeEditPosBtn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 16px 0 6px 0;">
+                <input type="hidden" id="editPosIdInput" />
+                <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;margin-bottom:14px;">
+                    <div>
+                        <label style="font-size:11px;font-weight:700;color:var(--bullish-green);display:block;margin-bottom:4px;">TARGET 1 (₹)</label>
+                        <input type="number" id="editPosTp1Input" class="input-dark text-bullish" style="width:100%;font-weight:700;" step="0.05" />
+                    </div>
+                    <div>
+                        <label style="font-size:11px;font-weight:700;color:var(--bullish-green);display:block;margin-bottom:4px;">TARGET 2 (₹)</label>
+                        <input type="number" id="editPosTp2Input" class="input-dark text-bullish" style="width:100%;font-weight:700;" step="0.05" />
+                    </div>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:11px;font-weight:700;color:var(--bearish-red);display:block;margin-bottom:4px;">STOP LOSS (₹)</label>
+                    <input type="number" id="editPosSlInput" class="input-dark text-bearish" style="width:100%;font-weight:700;" step="0.05" />
+                </div>
+                <button type="button" id="saveEditPosBtn" class="btn btn-gold btn-block" style="padding:12px;font-weight:800;">
+                    UPDATE POSITION
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- App JavaScript -->
