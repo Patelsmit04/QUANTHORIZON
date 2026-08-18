@@ -438,8 +438,8 @@ function initTradexoDashboard() {
     refreshStrategiesNavBadge();
     initNotifications();
     fetchTickerIndices();
-    setInterval(fetchTickerIndices, 5000); // 5-sec ticker refresh
-    setInterval(fetchLivePrices, 5000); // 5-sec live number updater
+    setInterval(fetchTickerIndices, 1000); // 1-sec real-time index marquee refresh
+    setInterval(fetchLivePrices, 1000); // 1-sec real-time stock & index numbers updater
     setInterval(fetchSplitAccuracy, 60000); // 1-min accuracy score metrics recalculation
     setInterval(fetchWinRatePerformance, 60000); // 1-min win rate performance updater
     scheduleMarketOpenRefresh();
