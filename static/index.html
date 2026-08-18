@@ -96,6 +96,10 @@
                     <i class="fa-solid fa-chart-line text-gold"></i>
                     <span class="nav-label">Live Trade</span>
                 </button>
+                <button class="sidebar-nav-item" data-section="paperTrading" title="Paper Trading Portfolio">
+                    <i class="fa-solid fa-wallet text-gold"></i>
+                    <span class="nav-label">Paper Portfolio</span>
+                </button>
                 <button class="sidebar-nav-item" data-section="strategies" title="Strategies">
                     <i class="fa-solid fa-sliders"></i>
                     <span class="nav-label">Strategies</span>
@@ -203,14 +207,14 @@
                  shown below the topbar on every section (see app.js fetchTickerIndices()). -->
             <div class="index-ticker-bar" id="indexTickerBar">
                 <div class="index-ticker-track" id="indexTickerTrack">
-                    <span class="index-ticker-item" data-index-name="NIFTY50" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>NIFTY 50</strong> <span>24,380.50</span> <span class="text-bullish">+125.40 (+0.52%)</span></span>
-                    <span class="index-ticker-item" data-index-name="BANKNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>BANKNIFTY</strong> <span>52,240.10</span> <span class="text-bullish">+340.10 (+0.65%)</span></span>
-                    <span class="index-ticker-item" data-index-name="SENSEX" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>SENSEX</strong> <span>79,920.80</span> <span class="text-bullish">+410.20 (+0.52%)</span></span>
-                    <span class="index-ticker-item" data-index-name="GIFTNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>GIFT NIFTY</strong> <span>24,440.00</span> <span class="text-bullish">+145.00 (+0.60%)</span></span>
-                    <span class="index-ticker-item" data-index-name="NIFTY50" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>NIFTY 50</strong> <span>24,380.50</span> <span class="text-bullish">+125.40 (+0.52%)</span></span>
-                    <span class="index-ticker-item" data-index-name="BANKNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>BANKNIFTY</strong> <span>52,240.10</span> <span class="text-bullish">+340.10 (+0.65%)</span></span>
-                    <span class="index-ticker-item" data-index-name="SENSEX" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>SENSEX</strong> <span>79,920.80</span> <span class="text-bullish">+410.20 (+0.52%)</span></span>
-                    <span class="index-ticker-item" data-index-name="GIFTNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>GIFT NIFTY</strong> <span>24,440.00</span> <span class="text-bullish">+145.00 (+0.60%)</span></span>
+                    <span class="index-ticker-item" data-index-name="NIFTY50" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>NIFTY 50</strong> <span>--</span> <span class="text-bullish">--</span></span>
+                    <span class="index-ticker-item" data-index-name="BANKNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>BANKNIFTY</strong> <span>--</span> <span class="text-bullish">--</span></span>
+                    <span class="index-ticker-item" data-index-name="SENSEX" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>SENSEX</strong> <span>--</span> <span class="text-bullish">--</span></span>
+                    <span class="index-ticker-item" data-index-name="GIFTNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>GIFT NIFTY</strong> <span>--</span> <span class="text-bullish">--</span></span>
+                    <span class="index-ticker-item" data-index-name="NIFTY50" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>NIFTY 50</strong> <span>--</span> <span class="text-bullish">--</span></span>
+                    <span class="index-ticker-item" data-index-name="BANKNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>BANKNIFTY</strong> <span>--</span> <span class="text-bullish">--</span></span>
+                    <span class="index-ticker-item" data-index-name="SENSEX" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>SENSEX</strong> <span>--</span> <span class="text-bullish">--</span></span>
+                    <span class="index-ticker-item" data-index-name="GIFTNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;"><strong>GIFT NIFTY</strong> <span>--</span> <span class="text-bullish">--</span></span>
                 </div>
             </div>
 
@@ -231,6 +235,11 @@
                     </div>
                     <button id="pushNotifToggleBtn" class="btn btn-sm btn-pill push-notif-switch" title="Toggle Lock-Screen Mobile Alerts">
                         <span id="pushNotifToggleText">ENABLE</span>
+                    </button>
+                </div>
+                <div style="padding: 6px 14px; display: flex; justify-content: flex-end; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.02);">
+                    <button id="sendTestAlertBtn" class="btn btn-xs btn-pill btn-secondary" style="font-size: 11px; padding: 4px 10px;">
+                        <i class="fa-solid fa-paper-plane text-gold"></i> Send Test Alert
                     </button>
                 </div>
                 <div id="notifList"><div class="notif-empty">No notifications yet.</div></div>
@@ -481,6 +490,111 @@
                 </div>
             </div>
             <!-- ============================== END LIVE TRADE SECTION ============================== -->
+
+            <!-- ============================== PAPER TRADING PORTFOLIO SECTION (Issue 7 Fix) ============================== -->
+            <div id="paperTradingSection" class="hidden">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i class="fa-solid fa-wallet text-gold"></i> PAPER TRADING PORTFOLIO
+                        <span class="section-page-subtitle">Virtual Account Balance, Live Mark-to-Market P&amp;L, Positions &amp; Closed Trades</span>
+                    </h2>
+                    <div class="dashboard-heading-actions">
+                        <button id="resetPaperAccountBtn" class="btn btn-pill btn-secondary" title="Reset virtual account balance to ₹10,00,000">
+                            <i class="fa-solid fa-rotate-left"></i><span>RESET ₹10L CAPITAL</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 6x Portfolio Overview Stat Cards Grid -->
+                <div class="stats-overview-grid" style="margin-top:14px;margin-bottom:16px;">
+                    <div class="stat-card" style="border-top:3px solid var(--gold, #d4af37);">
+                        <div class="stat-card-title"><i class="fa-solid fa-chart-pie text-gold"></i> TOTAL EQUITY</div>
+                        <div class="stat-card-value text-gold" id="paperTotalEquity">₹10,00,000.00</div>
+                        <div class="stat-card-footer">Starting Capital: ₹10,00,000</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #3b82f6;">
+                        <div class="stat-card-title"><i class="fa-solid fa-vault text-cyan"></i> CASH BALANCE</div>
+                        <div class="stat-card-value text-cyan" id="paperCashBalance">₹10,00,000.00</div>
+                        <div class="stat-card-footer">Available for new trades</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #10b981;">
+                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-up text-bullish"></i> UNREALIZED MTM P&amp;L</div>
+                        <div class="stat-card-value text-bullish" id="paperUnrealizedPnl">+₹0.00</div>
+                        <div class="stat-card-footer">Active open positions live mark</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #8b5cf6;">
+                        <div class="stat-card-title"><i class="fa-solid fa-sack-dollar text-gold"></i> REALIZED P&amp;L</div>
+                        <div class="stat-card-value text-gold" id="paperRealizedPnl">₹0.00</div>
+                        <div class="stat-card-footer">Booked profit / loss from closed trades</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #06b6d4;">
+                        <div class="stat-card-title"><i class="fa-solid fa-bullseye text-cyan"></i> WIN RATE</div>
+                        <div class="stat-card-value text-cyan" id="paperWinRate">--%</div>
+                        <div class="stat-card-footer"><span id="paperWinningTradesCount">0</span> winning / <span id="paperTotalTradesCount">0</span> closed</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #eab308;">
+                        <div class="stat-card-title"><i class="fa-solid fa-percent text-gold"></i> TOTAL RETURN</div>
+                        <div class="stat-card-value text-gold" id="paperTotalReturn">0.00%</div>
+                        <div class="stat-card-footer">Net virtual account ROI</div>
+                    </div>
+                </div>
+
+                <!-- Open Positions Table -->
+                <div class="card" style="margin-bottom:20px;padding:16px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                        <h3 style="font-size:15px;font-weight:800;color:#fff;margin:0;"><i class="fa-solid fa-layer-group text-gold"></i> OPEN POSITIONS (<span id="paperOpenPositionsCount">0</span>)</h3>
+                        <span style="font-size:11px;color:var(--ink-muted);">Auto-evaluates against live ticks &amp; targets</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="paperPositionsTable">
+                            <thead>
+                                <tr>
+                                    <th>POSITION ID</th>
+                                    <th>SYMBOL</th>
+                                    <th>SIGNAL</th>
+                                    <th>QTY</th>
+                                    <th>ENTRY PRICE</th>
+                                    <th>LIVE LTP</th>
+                                    <th>TARGET 1 / 2</th>
+                                    <th>STOP LOSS</th>
+                                    <th>UNREALIZED P&amp;L</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paperPositionsBody">
+                                <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--ink-muted);">No open paper positions. Click "TRADE" on any setup in Live Trade or Scanner to place virtual orders.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Closed Trade History Table -->
+                <div class="card" style="padding:16px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                        <h3 style="font-size:15px;font-weight:800;color:#fff;margin:0;"><i class="fa-solid fa-receipt text-cyan"></i> CLOSED TRADES JOURNAL</h3>
+                        <span style="font-size:11px;color:var(--ink-muted);">Realized performance archive</span>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="paperClosedTable">
+                            <thead>
+                                <tr>
+                                    <th>SYMBOL</th>
+                                    <th>SIGNAL</th>
+                                    <th>QTY</th>
+                                    <th>ENTRY PRICE</th>
+                                    <th>EXIT PRICE</th>
+                                    <th>REALIZED P&amp;L (₹)</th>
+                                    <th>RETURN (%)</th>
+                                    <th>OPENED AT</th>
+                                    <th>CLOSED AT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paperClosedBody">
+                                <tr><td colspan="9" style="text-align:center;padding:32px;color:var(--ink-muted);">No closed paper trades recorded yet.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             <!-- ============================== STOCKS NEWS SECTION ============================== -->
             <div id="stocksNewsSection" class="hidden">

@@ -487,7 +487,7 @@ function initTradexoDashboard() {
 
     // Sidebar destination -> URL hash, so every section is deep-linkable and back/forward-safe.
     const SECTION_HASHES = {
-        dashboard: "dashboard", scanner: "signals", liveTrades: "live-trade", stockDetail: "stock-detail", stocksNews: "stocks-news",
+        dashboard: "dashboard", scanner: "signals", liveTrades: "live-trade", paperTrading: "paper-trading", stockDetail: "stock-detail", stocksNews: "stocks-news",
         globalNews: "global-news", institutionalFlow: "institutional-flow",
         orderFlow: "order-flow", accuracy: "accuracy", indices: "index-intelligence", strategies: "strategies", history: "history",
         systemHealth: "system-health", guide: "guide", rules: "rules"
@@ -498,6 +498,9 @@ function initTradexoDashboard() {
         HASH_TO_SECTION[secKey] = secKey;
         HASH_TO_SECTION[secKey.toLowerCase()] = secKey;
     });
+    HASH_TO_SECTION["paper"] = "paperTrading";
+    HASH_TO_SECTION["paper-trading"] = "paperTrading";
+    HASH_TO_SECTION["paper_trading"] = "paperTrading";
     let suppressHashUpdate = false;
     let currentActiveSection = "scanner";
 
@@ -512,6 +515,7 @@ function initTradexoDashboard() {
             dashboard: document.getElementById("dashboardSection"),
             scanner: document.getElementById("scannerSection"),
             liveTrades: document.getElementById("liveTradesSection"),
+            paperTrading: document.getElementById("paperTradingSection"),
             stockDetail: document.getElementById("stockDetailSection"),
             stocksNews: document.getElementById("stocksNewsSection"),
             globalNews: document.getElementById("globalNewsSection"),
@@ -575,6 +579,7 @@ function initTradexoDashboard() {
         if (section === "orderFlow") fetchOrderFlowSection();
         if (section === "accuracy") fetchSplitAccuracy();
         if (section === "liveTrades") fetchLiveTradesSection();
+        if (section === "paperTrading") fetchPaperPortfolio();
 
         if (!opts.fromHash && SECTION_HASHES[section]) {
             suppressHashUpdate = true;
@@ -4532,10 +4537,31 @@ function initTradexoDashboard() {
                     console.error('[TRADEXO] Notification permission error:', e);
                 }
             });
+        const sendTestAlertBtn = document.getElementById("sendTestAlertBtn");
+        if (sendTestAlertBtn) {
+            sendTestAlertBtn.addEventListener("click", async () => {
+                try {
+                    if (typeof showToast === 'function') showToast('Dispatching AI Sentinel test alert...', 'info');
+                    const res = await apiFetch("/api/notifications/test_alert", { method: "POST" });
+                    if (res.ok) {
+                        if (typeof showToast === 'function') showToast('Test alert dispatched and broadcast successfully!', 'success');
+                        if (typeof fetchNotifications === 'function') fetchNotifications();
+                    }
+                } catch (e) {
+                    console.error("Test alert error:", e);
+                }
+            });
         }
     }
 
     initServiceWorkerAndPush();
+
+    const resetPaperAccountBtn = document.getElementById("resetPaperAccountBtn");
+    if (resetPaperAccountBtn) {
+        resetPaperAccountBtn.addEventListener("click", () => {
+            if (typeof handleResetPaperAccount === 'function') handleResetPaperAccount();
+        });
+    }
 
     window.openStockChartModal = openStockModal;
 
@@ -5995,7 +6021,7 @@ function renderLiveTradeCards(activeSetups) {
                         <button class="btn btn-sm btn-pill btn-secondary" onclick="openStockChartModal('${s.symbol}')">
                             <i class="fa-solid fa-chart-line text-gold"></i> CHART
                         </button>
-                        <button class="btn btn-sm btn-pill btn-gold" onclick="if(typeof showToast==='function') showToast('Paper Trade Executed for ${s.symbol}', 'success')">
+                        <button class="btn btn-sm btn-pill btn-gold" onclick="handlePlacePaperOrder('${s.symbol}', ${s.entry_price || 100}, '${sigLabel}', ${tp1 || 0}, ${tp2 || 0}, ${sl || 0})">
                             <i class="fa-solid fa-bolt"></i> TRADE
                         </button>
                     </div>
@@ -6003,6 +6029,185 @@ function renderLiveTradeCards(activeSetups) {
             </div>
         `;
     }).join("");
+}
+
+// ==========================================================================
+// PAPER TRADING & VIRTUAL PORTFOLIO (Issue 7 Implementation)
+// ==========================================================================
+window.handlePlacePaperOrder = async function(symbol, entryPrice, signal, tp1, tp2, sl) {
+    try {
+        if (typeof showToast === 'function') showToast(`Executing Paper Trade for ${symbol}...`, 'info');
+        const res = await apiFetch("/api/paper_trading/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                symbol: symbol,
+                entry_price: parseFloat(entryPrice) || 100.0,
+                signal: signal || "BTST (BUY)",
+                quantity: 50,
+                target_price_1: parseFloat(tp1) || 0,
+                target_price_2: parseFloat(tp2) || 0,
+                stop_loss: parseFloat(sl) || 0
+            })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (typeof showToast === 'function') showToast(`Position Opened: ${symbol} (50 shares @ ₹${entryPrice})`, 'success');
+            fetchPaperPortfolio();
+        } else {
+            const err = await res.json();
+            if (typeof showToast === 'function') showToast(err.detail || 'Order execution failed', 'error');
+        }
+    } catch (e) {
+        console.error("Failed to execute paper order:", e);
+        if (typeof showToast === 'function') showToast('Order placement network error', 'error');
+    }
+};
+
+window.handleClosePaperPosition = async function(posId) {
+    try {
+        if (typeof showToast === 'function') showToast(`Closing position ${posId}...`, 'info');
+        const res = await apiFetch(`/api/paper_trading/close/${posId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (typeof showToast === 'function') showToast(`Position Closed: ${data.symbol} | PnL: ₹${data.realized_pnl} (${data.realized_pnl_pct}%)`, 'success');
+            fetchPaperPortfolio();
+        } else {
+            const err = await res.json();
+            if (typeof showToast === 'function') showToast(err.detail || 'Failed to close position', 'error');
+        }
+    } catch (e) {
+        console.error("Close position error:", e);
+    }
+};
+
+window.handleResetPaperAccount = async function() {
+    if (!confirm("Are you sure you want to reset your virtual paper trading account to ₹10,00,000? All positions will be cleared.")) return;
+    try {
+        const res = await apiFetch("/api/paper_trading/reset", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        });
+        if (res.ok) {
+            if (typeof showToast === 'function') showToast('Paper trading portfolio reset to ₹10,00,000.', 'success');
+            fetchPaperPortfolio();
+        }
+    } catch (e) {
+        console.error("Reset paper account error:", e);
+    }
+};
+
+async function fetchPaperPortfolio() {
+    const totalEqEl = document.getElementById("paperTotalEquity");
+    const cashBalEl = document.getElementById("paperCashBalance");
+    const unrlPnlEl = document.getElementById("paperUnrealizedPnl");
+    const rlzdPnlEl = document.getElementById("paperRealizedPnl");
+    const winRateEl = document.getElementById("paperWinRate");
+    const totRetEl = document.getElementById("paperTotalReturn");
+    const winCountEl = document.getElementById("paperWinningTradesCount");
+    const totCountEl = document.getElementById("paperTotalTradesCount");
+    const openCountEl = document.getElementById("paperOpenPositionsCount");
+    const posBody = document.getElementById("paperPositionsBody");
+
+    try {
+        const res = await apiFetch("/api/paper_trading/portfolio");
+        if (!res.ok) return;
+        const data = await res.json();
+        const acc = data.account || {};
+        const openPos = data.open_positions || [];
+        const closedTrades = data.closed_trades || [];
+
+        if (totalEqEl) totalEqEl.textContent = `₹${(acc.total_equity || 1000000).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+        if (cashBalEl) cashBalEl.textContent = `₹${(acc.cash_balance || 1000000).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+        
+        const unrl = acc.unrealized_pnl || 0;
+        if (unrlPnlEl) {
+            unrlPnlEl.textContent = `${unrl >= 0 ? '+₹' : '-₹'}${Math.abs(unrl).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            unrlPnlEl.className = unrl >= 0 ? "stat-card-value text-bullish" : "stat-card-value text-bearish";
+        }
+
+        const rlzd = acc.realized_pnl || 0;
+        if (rlzdPnlEl) {
+            rlzdPnlEl.textContent = `${rlzd >= 0 ? '+₹' : '-₹'}${Math.abs(rlzd).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+            rlzdPnlEl.className = rlzd >= 0 ? "stat-card-value text-bullish" : "stat-card-value text-bearish";
+        }
+
+        if (winRateEl) winRateEl.textContent = acc.total_trades > 0 ? `${acc.win_rate_pct}%` : "--%";
+        if (winCountEl) winCountEl.textContent = acc.winning_trades || 0;
+        if (totCountEl) totCountEl.textContent = acc.total_trades || 0;
+        if (openCountEl) openCountEl.textContent = openPos.length;
+
+        const totRet = acc.total_return_pct || 0;
+        if (totRetEl) {
+            totRetEl.textContent = `${totRet >= 0 ? '+' : ''}${totRet.toFixed(2)}%`;
+            totRetEl.className = totRet >= 0 ? "stat-card-value text-bullish" : "stat-card-value text-bearish";
+        }
+
+        // Render Open Positions
+        if (posBody) {
+            if (!openPos.length) {
+                posBody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--ink-muted);">No open paper positions. Click "TRADE" on any setup in Live Trade or Scanner to place virtual orders.</td></tr>`;
+            } else {
+                posBody.innerHTML = openPos.map(p => {
+                    const isBull = (p.order_type || 'BUY') === 'BUY';
+                    const sigBadge = isBull ? '<span class="badge badge-bullish">BUY (CE)</span>' : '<span class="badge badge-bearish">SELL (PE)</span>';
+                    const pnl = p.unrealized_pnl || 0;
+                    const pnlPct = p.unrealized_pnl_pct || 0;
+                    const pnlClass = pnl >= 0 ? 'text-bullish' : 'text-bearish';
+                    return `
+                        <tr>
+                            <td><code style="font-size:11px;color:var(--ink-muted);">${escapeHtml(p.id)}</code></td>
+                            <td><strong style="color:#fff;cursor:pointer;" onclick="openStockChartModal('${p.symbol}')">${escapeHtml(p.symbol)}</strong></td>
+                            <td>${sigBadge}</td>
+                            <td><strong>${p.quantity}</strong></td>
+                            <td>₹${Number(p.entry_price).toFixed(2)}</td>
+                            <td><strong style="color:#fff;">₹${Number(p.current_price || p.entry_price).toFixed(2)}</strong></td>
+                            <td>₹${Number(p.target_price_1 || 0).toFixed(2)} / ₹${Number(p.target_price_2 || 0).toFixed(2)}</td>
+                            <td class="text-bearish">₹${Number(p.stop_loss || 0).toFixed(2)}</td>
+                            <td><strong class="${pnlClass}">${pnl >= 0 ? '+' : ''}₹${pnl.toFixed(2)} (${pnlPct.toFixed(2)}%)</strong></td>
+                            <td>
+                                <button class="btn btn-xs btn-pill btn-secondary" onclick="handleClosePaperPosition('${p.id}')">
+                                    <i class="fa-solid fa-xmark text-bearish"></i> CLOSE
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join("");
+            }
+        }
+
+        // Render Closed Trades
+        const closedTbody = document.getElementById("paperClosedBody");
+        if (closedTbody) {
+            if (!closedTrades.length) {
+                closedTbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--ink-muted);">No closed paper trades recorded yet.</td></tr>`;
+            } else {
+                closedTbody.innerHTML = closedTrades.map(t => {
+                    const pnl = t.realized_pnl || 0;
+                    const pnlPct = t.realized_pnl_pct || 0;
+                    const pnlClass = pnl >= 0 ? 'text-bullish' : 'text-bearish';
+                    return `
+                        <tr>
+                            <td><strong style="color:#fff;">${escapeHtml(t.symbol)}</strong></td>
+                            <td><span class="badge ${t.order_type === 'BUY' ? 'badge-bullish' : 'badge-bearish'}">${escapeHtml(t.signal || t.order_type)}</span></td>
+                            <td>${t.quantity}</td>
+                            <td>₹${Number(t.entry_price).toFixed(2)}</td>
+                            <td>₹${Number(t.exit_price || 0).toFixed(2)}</td>
+                            <td><strong class="${pnlClass}">${pnl >= 0 ? '+' : ''}₹${pnl.toFixed(2)}</strong></td>
+                            <td><strong class="${pnlClass}">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%</strong></td>
+                            <td style="font-size:11px;color:var(--ink-muted);">${escapeHtml(t.opened_at || '--')}</td>
+                            <td style="font-size:11px;color:var(--ink-muted);">${escapeHtml(t.closed_at || '--')}</td>
+                        </tr>
+                    `;
+                }).join("");
+            }
+        }
+    } catch (e) {
+        console.warn("fetchPaperPortfolio error:", e);
+    }
 }
 
 // ==========================================================================

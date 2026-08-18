@@ -801,7 +801,7 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
    item count grows a lot, lengthen the duration to keep the per-item scroll speed constant. */
 .index-ticker-bar {
     width: 100% !important;
-    max-width: 100vw !important;
+    max-width: 100% !important;
     min-width: 0 !important;
     overflow: hidden !important;
     position: relative !important;
@@ -810,6 +810,7 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     border-bottom: 1px solid var(--glass-border);
     padding: 8px 0;
     contain: paint !important;
+    box-sizing: border-box !important;
 }
 
 .index-ticker-track {

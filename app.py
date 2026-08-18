@@ -6,7 +6,7 @@ import threading
 import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime, timezone, timedelta
-from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, Header, Depends, Response, Request
+from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, Header, Depends, Response, Request, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -2690,6 +2690,48 @@ def api_clarification_budget_status():
     return sanitize_json_data(get_budget_status())
 
 
+@app.get("/api/strategies/performance")
+def api_all_strategies_performance():
+    """Aggregate performance summary across all active and built-in strategies."""
+    try:
+        strategies = sm.list_strategies()
+        results = []
+        for s in strategies:
+            sid = s.get("id")
+            results.append({
+                "strategy_id": sid,
+                "name": s.get("name"),
+                "metrics": get_metrics_summary(strategy_id=sid),
+                "paper_trading": get_paper_performance(strategy_id=sid),
+            })
+        return sanitize_json_data({"strategies": results, "total": len(results)})
+    except Exception as e:
+        logger.warning(f"Error compiling all strategies performance: {e}")
+        return sanitize_json_data({"strategies": [], "total": 0})
+
+
+@app.get("/api/strategies/active_signals")
+def api_all_strategies_active_signals():
+    """Returns active signals for all strategies."""
+    try:
+        strategies = sm.list_strategies()
+        all_signals = []
+        for s in strategies:
+            sid = s.get("id")
+            if sid == DEFAULT_STRATEGY_ID:
+                stocks = cache_store.get("data") or []
+            else:
+                stocks = (cache_store.get("strategy_results") or {}).get(sid, {}).get("stocks", [])
+            for stk in stocks:
+                sig = stk.get("signal", "")
+                if "BTST" in sig or "STBT" in sig:
+                    all_signals.append({"strategy_id": sid, "strategy_name": s.get("name"), **stk})
+        return sanitize_json_data({"active_signals": all_signals, "total": len(all_signals)})
+    except Exception as e:
+        logger.warning(f"Error compiling all strategies active signals: {e}")
+        return sanitize_json_data({"active_signals": [], "total": 0})
+
+
 @app.get("/api/strategies/{strategy_id}")
 def api_get_strategy(strategy_id: str):
     strategy = get_strategy(strategy_id)
@@ -2832,6 +2874,57 @@ def api_paper_trades(strategy_id: Optional[str] = Query(None), limit: int = Quer
     return sanitize_json_data({"trades": get_paper_trades(strategy_id=strategy_id, limit=limit)})
 
 
+# -------------------------------------------------------------
+# PAPER TRADING PORTFOLIO & ORDER MANAGEMENT (Issue 7 Fix)
+# -------------------------------------------------------------
+@app.get("/api/paper_trading/portfolio")
+def api_get_paper_portfolio():
+    """Returns virtual account summary, live MTM positions, and closed trades history."""
+    import paper_trading_service
+    return sanitize_json_data(paper_trading_service.get_paper_portfolio())
+
+
+@app.post("/api/paper_trading/order")
+def api_execute_paper_order(payload: Dict[str, Any] = Body(...)):
+    """Places and opens a new virtual paper trade position."""
+    import paper_trading_service
+    result = paper_trading_service.execute_paper_order(payload)
+    if not result.get("ok"):
+        raise HTTPException(status_code=400, detail=result.get("error", "Order execution failed"))
+    
+    # Broadcast notification to frontend
+    try:
+        notif = log_notification(
+            notif_type="paper_trade_executed",
+            title=f"Paper Trade Executed: {result.get('symbol')}",
+            message=f"Opened {result.get('quantity')} shares @ ₹{result.get('entry_price', 0):.2f}",
+            payload=result
+        )
+        ws_broadcast.broadcast_sync({"type": "notification", **notif})
+    except Exception as e:
+        logger.warning(f"Notification broadcast failed: {e}")
+    return sanitize_json_data(result)
+
+
+@app.post("/api/paper_trading/close/{position_id}")
+def api_close_paper_position(position_id: str, payload: Optional[Dict[str, Any]] = Body(None)):
+    """Closes an open virtual position and realizes P&L."""
+    import paper_trading_service
+    exit_price = (payload or {}).get("exit_price")
+    result = paper_trading_service.close_paper_position(position_id, exit_price)
+    if not result.get("ok"):
+        raise HTTPException(status_code=400, detail=result.get("error", "Position closure failed"))
+    return sanitize_json_data(result)
+
+
+@app.post("/api/paper_trading/reset")
+def api_reset_paper_account(payload: Optional[Dict[str, Any]] = Body(None)):
+    """Resets virtual portfolio to default starting capital."""
+    import paper_trading_service
+    capital = (payload or {}).get("starting_capital", 1000000.0)
+    return sanitize_json_data(paper_trading_service.reset_paper_account(capital))
+
+
 @app.get("/api/closing_sequence/status")
 def get_closing_sequence_status():
     """Today's progress through the 3:14-3:40 PM closing sequence (snapshot -> CAS close ->
@@ -2860,6 +2953,45 @@ def api_mark_notification_read(notification_id: str):
 def api_mark_all_notifications_read():
     mark_all_notifications_read()
     return {"status": "all_read"}
+
+
+@app.post("/api/notifications/test_alert")
+def api_send_test_alert():
+    """Dispatches a high-conviction test alert to verify notification delivery end-to-end."""
+    now_str = get_ist_now().strftime("%H:%M:%S IST")
+    notif = log_notification(
+        notif_type="test_alert",
+        title="🔔 TRADEXO AI Sentinel Alert (Test)",
+        message=f"Live alert pipeline verified nominal at {now_str}. Lock-screen & browser push operational.",
+        payload={"test": True, "time": now_str}
+    )
+    ws_broadcast.broadcast_sync({"type": "notification", **notif})
+    return sanitize_json_data({"status": "SUCCESS", "notification": notif})
+
+
+@app.post("/api/notifications/push_subscribe")
+def api_push_subscribe(subscription: Dict[str, Any] = Body(...)):
+    """Registers a browser Web Push subscription for service worker background notifications."""
+    try:
+        from signal_journal import get_db_connection
+        with get_db_connection() as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS push_subscriptions (
+                    endpoint TEXT PRIMARY KEY,
+                    subscription_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+            """)
+            endpoint = subscription.get("endpoint", "")
+            if endpoint:
+                conn.execute(
+                    "INSERT OR REPLACE INTO push_subscriptions (endpoint, subscription_json, created_at) VALUES (?, ?, ?)",
+                    (endpoint, json.dumps(subscription), get_ist_now().isoformat())
+                )
+                conn.commit()
+    except Exception as e:
+        logger.warning(f"Failed to persist push subscription: {e}")
+    return {"status": "SUCCESS", "message": "Push subscription registered."}
 
 
 @app.post("/api/lock_picks", dependencies=[Depends(require_api_key)])

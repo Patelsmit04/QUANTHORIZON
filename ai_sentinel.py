@@ -517,10 +517,16 @@ class AISentinelEngine:
             ("/api/scan", "Scanner & Matrix Engine"),
             ("/api/order_flow_all", "Order Flow Veto"),
             ("/api/accuracy/split", "Accuracy & Performance"),
-            ("/api/indices", "Index Intelligence"),
+            ("/api/indices", "Live Indices"),
+            ("/api/indices/verdict", "Index BTST Intelligence"),
             ("/api/history/predictions?limit=5", "History & Calibration"),
+            ("/api/validation", "Walk-Forward Validation"),
             ("/api/strategies", "Strategies Engine"),
             ("/api/performance", "Performance Dashboard"),
+            ("/api/news", "Macro & News Feed"),
+            ("/api/institutional_flow", "Institutional Deals Flow"),
+            ("/api/live_trades", "Live Trade Setups"),
+            ("/api/paper_trading/portfolio", "Paper Trading Virtual Portfolio"),
             ("/api/notifications?limit=1", "Notification System"),
         ]
 
@@ -530,6 +536,7 @@ class AISentinelEngine:
             ("/api/strategies/clarification_budget", "Strategy Clarification Budget"),
             ("/api/closing_sequence/status", "Closing Sequence Readiness"),
             ("/api/market_status", "Market Status Engine"),
+            ("/api/golden_path/status", "Golden Path Monitor"),
         ]
 
         all_probes = endpoint_probes + smoke_probes
