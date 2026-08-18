@@ -460,10 +460,142 @@
       "all_verified": false,
       "resulting_score": 100,
       "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-18 18:33:40 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "AUROPHARMA",
+            "BOSCHLTD",
+            "MFSL",
+            "NBCC",
+            "PETRONET",
+            "PIDILITIND",
+            "BHARTIARTL",
+            "INFY",
+            "PFIZER",
+            "NYKAA",
+            "PAGEIND",
+            "PAYTM",
+            "TMPV",
+            "ULTRACEMCO"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['AUROPHARMA', 'BOSCHLTD', 'MFSL']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-18 18:34:17 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "AUROPHARMA",
+            "BOSCHLTD",
+            "MFSL",
+            "NBCC",
+            "PETRONET",
+            "PIDILITIND",
+            "BHARTIARTL",
+            "INFY",
+            "PFIZER",
+            "NYKAA",
+            "PAGEIND",
+            "PAYTM",
+            "TMPV",
+            "ULTRACEMCO"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['AUROPHARMA', 'BOSCHLTD', 'MFSL']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-18 18:34:52 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "AUROPHARMA",
+            "BOSCHLTD",
+            "MFSL",
+            "NBCC",
+            "PETRONET",
+            "PIDILITIND",
+            "BHARTIARTL",
+            "INFY",
+            "PFIZER",
+            "NYKAA",
+            "PAGEIND",
+            "PAYTM",
+            "TMPV",
+            "ULTRACEMCO"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['AUROPHARMA', 'BOSCHLTD', 'MFSL']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-18 18:38:26 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "AUROPHARMA",
+            "BOSCHLTD",
+            "MFSL",
+            "NBCC",
+            "PETRONET",
+            "PIDILITIND",
+            "BHARTIARTL",
+            "INFY",
+            "PFIZER",
+            "NYKAA",
+            "PAGEIND",
+            "PAYTM",
+            "TMPV",
+            "ULTRACEMCO"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['AUROPHARMA', 'BOSCHLTD', 'MFSL']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
     }
   ],
-  "total_fixes_applied": 21,
-  "last_healing_pass": "2026-08-18 18:31:00 IST",
+  "total_fixes_applied": 25,
+  "last_healing_pass": "2026-08-18 18:38:26 IST",
   "last_score": 100,
   "last_all_verified": false
 }

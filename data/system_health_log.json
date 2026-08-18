@@ -1,6 +1,14 @@
 {
   "today_date": "2026-08-18",
-  "cold_starts": [],
+  "cold_starts": [
+    {
+      "timestamp": "2026-08-18 18:33:35 IST",
+      "is_market_hours": false,
+      "details": {
+        "platform": "Render/Local"
+      }
+    }
+  ],
   "market_transitions": [],
   "evaluations": [
     {
@@ -112,9 +120,137 @@
         "healed_by": "AISentinel",
         "trigger": "auto_reconciliation"
       }
+    },
+    {
+      "timestamp": "2026-08-18 18:33:42 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 18:33:42 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 18:34:17 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 18:34:17 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 18:35:42 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 18:37:51 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
+    },
+    {
+      "timestamp": "2026-08-18 18:39:16 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-08-18 18:41:24 IST",
+      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+      "locked_count": 0,
+      "symbols": [
+        "AUROPHARMA",
+        "BOSCHLTD",
+        "MFSL",
+        "NBCC",
+        "PETRONET",
+        "PIDILITIND",
+        "BHARTIARTL",
+        "INFY",
+        "PFIZER",
+        "NYKAA",
+        "PAGEIND",
+        "PAYTM",
+        "TMPV",
+        "ULTRACEMCO"
+      ],
+      "details": {
+        "healed_by": "AISentinel",
+        "trigger": "auto_reconciliation"
+      }
     }
   ],
   "errors": [],
   "warnings": [],
-  "last_health_check": "2026-08-18 18:31:01 IST"
+  "last_health_check": "2026-08-18 18:41:24 IST"
 }
