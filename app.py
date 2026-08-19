@@ -95,26 +95,37 @@ async def lifespan(app_instance: FastAPI):
         ws_broadcast.capture_event_loop()
 
         # ─── Angel One SmartAPI + WebSocket Stream (Primary Live Feed) ───
-        try:
-            if angel_one_provider.has_api_key():
-                scrip_count = angel_one_provider.load_scrip_master()
-                logger.info(f"Angel One Scrip Master loaded: {scrip_count} instruments indexed.")
+        # Perf/reliability fix: this used to run inline, before `yield` — a live login call to
+        # a third-party broker API (plus a scrip-master download on a cold cache) blocking the
+        # ASGI app from ever reaching `yield` means the port can't start serving traffic yet,
+        # so nothing (including a platform health check) gets a response until Angel One's
+        # network round-trip finishes. Already designed to degrade gracefully (see the existing
+        # "falling back to yfinance polling" / "Hybrid Free Data Mode" messages below) — running
+        # it as a background thread, exactly like every other worker here, means the app becomes
+        # ready immediately and the live feed simply comes online a few seconds later instead.
+        def _start_angel_one_feed():
+            try:
+                if angel_one_provider.has_api_key():
+                    scrip_count = angel_one_provider.load_scrip_master()
+                    logger.info(f"Angel One Scrip Master loaded: {scrip_count} instruments indexed.")
 
-            if angel_one_provider.is_configured():
-                logger.info("Angel One SmartAPI credentials present — initializing login...")
-                smart_api = angel_one_provider.angel_login()
-                if smart_api:
-                    angel_ws_stream.start()
-                    logger.info("Angel One WebSocket 2.0 stream started (primary live feed).")
+                if angel_one_provider.is_configured():
+                    logger.info("Angel One SmartAPI credentials present — initializing login...")
+                    smart_api = angel_one_provider.angel_login()
+                    if smart_api:
+                        angel_ws_stream.start()
+                        logger.info("Angel One WebSocket 2.0 stream started (primary live feed).")
+                    else:
+                        logger.warning("Angel One login failed — falling back to yfinance polling.")
                 else:
-                    logger.warning("Angel One login failed — falling back to yfinance polling.")
-            else:
-                logger.info(
-                    "Angel One running in Hybrid Free Data Mode (Fast In-Memory Cache + NSE Direct Scrapers + Live Ticker Feed). "
-                    "For full 1-second WebSocket streaming, also provide ANGEL_CLIENT_ID, ANGEL_PASSWORD, and ANGEL_TOTP_SECRET."
-                )
-        except Exception as e:
-            logger.warning(f"Angel One startup error (non-fatal, fallback active): {e}")
+                    logger.info(
+                        "Angel One running in Hybrid Free Data Mode (Fast In-Memory Cache + NSE Direct Scrapers + Live Ticker Feed). "
+                        "For full 1-second WebSocket streaming, also provide ANGEL_CLIENT_ID, ANGEL_PASSWORD, and ANGEL_TOTP_SECRET."
+                    )
+            except Exception as e:
+                logger.warning(f"Angel One startup error (non-fatal, fallback active): {e}")
+
+        threading.Thread(target=_start_angel_one_feed, daemon=True, name="AngelOneStartup").start()
 
         # ─── NSE Scraper Workers (Option Chain + Block Deals) ───
         try:
@@ -189,17 +200,6 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
-@app.middleware("http")
-async def add_no_cache_headers_for_static(request: Request, call_next):
-    response = await call_next(request)
-    path = request.url.path
-    if path.startswith("/static/") or path.startswith("/api/"):
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
-    return response
-
-
 class StrategyCreateRequest(BaseModel):
     name: str
     description: str = ""
@@ -243,20 +243,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Prevent stale browser caches on HTML / CSS / JS assets — force revalidation every load.
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request as StarletteRequest
+# Compress JSON/HTML/JS/CSS responses over the wire — the scan payload alone is well over a
+# hundred KB of JSON per request, and app.js/styles.css are each several hundred KB
+# uncompressed. Pure transport-size win, no behavior change.
+from starlette.middleware.gzip import GZipMiddleware
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
-class NoCacheStaticMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: StarletteRequest, call_next):
-        response = await call_next(request)
-        path = request.url.path
-        if path.endswith((".html", ".css", ".js")) or path == "/":
-            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-            response.headers["Pragma"] = "no-cache"
-        return response
-
-app.add_middleware(NoCacheStaticMiddleware)
+# Perf fix: this used to be THREE separate, overlapping middlewares (this one,
+# add_no_cache_headers_for_static, and NoCacheStaticMiddleware) that between them forced
+# `no-store` on literally every response — including /static/* JS/CSS/images — so the browser
+# re-downloaded the full JS/CSS/logo on every single navigation and reload. Consolidated into
+# one path-aware policy: API/HTML responses (which genuinely change every scan tick) keep the
+# exact original no-store behavior; /static/* assets that are cache-busted via a `?v=` query
+# string are safe to cache for a long time since any real update changes the URL, and other
+# static assets (icons, manifest, logos) get a shorter revalidation window as a safety net for
+# the rare case they change without a version bump.
+@app.middleware("http")
+async def cache_control_headers(request: Request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+    if path.startswith("/static/"):
+        if "v" in request.query_params:
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            response.headers["Cache-Control"] = "public, max-age=86400"
+    else:
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
 
 # M9 audit fix: every mutating endpoint (strategy CRUD, lock/evaluate picks, execute, run index
 # intelligence, mark notifications read) previously had zero authentication — anyone with the
@@ -287,14 +302,6 @@ def require_api_key(x_api_key: Optional[str] = Header(default=None, alias=API_KE
         raise HTTPException(status_code=401, detail="Missing or invalid API key.")
 
 
-@app.middleware("http")
-async def add_no_cache_headers(request, call_next):
-    response = await call_next(request)
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-    return response
-
 # Canonical Whitelisted NSE F&O Stock List (Yahoo Finance .NS format)
 FO_STOCKS = get_canonical_fo_tickers()
 
@@ -324,6 +331,16 @@ cache_store: Dict[str, Any] = {
 #      individual dict-key assignments are GIL-atomic, but a read-copy-then-mutate sequence
 #      isn't protected against a concurrent writer landing mid-sequence without this.
 _cache_lock = threading.Lock()
+
+# Perf fix: GET /api/scan and GET /api/live_trades (polled by every open browser tab every
+# 30-60s, plus every page load) used to take THIS SAME _cache_lock to read cache_store —
+# meaning every reader queued up behind whatever scan pipeline run currently held it, and a
+# full ~210-stock scan can legitimately take tens of seconds. That's the "site sometimes takes
+# forever to respond" symptom: readers blocking on an unrelated writer instead of just being
+# served the already-fresh in-memory snapshot. This lock only guards the read path's own
+# occasional disk/Postgres resync (see get_scan_results below) — never the scan pipeline
+# itself — so normal reads no longer wait on it.
+_cache_read_lock = threading.Lock()
 
 
 # -------------------------------------------------------------
@@ -2106,14 +2123,25 @@ def get_scan_results(
     if nocache and _can_run_live_scan_inline():
         threading.Thread(target=run_full_scan_pipeline, daemon=True).start()
 
-    with _cache_lock:
-        disk_scan = load_last_market_scan()
-        if disk_scan and disk_scan.get("stocks"):
-            cache_store["scan_summary"] = disk_scan
-            if disk_scan.get("indices"):
-                cache_store["index_data"] = disk_scan.get("indices")
-        cached = cache_store.get("scan_summary")
-        scan_response = copy.deepcopy(cached) if cached is not None else None
+    # Fast path: the background scheduler thread (same process, on a persistent host) already
+    # keeps cache_store warm, so the overwhelming majority of requests hit this single
+    # GIL-atomic dict read with no locking and no disk I/O at all — no more re-reading+parsing
+    # the multi-hundred-KB scan snapshot from disk on every single poll. Only fall back to
+    # disk/Postgres (behind _cache_read_lock, not the scan pipeline's _cache_lock) when
+    # cache_store genuinely has nothing yet: a cold process before its first scan lands, or a
+    # stateless deployment that never runs the scheduler and depends on the last synced snapshot.
+    cached = cache_store.get("scan_summary")
+    if cached is None:
+        with _cache_read_lock:
+            cached = cache_store.get("scan_summary")
+            if cached is None:
+                disk_scan = load_last_market_scan()
+                if disk_scan and disk_scan.get("stocks"):
+                    cache_store["scan_summary"] = disk_scan
+                    if disk_scan.get("indices"):
+                        cache_store["index_data"] = disk_scan.get("indices")
+                cached = cache_store.get("scan_summary")
+    scan_response = copy.deepcopy(cached) if cached is not None else None
 
     if scan_response is None:
         # Trigger background pipeline if no scan summary exists yet and inline scans are permitted
@@ -2191,8 +2219,9 @@ def get_performance():
 @app.get("/api/live_trades")
 def get_live_trades():
     """Returns active BTST/STBT paper setups, pending watchlist orders, and closed trade history for Live Trade view."""
-    with _cache_lock:
-        scan_data = cache_store.get("scan_summary") or load_last_market_scan() or {}
+    # Perf fix: this only ever reads cache_store, never mutates it — no reason to contend with
+    # the scan pipeline's _cache_lock (which can be held for tens of seconds during a scan).
+    scan_data = cache_store.get("scan_summary") or load_last_market_scan() or {}
     stocks = scan_data.get("stocks", [])
     if stocks:
         ensure_active_btst_signals(stocks)
@@ -2577,16 +2606,6 @@ def get_stock_news_detail(symbol: str):
             "fetched_at": get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST")
         })
     return sanitize_json_data(cached)
-
-
-@app.middleware("http")
-async def add_no_cache_headers_middleware(request, call_next):
-    response = await call_next(request)
-    if request.url.path.startswith("/api/"):
-        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
-    return response
 
 
 # -------------------------------------------------------------

@@ -50,6 +50,8 @@ except ImportError:
 USE_POSTGRES = bool(os.environ.get("DATABASE_URL", "").strip())
 
 
+_CONNECT_TIMEOUT_SECONDS = 10
+
 def get_pg_connection():
     """
     Opens a brand-new connection on every call — every caller in this module (and
@@ -57,13 +59,22 @@ def get_pg_connection():
     shared/pooled singleton (see tests/test_pg_utils.py's independent-connections assertion).
     Default row_factory (tuple_row) and autocommit=False are load-bearing: pg_read_json/
     pg_write_json index rows positionally, and every write path here commits explicitly.
+
+    connect_timeout is explicit because libpq's own default is 0 (wait forever) — with a
+    DATABASE_URL that's unreachable at the network level (wrong host, firewall silently
+    dropping packets, DB itself still waking up) rather than promptly refused, connect() can
+    hang far longer than any try/except around it helps with. Both this module's own
+    import-time init_app_state_schema() and signal_journal.py's init_journal_db() run before
+    the app finishes starting, so an unbounded hang here means the whole process never becomes
+    ready to accept traffic — exactly the "stuck at Connecting database... forever" failure
+    mode a bounded timeout exists to prevent.
     """
     if psycopg is None:
         raise RuntimeError("DATABASE_URL is set but the 'psycopg' package isn't installed — run `pip install -r requirements.txt`.")
     dsn = os.environ.get("DATABASE_URL", "").strip()
     if not dsn:
         raise RuntimeError("get_pg_connection() called but DATABASE_URL is not set.")
-    return psycopg.connect(dsn)
+    return psycopg.connect(dsn, connect_timeout=_CONNECT_TIMEOUT_SECONDS)
 
 
 def init_app_state_schema() -> None:
