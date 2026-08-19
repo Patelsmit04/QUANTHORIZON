@@ -141,6 +141,19 @@ function initTradexoDashboard() {
     let isFetchingOptionChain = false;
     let isFetchingScan = false;
 
+    // =========================================================================
+    // O(1) DOM NODE DICTIONARIES & RAF BATCHING PIPELINE
+    // =========================================================================
+    const stockTableNodes = new Map();        // symbol -> { tr, ltpStrong, changeSpan, ... }
+    const stockGridNodes = new Map();         // symbol -> { card, ltpEl, changeEl }
+    const accordionNodes = new Map();         // symbol -> { expTr, ltpStrong, changeStrong }
+    const indexTickerNodes = [];              // Array of { key, item, ltpSpan, changeSpan }
+    const indexCardNodes = new Map();         // indexKey -> { card, ltpEl, changeEl }
+    const indexVerdictNodes = new Map();      // indexKey -> { card, priceEl, tagEl }
+    const optionChainStrikeNodes = new Map(); // strike -> { row, ceOi, ceChg, ceVol, ceLtp, peLtp, peVol, peChg, peOi }
+    let livePricesRafId = null;
+    let optionChainRafId = null;
+
     // Phase 3 Visual Heartbeat Telemetry (Proof of 1-sec tick)
     function triggerHeartbeatPulse() {
         const hb = document.getElementById("liveTickHeartbeat");
@@ -1123,10 +1136,6 @@ function initTradexoDashboard() {
         // Phase 3: The Fast Loop (1000ms) strictly hits /api/live_prices for lightweight sub-10ms ticks
         livePricesFastInterval = setInterval(() => {
             fetchLivePrices();
-            if (typeof fetchTickerIndices === 'function') fetchTickerIndices();
-            if (currentActiveSection === "indices" && typeof fetchIndices === 'function') {
-                fetchIndices();
-            }
         }, 1000);
 
         // Phase 3: The Heavy Loop (60s) updates 5-pillar conviction scores, ranking models & news weights
@@ -1259,15 +1268,255 @@ function initTradexoDashboard() {
         }
     }
 
-    function normalizeIndexKey(name) {
-        return String(name || '').replace(/[\s\-_^]/g, '').toUpperCase();
+    // =========================================================================
+    // O(1) DOM NODE CACHING & RAF BATCH MUTATION ENGINE
+    // =========================================================================
+    function ensureNodeDictionariesPopulated() {
+        // 1. Index Ticker Nodes (Marquee Ticker Tape)
+        if (indexTickerNodes.length === 0 && indexTickerTrack) {
+            indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                const rawName = item.dataset.indexName || item.querySelector('strong')?.textContent || '';
+                const idxKey = normalizeIndexKey(rawName);
+                const spans = item.querySelectorAll('span');
+                indexTickerNodes.push({
+                    key: idxKey,
+                    item: item,
+                    ltpSpan: spans[0] || null,
+                    changeSpan: spans[1] || spans[2] || null
+                });
+            });
+        }
+
+        // 2. Index Card Nodes (#indexGrid)
+        if (indexCardNodes.size === 0 && indexGrid) {
+            indexGrid.querySelectorAll('.index-card').forEach(card => {
+                const rawName = card.dataset.indexName || card.querySelector('.index-card-name')?.textContent || '';
+                const idxKey = normalizeIndexKey(rawName);
+                indexCardNodes.set(idxKey, {
+                    card: card,
+                    ltpEl: card.querySelector('.index-card-ltp'),
+                    changeEl: card.querySelector('.index-card-change')
+                });
+            });
+        }
+
+        // 3. Index Verdict Nodes (#indexVerdictGrid)
+        if (indexVerdictNodes.size === 0 && indexVerdictGrid) {
+            indexVerdictGrid.querySelectorAll('.index-verdict-card').forEach(card => {
+                const rawName = card.querySelector('.index-verdict-card-name')?.textContent || '';
+                const idxKey = normalizeIndexKey(rawName);
+                indexVerdictNodes.set(idxKey, {
+                    card: card,
+                    priceEl: card.querySelector('.index-verdict-card-price'),
+                    tagEl: card.querySelector('.index-verdict-card-price span')
+                });
+            });
+        }
+
+        // 4. Scanner Table Nodes (#stocksTableBody)
+        if (stockTableNodes.size === 0 && stocksTableBody) {
+            stocksTableBody.querySelectorAll('tr[data-row-key]:not(.gap-distribution-row)').forEach(tr => {
+                const key = tr.dataset.rowKey || '';
+                const sym = key.split('-')[0];
+                if (!sym) return;
+                stockTableNodes.set(sym, {
+                    tr: tr,
+                    ltpStrong: tr.querySelector('[data-label="LTP"] strong') || tr.querySelector('[data-label="LTP"]'),
+                    changeSpan: tr.querySelector('[data-label="CHANGE"] span') || tr.querySelector('[data-label="CHANGE"]')
+                });
+            });
+        }
+
+        // 5. Live Grid Nodes (#liveStocksGrid)
+        if (stockGridNodes.size === 0) {
+            const liveGrid = document.getElementById("liveStocksGrid");
+            if (liveGrid) {
+                liveGrid.querySelectorAll('.live-stock-card').forEach(card => {
+                    const sym = card.dataset.symbol;
+                    if (!sym) return;
+                    stockGridNodes.set(sym, {
+                        card: card,
+                        ltpEl: card.querySelector('.live-card-ltp'),
+                        changeEl: card.querySelector('.live-card-change')
+                    });
+                });
+            }
+        }
+    }
+
+    function batchMutateLivePrices(data) {
+        if (livePricesRafId) cancelAnimationFrame(livePricesRafId);
+
+        livePricesRafId = requestAnimationFrame(() => {
+            livePricesRafId = null;
+
+            ensureNodeDictionariesPopulated();
+
+            // 1. Batch Index Updates (Synchronous execution for Nifty 50, Bank Nifty, Sensex, and GIFT Nifty)
+            if (data.indices && Array.isArray(data.indices) && data.indices.length > 0) {
+                const indexMap = new Map();
+                data.indices.forEach(idx => {
+                    if (idx.index_name) indexMap.set(normalizeIndexKey(idx.index_name), idx);
+                    if (idx.display_name) indexMap.set(normalizeIndexKey(idx.display_name), idx);
+                });
+
+                // Top marquee ticker bar (O(1) iterations over cached nodes, zero querySelector)
+                indexTickerNodes.forEach(node => {
+                    const idx = indexMap.get(node.key);
+                    if (!idx) return;
+
+                    if (node.ltpSpan && idx.ltp != null) {
+                        const formattedLtp = idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        if (node.ltpSpan.textContent !== formattedLtp) {
+                            node.ltpSpan.textContent = formattedLtp;
+                        }
+                    }
+
+                    if (node.changeSpan && idx.change_pts != null) {
+                        const isUp = idx.change_pts >= 0;
+                        const sign = isUp ? '+' : '';
+                        const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
+                        const text = `${sign}${pts} (${sign}${pctVal.toFixed(2)}%)`;
+                        if (node.changeSpan.textContent !== text) {
+                            node.changeSpan.textContent = text;
+                        }
+                        const targetClass = isUp ? 'text-bullish' : 'text-bearish';
+                        if (node.changeSpan.className !== targetClass) {
+                            node.changeSpan.className = targetClass;
+                        }
+                    }
+                });
+
+                // Index Intelligence Cards (O(1) lookups)
+                indexCardNodes.forEach((node, idxKey) => {
+                    const idx = indexMap.get(idxKey);
+                    if (!idx) return;
+
+                    if (node.ltpEl && idx.ltp != null) {
+                        const formatted = `₹${idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        if (node.ltpEl.textContent !== formatted) node.ltpEl.textContent = formatted;
+                    }
+
+                    if (node.changeEl && idx.change_pts != null && idx.pct_change != null) {
+                        const isUp = idx.change_pts >= 0;
+                        const sign = isUp ? '+' : '';
+                        const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
+                        const text = `${sign}${pts} (${sign}${pctVal.toFixed(2)}%)`;
+                        const targetClass = `index-card-change ${isUp ? 'text-bullish' : 'text-bearish'}`;
+                        if (node.changeEl.className !== targetClass) node.changeEl.className = targetClass;
+                        if (node.changeEl.textContent !== text) node.changeEl.textContent = text;
+                    }
+                });
+
+                // Index Verdict Cards (O(1) lookups)
+                indexVerdictNodes.forEach((node, idxKey) => {
+                    const idx = indexMap.get(idxKey);
+                    if (!idx || !node.priceEl) return;
+                    if (idx.ltp != null) {
+                        const tagHtml = node.tagEl ? node.tagEl.outerHTML : '';
+                        const formatted = `₹${idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ${tagHtml}`;
+                        if (node.priceEl.innerHTML !== formatted) node.priceEl.innerHTML = formatted;
+                    }
+                });
+            }
+
+            // 2. Batch Stock Price Updates (O(1) lookups)
+            if (data.stocks && Array.isArray(data.stocks) && data.stocks.length > 0) {
+                const stockMap = new Map();
+                data.stocks.forEach(s => stockMap.set(s.symbol, s));
+
+                // Update in-memory allStocks
+                allStocks.forEach(s => {
+                    const live = stockMap.get(s.symbol);
+                    if (live) {
+                        if (live.ltp != null) s.ltp = live.ltp;
+                        if (live.prev_close != null) s.prev_close = live.prev_close;
+                        if (live.change_pts != null) s.change_pts = live.change_pts;
+                        if (live.pct_change != null) s.pct_change = live.pct_change;
+                    }
+                });
+
+                // Scanner Table Rows (O(1) Map lookups, zero document.querySelector)
+                stockTableNodes.forEach((node, sym) => {
+                    const s = stockMap.get(sym);
+                    if (!s) return;
+
+                    if (node.ltpStrong && s.ltp != null) {
+                        const formattedLtp = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                        if (node.ltpStrong.textContent !== formattedLtp) {
+                            node.ltpStrong.textContent = formattedLtp;
+                        }
+                    }
+
+                    if (node.changeSpan && s.change_pts != null && s.pct_change != null) {
+                        const isUp = s.change_pts >= 0;
+                        const sign = isUp ? '+' : '';
+                        const newText = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                        const targetClass = isUp ? 'text-bullish' : 'text-bearish';
+                        if (node.changeSpan.className !== targetClass) {
+                            node.changeSpan.className = targetClass;
+                        }
+                        if (node.changeSpan.textContent !== newText) {
+                            node.changeSpan.textContent = newText;
+                        }
+                    }
+                });
+
+                // Live Stock Grid Cards (O(1) Map lookups, zero document.querySelector)
+                stockGridNodes.forEach((node, sym) => {
+                    const s = stockMap.get(sym);
+                    if (!s) return;
+
+                    const isUp = (s.change_pts || 0) >= 0;
+                    const sign = isUp ? '+' : '';
+                    const targetCardClass = `live-stock-card ${isUp ? 'live-card-up' : 'live-card-down'}`;
+                    if (node.card.className !== targetCardClass) {
+                        node.card.className = targetCardClass;
+                    }
+
+                    if (node.ltpEl && s.ltp != null) {
+                        const formattedLtp = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                        if (node.ltpEl.textContent !== formattedLtp) {
+                            node.ltpEl.textContent = formattedLtp;
+                        }
+                    }
+
+                    if (node.changeEl && s.change_pts != null && s.pct_change != null) {
+                        const arrowIcon = isUp ? 'fa-caret-up' : 'fa-caret-down';
+                        const newHtml = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                        if (node.changeEl.innerHTML !== newHtml) {
+                            node.changeEl.innerHTML = newHtml;
+                        }
+                    }
+                });
+
+                // Accordion Open Detail Rows (O(1) Map lookups)
+                accordionNodes.forEach((node, sym) => {
+                    const s = stockMap.get(sym);
+                    if (!s || !node.strongs || node.strongs.length < 2) return;
+                    if (s.ltp != null) {
+                        const formatted = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                        if (node.strongs[0].textContent !== formatted) node.strongs[0].textContent = formatted;
+                    }
+                    if (s.change_pts != null && s.pct_change != null) {
+                        const isUp = s.change_pts >= 0;
+                        const sign = isUp ? '+' : '';
+                        const targetClass = isUp ? 'text-bullish' : 'text-bearish';
+                        if (node.strongs[1].className !== targetClass) node.strongs[1].className = targetClass;
+                        const newText = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                        if (node.strongs[1].textContent !== newText) node.strongs[1].textContent = newText;
+                    }
+                });
+            }
+        });
     }
 
     // Phase 1: Timestamp Monotonicity State & Fast In-Place Price Updater
     let lastBtstStatus = 'pre_btst';
     async function fetchLivePrices() {
         if (isFetchingPrices) {
-            // Traffic Jam Prevention: previous tick is still in-flight
             const hb = document.getElementById("liveTickHeartbeat");
             if (hb) hb.className = "tick-heartbeat tick-lagging";
             return;
@@ -1298,209 +1547,29 @@ function initTradexoDashboard() {
             // Update BTST status
             if (data.btst_status) lastBtstStatus = data.btst_status;
 
-            // 1. Update Index Prices In-Place across all sections (Micro-targeted text mutations)
-            if (data.indices && Array.isArray(data.indices) && data.indices.length > 0) {
-                const indexMap = {};
-                data.indices.forEach(idx => {
-                    if (idx.index_name) indexMap[normalizeIndexKey(idx.index_name)] = idx;
-                    if (idx.display_name) indexMap[normalizeIndexKey(idx.display_name)] = idx;
-                });
-
-                // Top marquee ticker bar (#indexTickerTrack)
-                if (indexTickerTrack) {
-                    const items = indexTickerTrack.querySelectorAll('.index-ticker-item');
-                    items.forEach(item => {
-                        const idxName = item.dataset.indexName;
-                        const nameEl = item.querySelector('strong');
-                        const nameText = nameEl ? nameEl.textContent.trim() : '';
-                        const idx = indexMap[normalizeIndexKey(idxName)] || indexMap[normalizeIndexKey(nameText)];
-                        if (!idx) return;
-                        const spans = item.querySelectorAll('span');
-                        if (spans.length >= 1 && idx.ltp != null) {
-                            const formattedLtp = idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            if (spans[0].textContent !== formattedLtp) spans[0].textContent = formattedLtp;
-                        }
-                        const changeSpan = spans[1] || spans[2];
-                        if (changeSpan && idx.change_pts != null) {
-                            const isUp = idx.change_pts >= 0;
-                            const sign = isUp ? '+' : '';
-                            const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
-                            const pct = pctVal.toFixed(2);
-                            const text = `${sign}${pts} (${sign}${pct}%)`;
-                            if (changeSpan.textContent !== text) changeSpan.textContent = text;
-                            changeSpan.className = isUp ? 'text-bullish' : 'text-bearish';
-                        }
-                    });
-                }
-
-                // Index Intelligence Cards (#indexGrid)
-                if (indexGrid) {
-                    const indexCards = indexGrid.querySelectorAll('.index-card');
-                    indexCards.forEach(card => {
-                        const idxName = card.dataset.indexName;
-                        const nameEl = card.querySelector('.index-card-name');
-                        const nameText = nameEl ? nameEl.textContent.trim() : '';
-                        const idx = indexMap[normalizeIndexKey(idxName)] || indexMap[normalizeIndexKey(nameText)];
-                        if (!idx) return;
-
-                        const ltpEl = card.querySelector('.index-card-ltp');
-                        if (ltpEl && idx.ltp != null) {
-                            const formatted = `₹${idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-                            if (ltpEl.textContent !== formatted) ltpEl.textContent = formatted;
-                        }
-                        const changeEl = card.querySelector('.index-card-change');
-                        if (changeEl && idx.change_pts != null && idx.pct_change != null) {
-                            const isUp = idx.change_pts >= 0;
-                            const sign = isUp ? '+' : '';
-                            const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
-                            const pct = pctVal.toFixed(2);
-                            changeEl.className = `index-card-change ${isUp ? 'text-bullish' : 'text-bearish'}`;
-                            const text = `${sign}${pts} (${sign}${pct}%)`;
-                            if (changeEl.textContent !== text) changeEl.textContent = text;
-                        }
-                    });
-                }
-
-                // Index Verdict Cards (#indexVerdictGrid)
-                if (indexVerdictGrid) {
-                    const verdictCards = indexVerdictGrid.querySelectorAll('.index-verdict-card');
-                    verdictCards.forEach(card => {
-                        const nameEl = card.querySelector('.index-verdict-card-name');
-                        const nameText = nameEl ? nameEl.textContent.trim() : '';
-                        const idx = nameText ? indexMap[nameText] : null;
-                        if (!idx) return;
-                        const priceEl = card.querySelector('.index-verdict-card-price');
-                        if (priceEl && idx.ltp != null) {
-                            const tagEl = priceEl.querySelector('span');
-                            const tagHtml = tagEl ? tagEl.outerHTML : '';
-                            priceEl.innerHTML = `₹${idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ${tagHtml}`;
-                        }
-                    });
-                }
-            }
-
-            // 2. Update Stock Prices In-Place (Strict textNode mutations, ZERO img/accordion wipes)
-            if (data.stocks && Array.isArray(data.stocks) && data.stocks.length > 0) {
-                const stockMap = {};
-                data.stocks.forEach(s => { stockMap[s.symbol] = s; });
-
-                if (allStocks.length === 0) {
-                    // Cold-start fallback: populate allStocks from live prices endpoint
-                    allStocks = data.stocks.map((s, idx) => ({
-                        symbol: s.symbol,
-                        raw_ticker: `${s.symbol}.NS`,
-                        rank_position: idx + 1,
-                        priority_level: "P3_LOW",
-                        signal: "WATCHLIST",
-                        confidence_score: 50,
-                        predicted_gap_pct: 0.0,
-                        ltp: s.ltp || 0.0,
-                        prev_close: s.prev_close || 0.0,
-                        change_pts: s.change_pts || 0.0,
-                        pct_change: s.pct_change || 0.0,
-                        volume_spike: 1.0,
-                        rsi: 50.0,
-                        confirmed_pillars_weight: 0.0,
-                        required_pillars: 3,
-                    }));
-                    filterAndRenderTable();
-                } else {
-                    const existingSymbols = new Set(allStocks.map(s => s.symbol));
-                    allStocks.forEach(s => {
-                        const live = stockMap[s.symbol];
-                        if (live) {
-                            if (live.ltp != null) s.ltp = live.ltp;
-                            if (live.prev_close != null) s.prev_close = live.prev_close;
-                            if (live.change_pts != null) s.change_pts = live.change_pts;
-                            if (live.pct_change != null) s.pct_change = live.pct_change;
-                        }
-                    });
-
-                    // Update Live Stock Grid Cards in-place
-                    const liveGrid = document.getElementById("liveStocksGrid");
-                    if (liveGrid) {
-                        const cards = liveGrid.querySelectorAll('.live-stock-card');
-                        if (cards.length === 0 && currentStockView === "live") {
-                            filterAndRenderTable();
-                        } else {
-                            cards.forEach(card => {
-                                const sym = card.dataset.symbol;
-                                const s = stockMap[sym];
-                                if (!s) return;
-                                const isUp = (s.change_pts || 0) >= 0;
-                                const sign = isUp ? '+' : '';
-                                card.className = `live-stock-card ${isUp ? 'live-card-up' : 'live-card-down'}`;
-                                const ltpEl = card.querySelector('.live-card-ltp');
-                                if (ltpEl && s.ltp != null) {
-                                    const formattedLtp = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-                                    if (ltpEl.textContent !== formattedLtp) {
-                                        ltpEl.textContent = formattedLtp;
-                                        ltpEl.classList.add('price-tick-flash');
-                                        setTimeout(() => ltpEl.classList.remove('price-tick-flash'), 800);
-                                    }
-                                }
-                                const changeEl = card.querySelector('.live-card-change');
-                                if (changeEl && s.change_pts != null && s.pct_change != null) {
-                                    const arrowIcon = isUp ? 'fa-caret-up' : 'fa-caret-down';
-                                    const newHtml = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
-                                    if (changeEl.innerHTML !== newHtml) {
-                                        changeEl.innerHTML = newHtml;
-                                    }
-                                }
-                            });
-                        }
-                    }
-
-                    // Update BTST Scanner Table cells in-place (Strict text queries, ZERO innerHTML parent replacement)
-                    if (stocksTableBody) {
-                        stocksTableBody.querySelectorAll('tr[data-row-key]:not(.gap-distribution-row)').forEach(tr => {
-                            const key = tr.dataset.rowKey || '';
-                            const sym = key.split('-')[0];
-                            const s = stockMap[sym];
-                            if (!s) return;
-
-                            const ltpCell = tr.querySelector('[data-label="LTP"]');
-                            if (ltpCell && s.ltp != null) {
-                                const formattedLtp = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-                                const strong = ltpCell.querySelector('strong') || ltpCell;
-                                if (strong.textContent !== formattedLtp) {
-                                    strong.textContent = formattedLtp;
-                                }
-                            }
-                            const changeCell = tr.querySelector('[data-label="CHANGE"]');
-                            if (changeCell && s.change_pts != null && s.pct_change != null) {
-                                const isUp = s.change_pts >= 0;
-                                const sign = isUp ? '+' : '';
-                                const span = changeCell.querySelector('span') || changeCell;
-                                const newText = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
-                                span.className = isUp ? 'text-bullish' : 'text-bearish';
-                                if (span.textContent !== newText) {
-                                    span.textContent = newText;
-                                }
-                            }
-                        });
-
-                        // Update open expanded accordion rows without rebuilding
-                        stocksTableBody.querySelectorAll('tr.gap-distribution-row.expanded').forEach(expTr => {
-                            const key = expTr.dataset.rowKey || '';
-                            const sym = key.split('-')[0];
-                            const s = stockMap[sym];
-                            if (!s) return;
-                            const strongs = expTr.querySelectorAll('.card-ltp-strip strong');
-                            if (strongs.length >= 2) {
-                                if (s.ltp != null) strongs[0].textContent = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-                                if (s.change_pts != null && s.pct_change != null) {
-                                    const isUp = s.change_pts >= 0;
-                                    const sign = isUp ? '+' : '';
-                                    strongs[1].className = isUp ? 'text-bullish' : 'text-bearish';
-                                    strongs[1].textContent = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
-                                }
-                            }
-                        });
-                    }
-                }
+            if (allStocks.length === 0 && data.stocks && Array.isArray(data.stocks) && data.stocks.length > 0) {
+                // Cold-start fallback: populate allStocks from live prices endpoint
+                allStocks = data.stocks.map((s, idx) => ({
+                    symbol: s.symbol,
+                    raw_ticker: `${s.symbol}.NS`,
+                    rank_position: idx + 1,
+                    priority_level: "P3_LOW",
+                    signal: "WATCHLIST",
+                    confidence_score: 50,
+                    predicted_gap_pct: 0.0,
+                    ltp: s.ltp || 0.0,
+                    prev_close: s.prev_close || 0.0,
+                    change_pts: s.change_pts || 0.0,
+                    pct_change: s.pct_change || 0.0,
+                    volume_spike: 1.0,
+                    rsi: 50.0,
+                    confirmed_pillars_weight: 0.0,
+                    required_pillars: 3,
+                }));
+                filterAndRenderTable();
+            } else {
+                // High-Performance O(1) Dictionary Mutation in requestAnimationFrame
+                batchMutateLivePrices(data);
             }
         } catch (e) {
             triggerHeartbeatError();
@@ -1738,6 +1807,7 @@ function initTradexoDashboard() {
                 return;
             }
 
+            stockGridNodes.clear();
             liveStocksGrid.innerHTML = "";
             filtered.forEach(stock => {
                 const changePts = stock.change_pts || 0;
@@ -1749,41 +1819,36 @@ function initTradexoDashboard() {
                 const arrowIcon = isUp ? "fa-caret-up" : "fa-caret-down";
                 const sigText = stock.signal || (isUp ? "TOP GAINER" : "TOP LOSER");
 
-                let card = liveStocksGrid.querySelector(`[data-symbol="${CSS.escape(stock.symbol || '')}"]`);
-                if (card) {
-                    // Selective In-Place Update — PRESERVES LOGO IMAGE TAG & PREVENTS FLASHING
-                    card.className = `live-stock-card ${colorClass}`;
-                    const ltpEl = card.querySelector(".live-card-ltp");
-                    if (ltpEl) ltpEl.textContent = `₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-                    const changeEl = card.querySelector(".live-card-change");
-                    if (changeEl) {
-                        changeEl.innerHTML = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)`;
-                    }
-                } else {
-                    card = document.createElement("div");
-                    card.className = `live-stock-card ${colorClass}`;
-                    card.dataset.symbol = stock.symbol || "";
-                    card.innerHTML = `
-                        <div class="symbol-with-logo">
-                            ${getStockLogoHTML(stock.symbol)}
-                            <div>
-                                <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
-                                <div style="font-size: 10px; font-weight: 700; color: ${isUp ? '#10b981' : '#ef4444'}; margin-top: 2px;">
-                                    <i class="fa-solid ${isUp ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${escapeHtml(sigText)}
-                                </div>
+                const card = document.createElement("div");
+                card.className = `live-stock-card ${colorClass}`;
+                card.dataset.symbol = stock.symbol || "";
+                card.innerHTML = `
+                    <div class="symbol-with-logo">
+                        ${getStockLogoHTML(stock.symbol)}
+                        <div>
+                            <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
+                            <div style="font-size: 10px; font-weight: 700; color: ${isUp ? '#10b981' : '#ef4444'}; margin-top: 2px;">
+                                <i class="fa-solid ${isUp ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${escapeHtml(sigText)}
                             </div>
                         </div>
-                        <div style="text-align:right;">
-                            <div class="live-card-ltp">₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
-                            <div class="live-card-change">
-                                <i class="fa-solid ${arrowIcon}"></i>
-                                ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
-                            </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="live-card-ltp">₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+                        <div class="live-card-change">
+                            <i class="fa-solid ${arrowIcon}"></i>
+                            ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
                         </div>
-                    `;
-                    card.addEventListener("click", () => openStockModal(stock.symbol));
-                    liveStocksGrid.appendChild(card);
-                }
+                    </div>
+                `;
+                card.addEventListener("click", () => openStockModal(stock.symbol));
+                liveStocksGrid.appendChild(card);
+
+                // Register into O(1) Node Dictionary
+                stockGridNodes.set(stock.symbol, {
+                    card: card,
+                    ltpEl: card.querySelector(".live-card-ltp"),
+                    changeEl: card.querySelector(".live-card-change")
+                });
             });
             return;
         }
@@ -1791,6 +1856,8 @@ function initTradexoDashboard() {
         // ── BTST STOCKS VIEW: Table rendering ──
         if (btstTableWrapper) btstTableWrapper.classList.remove("hidden");
         if (liveStocksGrid) liveStocksGrid.classList.add("hidden");
+        stockTableNodes.clear();
+        accordionNodes.clear();
         stocksTableBody.innerHTML = "";
         
         if (filtered.length === 0) {
@@ -2047,10 +2114,23 @@ function initTradexoDashboard() {
             }
 
             stocksTableBody.appendChild(tr);
+
+            // Register into O(1) Node Dictionary
+            stockTableNodes.set(stock.symbol, {
+                tr: tr,
+                ltpStrong: tr.querySelector('[data-label="LTP"] strong') || tr.querySelector('[data-label="LTP"]'),
+                changeSpan: tr.querySelector('[data-label="CHANGE"] span') || tr.querySelector('[data-label="CHANGE"]')
+            });
+
             if (bucketHtml) {
                 const tempTable = document.createElement("table");
                 tempTable.innerHTML = `<tbody>${bucketHtml}</tbody>`;
-                stocksTableBody.appendChild(tempTable.querySelector("tr"));
+                const expTr = tempTable.querySelector("tr");
+                stocksTableBody.appendChild(expTr);
+                accordionNodes.set(stock.symbol, {
+                    expTr: expTr,
+                    strongs: expTr.querySelectorAll('.card-ltp-strip strong')
+                });
             }
             if (flowDetailRowHtml) {
                 const tempTable = document.createElement("table");
@@ -2576,47 +2656,55 @@ function initTradexoDashboard() {
             }
 
             // Check if table rows already exist for in-place mutation (Zero DOM thrashing on 1s silent ticks)
-            const existingRows = tbody.querySelectorAll('tr[data-strike]');
-            if (existingRows.length === strikes.length && isSilentTick) {
-                strikes.forEach(s => {
-                    const row = tbody.querySelector(`tr[data-strike="${s.strike_price}"]`);
-                    if (!row) return;
-                    const ce = s.ce || {};
-                    const pe = s.pe || {};
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length >= 9) {
+            if (isSilentTick && optionChainStrikeNodes.size === strikes.length) {
+                if (optionChainRafId) cancelAnimationFrame(optionChainRafId);
+                optionChainRafId = requestAnimationFrame(() => {
+                    optionChainRafId = null;
+                    strikes.forEach(s => {
+                        const strikeKey = String(s.strike_price);
+                        const node = optionChainStrikeNodes.get(strikeKey);
+                        if (!node) return;
+                        const ce = s.ce || {};
+                        const pe = s.pe || {};
+
                         // CE: OI (0)
                         const ceOi = (ce.open_interest || 0).toLocaleString();
-                        if (cells[0].textContent.trim() !== ceOi) cells[0].textContent = ceOi;
+                        if (node.ceOi.textContent.trim() !== ceOi) node.ceOi.textContent = ceOi;
+
                         // CE: CHNG IN OI (1)
                         const ceChg = `${(ce.change_in_oi || 0) >= 0 ? '+' : ''}${(ce.change_in_oi || 0).toLocaleString()}`;
-                        if (cells[1].textContent.trim() !== ceChg) {
-                            cells[1].textContent = ceChg;
-                            cells[1].style.color = (ce.change_in_oi || 0) >= 0 ? '#047857' : '#be123c';
+                        if (node.ceChg.textContent.trim() !== ceChg) {
+                            node.ceChg.textContent = ceChg;
+                            node.ceChg.style.color = (ce.change_in_oi || 0) >= 0 ? '#047857' : '#be123c';
                         }
+
                         // CE: VOL (2)
                         const ceVol = (ce.volume || 0).toLocaleString();
-                        if (cells[2].textContent.trim() !== ceVol) cells[2].textContent = ceVol;
+                        if (node.ceVol.textContent.trim() !== ceVol) node.ceVol.textContent = ceVol;
+
                         // CE: LTP (3)
                         const ceLtp = `₹${(ce.ltp || 0).toFixed(2)}`;
-                        if (cells[3].textContent.trim() !== ceLtp) cells[3].textContent = ceLtp;
+                        if (node.ceLtp.textContent.trim() !== ceLtp) node.ceLtp.textContent = ceLtp;
 
                         // PE: LTP (5)
                         const peLtp = `₹${(pe.ltp || 0).toFixed(2)}`;
-                        if (cells[5].textContent.trim() !== peLtp) cells[5].textContent = peLtp;
+                        if (node.peLtp.textContent.trim() !== peLtp) node.peLtp.textContent = peLtp;
+
                         // PE: VOL (6)
                         const peVol = (pe.volume || 0).toLocaleString();
-                        if (cells[6].textContent.trim() !== peVol) cells[6].textContent = peVol;
+                        if (node.peVol.textContent.trim() !== peVol) node.peVol.textContent = peVol;
+
                         // PE: CHNG IN OI (7)
                         const peChg = `${(pe.change_in_oi || 0) >= 0 ? '+' : ''}${(pe.change_in_oi || 0).toLocaleString()}`;
-                        if (cells[7].textContent.trim() !== peChg) {
-                            cells[7].textContent = peChg;
-                            cells[7].style.color = (pe.change_in_oi || 0) >= 0 ? '#047857' : '#be123c';
+                        if (node.peChg.textContent.trim() !== peChg) {
+                            node.peChg.textContent = peChg;
+                            node.peChg.style.color = (pe.change_in_oi || 0) >= 0 ? '#047857' : '#be123c';
                         }
+
                         // PE: OI (8)
                         const peOi = (pe.open_interest || 0).toLocaleString();
-                        if (cells[8].textContent.trim() !== peOi) cells[8].textContent = peOi;
-                    }
+                        if (node.peOi.textContent.trim() !== peOi) node.peOi.textContent = peOi;
+                    });
                 });
                 return;
             }
@@ -2678,6 +2766,27 @@ function initTradexoDashboard() {
                     </tr>
                 `;
             }).join("");
+
+            // Register into O(1) optionChainStrikeNodes dictionary
+            optionChainStrikeNodes.clear();
+            tbody.querySelectorAll('tr[data-strike]').forEach(row => {
+                const strike = row.dataset.strike;
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 9) {
+                    optionChainStrikeNodes.set(String(strike), {
+                        row: row,
+                        ceOi: cells[0],
+                        ceChg: cells[1],
+                        ceVol: cells[2],
+                        ceLtp: cells[3],
+                        strikeCell: cells[4],
+                        peLtp: cells[5],
+                        peVol: cells[6],
+                        peChg: cells[7],
+                        peOi: cells[8]
+                    });
+                }
+            });
 
         } catch (err) {
             if (!isSilentTick) console.warn("Option chain fetch error:", err);
@@ -3974,39 +4083,21 @@ function initTradexoDashboard() {
                             if (idxName) openIndexChartModal(idxName);
                         });
                     });
-                } else {
-                    // Update numbers in-place without touching innerHTML (preserves CSS marquee scroll position!)
-                    const indexMap = {};
-                    indices.forEach(idx => {
-                        if (idx.index_name) indexMap[normalizeIndexKey(idx.index_name)] = idx;
-                        if (idx.display_name) indexMap[normalizeIndexKey(idx.display_name)] = idx;
-                    });
-                    indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
-                        const idxName = item.dataset.indexName;
-                        const nameEl = item.querySelector('strong');
-                        const nameText = nameEl ? nameEl.textContent.trim() : '';
-                        const fallback = DEFAULT_INDEX_FALLBACKS.find(f => normalizeIndexKey(f.index_name) === normalizeIndexKey(idxName) || normalizeIndexKey(f.display_name) === normalizeIndexKey(nameText)) || DEFAULT_INDEX_FALLBACKS[0];
-                        const idx = indexMap[normalizeIndexKey(idxName)] || indexMap[normalizeIndexKey(nameText)] || fallback;
-                        const spans = item.querySelectorAll('span');
-                        if (spans.length >= 2) {
-                            const rawLtp = idx.ltp != null ? idx.ltp : fallback.ltp;
-                            const ltp = rawLtp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            const changePts = idx.change_pts != null ? idx.change_pts : fallback.change_pts;
-                            const pctChange = idx.pct_change != null ? idx.pct_change : fallback.pct_change;
-                            const isUp = changePts >= 0;
-                            const sign = isUp ? '+' : '';
-                            const ptsText = Math.abs(changePts).toFixed(2);
-                            const pctText = (typeof pctChange === 'number' ? Math.abs(pctChange).toFixed(2) : pctChange);
-
-                            spans[0].textContent = ltp;
-                            const changeSpan = spans[1] || spans[2];
-                            if (changeSpan) {
-                                changeSpan.className = isUp ? 'text-bullish' : 'text-bearish';
-                                changeSpan.textContent = `${sign}${ptsText} (${sign}${pctText}%)`;
-                            }
-                        }
-                    });
                 }
+
+                // Register into O(1) indexTickerNodes dictionary
+                indexTickerNodes.length = 0;
+                indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                    const rawName = item.dataset.indexName || item.querySelector('strong')?.textContent || '';
+                    const idxKey = normalizeIndexKey(rawName);
+                    const spans = item.querySelectorAll('span');
+                    indexTickerNodes.push({
+                        key: idxKey,
+                        item: item,
+                        ltpSpan: spans[0] || null,
+                        changeSpan: spans[1] || spans[2] || null
+                    });
+                });
             }
         } catch (e) {
             console.warn("Error fetching ticker indices:", e);
