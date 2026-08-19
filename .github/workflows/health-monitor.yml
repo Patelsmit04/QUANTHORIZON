@@ -1,0 +1,80 @@
+name: External Health Monitor & Alerting
+
+# Independent availability monitor for the deployed site's /health endpoint. Deliberately
+# separate from market-cron.yml / sentinel_heartbeat.yml, which drive market-hours business
+# logic (scanner ticks, self-healing) -- this workflow's only job is "is the site reachable
+# and how fast", runs 24/7 (not just market hours), and alerts on sustained failure /
+# recovery. See monitoring/README.md for full setup.
+#
+# Honest limitation: GitHub Actions' schedule trigger is best-effort and NOT guaranteed to
+# fire exactly on time -- 5 minutes is the realistic minimum interval (this repo's other
+# scheduled workflows already settled on 5-10 minutes for the same reason). It will not
+# reliably hit a true 60-second cadence. If you need genuine ~1-minute checks with guaranteed
+# delivery, pair this with a free dedicated uptime service (see monitoring/README.md).
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  health_check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout main (monitor scripts)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: app
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install --quiet requests
+
+      - name: Prepare monitoring-data worktree (state history + dashboard)
+        working-directory: app
+        run: |
+          git fetch origin monitoring-data:monitoring-data 2>/dev/null || true
+          if git show-ref --verify --quiet refs/heads/monitoring-data; then
+            git worktree add ../monitoring-data monitoring-data
+          else
+            git worktree add --orphan -b monitoring-data ../monitoring-data
+          fi
+
+      - name: Run health check
+        id: healthcheck
+        working-directory: app/monitoring
+        continue-on-error: true
+        env:
+          APP_BASE_URL: ${{ secrets.QUANTHORIZON_APP_URL || secrets.TRADEXO_APP_URL }}
+          MONITOR_STATE_FILE: ../../monitoring-data/state.json
+          MONITOR_SITE_LABEL: "QUANTHORIZON WEBSITE"
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python health_monitor.py
+
+      - name: Publish dashboard + commit state history
+        working-directory: monitoring-data
+        run: |
+          cp ../app/monitoring/dashboard.html index.html
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add state.json index.html
+          git commit -m "chore(monitor): health check $(date -u +%Y-%m-%dT%H:%M:%SZ)" || echo "Nothing to commit"
+          git push origin monitoring-data
+
+      - name: Fail this run if the site is currently DOWN
+        if: steps.healthcheck.outcome == 'failure'
+        run: |
+          echo "::error::Site is DOWN (consecutive failure threshold reached) -- see health check step output above."
+          exit 1
