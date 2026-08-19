@@ -124,13 +124,17 @@ function getStockLogoHTML(symbol) {
 window.getStockLogoHTML = getStockLogoHTML;
 
 function initTradexoDashboard() {
-    // Application State
+    // Application State & Polling Infrastructure
     window.allStocks = [];
     let allStocks = window.allStocks;
     let currentFilter = "ALL";
     let currentStockView = "intelligence"; // "intelligence" or "live"
-    let autoRefreshInterval = null;
+    let livePricesFastInterval = null;     // Phase 3: 1-Second Fast Price Ticks Loop
+    let heavyScanInterval = null;          // Phase 3: 60-Second Slow Conviction Scoring Loop
+    let autoRefreshInterval = null;        // Legacy handle alias
     let newsRefreshInterval = null;
+    let lastProcessedMarketTimestamp = 0;      // Phase 1: Global Timestamp Monotonicity Tracker
+    let lastProcessedOptionChainTimestamp = 0; // Phase 1: Option Chain Timestamp Tracker
     // Strategy cards rebuild #strategyGrid from scratch on every toggle/edit action, so
     // collapsed/expanded state must survive that — tracked here, not as a DOM class.
     const collapsedStrategyIds = new Set();
@@ -1081,19 +1085,35 @@ function initTradexoDashboard() {
     }
 
     function setupAutoRefresh() {
-        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        // Strict Teardown of any existing intervals to prevent ghost polling loops
+        if (livePricesFastInterval) {
+            clearInterval(livePricesFastInterval);
+            livePricesFastInterval = null;
+        }
+        if (heavyScanInterval) {
+            clearInterval(heavyScanInterval);
+            heavyScanInterval = null;
+        }
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+        }
 
-        // Strict 5-second live market refresh for stocks & top index marquee ticker bar
-        const refreshMs = 5000; // 5 seconds live refresh
-
-        autoRefreshInterval = setInterval(() => {
-            fetchScanResults(false);
+        // Phase 3: The Fast Loop (1000ms) strictly hits /api/live_prices for lightweight sub-10ms ticks
+        livePricesFastInterval = setInterval(() => {
+            fetchLivePrices();
             if (typeof fetchTickerIndices === 'function') fetchTickerIndices();
-            if (typeof fetchLivePrices === 'function') fetchLivePrices();
             if (currentActiveSection === "indices" && typeof fetchIndices === 'function') {
                 fetchIndices();
             }
-        }, refreshMs);
+        }, 1000);
+
+        // Phase 3: The Heavy Loop (60s) updates 5-pillar conviction scores, ranking models & news weights
+        heavyScanInterval = setInterval(() => {
+            fetchScanResults(false);
+        }, 60000);
+
+        autoRefreshInterval = livePricesFastInterval;
     }
 
     // Schedule a hard page reload at exactly 9:15:45 AM IST for fresh market data
@@ -1222,7 +1242,7 @@ function initTradexoDashboard() {
         return String(name || '').replace(/[\s\-_^]/g, '').toUpperCase();
     }
 
-    // Lightweight 5-sec live price updater — updates numbers in-place without re-rendering
+    // Phase 1: Timestamp Monotonicity State & Fast In-Place Price Updater
     let lastBtstStatus = 'pre_btst';
     async function fetchLivePrices() {
         try {
@@ -1230,13 +1250,21 @@ function initTradexoDashboard() {
             if (!response.ok) return;
             const data = await response.json();
 
+            // Phase 1: Monotonic Timestamp Validation Guard (Discard stale out-of-order responses)
+            const rawTime = data.timestamp || data.server_time || Date.now();
+            const payloadTime = typeof rawTime === 'number' ? rawTime : new Date(rawTime).getTime();
+            if (payloadTime && payloadTime < lastProcessedMarketTimestamp) {
+                return; // Discard stale asynchronous response
+            }
+            if (payloadTime) lastProcessedMarketTimestamp = payloadTime;
+
             // Synchronize Market Status Badge & Subtext
             updateMarketStatusBadge(data);
 
             // Update BTST status
             if (data.btst_status) lastBtstStatus = data.btst_status;
 
-            // 1. Update Index Prices In-Place across all sections
+            // 1. Update Index Prices In-Place across all sections (Micro-targeted text mutations)
             if (data.indices && Array.isArray(data.indices) && data.indices.length > 0) {
                 const indexMap = {};
                 data.indices.forEach(idx => {
@@ -1256,7 +1284,7 @@ function initTradexoDashboard() {
                         const spans = item.querySelectorAll('span');
                         if (spans.length >= 1 && idx.ltp != null) {
                             const formattedLtp = idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            spans[0].textContent = formattedLtp;
+                            if (spans[0].textContent !== formattedLtp) spans[0].textContent = formattedLtp;
                         }
                         const changeSpan = spans[1] || spans[2];
                         if (changeSpan && idx.change_pts != null) {
@@ -1265,7 +1293,8 @@ function initTradexoDashboard() {
                             const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                             const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
                             const pct = pctVal.toFixed(2);
-                            changeSpan.textContent = `${sign}${pts} (${sign}${pct}%)`;
+                            const text = `${sign}${pts} (${sign}${pct}%)`;
+                            if (changeSpan.textContent !== text) changeSpan.textContent = text;
                             changeSpan.className = isUp ? 'text-bullish' : 'text-bearish';
                         }
                     });
@@ -1283,7 +1312,8 @@ function initTradexoDashboard() {
 
                         const ltpEl = card.querySelector('.index-card-ltp');
                         if (ltpEl && idx.ltp != null) {
-                            ltpEl.textContent = `₹${idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                            const formatted = `₹${idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                            if (ltpEl.textContent !== formatted) ltpEl.textContent = formatted;
                         }
                         const changeEl = card.querySelector('.index-card-change');
                         if (changeEl && idx.change_pts != null && idx.pct_change != null) {
@@ -1293,7 +1323,8 @@ function initTradexoDashboard() {
                             const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
                             const pct = pctVal.toFixed(2);
                             changeEl.className = `index-card-change ${isUp ? 'text-bullish' : 'text-bearish'}`;
-                            changeEl.textContent = `${sign}${pts} (${sign}${pct}%)`;
+                            const text = `${sign}${pts} (${sign}${pct}%)`;
+                            if (changeEl.textContent !== text) changeEl.textContent = text;
                         }
                     });
                 }
@@ -1316,13 +1347,13 @@ function initTradexoDashboard() {
                 }
             }
 
-            // 2. Update Stock Prices In-Place
+            // 2. Update Stock Prices In-Place (Strict textNode mutations, ZERO img/accordion wipes)
             if (data.stocks && Array.isArray(data.stocks) && data.stocks.length > 0) {
                 const stockMap = {};
                 data.stocks.forEach(s => { stockMap[s.symbol] = s; });
 
                 if (allStocks.length === 0) {
-                    // Cold-start fallback: populate allStocks from 5-sec live prices endpoint
+                    // Cold-start fallback: populate allStocks from live prices endpoint
                     allStocks = data.stocks.map((s, idx) => ({
                         symbol: s.symbol,
                         raw_ticker: `${s.symbol}.NS`,
@@ -1343,7 +1374,6 @@ function initTradexoDashboard() {
                     filterAndRenderTable();
                 } else {
                     const existingSymbols = new Set(allStocks.map(s => s.symbol));
-                    // Update existing allStocks in memory
                     allStocks.forEach(s => {
                         const live = stockMap[s.symbol];
                         if (live) {
@@ -1353,35 +1383,6 @@ function initTradexoDashboard() {
                             if (live.pct_change != null) s.pct_change = live.pct_change;
                         }
                     });
-
-                    // In Live Stock View, ensure all live market stocks exist in allStocks
-                    if (currentStockView === "live") {
-                        let hasNew = false;
-                        data.stocks.forEach(s => {
-                            if (!existingSymbols.has(s.symbol)) {
-                                allStocks.push({
-                                    symbol: s.symbol,
-                                    raw_ticker: `${s.symbol}.NS`,
-                                    rank_position: allStocks.length + 1,
-                                    priority_level: "P3_LOW",
-                                    signal: "WATCHLIST",
-                                    confidence_score: 50,
-                                    predicted_gap_pct: 0.0,
-                                    ltp: s.ltp || 0.0,
-                                    prev_close: s.prev_close || 0.0,
-                                    change_pts: s.change_pts || 0.0,
-                                    pct_change: s.pct_change || 0.0,
-                                    volume_spike: 1.0,
-                                    rsi: 50.0,
-                                    confirmed_pillars_weight: 0.0,
-                                    required_pillars: 3,
-                                });
-                                existingSymbols.add(s.symbol);
-                                hasNew = true;
-                            }
-                        });
-                        if (hasNew) filterAndRenderTable();
-                    }
 
                     // Update Live Stock Grid Cards in-place
                     const liveGrid = document.getElementById("liveStocksGrid");
@@ -1409,30 +1410,59 @@ function initTradexoDashboard() {
                                 const changeEl = card.querySelector('.live-card-change');
                                 if (changeEl && s.change_pts != null && s.pct_change != null) {
                                     const arrowIcon = isUp ? 'fa-caret-up' : 'fa-caret-down';
-                                    changeEl.innerHTML = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                                    const newHtml = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                                    if (changeEl.innerHTML !== newHtml) {
+                                        changeEl.innerHTML = newHtml;
+                                    }
                                 }
                             });
                         }
                     }
 
-                    // Update BTST Scanner Table cells in-place
+                    // Update BTST Scanner Table cells in-place (Strict text queries, ZERO innerHTML parent replacement)
                     if (stocksTableBody) {
-                        stocksTableBody.querySelectorAll('tr[data-row-key]').forEach(tr => {
+                        stocksTableBody.querySelectorAll('tr[data-row-key]:not(.gap-distribution-row)').forEach(tr => {
                             const key = tr.dataset.rowKey || '';
                             const sym = key.split('-')[0];
                             const s = stockMap[sym];
                             if (!s) return;
+
                             const ltpCell = tr.querySelector('[data-label="LTP"]');
                             if (ltpCell && s.ltp != null) {
                                 const formattedLtp = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-                                ltpCell.innerHTML = `<strong>${formattedLtp}</strong>`;
+                                const strong = ltpCell.querySelector('strong') || ltpCell;
+                                if (strong.textContent !== formattedLtp) {
+                                    strong.textContent = formattedLtp;
+                                }
                             }
                             const changeCell = tr.querySelector('[data-label="CHANGE"]');
                             if (changeCell && s.change_pts != null && s.pct_change != null) {
                                 const isUp = s.change_pts >= 0;
                                 const sign = isUp ? '+' : '';
-                                const cls = isUp ? 'text-bullish' : 'text-bearish';
-                                changeCell.innerHTML = `<span class="${cls}" style="font-weight:700;font-size:12px;">${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)</span>`;
+                                const span = changeCell.querySelector('span') || changeCell;
+                                const newText = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                                span.className = isUp ? 'text-bullish' : 'text-bearish';
+                                if (span.textContent !== newText) {
+                                    span.textContent = newText;
+                                }
+                            }
+                        });
+
+                        // Update open expanded accordion rows without rebuilding
+                        stocksTableBody.querySelectorAll('tr.gap-distribution-row.expanded').forEach(expTr => {
+                            const key = expTr.dataset.rowKey || '';
+                            const sym = key.split('-')[0];
+                            const s = stockMap[sym];
+                            if (!s) return;
+                            const strongs = expTr.querySelectorAll('.card-ltp-strip strong');
+                            if (strongs.length >= 2) {
+                                if (s.ltp != null) strongs[0].textContent = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                                if (s.change_pts != null && s.pct_change != null) {
+                                    const isUp = s.change_pts >= 0;
+                                    const sign = isUp ? '+' : '';
+                                    strongs[1].className = isUp ? 'text-bullish' : 'text-bearish';
+                                    strongs[1].textContent = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                                }
                             }
                         });
                     }
@@ -2442,24 +2472,33 @@ function initTradexoDashboard() {
             const data = await response.json();
             currentOptionChainData = data;
 
+            // Phase 1: Timestamp Monotonicity Guard for Option Chain
+            const rawTime = data.fetched_at || data.timestamp || Date.now();
+            const payloadTime = typeof rawTime === 'number' ? rawTime : new Date(rawTime).getTime();
+            if (payloadTime && payloadTime < lastProcessedOptionChainTimestamp) {
+                return; // Discard stale out-of-order option chain tick
+            }
+            if (payloadTime) lastProcessedOptionChainTimestamp = payloadTime;
+
             const modal = document.getElementById("optionChainModal");
             if (!modal || modal.classList.contains("hidden")) return;
 
-            // Header summary
+            // Header summary (Phase 2: selective textContent mutations)
             const symEl = document.getElementById("ocModalSymbol");
-            if (symEl) symEl.textContent = data.symbol || cleanSym;
+            if (symEl && symEl.textContent !== (data.symbol || cleanSym)) symEl.textContent = data.symbol || cleanSym;
 
             const ltpEl = document.getElementById("ocModalLtp");
-            if (ltpEl) ltpEl.textContent = `₹${(data.underlying_value || 0).toFixed(2)}`;
+            const newUnderlying = `₹${(data.underlying_value || 0).toFixed(2)}`;
+            if (ltpEl && ltpEl.textContent !== newUnderlying) ltpEl.textContent = newUnderlying;
 
             const lotEl = document.getElementById("ocModalLotSize");
-            if (lotEl) lotEl.textContent = data.lot_size || 250;
+            if (lotEl && lotEl.textContent !== String(data.lot_size || 250)) lotEl.textContent = data.lot_size || 250;
 
             const pcrEl = document.getElementById("ocModalPcr");
-            if (pcrEl) pcrEl.textContent = data.pcr || "--";
+            if (pcrEl && pcrEl.textContent !== String(data.pcr || "--")) pcrEl.textContent = data.pcr || "--";
 
             const painEl = document.getElementById("ocModalMaxPain");
-            if (painEl) painEl.textContent = data.max_pain || "--";
+            if (painEl && painEl.textContent !== String(data.max_pain || "--")) painEl.textContent = data.max_pain || "--";
 
             const updatedEl = document.getElementById("ocLastUpdatedTime");
             if (updatedEl) updatedEl.textContent = `Updated: ${data.fetched_at ? data.fetched_at.split(" ")[1] || data.fetched_at : new Date().toLocaleTimeString()}`;
@@ -2488,7 +2527,7 @@ function initTradexoDashboard() {
                 expirySelect.innerHTML = expiries.map(exp => `<option value="${exp}">${exp}</option>`).join("");
             }
 
-            // Render table body
+            // Render / In-Place Update Table Body
             const tbody = document.getElementById("ocMatrixTableBody");
             if (!tbody) return;
 
@@ -2498,6 +2537,53 @@ function initTradexoDashboard() {
                 return;
             }
 
+            // Check if table rows already exist for in-place mutation (Zero DOM thrashing on 1s silent ticks)
+            const existingRows = tbody.querySelectorAll('tr[data-strike]');
+            if (existingRows.length === strikes.length && isSilentTick) {
+                strikes.forEach(s => {
+                    const row = tbody.querySelector(`tr[data-strike="${s.strike_price}"]`);
+                    if (!row) return;
+                    const ce = s.ce || {};
+                    const pe = s.pe || {};
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 9) {
+                        // CE: OI (0)
+                        const ceOi = (ce.open_interest || 0).toLocaleString();
+                        if (cells[0].textContent.trim() !== ceOi) cells[0].textContent = ceOi;
+                        // CE: CHNG IN OI (1)
+                        const ceChg = `${(ce.change_in_oi || 0) >= 0 ? '+' : ''}${(ce.change_in_oi || 0).toLocaleString()}`;
+                        if (cells[1].textContent.trim() !== ceChg) {
+                            cells[1].textContent = ceChg;
+                            cells[1].style.color = (ce.change_in_oi || 0) >= 0 ? '#047857' : '#be123c';
+                        }
+                        // CE: VOL (2)
+                        const ceVol = (ce.volume || 0).toLocaleString();
+                        if (cells[2].textContent.trim() !== ceVol) cells[2].textContent = ceVol;
+                        // CE: LTP (3)
+                        const ceLtp = `₹${(ce.ltp || 0).toFixed(2)}`;
+                        if (cells[3].textContent.trim() !== ceLtp) cells[3].textContent = ceLtp;
+
+                        // PE: LTP (5)
+                        const peLtp = `₹${(pe.ltp || 0).toFixed(2)}`;
+                        if (cells[5].textContent.trim() !== peLtp) cells[5].textContent = peLtp;
+                        // PE: VOL (6)
+                        const peVol = (pe.volume || 0).toLocaleString();
+                        if (cells[6].textContent.trim() !== peVol) cells[6].textContent = peVol;
+                        // PE: CHNG IN OI (7)
+                        const peChg = `${(pe.change_in_oi || 0) >= 0 ? '+' : ''}${(pe.change_in_oi || 0).toLocaleString()}`;
+                        if (cells[7].textContent.trim() !== peChg) {
+                            cells[7].textContent = peChg;
+                            cells[7].style.color = (pe.change_in_oi || 0) >= 0 ? '#047857' : '#be123c';
+                        }
+                        // PE: OI (8)
+                        const peOi = (pe.open_interest || 0).toLocaleString();
+                        if (cells[8].textContent.trim() !== peOi) cells[8].textContent = peOi;
+                    }
+                });
+                return;
+            }
+
+            // Initial full render with stable data-strike attributes
             tbody.innerHTML = strikes.map(s => {
                 const ce = s.ce || {};
                 const pe = s.pe || {};
@@ -2510,7 +2596,7 @@ function initTradexoDashboard() {
                 const peChgColor = (pe.change_in_oi || 0) >= 0 ? '#047857' : '#be123c';
 
                 return `
-                    <tr style="border-bottom: 1px solid #f1f5f9; ${isAtm ? 'background: #fffbeb; font-weight: 800;' : ''} transition: background 0.15s ease;" class="${isAtm ? 'oc-atm-row' : ''}">
+                    <tr data-strike="${strikePrice}" style="border-bottom: 1px solid #f1f5f9; ${isAtm ? 'background: #fffbeb; font-weight: 800;' : ''} transition: background 0.15s ease;" class="${isAtm ? 'oc-atm-row' : ''}">
                         <!-- CE: OI -->
                         <td style="padding: 7px 10px; text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: #475569; ${isCeItm ? 'background: rgba(236, 253, 245, 0.45);' : ''}">
                             ${(ce.open_interest || 0).toLocaleString()}
