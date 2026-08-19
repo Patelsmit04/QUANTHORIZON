@@ -8,6 +8,14 @@ def test_closing_sequence_auto_lock_325_and_market_lock_330_triggers(tmp_path, m
     today = "2026-08-10"
     notifications = []
 
+    import json
+    scan_file = tmp_path / "last_market_scan.json"
+    scan_file.write_text(json.dumps({"timestamp": f"{today} 15:10:00", "stocks": [{"symbol": "RELIANCE", "signal": "BTST (BUY)"}]}))
+
+    import pandas as pd
+    dummy_df = pd.DataFrame({"Close": [2500.0]}, index=pd.date_range("2026-08-10", periods=1))
+    monkeypatch.setattr(closing_sequence.yf, "download", lambda *a, **k: dummy_df)
+
     def mock_broadcast(msg):
         notifications.append(msg)
 

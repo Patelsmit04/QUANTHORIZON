@@ -269,6 +269,11 @@ def analyze_global_stock_impact(headline: Dict[str, Any]) -> Dict[str, Any]:
 
     return {
         "headline": headline,
+        "title": headline.get("title", ""),
+        "description": headline.get("description", ""),
+        "url": headline.get("url", ""),
+        "published": headline.get("published", ""),
+        "source": headline.get("source", ""),
         "affected_stocks": affected_stocks[:6],
         "impact_reasons": list(set(impact_reasons)),
         "verdict": sentiment.get("verdict", "NEUTRAL"),

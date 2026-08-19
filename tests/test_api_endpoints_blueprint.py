@@ -1,9 +1,10 @@
+import os
 import pytest
 from fastapi.testclient import TestClient
-from app import app
+from app import app, TRADEXO_API_KEY
 
 client = TestClient(app)
-auth_headers = {"X-API-Key": "test"}
+auth_headers = {"X-API-Key": TRADEXO_API_KEY or "test"}
 
 def test_api_scan_endpoint_returns_required_fields():
     from app import cache_store

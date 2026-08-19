@@ -9,12 +9,12 @@ from dotenv import load_dotenv
 
 
 def load_env_with_fallback(base_dir: str) -> None:
-    env_file = os.path.join(base_dir, ".env")
     example_file = os.path.join(base_dir, ".env.example")
+    env_file = os.path.join(base_dir, ".env")
+    if os.path.exists(example_file):
+        load_dotenv(example_file, override=False)
     if os.path.exists(env_file):
         load_dotenv(env_file, override=True)
-    elif os.path.exists(example_file):
-        load_dotenv(example_file, override=False)
 
 
 def _get_data_dir() -> str:

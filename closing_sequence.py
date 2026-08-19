@@ -117,7 +117,7 @@ def _step_snapshot(state: Dict[str, Any], get_current_stocks: Callable[[], List[
     # snapshotting — otherwise we freeze stale candidates and the entire closing
     # sequence locks zero picks.  This was the root cause of the Aug-18 failure:
     # process ran 24h+ without a fresh scan, so snapshot_picks was [].
-    today_str = _get_ist_now().strftime("%Y-%m-%d")
+    today_str = state.get("date") or _get_ist_now().strftime("%Y-%m-%d")
     scan_data = read_json(os.path.join(DATA_DIR, "last_market_scan.json"), default={})
     scan_ts = scan_data.get("timestamp", "")
     if today_str not in scan_ts:

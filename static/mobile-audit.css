@@ -570,29 +570,29 @@
 
     #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row) {
         display: block !important;
-        background: var(--card-bg, rgba(18, 22, 31, 0.95)) !important;
-        border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.1)) !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
         border-radius: 14px !important;
-        padding: 10px 14px !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+        padding: 12px 14px !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
         transition: all 0.2s ease !important;
         margin-bottom: 0 !important;
     }
 
     #scannerDataTable > tbody > tr.top-choice-row {
-        border: 1.5px solid var(--gold, #c99433) !important;
-        box-shadow: 0 0 16px rgba(201, 148, 51, 0.18) !important;
+        border: 1.5px solid #d97706 !important;
+        box-shadow: 0 0 12px rgba(217, 119, 6, 0.12) !important;
     }
 
     /* When expanded, seamlessly attach top header to bottom distribution box */
     #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row).expanded {
         border-bottom-left-radius: 0 !important;
         border-bottom-right-radius: 0 !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-bottom: 1px solid #e2e8f0 !important;
         margin-bottom: 0 !important;
     }
 
-    /* Hide all extra redundant table cells on mobile so card is 100% clean matching Picture 2 */
+    /* Hide all extra redundant table cells on mobile so card is 100% clean */
     #scannerDataTable > tbody > tr:not(.gap-distribution-row):not(.flow-detail-row) > td:not([data-label="TICKER"]) {
         display: none !important;
     }
@@ -607,8 +607,50 @@
         font-size: 0.85rem !important;
         font-weight: 800 !important;
     }
+    #scannerDataTable > tbody > tr > td[data-label="TICKER"] .symbol-with-logo {
+        display: inline-flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+        vertical-align: middle !important;
+        flex-shrink: 0 !important;
+    }
+    #scannerDataTable > tbody > tr > td[data-label="TICKER"] .stock-logo-frame {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        min-height: 28px !important;
+        max-height: 28px !important;
+        flex: 0 0 28px !important;
+        flex-shrink: 0 !important;
+        border-radius: 6px !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        padding: 2px !important;
+        box-sizing: border-box !important;
+    }
+    #scannerDataTable > tbody > tr > td[data-label="TICKER"] .stock-logo-frame img {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 24px !important;
+        max-height: 24px !important;
+        object-fit: contain !important;
+        display: block !important;
+    }
     #scannerDataTable > tbody > tr > td[data-label="TICKER"] .symbol-name {
         font-size: 13px !important;
+        color: #0f172a !important;
+        font-weight: 800 !important;
+        display: inline-flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        line-height: 1.2 !important;
     }
     #scannerDataTable > tbody > tr > td[data-label="TICKER"] .ticker-header-flex {
         display: flex !important;
@@ -631,8 +673,8 @@
     #scannerDataTable > tbody > tr.flow-detail-row.expanded {
         display: block !important;
         width: 100% !important;
-        background: var(--card-bg, rgba(18, 22, 31, 0.95)) !important;
-        border: 1px solid var(--glass-border-strong, rgba(255, 255, 255, 0.1)) !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
         border-top: none !important;
         border-top-left-radius: 0 !important;
         border-top-right-radius: 0 !important;
@@ -642,6 +684,7 @@
         margin-top: 0 !important;
         margin-bottom: 12px !important;
         box-sizing: border-box !important;
+        box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05) !important;
     }
 
     #scannerDataTable > tbody > tr.gap-distribution-row td,

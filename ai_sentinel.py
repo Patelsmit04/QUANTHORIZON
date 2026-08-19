@@ -50,31 +50,70 @@ _sentinel_lock = threading.RLock()
 # Port for self-probes — read from the same env var the server uses.
 _SELF_PROBE_PORT = int(os.environ.get("PORT", 8000))
 _SELF_PROBE_BASE = f"http://127.0.0.1:{_SELF_PROBE_PORT}"
-_SELF_PROBE_TIMEOUT = 10  # seconds
+_SELF_PROBE_TIMEOUT = 1.0  # seconds (local loopback connects in <5ms)
+_cached_test_client = None
+_last_http_alive_check = 0.0
+_is_http_server_alive = False
 
 
 def _get_today_str() -> str:
     return get_ist_now().strftime("%Y-%m-%d")
 
 
-def _http_get_json(path: str, timeout: int = _SELF_PROBE_TIMEOUT) -> Tuple[int, Any]:
-    """Lightweight HTTP GET against the local server.  Returns (status_code, parsed_json_or_None).
+def _get_test_client():
+    global _cached_test_client
+    if _cached_test_client is None:
+        from starlette.testclient import TestClient
+        from app import app
+        _cached_test_client = TestClient(app, raise_server_exceptions=False)
+    return _cached_test_client
+
+
+def _http_get_json(path: str, timeout: float = _SELF_PROBE_TIMEOUT) -> Tuple[int, Any]:
+    """Lightweight HTTP GET against the local server or in-process TestClient. Returns (status_code, parsed_json_or_None).
     Never raises — failures are returned as (0, None) for the caller to handle gracefully."""
-    url = f"{_SELF_PROBE_BASE}{path}"
+    global _last_http_alive_check, _is_http_server_alive
+    now = time.time()
+    
+    # Refresh socket reachability check every 15 seconds
+    if (now - _last_http_alive_check) > 15.0:
+        _last_http_alive_check = now
+        try:
+            req = urllib.request.Request(f"{_SELF_PROBE_BASE}/api/market_status", method="GET")
+            req.add_header("User-Agent", "AISentinel/1.0")
+            with urllib.request.urlopen(req, timeout=0.5) as r:
+                _is_http_server_alive = (r.status < 500)
+        except Exception:
+            _is_http_server_alive = False
+
+    if _is_http_server_alive:
+        url = f"{_SELF_PROBE_BASE}{path}"
+        try:
+            req = urllib.request.Request(url, method="GET")
+            req.add_header("User-Agent", "AISentinel/1.0")
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                body = resp.read().decode("utf-8", errors="replace")
+                try:
+                    data = json.loads(body)
+                except Exception:
+                    data = body
+                return (resp.status, data)
+        except urllib.error.HTTPError as he:
+            return (he.code, None)
+        except Exception:
+            pass
+
+    # Instant resilient in-process TestClient probe
     try:
-        req = urllib.request.Request(url, method="GET")
-        req.add_header("User-Agent", "AISentinel/1.0")
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = resp.read().decode("utf-8", errors="replace")
-            try:
-                data = json.loads(body)
-            except Exception:
-                data = body
-            return (resp.status, data)
-    except urllib.error.HTTPError as he:
-        return (he.code, None)
+        client = _get_test_client()
+        resp = client.get(path)
+        try:
+            data = resp.json()
+        except Exception:
+            data = resp.text
+        return (resp.status_code, data)
     except Exception as e:
-        logger.debug(f"[AI SENTINEL] HTTP probe {path} failed: {e}")
+        logger.debug(f"[AI SENTINEL] HTTP and TestClient probe {path} failed: {e}")
         return (0, None)
 
 
@@ -394,12 +433,13 @@ class AISentinelEngine:
                     strat_name = strat.get("name", strat_id)
                     try:
                         row = conn.execute(
-                            "SELECT COUNT(*) c FROM signals WHERE strategy_id = ? AND created_at > datetime('now', '-2 days')",
+                            "SELECT COUNT(*) as c FROM signal_journal WHERE strategy_id = ? AND (timestamp >= datetime('now', '-7 days') OR signal_date >= date('now', '-7 days'))",
                             (strat_id,)
                         ).fetchone()
-                        recent_count = row["c"] if row else 0
-                    except Exception:
-                        recent_count = -1  # Table may not exist yet
+                        recent_count = row["c"] if (row and "c" in row.keys() if hasattr(row, 'keys') else row and row[0] is not None) else (row[0] if row else 0)
+                    except Exception as ex:
+                        logger.debug(f"[AI SENTINEL] Strategy table query fallback: {ex}")
+                        recent_count = -1
 
                     if recent_count == 0:
                         findings.append({

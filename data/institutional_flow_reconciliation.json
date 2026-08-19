@@ -219,5 +219,16 @@
     "symbols_only_in_archive": [],
     "value_mismatches": [],
     "status": "ARCHIVE_UNAVAILABLE"
+  },
+  {
+    "date": "2026-08-19",
+    "run_at": "2026-08-19T20:11:14.389453+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 17,
+    "archive_symbol_count": 17,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "CLEAN"
   }
 ]

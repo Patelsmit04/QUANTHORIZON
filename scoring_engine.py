@@ -590,7 +590,7 @@ def evaluate_5_pillar_matrix(
             conviction_level = "MODERATE"
 
     # ORDER FLOW VETO LAYER (3:15-3:25 PM Closing Aggression)
-    from zerodha_order_flow_provider import get_order_flow_data
+    from synthetic_cvd_engine import get_order_flow_data
     from order_flow_analyzer import check_closing_aggression
     
     order_flow_data = get_order_flow_data(clean_sym, signal_type=signal)

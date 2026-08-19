@@ -48,14 +48,24 @@ SCRIP_MASTER_CACHE_FILE = os.path.join(DATA_DIR, "angel_scrip_master.json")
 SCRIP_MASTER_URL = "https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json"
 
 
+def get_credentials() -> Tuple[str, str, str, str]:
+    api_key = (os.environ.get("ANGEL_API_KEY") or os.environ.get("ANGLE_API_KEY") or "").strip()
+    client_id = (os.environ.get("ANGEL_CLIENT_ID") or os.environ.get("ANGLE_CLIENT_ID") or "").strip()
+    password = (os.environ.get("ANGEL_PASSWORD") or os.environ.get("ANGLE_PASSWORD") or "").strip()
+    totp_secret = (os.environ.get("ANGEL_TOTP_SECRET") or os.environ.get("ANGLE_TOTP_SECRET") or "").strip()
+    return api_key, client_id, password, totp_secret
+
+
 def is_configured() -> bool:
     """Check if full Angel One SmartAPI login credentials are present in environment."""
-    return bool(ANGEL_API_KEY and ANGEL_CLIENT_ID and ANGEL_PASSWORD and ANGEL_TOTP_SECRET)
+    api_key, client_id, password, totp_secret = get_credentials()
+    return bool(api_key and client_id and password and totp_secret)
 
 
 def has_api_key() -> bool:
     """Check if at least the Angel One API key is configured."""
-    return bool(ANGEL_API_KEY)
+    api_key, _, _, _ = get_credentials()
+    return bool(api_key)
 
 
 def angel_login() -> Optional[Any]:

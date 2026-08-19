@@ -37,7 +37,9 @@ def test_pillar1_short_buildup_requires_rising_oi():
     assert res_falling["pillar_weights"]["Pillar 1: Futures OI"] == 0.0
 
 
-def test_bulk_deal_10cr_threshold_triggers_weak_tier():
+def test_bulk_deal_10cr_threshold_triggers_weak_tier(monkeypatch):
+    import block_deal_provider as bdp
+    monkeypatch.setattr(bdp, "MIN_VALUE_CR", 10.0)
     records = [{
         "symbol": "RELIANCE",
         "side": "BUY",

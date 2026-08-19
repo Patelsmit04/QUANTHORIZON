@@ -119,7 +119,7 @@ def clarify_strategy_text(strategy_text: str) -> Dict[str, Any]:
                 f"Strategy text:\n{strategy_text}\nReturn valid JSON."
             )
             response = client.messages.create(
-                model="claude-sonnet-5",
+                model=os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022"),
                 max_tokens=1000,
                 messages=[{"role": "user", "content": prompt}]
             )

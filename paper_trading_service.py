@@ -89,7 +89,9 @@ def init_paper_trading_db():
             ("gross_pnl", "REAL DEFAULT 0.0"),
             ("entry_charges", "REAL DEFAULT 0.0"),
             ("exit_charges", "REAL DEFAULT 0.0"),
-            ("slippage_applied", "REAL DEFAULT 0.0")
+            ("slippage_applied", "REAL DEFAULT 0.0"),
+            ("is_synthetic", "INTEGER DEFAULT 0"),
+            ("data_source", "TEXT DEFAULT 'LIVE_EXCHANGE'")
         ]:
             try:
                 conn.execute(f"ALTER TABLE paper_positions ADD COLUMN {col_name} {col_type};")
@@ -112,23 +114,43 @@ init_paper_trading_db()
 
 
 def get_current_live_price(symbol: str) -> float:
-    """Helper to fetch current live LTP from cache for MTM P&L calculations."""
+    """Helper to fetch current live LTP from cache/options chain for MTM P&L calculations."""
     try:
+        clean_sym = symbol.strip().upper()
+        parts = clean_sym.split()
+        if len(parts) >= 3 and parts[-1] in ("CE", "PE"):
+            # Options contract: e.g. "RELIANCE 2980 CE"
+            underlying = parts[0]
+            try:
+                strike = float(parts[1])
+                opt_type = parts[2].lower()
+                from options_chain_provider import fetch_option_chain_unified
+                chain = fetch_option_chain_unified(underlying)
+                if chain and chain.get("strikes"):
+                    for s in chain["strikes"]:
+                        if abs(s.get("strike_price", 0) - strike) < 0.5:
+                            leg_data = s.get(opt_type) or {}
+                            ltp = float(leg_data.get("ltp") or 0.0)
+                            if ltp > 0:
+                                return ltp
+            except Exception:
+                pass
+
         from app import cache_store
         live_map = cache_store.get("live_prices_map") or {}
-        if symbol in live_map:
-            return float(live_map[symbol].get("ltp", 0.0))
+        if clean_sym in live_map:
+            return float(live_map[clean_sym].get("ltp", 0.0))
 
         # Check in main stocks scan
         stocks = (cache_store.get("scan_summary") or {}).get("stocks") or []
         for s in stocks:
-            if s.get("symbol") == symbol:
+            if s.get("symbol") == clean_sym or s.get("raw_ticker") == clean_sym:
                 return float(s.get("ltp", 0.0))
 
         # Check in indices
         indices = cache_store.get("index_data") or []
         for idx in indices:
-            if idx.get("index_name") == symbol or idx.get("display_name") == symbol:
+            if idx.get("index_name") == clean_sym or idx.get("display_name") == clean_sym:
                 return float(idx.get("ltp", 0.0))
     except Exception:
         pass
@@ -243,7 +265,13 @@ def execute_paper_order(order: Dict[str, Any]) -> Dict[str, Any]:
         order_type = "BUY"
 
     execution_mode = str(order.get("execution_mode", "MARKET")).upper()
-    raw_price = float(order.get("entry_price") or order.get("limit_price") or get_current_live_price(symbol) or 100.0)
+    # Anti-Latency Arbitrage: MARKET orders always resolve against live server-side cache/feed
+    if execution_mode == "MARKET":
+        live_p = get_current_live_price(symbol)
+        raw_price = live_p if live_p > 0 else float(order.get("entry_price") or 100.0)
+    else:
+        raw_price = float(order.get("limit_price") or order.get("entry_price") or get_current_live_price(symbol) or 100.0)
+
     if raw_price <= 0:
         raw_price = 100.0
 
@@ -268,7 +296,10 @@ def execute_paper_order(order: Dict[str, Any]) -> Dict[str, Any]:
     sl = float(order.get("stop_loss") or (entry_price * 0.985 if order_type == "BUY" else entry_price * 1.015))
     strategy_id = order.get("strategy_id", "5-Pillar Engine")
 
-    pos_id = f"POS-{symbol}-{int(time.time() * 1000)}"
+    is_synthetic = 1 if (order.get("data_source") == "SYNTHETIC_OFF_MARKET" or order.get("is_synthetic") or "SYNTHETIC" in str(order.get("notes", ""))) else 0
+    data_source = str(order.get("data_source", "SYNTHETIC_OFF_MARKET" if is_synthetic else "LIVE_EXCHANGE"))
+
+    pos_id = f"POS-{symbol.replace(' ', '_')}-{int(time.time() * 1000)}"
     now_str = get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST")
 
     with _get_db() as conn:
@@ -299,12 +330,12 @@ def execute_paper_order(order: Dict[str, Any]) -> Dict[str, Any]:
             INSERT INTO paper_positions (
                 id, symbol, signal, order_type, execution_mode, strategy_id, entry_price,
                 raw_order_price, quantity, target_price_1, target_price_2, stop_loss,
-                status, opened_at, entry_charges, slippage_applied, notes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?)
+                status, opened_at, entry_charges, slippage_applied, is_synthetic, data_source, notes
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'OPEN', ?, ?, ?, ?, ?, ?)
         """, (
             pos_id, symbol, signal, order_type, execution_mode, strategy_id, entry_price,
             raw_price, quantity, tp1, tp2, sl, now_str, entry_charges, round(slippage_pct * 100, 3),
-            order.get("notes", "Institutional Order Ticket Execution")
+            is_synthetic, data_source, order.get("notes", "Institutional Order Ticket Execution")
         ))
         conn.commit()
 
@@ -467,3 +498,56 @@ def reset_paper_account(starting_capital: float = DEFAULT_STARTING_CAPITAL) -> D
         conn.commit()
 
     return {"ok": True, "message": f"Paper trading account reset to ₹{starting_capital:,.2f}."}
+
+
+def evaluate_open_positions_tick() -> List[Dict[str, Any]]:
+    """
+    Continuous background daemon tick evaluator:
+    Inspects all active open paper_positions against live server-side prices in fast_cache.
+    Auto-executes Take Profit (TP1 / TP2) or Stop Loss (SL) triggers with exit slippage.
+    """
+    closed_events = []
+    try:
+        with _get_db() as conn:
+            open_rows = conn.execute("SELECT * FROM paper_positions WHERE status = 'OPEN'").fetchall()
+            for r in open_rows:
+                pos = dict(r)
+                pos_id = pos["id"]
+                sym = pos["symbol"]
+                order_type = pos.get("order_type", "BUY")
+                tp1 = float(pos.get("target_price_1") or 0.0)
+                tp2 = float(pos.get("target_price_2") or 0.0)
+                sl = float(pos.get("stop_loss") or 0.0)
+
+                ltp = get_current_live_price(sym)
+                if ltp <= 0:
+                    continue
+
+                is_bull = "BUY" in order_type
+                trigger_reason = None
+
+                if is_bull:
+                    if tp2 > 0 and ltp >= tp2:
+                        trigger_reason = f"TARGET 2 HIT (₹{ltp:.2f} >= ₹{tp2:.2f})"
+                    elif tp1 > 0 and ltp >= tp1:
+                        trigger_reason = f"TARGET 1 HIT (₹{ltp:.2f} >= ₹{tp1:.2f})"
+                    elif sl > 0 and ltp <= sl:
+                        trigger_reason = f"STOP LOSS HIT (₹{ltp:.2f} <= ₹{sl:.2f})"
+                else:
+                    if tp2 > 0 and ltp <= tp2:
+                        trigger_reason = f"TARGET 2 HIT (₹{ltp:.2f} <= ₹{tp2:.2f})"
+                    elif tp1 > 0 and ltp <= tp1:
+                        trigger_reason = f"TARGET 1 HIT (₹{ltp:.2f} <= ₹{tp1:.2f})"
+                    elif sl > 0 and ltp >= sl:
+                        trigger_reason = f"STOP LOSS HIT (₹{ltp:.2f} >= ₹{sl:.2f})"
+
+                if trigger_reason:
+                    res = close_paper_position(pos_id, exit_price=ltp)
+                    if res.get("ok"):
+                        res["trigger_reason"] = trigger_reason
+                        closed_events.append(res)
+                        logger.info(f"[Auto TP/SL Daemon] Position {pos_id} ({sym}) auto-closed: {trigger_reason}")
+    except Exception as e:
+        logger.warning(f"Error in evaluate_open_positions_tick: {e}")
+
+    return closed_events

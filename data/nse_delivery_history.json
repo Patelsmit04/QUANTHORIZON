@@ -1,13 +1,6 @@
 {
   "360ONE": [
     {
-      "date": "2026-07-28",
-      "delivery_pct": 63.15,
-      "volume": 1135914,
-      "close": 1161.3,
-      "vwap": 1146.8
-    },
-    {
       "date": "2026-07-29",
       "delivery_pct": 58.23,
       "volume": 1268562,
@@ -104,16 +97,16 @@
       "volume": 683646,
       "close": 1163.6,
       "vwap": 1170.43
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.94,
+      "volume": 634522,
+      "close": 1180.5,
+      "vwap": 1176.29
     }
   ],
   "AARTIIND": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 47.89,
-      "volume": 265222,
-      "close": 485.5,
-      "vwap": 485.47
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 40.46,
@@ -211,16 +204,16 @@
       "volume": 830422,
       "close": 530.1,
       "vwap": 526.96
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 65.0,
+      "volume": 1436341,
+      "close": 527.05,
+      "vwap": 525.97
     }
   ],
   "ABB": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 31.31,
-      "volume": 570622,
-      "close": 7310.5,
-      "vwap": 7268.0
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 35.72,
@@ -318,16 +311,16 @@
       "volume": 126259,
       "close": 7546.0,
       "vwap": 7614.57
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 47.78,
+      "volume": 187000,
+      "close": 7430.0,
+      "vwap": 7442.62
     }
   ],
   "ABCAPITAL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.37,
-      "volume": 2985489,
-      "close": 397.6,
-      "vwap": 394.14
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.04,
@@ -425,16 +418,16 @@
       "volume": 4314550,
       "close": 402.0,
       "vwap": 398.51
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 56.43,
+      "volume": 4164096,
+      "close": 396.0,
+      "vwap": 396.68
     }
   ],
   "ABFRL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.25,
-      "volume": 3323129,
-      "close": 58.06,
-      "vwap": 57.89
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 36.52,
@@ -532,16 +525,16 @@
       "volume": 2804136,
       "close": 54.97,
       "vwap": 55.04
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 56.53,
+      "volume": 2601608,
+      "close": 54.47,
+      "vwap": 54.7
     }
   ],
   "ACC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.57,
-      "volume": 300540,
-      "close": 1370.8,
-      "vwap": 1369.42
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 29.77,
@@ -639,16 +632,16 @@
       "volume": 116554,
       "close": 1303.8,
       "vwap": 1310.2
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 61.37,
+      "volume": 129546,
+      "close": 1288.7,
+      "vwap": 1291.76
     }
   ],
   "ADANIENSOL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 47.27,
-      "volume": 2202376,
-      "close": 1667.8,
-      "vwap": 1659.16
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.86,
@@ -746,16 +739,16 @@
       "volume": 2294009,
       "close": 1603.0,
       "vwap": 1607.69
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 48.52,
+      "volume": 3477602,
+      "close": 1540.7,
+      "vwap": 1553.73
     }
   ],
   "ADANIENT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 20.91,
-      "volume": 1547208,
-      "close": 3024.5,
-      "vwap": 3013.68
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 36.93,
@@ -853,16 +846,16 @@
       "volume": 721988,
       "close": 3002.5,
       "vwap": 3023.61
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 48.16,
+      "volume": 938700,
+      "close": 2990.3,
+      "vwap": 2988.43
     }
   ],
   "ADANIGREEN": [
-    {
-      "date": "2026-07-29",
-      "delivery_pct": 25.75,
-      "volume": 1194084,
-      "close": 1358.7,
-      "vwap": 1360.89
-    },
     {
       "date": "2026-07-30",
       "delivery_pct": 31.68,
@@ -960,6 +953,13 @@
       "volume": 925260,
       "close": 1308.0,
       "vwap": 1322.65
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 29.6,
+      "volume": 1333768,
+      "close": 1293.0,
+      "vwap": 1290.97
     }
   ],
   "ADANIPORTS": [
@@ -1071,13 +1071,6 @@
   ],
   "ADANIPOWER": [
     {
-      "date": "2026-07-29",
-      "delivery_pct": 34.43,
-      "volume": 17581232,
-      "close": 208.97,
-      "vwap": 209.28
-    },
-    {
       "date": "2026-07-30",
       "delivery_pct": 40.06,
       "volume": 15216198,
@@ -1174,16 +1167,16 @@
       "volume": 19181716,
       "close": 205.58,
       "vwap": 206.76
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 34.49,
+      "volume": 10553545,
+      "close": 204.02,
+      "vwap": 203.66
     }
   ],
   "ALKEM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 55.71,
-      "volume": 57547,
-      "close": 5672.5,
-      "vwap": 5677.05
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 33.67,
@@ -1281,16 +1274,16 @@
       "volume": 127028,
       "close": 5475.0,
       "vwap": 5471.61
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 66.01,
+      "volume": 213076,
+      "close": 5382.5,
+      "vwap": 5430.59
     }
   ],
   "AMBER": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 22.44,
-      "volume": 241556,
-      "close": 7411.5,
-      "vwap": 7380.86
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 20.88,
@@ -1388,16 +1381,16 @@
       "volume": 578175,
       "close": 7350.0,
       "vwap": 7319.11
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 30.99,
+      "volume": 231498,
+      "close": 7250.0,
+      "vwap": 7274.24
     }
   ],
   "AMBUJACEM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 39.81,
-      "volume": 5054536,
-      "close": 435.3,
-      "vwap": 435.24
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 47.3,
@@ -1495,16 +1488,16 @@
       "volume": 2377631,
       "close": 412.4,
       "vwap": 412.56
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 50.26,
+      "volume": 2103066,
+      "close": 407.5,
+      "vwap": 407.29
     }
   ],
   "ANGELONE": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 32.75,
-      "volume": 3944323,
-      "close": 302.5,
-      "vwap": 301.57
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 49.81,
@@ -1602,16 +1595,16 @@
       "volume": 7260733,
       "close": 291.75,
       "vwap": 287.97
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 34.86,
+      "volume": 2506672,
+      "close": 289.5,
+      "vwap": 291.07
     }
   ],
   "APLAPOLLO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 65.85,
-      "volume": 349697,
-      "close": 1869.8,
-      "vwap": 1864.9
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 55.22,
@@ -1709,16 +1702,16 @@
       "volume": 418384,
       "close": 2115.0,
       "vwap": 2104.23
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 58.23,
+      "volume": 292451,
+      "close": 2121.8,
+      "vwap": 2110.08
     }
   ],
   "APOLLOHOSP": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 58.62,
-      "volume": 164862,
-      "close": 8935.0,
-      "vwap": 8939.47
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 62.11,
@@ -1816,16 +1809,16 @@
       "volume": 474997,
       "close": 8817.0,
       "vwap": 8841.71
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 60.37,
+      "volume": 298438,
+      "close": 8750.0,
+      "vwap": 8782.15
     }
   ],
   "APOLLOTYRE": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.28,
-      "volume": 426938,
-      "close": 424.1,
-      "vwap": 426.48
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 49.53,
@@ -1923,16 +1916,16 @@
       "volume": 236230,
       "close": 436.0,
       "vwap": 436.84
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 80.31,
+      "volume": 1931870,
+      "close": 427.35,
+      "vwap": 430.51
     }
   ],
   "ASHOKLEY": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 35.6,
-      "volume": 13880649,
-      "close": 157.96,
-      "vwap": 158.41
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 51.92,
@@ -2030,16 +2023,16 @@
       "volume": 14208948,
       "close": 176.35,
       "vwap": 176.27
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 44.42,
+      "volume": 10072866,
+      "close": 173.1,
+      "vwap": 174.33
     }
   ],
   "ASIANPAINT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 28.29,
-      "volume": 3803474,
-      "close": 2758.4,
-      "vwap": 2787.66
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 41.76,
@@ -2137,16 +2130,16 @@
       "volume": 1017022,
       "close": 2628.4,
       "vwap": 2638.14
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 63.12,
+      "volume": 742443,
+      "close": 2630.8,
+      "vwap": 2613.27
     }
   ],
   "ASTRAL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 33.96,
-      "volume": 187215,
-      "close": 1476.3,
-      "vwap": 1470.41
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 36.34,
@@ -2244,16 +2237,16 @@
       "volume": 176344,
       "close": 1520.0,
       "vwap": 1524.87
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 40.67,
+      "volume": 385557,
+      "close": 1544.9,
+      "vwap": 1535.31
     }
   ],
   "ATGL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 28.15,
-      "volume": 770640,
-      "close": 655.9,
-      "vwap": 653.69
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 31.14,
@@ -2351,16 +2344,16 @@
       "volume": 343489,
       "close": 647.3,
       "vwap": 649.84
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 16.2,
+      "volume": 8506454,
+      "close": 664.25,
+      "vwap": 671.41
     }
   ],
   "AUBANK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 64.94,
-      "volume": 1383599,
-      "close": 1042.3,
-      "vwap": 1047.63
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 44.49,
@@ -2458,16 +2451,16 @@
       "volume": 450491,
       "close": 1075.7,
       "vwap": 1073.93
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.78,
+      "volume": 1035506,
+      "close": 1075.0,
+      "vwap": 1076.17
     }
   ],
   "AUROPHARMA": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 36.07,
-      "volume": 1031789,
-      "close": 1590.7,
-      "vwap": 1585.7
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 48.72,
@@ -2565,16 +2558,16 @@
       "volume": 573961,
       "close": 1645.0,
       "vwap": 1638.1
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 58.35,
+      "volume": 752484,
+      "close": 1624.5,
+      "vwap": 1624.56
     }
   ],
   "AXISBANK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 60.75,
-      "volume": 10110233,
-      "close": 1235.4,
-      "vwap": 1224.6
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 63.27,
@@ -2672,16 +2665,16 @@
       "volume": 5064697,
       "close": 1243.0,
       "vwap": 1240.41
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 59.8,
+      "volume": 3061937,
+      "close": 1235.0,
+      "vwap": 1232.88
     }
   ],
   "BAJAJ-AUTO": [
-    {
-      "date": "2026-07-29",
-      "delivery_pct": 49.57,
-      "volume": 295600,
-      "close": 11432.0,
-      "vwap": 11447.54
-    },
     {
       "date": "2026-07-30",
       "delivery_pct": 57.13,
@@ -2779,16 +2772,16 @@
       "volume": 237816,
       "close": 11607.0,
       "vwap": 11674.13
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 51.57,
+      "volume": 222810,
+      "close": 11645.0,
+      "vwap": 11649.35
     }
   ],
   "BAJAJFINSV": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 63.08,
-      "volume": 1066741,
-      "close": 1924.4,
-      "vwap": 1922.9
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 45.57,
@@ -2886,16 +2879,16 @@
       "volume": 413236,
       "close": 2011.2,
       "vwap": 2010.2
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 62.93,
+      "volume": 920207,
+      "close": 2012.0,
+      "vwap": 1998.35
     }
   ],
   "BAJAJHLDNG": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 56.96,
-      "volume": 25720,
-      "close": 10949.0,
-      "vwap": 10908.78
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 55.6,
@@ -2993,16 +2986,16 @@
       "volume": 21569,
       "close": 11254.0,
       "vwap": 11294.85
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.03,
+      "volume": 25169,
+      "close": 11380.0,
+      "vwap": 11324.69
     }
   ],
   "BAJFINANCE": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 65.12,
-      "volume": 6444368,
-      "close": 1054.4,
-      "vwap": 1056.62
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 52.48,
@@ -3100,16 +3093,16 @@
       "volume": 3374018,
       "close": 1094.3,
       "vwap": 1094.85
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 57.52,
+      "volume": 2877930,
+      "close": 1080.2,
+      "vwap": 1081.41
     }
   ],
   "BANDHANBNK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 46.5,
-      "volume": 19391311,
-      "close": 173.58,
-      "vwap": 171.8
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.72,
@@ -3207,16 +3200,16 @@
       "volume": 4548748,
       "close": 170.5,
       "vwap": 171.53
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 36.35,
+      "volume": 4976272,
+      "close": 169.2,
+      "vwap": 169.05
     }
   ],
   "BANKBARODA": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 58.66,
-      "volume": 10011406,
-      "close": 243.35,
-      "vwap": 243.21
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 47.29,
@@ -3314,16 +3307,16 @@
       "volume": 3521816,
       "close": 244.0,
       "vwap": 245.14
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 51.54,
+      "volume": 6256020,
+      "close": 245.0,
+      "vwap": 244.57
     }
   ],
   "BANKINDIA": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.84,
-      "volume": 8293430,
-      "close": 137.65,
-      "vwap": 137.34
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 46.99,
@@ -3421,16 +3414,16 @@
       "volume": 2382166,
       "close": 142.1,
       "vwap": 142.89
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 53.43,
+      "volume": 5252432,
+      "close": 141.7,
+      "vwap": 142.09
     }
   ],
   "BDL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 25.22,
-      "volume": 412387,
-      "close": 1261.8,
-      "vwap": 1261.59
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 26.17,
@@ -3528,16 +3521,16 @@
       "volume": 2608024,
       "close": 1393.0,
       "vwap": 1380.17
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 34.95,
+      "volume": 1670098,
+      "close": 1349.0,
+      "vwap": 1362.69
     }
   ],
   "BEL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 63.08,
-      "volume": 32630643,
-      "close": 387.55,
-      "vwap": 385.56
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 63.19,
@@ -3635,16 +3628,16 @@
       "volume": 9120934,
       "close": 412.0,
       "vwap": 413.1
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 60.07,
+      "volume": 10660149,
+      "close": 409.2,
+      "vwap": 408.9
     }
   ],
   "BHARATFORG": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.08,
-      "volume": 686018,
-      "close": 2171.5,
-      "vwap": 2164.98
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.42,
@@ -3742,16 +3735,16 @@
       "volume": 771575,
       "close": 2098.9,
       "vwap": 2086.52
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 62.79,
+      "volume": 1263394,
+      "close": 2069.0,
+      "vwap": 2065.54
     }
   ],
   "BHARTIARTL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 66.19,
-      "volume": 6315728,
-      "close": 1950.2,
-      "vwap": 1944.67
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 69.1,
@@ -3849,16 +3842,16 @@
       "volume": 6710275,
       "close": 1934.2,
       "vwap": 1944.24
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 75.21,
+      "volume": 6252338,
+      "close": 1922.0,
+      "vwap": 1928.56
     }
   ],
   "BHEL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 30.75,
-      "volume": 10523689,
-      "close": 405.15,
-      "vwap": 402.68
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.22,
@@ -3956,16 +3949,16 @@
       "volume": 7418846,
       "close": 425.0,
       "vwap": 428.17
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 28.59,
+      "volume": 5840962,
+      "close": 419.8,
+      "vwap": 417.85
     }
   ],
   "BIOCON": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.93,
-      "volume": 3351508,
-      "close": 431.1,
-      "vwap": 430.7
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 50.22,
@@ -4063,16 +4056,16 @@
       "volume": 2691030,
       "close": 417.5,
       "vwap": 418.71
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 47.26,
+      "volume": 1683297,
+      "close": 412.75,
+      "vwap": 413.7
     }
   ],
   "BLUESTARCO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 40.05,
-      "volume": 156603,
-      "close": 1680.8,
-      "vwap": 1666.11
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 50.29,
@@ -4170,23 +4163,16 @@
       "volume": 576843,
       "close": 1493.0,
       "vwap": 1501.9
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 44.64,
+      "volume": 292749,
+      "close": 1493.2,
+      "vwap": 1489.75
     }
   ],
   "BOSCHLTD": [
-    {
-      "date": "2026-07-27",
-      "delivery_pct": 47.25,
-      "volume": 25733,
-      "close": 41310.0,
-      "vwap": 41252.42
-    },
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 38.22,
-      "volume": 46738,
-      "close": 41065.0,
-      "vwap": 40846.79
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 44.77,
@@ -4277,16 +4263,23 @@
       "volume": 29499,
       "close": 46970.0,
       "vwap": 47264.88
+    },
+    {
+      "date": "2026-08-17",
+      "delivery_pct": 39.01,
+      "volume": 93891,
+      "close": 48730.0,
+      "vwap": 48230.61
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 41.88,
+      "volume": 52957,
+      "close": 48460.0,
+      "vwap": 48672.33
     }
   ],
   "BPCL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 58.12,
-      "volume": 5132678,
-      "close": 317.4,
-      "vwap": 317.97
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 57.6,
@@ -4384,23 +4377,16 @@
       "volume": 5279469,
       "close": 310.3,
       "vwap": 314.47
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 50.04,
+      "volume": 4757433,
+      "close": 307.0,
+      "vwap": 307.1
     }
   ],
   "BRITANNIA": [
-    {
-      "date": "2026-07-27",
-      "delivery_pct": 48.7,
-      "volume": 340199,
-      "close": 5478.5,
-      "vwap": 5456.85
-    },
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 51.33,
-      "volume": 356551,
-      "close": 5517.5,
-      "vwap": 5546.51
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 56.37,
@@ -4491,16 +4477,23 @@
       "volume": 189361,
       "close": 5521.0,
       "vwap": 5538.0
+    },
+    {
+      "date": "2026-08-17",
+      "delivery_pct": 67.44,
+      "volume": 281420,
+      "close": 5495.0,
+      "vwap": 5526.19
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.43,
+      "volume": 251106,
+      "close": 5453.0,
+      "vwap": 5510.45
     }
   ],
   "BSE": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 36.6,
-      "volume": 2058479,
-      "close": 3541.4,
-      "vwap": 3528.92
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 45.8,
@@ -4598,16 +4591,16 @@
       "volume": 5806922,
       "close": 3308.0,
       "vwap": 3281.34
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 30.83,
+      "volume": 4767443,
+      "close": 3352.0,
+      "vwap": 3353.34
     }
   ],
   "CAMS": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.59,
-      "volume": 541450,
-      "close": 792.4,
-      "vwap": 793.59
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 45.0,
@@ -4705,16 +4698,16 @@
       "volume": 1270110,
       "close": 762.0,
       "vwap": 761.37
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 56.01,
+      "volume": 1126243,
+      "close": 754.3,
+      "vwap": 756.9
     }
   ],
   "CANBK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 47.1,
-      "volume": 17108935,
-      "close": 124.72,
-      "vwap": 124.84
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.11,
@@ -4812,16 +4805,16 @@
       "volume": 6622726,
       "close": 129.1,
       "vwap": 129.65
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 44.35,
+      "volume": 7255746,
+      "close": 129.08,
+      "vwap": 128.69
     }
   ],
   "CDSL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 38.06,
-      "volume": 1018335,
-      "close": 1350.0,
-      "vwap": 1351.94
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 33.83,
@@ -4919,16 +4912,16 @@
       "volume": 759440,
       "close": 1340.6,
       "vwap": 1343.9
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 40.19,
+      "volume": 560859,
+      "close": 1329.0,
+      "vwap": 1335.71
     }
   ],
   "CGPOWER": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 56.4,
-      "volume": 5215606,
-      "close": 829.5,
-      "vwap": 831.07
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 53.97,
@@ -5026,6 +5019,13 @@
       "volume": 1568655,
       "close": 894.2,
       "vwap": 893.66
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 43.52,
+      "volume": 4061889,
+      "close": 863.05,
+      "vwap": 867.5
     }
   ],
   "CHOLAFIN": [
@@ -5244,13 +5244,6 @@
   ],
   "COALINDIA": [
     {
-      "date": "2026-07-28",
-      "delivery_pct": 64.14,
-      "volume": 9914444,
-      "close": 410.05,
-      "vwap": 410.19
-    },
-    {
       "date": "2026-07-29",
       "delivery_pct": 66.99,
       "volume": 23225454,
@@ -5347,16 +5340,16 @@
       "volume": 7352659,
       "close": 406.9,
       "vwap": 409.55
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 59.31,
+      "volume": 6030203,
+      "close": 400.0,
+      "vwap": 400.25
     }
   ],
   "COCHINSHIP": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 48.89,
-      "volume": 742837,
-      "close": 1403.6,
-      "vwap": 1397.4
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 39.17,
@@ -5454,6 +5447,13 @@
       "volume": 1360896,
       "close": 1485.1,
       "vwap": 1488.47
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 38.1,
+      "volume": 680465,
+      "close": 1485.0,
+      "vwap": 1483.43
     }
   ],
   "COFORGE": [
@@ -5565,13 +5565,6 @@
   ],
   "CONCOR": [
     {
-      "date": "2026-07-28",
-      "delivery_pct": 43.42,
-      "volume": 1843068,
-      "close": 525.85,
-      "vwap": 526.58
-    },
-    {
       "date": "2026-07-29",
       "delivery_pct": 47.05,
       "volume": 1129654,
@@ -5668,16 +5661,16 @@
       "volume": 419489,
       "close": 518.25,
       "vwap": 520.55
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 40.7,
+      "volume": 724297,
+      "close": 514.35,
+      "vwap": 514.84
     }
   ],
   "CROMPTON": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 30.98,
-      "volume": 6188364,
-      "close": 264.25,
-      "vwap": 260.66
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 45.16,
@@ -5775,16 +5768,16 @@
       "volume": 1305455,
       "close": 244.8,
       "vwap": 244.03
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 49.17,
+      "volume": 2206730,
+      "close": 245.5,
+      "vwap": 244.61
     }
   ],
   "CUB": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 43.52,
-      "volume": 7988538,
-      "close": 228.86,
-      "vwap": 228.81
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 53.51,
@@ -5882,16 +5875,16 @@
       "volume": 3912107,
       "close": 222.18,
       "vwap": 220.91
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 58.24,
+      "volume": 5707017,
+      "close": 221.03,
+      "vwap": 222.31
     }
   ],
   "CYIENT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 56.62,
-      "volume": 1337269,
-      "close": 867.45,
-      "vwap": 867.4
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 55.31,
@@ -5989,16 +5982,16 @@
       "volume": 1226576,
       "close": 858.55,
       "vwap": 856.29
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 45.75,
+      "volume": 2033629,
+      "close": 894.5,
+      "vwap": 891.97
     }
   ],
   "DALBHARAT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 42.21,
-      "volume": 126193,
-      "close": 1823.0,
-      "vwap": 1824.98
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 55.06,
@@ -6096,16 +6089,16 @@
       "volume": 246659,
       "close": 1837.1,
       "vwap": 1843.55
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 62.48,
+      "volume": 276847,
+      "close": 1875.0,
+      "vwap": 1857.23
     }
   ],
   "DEEPAKNTR": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 47.53,
-      "volume": 54921,
-      "close": 1674.6,
-      "vwap": 1676.12
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 61.53,
@@ -6203,23 +6196,16 @@
       "volume": 229368,
       "close": 1771.0,
       "vwap": 1774.49
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 52.84,
+      "volume": 477429,
+      "close": 1768.3,
+      "vwap": 1793.69
     }
   ],
   "DELHIVERY": [
-    {
-      "date": "2026-07-27",
-      "delivery_pct": 62.08,
-      "volume": 5085231,
-      "close": 472.2,
-      "vwap": 471.44
-    },
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 62.02,
-      "volume": 4042367,
-      "close": 470.0,
-      "vwap": 470.25
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 51.27,
@@ -6310,16 +6296,23 @@
       "volume": 1432534,
       "close": 456.0,
       "vwap": 456.4
+    },
+    {
+      "date": "2026-08-17",
+      "delivery_pct": 50.67,
+      "volume": 1460519,
+      "close": 451.8,
+      "vwap": 451.98
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 53.79,
+      "volume": 1321278,
+      "close": 450.0,
+      "vwap": 448.52
     }
   ],
   "DIVISLAB": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 60.04,
-      "volume": 1158131,
-      "close": 7784.5,
-      "vwap": 7701.29
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 54.06,
@@ -6417,16 +6410,16 @@
       "volume": 404163,
       "close": 8588.0,
       "vwap": 8581.62
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 60.6,
+      "volume": 179152,
+      "close": 8560.0,
+      "vwap": 8534.68
     }
   ],
   "DIXON": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 38.12,
-      "volume": 423218,
-      "close": 14275.0,
-      "vwap": 14163.25
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 35.31,
@@ -6524,16 +6517,16 @@
       "volume": 387416,
       "close": 14150.0,
       "vwap": 14209.28
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 42.4,
+      "volume": 468989,
+      "close": 14462.0,
+      "vwap": 14364.25
     }
   ],
   "DLF": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.5,
-      "volume": 4053062,
-      "close": 670.25,
-      "vwap": 668.8
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 41.64,
@@ -6631,16 +6624,16 @@
       "volume": 6099954,
       "close": 665.75,
       "vwap": 670.97
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 35.28,
+      "volume": 2895273,
+      "close": 669.9,
+      "vwap": 668.44
     }
   ],
   "DRREDDY": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 41.6,
-      "volume": 1280586,
-      "close": 1142.3,
-      "vwap": 1140.32
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 51.64,
@@ -6738,16 +6731,16 @@
       "volume": 805633,
       "close": 1178.8,
       "vwap": 1184.22
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 53.08,
+      "volume": 1150424,
+      "close": 1170.0,
+      "vwap": 1176.37
     }
   ],
   "EICHERMOT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 60.04,
-      "volume": 522935,
-      "close": 7779.0,
-      "vwap": 7812.39
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 37.07,
@@ -6845,16 +6838,16 @@
       "volume": 262500,
       "close": 8018.5,
       "vwap": 8072.48
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 64.33,
+      "volume": 344004,
+      "close": 7990.5,
+      "vwap": 8013.2
     }
   ],
   "ESCORTS": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 67.95,
-      "volume": 131827,
-      "close": 3016.8,
-      "vwap": 3017.25
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 56.97,
@@ -6952,16 +6945,16 @@
       "volume": 51759,
       "close": 3062.1,
       "vwap": 3082.77
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 55.34,
+      "volume": 52749,
+      "close": 3054.9,
+      "vwap": 3055.25
     }
   ],
   "ETERNAL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.52,
-      "volume": 49740797,
-      "close": 311.8,
-      "vwap": 312.52
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 45.89,
@@ -7059,16 +7052,16 @@
       "volume": 18387007,
       "close": 315.9,
       "vwap": 317.93
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 55.3,
+      "volume": 28100651,
+      "close": 320.0,
+      "vwap": 320.16
     }
   ],
   "EXIDEIND": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 46.88,
-      "volume": 2846579,
-      "close": 435.65,
-      "vwap": 432.64
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 34.43,
@@ -7166,16 +7159,16 @@
       "volume": 1543959,
       "close": 465.25,
       "vwap": 468.15
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 42.32,
+      "volume": 2001169,
+      "close": 459.5,
+      "vwap": 462.98
     }
   ],
   "FEDERALBNK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 66.57,
-      "volume": 5713345,
-      "close": 359.15,
-      "vwap": 358.52
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 58.35,
@@ -7273,16 +7266,16 @@
       "volume": 2828360,
       "close": 357.8,
       "vwap": 355.72
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 51.84,
+      "volume": 2198228,
+      "close": 358.8,
+      "vwap": 358.16
     }
   ],
   "FORCEMOT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 25.02,
-      "volume": 74765,
-      "close": 17334.0,
-      "vwap": 17244.81
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 21.7,
@@ -7380,16 +7373,16 @@
       "volume": 77240,
       "close": 18200.0,
       "vwap": 18292.26
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 42.23,
+      "volume": 66917,
+      "close": 17837.0,
+      "vwap": 17895.81
     }
   ],
   "GMRAIRPORT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.36,
-      "volume": 10241822,
-      "close": 107.1,
-      "vwap": 107.29
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 53.08,
@@ -7487,16 +7480,16 @@
       "volume": 6639327,
       "close": 101.39,
       "vwap": 101.86
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.19,
+      "volume": 13282311,
+      "close": 102.5,
+      "vwap": 102.34
     }
   ],
   "GNFC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.57,
-      "volume": 515182,
-      "close": 525.1,
-      "vwap": 521.7
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 49.48,
@@ -7594,16 +7587,16 @@
       "volume": 1477642,
       "close": 609.75,
       "vwap": 610.68
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 45.14,
+      "volume": 484634,
+      "close": 602.3,
+      "vwap": 604.86
     }
   ],
   "GODFRYPHLP": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 21.53,
-      "volume": 861418,
-      "close": 2076.0,
-      "vwap": 2057.41
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 38.51,
@@ -7701,16 +7694,16 @@
       "volume": 145007,
       "close": 2102.3,
       "vwap": 2113.97
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 17.9,
+      "volume": 415947,
+      "close": 2117.6,
+      "vwap": 2134.57
     }
   ],
   "GOKULAGRO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.39,
-      "volume": 908074,
-      "close": 223.2,
-      "vwap": 219.79
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 18.84,
@@ -7808,16 +7801,16 @@
       "volume": 319417,
       "close": 236.92,
       "vwap": 236.46
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 48.97,
+      "volume": 844481,
+      "close": 243.02,
+      "vwap": 240.99
     }
   ],
   "GRANULES": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 57.13,
-      "volume": 916692,
-      "close": 841.85,
-      "vwap": 853.84
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 48.69,
@@ -7915,16 +7908,16 @@
       "volume": 407105,
       "close": 851.2,
       "vwap": 853.78
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 51.35,
+      "volume": 287607,
+      "close": 841.15,
+      "vwap": 848.45
     }
   ],
   "GRASIM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.61,
-      "volume": 304356,
-      "close": 3113.0,
-      "vwap": 3119.31
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 56.66,
@@ -8022,6 +8015,13 @@
       "volume": 1498859,
       "close": 3278.7,
       "vwap": 3279.61
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 64.78,
+      "volume": 978120,
+      "close": 3270.0,
+      "vwap": 3255.1
     }
   ],
   "GUJGASLTD": [
@@ -8133,13 +8133,6 @@
   ],
   "HAL": [
     {
-      "date": "2026-07-28",
-      "delivery_pct": 40.31,
-      "volume": 495981,
-      "close": 4592.0,
-      "vwap": 4575.51
-    },
-    {
       "date": "2026-07-29",
       "delivery_pct": 53.86,
       "volume": 606007,
@@ -8236,16 +8229,16 @@
       "volume": 1238546,
       "close": 5099.0,
       "vwap": 5094.63
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 64.56,
+      "volume": 983643,
+      "close": 5017.0,
+      "vwap": 5032.3
     }
   ],
   "HAVELLS": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 61.59,
-      "volume": 584475,
-      "close": 1237.0,
-      "vwap": 1237.88
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 48.77,
@@ -8343,6 +8336,13 @@
       "volume": 1021226,
       "close": 1299.7,
       "vwap": 1295.28
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 62.16,
+      "volume": 567244,
+      "close": 1287.0,
+      "vwap": 1283.69
     }
   ],
   "HCLTECH": [
@@ -8454,13 +8454,6 @@
   ],
   "HDFCAMC": [
     {
-      "date": "2026-07-28",
-      "delivery_pct": 52.71,
-      "volume": 470968,
-      "close": 2541.9,
-      "vwap": 2545.68
-    },
-    {
       "date": "2026-07-29",
       "delivery_pct": 54.95,
       "volume": 293137,
@@ -8557,16 +8550,16 @@
       "volume": 672054,
       "close": 2525.0,
       "vwap": 2513.33
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 64.06,
+      "volume": 792412,
+      "close": 2551.7,
+      "vwap": 2538.75
     }
   ],
   "HDFCBANK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 67.67,
-      "volume": 20460659,
-      "close": 748.2,
-      "vwap": 747.8
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 57.66,
@@ -8664,16 +8657,16 @@
       "volume": 17916507,
       "close": 723.0,
       "vwap": 724.7
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 62.1,
+      "volume": 21342651,
+      "close": 720.0,
+      "vwap": 718.98
     }
   ],
   "HDFCLIFE": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.8,
-      "volume": 1180266,
-      "close": 556.7,
-      "vwap": 557.91
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 70.49,
@@ -8771,16 +8764,16 @@
       "volume": 1271552,
       "close": 538.25,
       "vwap": 540.27
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 66.76,
+      "volume": 2892561,
+      "close": 536.3,
+      "vwap": 536.93
     }
   ],
   "HEROMOTOCO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.29,
-      "volume": 682570,
-      "close": 5149.1,
-      "vwap": 5183.52
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 47.59,
@@ -8878,16 +8871,16 @@
       "volume": 485939,
       "close": 5745.5,
       "vwap": 5729.99
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.4,
+      "volume": 348863,
+      "close": 5709.5,
+      "vwap": 5706.47
     }
   ],
   "HINDALCO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 53.27,
-      "volume": 2939377,
-      "close": 962.45,
-      "vwap": 956.13
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 55.61,
@@ -8985,16 +8978,16 @@
       "volume": 2525385,
       "close": 1041.6,
       "vwap": 1042.62
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 50.4,
+      "volume": 2125136,
+      "close": 1038.95,
+      "vwap": 1032.89
     }
   ],
   "HINDUNILVR": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 51.81,
-      "volume": 5183374,
-      "close": 2117.8,
-      "vwap": 2098.18
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 58.85,
@@ -9092,16 +9085,16 @@
       "volume": 1234596,
       "close": 2035.0,
       "vwap": 2041.16
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 58.42,
+      "volume": 1449442,
+      "close": 2020.7,
+      "vwap": 2019.17
     }
   ],
   "HINDZINC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.82,
-      "volume": 2538802,
-      "close": 536.7,
-      "vwap": 533.92
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 56.9,
@@ -9199,16 +9192,16 @@
       "volume": 2256802,
       "close": 558.0,
       "vwap": 562.77
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 46.06,
+      "volume": 3683890,
+      "close": 557.0,
+      "vwap": 554.16
     }
   ],
   "HONAUT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 22.46,
-      "volume": 55510,
-      "close": 40105.0,
-      "vwap": 40341.0
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 51.57,
@@ -9306,16 +9299,16 @@
       "volume": 3269,
       "close": 36400.0,
       "vwap": 36435.95
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 43.95,
+      "volume": 1381,
+      "close": 36140.0,
+      "vwap": 36126.0
     }
   ],
   "HUDCO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 45.22,
-      "volume": 2302330,
-      "close": 195.21,
-      "vwap": 196.66
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 35.9,
@@ -9413,16 +9406,16 @@
       "volume": 1134421,
       "close": 188.01,
       "vwap": 187.29
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 40.54,
+      "volume": 2510381,
+      "close": 188.32,
+      "vwap": 189.91
     }
   ],
   "HYUNDAI": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 43.31,
-      "volume": 327236,
-      "close": 1992.9,
-      "vwap": 1988.06
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 44.58,
@@ -9520,16 +9513,16 @@
       "volume": 474077,
       "close": 2186.0,
       "vwap": 2203.71
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.07,
+      "volume": 810355,
+      "close": 2174.5,
+      "vwap": 2192.63
     }
   ],
   "ICICIBANK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 68.0,
-      "volume": 10856166,
-      "close": 1437.9,
-      "vwap": 1438.32
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 45.44,
@@ -9627,16 +9620,16 @@
       "volume": 8345198,
       "close": 1412.0,
       "vwap": 1410.79
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 69.2,
+      "volume": 10304210,
+      "close": 1402.0,
+      "vwap": 1398.73
     }
   ],
   "ICICIGI": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 55.02,
-      "volume": 605476,
-      "close": 1648.8,
-      "vwap": 1657.45
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 55.02,
@@ -9734,16 +9727,16 @@
       "volume": 625804,
       "close": 1623.8,
       "vwap": 1624.19
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 61.76,
+      "volume": 325133,
+      "close": 1615.7,
+      "vwap": 1620.55
     }
   ],
   "ICICIPRULI": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.08,
-      "volume": 475310,
-      "close": 511.65,
-      "vwap": 511.1
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 67.26,
@@ -9841,16 +9834,16 @@
       "volume": 1584467,
       "close": 498.2,
       "vwap": 505.37
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 55.74,
+      "volume": 664569,
+      "close": 499.5,
+      "vwap": 498.86
     }
   ],
   "IDBI": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 48.45,
-      "volume": 4781984,
-      "close": 84.14,
-      "vwap": 84.66
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 37.03,
@@ -9948,16 +9941,16 @@
       "volume": 1964380,
       "close": 81.11,
       "vwap": 81.56
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 44.91,
+      "volume": 2162834,
+      "close": 80.72,
+      "vwap": 81.17
     }
   ],
   "IDEA": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 33.13,
-      "volume": 275144292,
-      "close": 13.05,
-      "vwap": 13.06
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 31.66,
@@ -10055,16 +10048,16 @@
       "volume": 820797167,
       "close": 14.12,
       "vwap": 13.9
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 17.58,
+      "volume": 320742876,
+      "close": 14.07,
+      "vwap": 14.06
     }
   ],
   "IDFCFIRSTB": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 47.27,
-      "volume": 19050886,
-      "close": 85.02,
-      "vwap": 85.39
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 43.53,
@@ -10162,16 +10155,16 @@
       "volume": 8806133,
       "close": 84.76,
       "vwap": 84.92
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 52.74,
+      "volume": 8681089,
+      "close": 85.49,
+      "vwap": 85.3
     }
   ],
   "IEX": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.88,
-      "volume": 8086757,
-      "close": 134.19,
-      "vwap": 133.46
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 52.6,
@@ -10269,16 +10262,16 @@
       "volume": 1978111,
       "close": 124.4,
       "vwap": 124.44
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 55.43,
+      "volume": 3276922,
+      "close": 123.0,
+      "vwap": 123.25
     }
   ],
   "IGL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.87,
-      "volume": 898213,
-      "close": 152.91,
-      "vwap": 152.18
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 48.65,
@@ -10376,16 +10369,16 @@
       "volume": 755290,
       "close": 149.39,
       "vwap": 150.28
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 14.26,
+      "volume": 13762283,
+      "close": 152.64,
+      "vwap": 154.54
     }
   ],
   "INDHOTEL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.83,
-      "volume": 1155231,
-      "close": 738.2,
-      "vwap": 736.95
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 52.32,
@@ -10483,16 +10476,16 @@
       "volume": 1151586,
       "close": 719.0,
       "vwap": 717.37
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 57.05,
+      "volume": 881149,
+      "close": 723.35,
+      "vwap": 720.25
     }
   ],
   "INDIACEM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 38.06,
-      "volume": 208689,
-      "close": 398.2,
-      "vwap": 395.7
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 36.93,
@@ -10590,16 +10583,16 @@
       "volume": 73424,
       "close": 374.5,
       "vwap": 374.08
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.81,
+      "volume": 87660,
+      "close": 369.7,
+      "vwap": 370.94
     }
   ],
   "INDIGO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 59.44,
-      "volume": 668162,
-      "close": 5276.5,
-      "vwap": 5261.71
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 48.38,
@@ -10697,16 +10690,16 @@
       "volume": 554778,
       "close": 5220.0,
       "vwap": 5213.08
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 51.01,
+      "volume": 372642,
+      "close": 5193.0,
+      "vwap": 5180.67
     }
   ],
   "INDUSINDBK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.39,
-      "volume": 1232625,
-      "close": 1012.3,
-      "vwap": 1007.03
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 39.0,
@@ -10804,16 +10797,16 @@
       "volume": 539358,
       "close": 1015.0,
       "vwap": 1014.07
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 53.6,
+      "volume": 433216,
+      "close": 1016.7,
+      "vwap": 1011.41
     }
   ],
   "INDUSTOWER": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 53.14,
-      "volume": 3522014,
-      "close": 386.15,
-      "vwap": 384.95
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 56.27,
@@ -10911,16 +10904,16 @@
       "volume": 4522943,
       "close": 372.4,
       "vwap": 373.75
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 58.21,
+      "volume": 3330556,
+      "close": 372.4,
+      "vwap": 370.38
     }
   ],
   "INFY": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 58.52,
-      "volume": 34400369,
-      "close": 1155.6,
-      "vwap": 1152.38
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 55.05,
@@ -11018,16 +11011,16 @@
       "volume": 8851110,
       "close": 1115.0,
       "vwap": 1116.78
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 63.91,
+      "volume": 8408573,
+      "close": 1119.8,
+      "vwap": 1120.37
     }
   ],
   "IOC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 61.07,
-      "volume": 7526333,
-      "close": 140.11,
-      "vwap": 140.17
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 51.49,
@@ -11125,16 +11118,16 @@
       "volume": 8312830,
       "close": 137.8,
       "vwap": 138.47
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 64.53,
+      "volume": 8404311,
+      "close": 136.3,
+      "vwap": 136.9
     }
   ],
   "IRB": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.43,
-      "volume": 9542643,
-      "close": 19.98,
-      "vwap": 19.9
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 17.14,
@@ -11232,16 +11225,16 @@
       "volume": 6032637,
       "close": 19.03,
       "vwap": 19.07
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 63.79,
+      "volume": 5476549,
+      "close": 18.98,
+      "vwap": 18.97
     }
   ],
   "IRCTC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 51.75,
-      "volume": 844855,
-      "close": 496.0,
-      "vwap": 494.1
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 51.7,
@@ -11339,16 +11332,16 @@
       "volume": 592203,
       "close": 493.05,
       "vwap": 495.05
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 57.89,
+      "volume": 711247,
+      "close": 488.35,
+      "vwap": 489.89
     }
   ],
   "IRFC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 34.89,
-      "volume": 10298238,
-      "close": 89.13,
-      "vwap": 88.87
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 24.32,
@@ -11446,16 +11439,16 @@
       "volume": 5607787,
       "close": 86.11,
       "vwap": 86.43
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 40.35,
+      "volume": 9477952,
+      "close": 85.18,
+      "vwap": 85.66
     }
   ],
   "ITC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.59,
-      "volume": 19030590,
-      "close": 286.25,
-      "vwap": 287.13
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 52.75,
@@ -11553,16 +11546,16 @@
       "volume": 14561572,
       "close": 270.0,
       "vwap": 271.01
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 63.94,
+      "volume": 13821291,
+      "close": 267.05,
+      "vwap": 267.49
     }
   ],
   "JINDALSTEL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 39.13,
-      "volume": 1960722,
-      "close": 1088.7,
-      "vwap": 1088.61
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.47,
@@ -11660,16 +11653,16 @@
       "volume": 561974,
       "close": 1101.5,
       "vwap": 1108.13
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 41.3,
+      "volume": 1140894,
+      "close": 1115.0,
+      "vwap": 1116.09
     }
   ],
   "JIOFIN": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 40.34,
-      "volume": 48984683,
-      "close": 249.48,
-      "vwap": 247.4
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 35.72,
@@ -11767,16 +11760,16 @@
       "volume": 9238709,
       "close": 245.8,
       "vwap": 246.6
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 45.31,
+      "volume": 9712757,
+      "close": 243.15,
+      "vwap": 243.86
     }
   ],
   "JKCEMENT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 55.63,
-      "volume": 52330,
-      "close": 5642.0,
-      "vwap": 5675.69
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 54.04,
@@ -11874,16 +11867,16 @@
       "volume": 21124,
       "close": 5375.5,
       "vwap": 5368.55
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 46.66,
+      "volume": 15818,
+      "close": 5276.0,
+      "vwap": 5299.83
     }
   ],
   "JSWENERGY": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.84,
-      "volume": 1361191,
-      "close": 545.7,
-      "vwap": 546.34
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 49.73,
@@ -11981,16 +11974,16 @@
       "volume": 1195546,
       "close": 548.1,
       "vwap": 550.55
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 49.04,
+      "volume": 1124071,
+      "close": 543.95,
+      "vwap": 542.74
     }
   ],
   "JSWSTEEL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.74,
-      "volume": 1516573,
-      "close": 1276.6,
-      "vwap": 1271.2
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 49.56,
@@ -12088,16 +12081,16 @@
       "volume": 719017,
       "close": 1267.6,
       "vwap": 1274.49
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 39.91,
+      "volume": 1009930,
+      "close": 1285.8,
+      "vwap": 1277.4
     }
   ],
   "JUBLFOOD": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.41,
-      "volume": 2657255,
-      "close": 440.1,
-      "vwap": 438.35
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 31.89,
@@ -12195,16 +12188,16 @@
       "volume": 2285057,
       "close": 500.55,
       "vwap": 503.44
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 44.79,
+      "volume": 859757,
+      "close": 498.3,
+      "vwap": 498.47
     }
   ],
   "KALYANKJIL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 21.81,
-      "volume": 44160878,
-      "close": 628.6,
-      "vwap": 623.25
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 15.42,
@@ -12302,16 +12295,16 @@
       "volume": 6089064,
       "close": 601.6,
       "vwap": 605.39
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 17.1,
+      "volume": 6600446,
+      "close": 595.2,
+      "vwap": 593.56
     }
   ],
   "KAYNES": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 22.88,
-      "volume": 6028689,
-      "close": 3638.6,
-      "vwap": 3557.5
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 18.1,
@@ -12409,16 +12402,16 @@
       "volume": 514083,
       "close": 3644.1,
       "vwap": 3671.32
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 22.83,
+      "volume": 1892334,
+      "close": 3823.3,
+      "vwap": 3772.29
     }
   ],
   "KEI": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 48.14,
-      "volume": 207369,
-      "close": 4853.5,
-      "vwap": 4854.25
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 49.19,
@@ -12516,16 +12509,16 @@
       "volume": 311725,
       "close": 5790.0,
       "vwap": 5801.23
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 50.23,
+      "volume": 306096,
+      "close": 5681.1,
+      "vwap": 5689.5
     }
   ],
   "KOTAKBANK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 71.6,
-      "volume": 9190194,
-      "close": 390.2,
-      "vwap": 389.3
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 67.88,
@@ -12623,16 +12616,16 @@
       "volume": 5653147,
       "close": 387.65,
       "vwap": 390.41
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.69,
+      "volume": 6704930,
+      "close": 390.25,
+      "vwap": 390.17
     }
   ],
   "KPITTECH": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 17.52,
-      "volume": 28550031,
-      "close": 638.75,
-      "vwap": 634.65
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 22.94,
@@ -12730,16 +12723,16 @@
       "volume": 1619307,
       "close": 596.65,
       "vwap": 600.7
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 36.76,
+      "volume": 1451052,
+      "close": 589.1,
+      "vwap": 592.7
     }
   ],
   "LALPATHLAB": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 53.78,
-      "volume": 1040066,
-      "close": 1882.5,
-      "vwap": 1870.74
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 61.98,
@@ -12837,16 +12830,16 @@
       "volume": 211640,
       "close": 1901.4,
       "vwap": 1896.5
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 69.48,
+      "volume": 156564,
+      "close": 1887.2,
+      "vwap": 1886.62
     }
   ],
   "LICHSGFIN": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 61.07,
-      "volume": 1485850,
-      "close": 553.45,
-      "vwap": 552.48
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 38.56,
@@ -12944,16 +12937,16 @@
       "volume": 1854138,
       "close": 498.8,
       "vwap": 498.84
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 48.65,
+      "volume": 971490,
+      "close": 497.0,
+      "vwap": 498.83
     }
   ],
   "LIQUIDBEES": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 73.43,
-      "volume": 2770512,
-      "close": 1000.0,
-      "vwap": 1000.0
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 75.8,
@@ -13051,16 +13044,16 @@
       "volume": 2862680,
       "close": 1000.0,
       "vwap": 1000.0
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 80.09,
+      "volume": 2458263,
+      "close": 999.99,
+      "vwap": 1000.0
     }
   ],
   "LT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 45.77,
-      "volume": 3115802,
-      "close": 3931.4,
-      "vwap": 3944.0
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 50.16,
@@ -13158,16 +13151,16 @@
       "volume": 1355575,
       "close": 4064.3,
       "vwap": 4070.84
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 56.79,
+      "volume": 1190832,
+      "close": 4041.3,
+      "vwap": 4037.96
     }
   ],
   "LTF": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.11,
-      "volume": 14431153,
-      "close": 309.15,
-      "vwap": 305.31
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 47.11,
@@ -13265,16 +13258,16 @@
       "volume": 10165537,
       "close": 325.1,
       "vwap": 320.12
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 33.24,
+      "volume": 14527880,
+      "close": 315.4,
+      "vwap": 316.45
     }
   ],
   "LTTS": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 38.78,
-      "volume": 121106,
-      "close": 3585.0,
-      "vwap": 3630.19
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 38.23,
@@ -13372,16 +13365,16 @@
       "volume": 47263,
       "close": 3509.9,
       "vwap": 3531.42
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 26.63,
+      "volume": 141790,
+      "close": 3540.9,
+      "vwap": 3552.95
     }
   ],
   "M&M": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 66.05,
-      "volume": 3693381,
-      "close": 3221.8,
-      "vwap": 3249.87
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 34.86,
@@ -13479,16 +13472,16 @@
       "volume": 1371664,
       "close": 3421.5,
       "vwap": 3421.64
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 61.79,
+      "volume": 1601024,
+      "close": 3415.0,
+      "vwap": 3409.5
     }
   ],
   "M&MFIN": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 60.0,
-      "volume": 8498054,
-      "close": 393.75,
-      "vwap": 387.04
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 54.38,
@@ -13586,16 +13579,16 @@
       "volume": 1441684,
       "close": 386.2,
       "vwap": 385.86
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 47.87,
+      "volume": 2316241,
+      "close": 389.6,
+      "vwap": 390.69
     }
   ],
   "MANAPPURAM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 43.73,
-      "volume": 5738347,
-      "close": 370.15,
-      "vwap": 367.15
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 35.84,
@@ -13693,16 +13686,16 @@
       "volume": 2534288,
       "close": 346.6,
       "vwap": 345.85
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 49.64,
+      "volume": 4290224,
+      "close": 340.0,
+      "vwap": 339.7
     }
   ],
   "MANKIND": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.07,
-      "volume": 309498,
-      "close": 2592.7,
-      "vwap": 2613.4
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.41,
@@ -13800,16 +13793,16 @@
       "volume": 366118,
       "close": 2380.0,
       "vwap": 2375.15
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 37.98,
+      "volume": 370273,
+      "close": 2394.0,
+      "vwap": 2399.51
     }
   ],
   "MARICO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.56,
-      "volume": 2912454,
-      "close": 878.7,
-      "vwap": 877.78
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 62.0,
@@ -13907,16 +13900,16 @@
       "volume": 537548,
       "close": 841.55,
       "vwap": 847.61
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 57.92,
+      "volume": 1366779,
+      "close": 850.0,
+      "vwap": 850.91
     }
   ],
   "MARUTI": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 67.22,
-      "volume": 515674,
-      "close": 13948.0,
-      "vwap": 13882.52
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 52.38,
@@ -14014,16 +14007,16 @@
       "volume": 267433,
       "close": 13691.0,
       "vwap": 13788.12
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 50.1,
+      "volume": 175646,
+      "close": 13690.0,
+      "vwap": 13674.73
     }
   ],
   "MAZDOCK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 30.54,
-      "volume": 250953,
-      "close": 2307.8,
-      "vwap": 2305.96
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 22.02,
@@ -14121,16 +14114,16 @@
       "volume": 1229574,
       "close": 2587.0,
       "vwap": 2593.42
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 38.48,
+      "volume": 513343,
+      "close": 2563.8,
+      "vwap": 2561.72
     }
   ],
   "MCX": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 47.94,
-      "volume": 1061461,
-      "close": 2717.5,
-      "vwap": 2733.89
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 43.9,
@@ -14228,16 +14221,16 @@
       "volume": 3187586,
       "close": 3040.0,
       "vwap": 3016.72
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 49.84,
+      "volume": 3238717,
+      "close": 2973.0,
+      "vwap": 3002.7
     }
   ],
   "METROPOLIS": [
-    {
-      "date": "2026-07-29",
-      "delivery_pct": 40.61,
-      "volume": 460563,
-      "close": 585.2,
-      "vwap": 593.88
-    },
     {
       "date": "2026-07-30",
       "delivery_pct": 54.18,
@@ -14335,16 +14328,16 @@
       "volume": 118593,
       "close": 551.95,
       "vwap": 551.1
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.39,
+      "volume": 241847,
+      "close": 555.0,
+      "vwap": 556.59
     }
   ],
   "MFSL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 61.98,
-      "volume": 1146452,
-      "close": 1515.1,
-      "vwap": 1511.81
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 74.56,
@@ -14442,16 +14435,16 @@
       "volume": 1054795,
       "close": 1584.5,
       "vwap": 1574.76
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 42.75,
+      "volume": 286908,
+      "close": 1546.1,
+      "vwap": 1561.17
     }
   ],
   "MGL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 61.93,
-      "volume": 186206,
-      "close": 1105.0,
-      "vwap": 1099.95
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 19.13,
@@ -14549,16 +14542,16 @@
       "volume": 277306,
       "close": 1111.4,
       "vwap": 1109.76
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 17.49,
+      "volume": 1595429,
+      "close": 1128.0,
+      "vwap": 1149.54
     }
   ],
   "MOTHERSON": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 50.47,
-      "volume": 14481610,
-      "close": 146.0,
-      "vwap": 145.58
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 51.23,
@@ -14656,16 +14649,16 @@
       "volume": 12696084,
       "close": 170.4,
       "vwap": 169.92
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 45.65,
+      "volume": 15320296,
+      "close": 170.29,
+      "vwap": 171.15
     }
   ],
   "MOTILALOFS": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 41.95,
-      "volume": 802471,
-      "close": 855.25,
-      "vwap": 856.98
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.95,
@@ -14763,16 +14756,16 @@
       "volume": 1041748,
       "close": 938.0,
       "vwap": 941.79
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 36.76,
+      "volume": 605680,
+      "close": 942.1,
+      "vwap": 940.86
     }
   ],
   "MPHASIS": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 47.06,
-      "volume": 847189,
-      "close": 2361.3,
-      "vwap": 2407.98
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 46.38,
@@ -14870,16 +14863,16 @@
       "volume": 504720,
       "close": 2432.0,
       "vwap": 2458.4
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 52.56,
+      "volume": 438635,
+      "close": 2424.5,
+      "vwap": 2416.85
     }
   ],
   "MRF": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 42.05,
-      "volume": 4642,
-      "close": 134200.0,
-      "vwap": 134258.93
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 44.04,
@@ -14977,16 +14970,16 @@
       "volume": 2637,
       "close": 133505.0,
       "vwap": 133462.83
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 49.27,
+      "volume": 3065,
+      "close": 133630.0,
+      "vwap": 133409.48
     }
   ],
   "MUTHOOTFIN": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.35,
-      "volume": 569238,
-      "close": 3017.9,
-      "vwap": 3011.73
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 63.38,
@@ -15084,16 +15077,16 @@
       "volume": 499431,
       "close": 2894.1,
       "vwap": 2900.19
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 53.81,
+      "volume": 495026,
+      "close": 2859.0,
+      "vwap": 2859.39
     }
   ],
   "NACLIND": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 27.03,
-      "volume": 717452,
-      "close": 195.14,
-      "vwap": 191.86
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 27.85,
@@ -15191,16 +15184,16 @@
       "volume": 358338,
       "close": 172.4,
       "vwap": 172.67
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 36.61,
+      "volume": 383919,
+      "close": 173.99,
+      "vwap": 174.29
     }
   ],
   "NAM-INDIA": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 43.33,
-      "volume": 858982,
-      "close": 1168.1,
-      "vwap": 1164.32
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 47.75,
@@ -15298,16 +15291,16 @@
       "volume": 1023188,
       "close": 1170.6,
       "vwap": 1176.02
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 50.21,
+      "volume": 1411986,
+      "close": 1217.0,
+      "vwap": 1200.62
     }
   ],
   "NATIONALUM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 37.83,
-      "volume": 5431501,
-      "close": 344.7,
-      "vwap": 341.4
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 55.3,
@@ -15405,16 +15398,16 @@
       "volume": 2824411,
       "close": 388.0,
       "vwap": 388.58
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 37.2,
+      "volume": 3939022,
+      "close": 386.55,
+      "vwap": 382.95
     }
   ],
   "NBCC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 40.21,
-      "volume": 4086454,
-      "close": 94.6,
-      "vwap": 94.74
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 30.75,
@@ -15512,16 +15505,16 @@
       "volume": 6718438,
       "close": 88.0,
       "vwap": 88.37
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 39.77,
+      "volume": 4316941,
+      "close": 87.19,
+      "vwap": 87.38
     }
   ],
   "NESTLEIND": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 62.59,
-      "volume": 3055336,
-      "close": 1503.3,
-      "vwap": 1504.92
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 68.42,
@@ -15619,16 +15612,16 @@
       "volume": 1815216,
       "close": 1462.5,
       "vwap": 1467.72
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 61.03,
+      "volume": 1837329,
+      "close": 1465.0,
+      "vwap": 1463.75
     }
   ],
   "NMDC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 50.0,
-      "volume": 24493891,
-      "close": 85.85,
-      "vwap": 85.85
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 56.77,
@@ -15726,16 +15719,16 @@
       "volume": 18390025,
       "close": 84.19,
       "vwap": 84.12
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 52.95,
+      "volume": 20291366,
+      "close": 83.35,
+      "vwap": 83.35
     }
   ],
   "NTPC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 65.92,
-      "volume": 8471125,
-      "close": 343.5,
-      "vwap": 342.97
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 58.67,
@@ -15833,16 +15826,16 @@
       "volume": 9943991,
       "close": 337.1,
       "vwap": 338.13
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 56.03,
+      "volume": 7502595,
+      "close": 336.55,
+      "vwap": 335.55
     }
   ],
   "NYKAA": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 58.51,
-      "volume": 2803127,
-      "close": 327.5,
-      "vwap": 328.65
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 70.92,
@@ -15940,16 +15933,16 @@
       "volume": 1681742,
       "close": 320.6,
       "vwap": 323.47
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 63.29,
+      "volume": 5601280,
+      "close": 327.35,
+      "vwap": 326.14
     }
   ],
   "OBEROIRLTY": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 46.27,
-      "volume": 230937,
-      "close": 1836.5,
-      "vwap": 1831.98
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 29.23,
@@ -16047,16 +16040,16 @@
       "volume": 1642587,
       "close": 1858.0,
       "vwap": 1903.23
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 27.72,
+      "volume": 613359,
+      "close": 1869.7,
+      "vwap": 1870.55
     }
   ],
   "OIL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 38.97,
-      "volume": 1787186,
-      "close": 447.9,
-      "vwap": 445.14
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 30.35,
@@ -16154,16 +16147,16 @@
       "volume": 5000847,
       "close": 480.5,
       "vwap": 482.89
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 47.55,
+      "volume": 1699810,
+      "close": 474.85,
+      "vwap": 476.96
     }
   ],
   "ONGC": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 61.29,
-      "volume": 9139712,
-      "close": 238.31,
-      "vwap": 238.91
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 49.32,
@@ -16261,16 +16254,16 @@
       "volume": 14903605,
       "close": 239.5,
       "vwap": 239.77
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 56.77,
+      "volume": 17345994,
+      "close": 238.0,
+      "vwap": 239.47
     }
   ],
   "PAGEIND": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 59.68,
-      "volume": 27423,
-      "close": 40270.0,
-      "vwap": 40182.15
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 35.76,
@@ -16368,16 +16361,16 @@
       "volume": 46266,
       "close": 36425.0,
       "vwap": 36776.2
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 57.28,
+      "volume": 40937,
+      "close": 35240.0,
+      "vwap": 35615.22
     }
   ],
   "PAYTM": [
-    {
-      "date": "2026-07-30",
-      "delivery_pct": 50.07,
-      "volume": 2303054,
-      "close": 1343.0,
-      "vwap": 1345.23
-    },
     {
       "date": "2026-08-02",
       "delivery_pct": 29.65,
@@ -16475,16 +16468,16 @@
       "volume": 3848121,
       "close": 1546.3,
       "vwap": 1565.43
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 37.41,
+      "volume": 5645397,
+      "close": 1583.5,
+      "vwap": 1588.02
     }
   ],
   "PERSISTENT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 38.12,
-      "volume": 563293,
-      "close": 5483.3,
-      "vwap": 5524.89
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 32.21,
@@ -16582,16 +16575,16 @@
       "volume": 353161,
       "close": 5442.5,
       "vwap": 5505.34
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 30.63,
+      "volume": 474744,
+      "close": 5510.0,
+      "vwap": 5523.71
     }
   ],
   "PETRONET": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 56.69,
-      "volume": 1226262,
-      "close": 277.1,
-      "vwap": 276.82
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 53.16,
@@ -16689,23 +16682,16 @@
       "volume": 2933102,
       "close": 286.25,
       "vwap": 285.35
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 59.65,
+      "volume": 5252827,
+      "close": 288.15,
+      "vwap": 288.76
     }
   ],
   "PFC": [
-    {
-      "date": "2026-07-27",
-      "delivery_pct": 59.91,
-      "volume": 4699114,
-      "close": 419.9,
-      "vwap": 420.67
-    },
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 62.66,
-      "volume": 6586258,
-      "close": 427.1,
-      "vwap": 425.75
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 64.02,
@@ -16796,16 +16782,23 @@
       "volume": 7164194,
       "close": 374.4,
       "vwap": 374.59
+    },
+    {
+      "date": "2026-08-17",
+      "delivery_pct": 66.74,
+      "volume": 7433916,
+      "close": 374.45,
+      "vwap": 374.81
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 61.58,
+      "volume": 7426828,
+      "close": 374.45,
+      "vwap": 373.91
     }
   ],
   "PFIZER": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.53,
-      "volume": 41592,
-      "close": 4755.1,
-      "vwap": 4787.03
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 69.41,
@@ -16903,16 +16896,16 @@
       "volume": 76326,
       "close": 4799.3,
       "vwap": 4779.35
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 69.86,
+      "volume": 160066,
+      "close": 4919.5,
+      "vwap": 4915.77
     }
   ],
   "PIDILITIND": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.3,
-      "volume": 1117313,
-      "close": 1629.9,
-      "vwap": 1621.35
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 63.78,
@@ -17010,16 +17003,16 @@
       "volume": 655495,
       "close": 1674.0,
       "vwap": 1665.7
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 65.62,
+      "volume": 1011213,
+      "close": 1650.0,
+      "vwap": 1660.79
     }
   ],
   "PIIND": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 65.82,
-      "volume": 260551,
-      "close": 2753.9,
-      "vwap": 2738.45
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 44.59,
@@ -17117,16 +17110,16 @@
       "volume": 623898,
       "close": 2515.0,
       "vwap": 2487.38
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 63.49,
+      "volume": 262916,
+      "close": 2505.0,
+      "vwap": 2503.77
     }
   ],
   "PIRAMALFIN": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.1,
-      "volume": 256754,
-      "close": 2043.3,
-      "vwap": 2018.24
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 51.4,
@@ -17224,16 +17217,16 @@
       "volume": 176263,
       "close": 2060.5,
       "vwap": 2061.91
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 51.88,
+      "volume": 137295,
+      "close": 2057.4,
+      "vwap": 2071.85
     }
   ],
   "POLYCAB": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 45.22,
-      "volume": 233061,
-      "close": 9047.0,
-      "vwap": 9045.4
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 60.83,
@@ -17331,16 +17324,16 @@
       "volume": 256413,
       "close": 9139.0,
       "vwap": 9176.02
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 45.29,
+      "volume": 333641,
+      "close": 9140.0,
+      "vwap": 9076.27
     }
   ],
   "POWERGRID": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 65.88,
-      "volume": 12375693,
-      "close": 282.85,
-      "vwap": 282.65
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 62.89,
@@ -17438,16 +17431,16 @@
       "volume": 6792173,
       "close": 268.0,
       "vwap": 267.51
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 62.19,
+      "volume": 9674185,
+      "close": 263.5,
+      "vwap": 263.73
     }
   ],
   "PREMIER": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": NaN,
-      "volume": 3599,
-      "close": 2.77,
-      "vwap": 2.8
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": NaN,
@@ -17545,16 +17538,16 @@
       "volume": 1826,
       "close": 2.77,
       "vwap": 2.72
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": NaN,
+      "volume": 3505,
+      "close": 2.72,
+      "vwap": 2.84
     }
   ],
   "PVRINOX": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 51.14,
-      "volume": 460909,
-      "close": 1140.0,
-      "vwap": 1141.27
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 49.2,
@@ -17652,16 +17645,16 @@
       "volume": 463266,
       "close": 1198.1,
       "vwap": 1207.4
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 42.97,
+      "volume": 307429,
+      "close": 1200.9,
+      "vwap": 1207.15
     }
   ],
   "RAIN": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 37.45,
-      "volume": 3433323,
-      "close": 224.57,
-      "vwap": 224.78
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 44.64,
@@ -17759,16 +17752,16 @@
       "volume": 3467534,
       "close": 203.74,
       "vwap": 205.03
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 48.74,
+      "volume": 2239195,
+      "close": 205.54,
+      "vwap": 206.09
     }
   ],
   "RAMCOCEM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 56.75,
-      "volume": 51340,
-      "close": 921.5,
-      "vwap": 920.63
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 91.75,
@@ -17866,16 +17859,16 @@
       "volume": 232980,
       "close": 909.8,
       "vwap": 908.66
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 47.05,
+      "volume": 250361,
+      "close": 902.2,
+      "vwap": 903.62
     }
   ],
   "RBLBANK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 60.0,
-      "volume": 4168194,
-      "close": 371.15,
-      "vwap": 367.57
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 53.89,
@@ -17973,16 +17966,16 @@
       "volume": 2330589,
       "close": 383.0,
       "vwap": 381.12
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 40.97,
+      "volume": 1110741,
+      "close": 381.5,
+      "vwap": 380.63
     }
   ],
   "RECLTD": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.91,
-      "volume": 6301213,
-      "close": 374.25,
-      "vwap": 374.07
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 56.72,
@@ -18080,16 +18073,16 @@
       "volume": 5976016,
       "close": 338.5,
       "vwap": 340.35
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 56.76,
+      "volume": 5097595,
+      "close": 337.0,
+      "vwap": 338.96
     }
   ],
   "RELIANCE": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 61.85,
-      "volume": 9448307,
-      "close": 1275.9,
-      "vwap": 1275.55
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 43.48,
@@ -18187,16 +18180,16 @@
       "volume": 10180567,
       "close": 1322.0,
       "vwap": 1322.76
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 58.12,
+      "volume": 7489365,
+      "close": 1311.0,
+      "vwap": 1312.86
     }
   ],
   "SBICARD": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 42.48,
-      "volume": 779077,
-      "close": 660.5,
-      "vwap": 658.42
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 53.44,
@@ -18294,16 +18287,16 @@
       "volume": 2769735,
       "close": 615.0,
       "vwap": 622.79
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 59.4,
+      "volume": 2246351,
+      "close": 623.65,
+      "vwap": 619.77
     }
   ],
   "SBILIFE": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 71.55,
-      "volume": 1365116,
-      "close": 1894.9,
-      "vwap": 1893.34
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 75.0,
@@ -18401,23 +18394,16 @@
       "volume": 584461,
       "close": 1778.0,
       "vwap": 1782.16
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 59.71,
+      "volume": 1208471,
+      "close": 1780.4,
+      "vwap": 1766.66
     }
   ],
   "SBIN": [
-    {
-      "date": "2026-07-27",
-      "delivery_pct": 44.43,
-      "volume": 9873370,
-      "close": 1013.2,
-      "vwap": 1014.13
-    },
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.11,
-      "volume": 4792964,
-      "close": 1013.7,
-      "vwap": 1014.99
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 40.5,
@@ -18508,16 +18494,23 @@
       "volume": 7039473,
       "close": 1061.2,
       "vwap": 1061.0
+    },
+    {
+      "date": "2026-08-17",
+      "delivery_pct": 49.35,
+      "volume": 5583771,
+      "close": 1053.0,
+      "vwap": 1056.82
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 57.64,
+      "volume": 7182636,
+      "close": 1048.6,
+      "vwap": 1047.08
     }
   ],
   "SHREECEM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 47.12,
-      "volume": 11491,
-      "close": 26825.0,
-      "vwap": 26821.57
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 48.82,
@@ -18615,16 +18608,16 @@
       "volume": 39655,
       "close": 24725.0,
       "vwap": 24689.47
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 43.39,
+      "volume": 25056,
+      "close": 24340.0,
+      "vwap": 24298.51
     }
   ],
   "SIEMENS": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 29.68,
-      "volume": 234026,
-      "close": 3650.8,
-      "vwap": 3644.31
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 32.92,
@@ -18722,16 +18715,16 @@
       "volume": 120386,
       "close": 3957.0,
       "vwap": 3956.76
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 38.42,
+      "volume": 146047,
+      "close": 3898.9,
+      "vwap": 3903.55
     }
   ],
   "SOLARINDS": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.2,
-      "volume": 72096,
-      "close": 18080.0,
-      "vwap": 18179.96
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 48.54,
@@ -18829,16 +18822,16 @@
       "volume": 178203,
       "close": 20280.0,
       "vwap": 20196.91
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 37.67,
+      "volume": 197246,
+      "close": 19721.0,
+      "vwap": 19730.38
     }
   ],
   "SRF": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.04,
-      "volume": 168487,
-      "close": 2643.8,
-      "vwap": 2642.43
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 65.47,
@@ -18936,16 +18929,16 @@
       "volume": 238565,
       "close": 2630.0,
       "vwap": 2629.46
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 51.8,
+      "volume": 267803,
+      "close": 2578.6,
+      "vwap": 2585.7
     }
   ],
   "SULA": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 19.47,
-      "volume": 4610818,
-      "close": 167.33,
-      "vwap": 167.77
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 38.26,
@@ -19043,16 +19036,16 @@
       "volume": 566729,
       "close": 146.85,
       "vwap": 149.21
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 58.95,
+      "volume": 247820,
+      "close": 145.43,
+      "vwap": 146.02
     }
   ],
   "SUNDARMFIN": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 49.25,
-      "volume": 30337,
-      "close": 4480.1,
-      "vwap": 4471.45
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 65.04,
@@ -19150,16 +19143,16 @@
       "volume": 81086,
       "close": 4619.6,
       "vwap": 4605.66
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 60.89,
+      "volume": 38437,
+      "close": 4485.1,
+      "vwap": 4514.87
     }
   ],
   "SUNPHARMA": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 63.26,
-      "volume": 2682295,
-      "close": 1989.9,
-      "vwap": 1978.09
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 60.12,
@@ -19257,16 +19250,16 @@
       "volume": 1819169,
       "close": 1875.1,
       "vwap": 1880.49
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 66.01,
+      "volume": 1566692,
+      "close": 1900.0,
+      "vwap": 1892.37
     }
   ],
   "SUNTV": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 45.17,
-      "volume": 1036019,
-      "close": 512.85,
-      "vwap": 511.6
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 47.34,
@@ -19364,16 +19357,16 @@
       "volume": 162286,
       "close": 482.8,
       "vwap": 483.62
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 57.11,
+      "volume": 207536,
+      "close": 480.9,
+      "vwap": 482.01
     }
   ],
   "SWIGGY": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 38.12,
-      "volume": 73291848,
-      "close": 287.34,
-      "vwap": 285.94
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 34.97,
@@ -19471,16 +19464,16 @@
       "volume": 8346867,
       "close": 274.0,
       "vwap": 274.29
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 45.47,
+      "volume": 19048103,
+      "close": 272.4,
+      "vwap": 273.2
     }
   ],
   "SYNGENE": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 64.24,
-      "volume": 1219638,
-      "close": 414.25,
-      "vwap": 413.24
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 26.34,
@@ -19578,6 +19571,13 @@
       "volume": 335081,
       "close": 404.1,
       "vwap": 406.16
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 45.75,
+      "volume": 366481,
+      "close": 396.85,
+      "vwap": 399.04
     }
   ],
   "TATACHEM": [
@@ -19689,13 +19689,6 @@
   ],
   "TATACOMM": [
     {
-      "date": "2026-07-28",
-      "delivery_pct": 44.85,
-      "volume": 210812,
-      "close": 1780.7,
-      "vwap": 1780.34
-    },
-    {
       "date": "2026-07-29",
       "delivery_pct": 51.47,
       "volume": 176583,
@@ -19792,16 +19785,16 @@
       "volume": 357284,
       "close": 1689.8,
       "vwap": 1693.17
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 59.44,
+      "volume": 284561,
+      "close": 1660.0,
+      "vwap": 1672.31
     }
   ],
   "TATACONSUM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 52.01,
-      "volume": 1130132,
-      "close": 1096.1,
-      "vwap": 1097.81
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 63.57,
@@ -19899,16 +19892,16 @@
       "volume": 939925,
       "close": 1061.6,
       "vwap": 1068.06
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 58.37,
+      "volume": 1241204,
+      "close": 1068.0,
+      "vwap": 1066.1
     }
   ],
   "TATAELXSI": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 40.55,
-      "volume": 755828,
-      "close": 3673.4,
-      "vwap": 3674.56
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 42.2,
@@ -20006,16 +19999,16 @@
       "volume": 192129,
       "close": 3662.0,
       "vwap": 3684.47
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 26.8,
+      "volume": 143684,
+      "close": 3659.7,
+      "vwap": 3651.65
     }
   ],
   "TATAPOWER": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 41.19,
-      "volume": 4420793,
-      "close": 377.25,
-      "vwap": 375.63
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 39.4,
@@ -20113,16 +20106,16 @@
       "volume": 2827459,
       "close": 381.0,
       "vwap": 380.54
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 49.77,
+      "volume": 3880698,
+      "close": 378.9,
+      "vwap": 377.49
     }
   ],
   "TATASTEEL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 47.98,
-      "volume": 24872418,
-      "close": 187.27,
-      "vwap": 186.93
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 35.4,
@@ -20220,16 +20213,16 @@
       "volume": 13393441,
       "close": 185.5,
       "vwap": 185.31
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 51.6,
+      "volume": 15509632,
+      "close": 184.0,
+      "vwap": 183.8
     }
   ],
   "TATATECH": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 43.11,
-      "volume": 573923,
-      "close": 742.4,
-      "vwap": 745.31
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 31.44,
@@ -20327,23 +20320,16 @@
       "volume": 1516377,
       "close": 835.8,
       "vwap": 830.51
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 36.13,
+      "volume": 914308,
+      "close": 812.55,
+      "vwap": 820.57
     }
   ],
   "TCS": [
-    {
-      "date": "2026-07-27",
-      "delivery_pct": 50.18,
-      "volume": 8248513,
-      "close": 2398.0,
-      "vwap": 2389.74
-    },
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 55.11,
-      "volume": 7169419,
-      "close": 2446.6,
-      "vwap": 2450.86
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 49.96,
@@ -20434,16 +20420,23 @@
       "volume": 2237636,
       "close": 2313.2,
       "vwap": 2322.55
+    },
+    {
+      "date": "2026-08-17",
+      "delivery_pct": 44.47,
+      "volume": 1797822,
+      "close": 2280.0,
+      "vwap": 2288.7
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 52.86,
+      "volume": 3368922,
+      "close": 2289.0,
+      "vwap": 2278.77
     }
   ],
   "TECHM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 45.91,
-      "volume": 2189575,
-      "close": 1644.2,
-      "vwap": 1652.75
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 60.27,
@@ -20541,16 +20534,16 @@
       "volume": 1904893,
       "close": 1592.0,
       "vwap": 1587.26
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 61.28,
+      "volume": 1752634,
+      "close": 1589.8,
+      "vwap": 1585.87
     }
   ],
   "TITAN": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 67.74,
-      "volume": 837059,
-      "close": 4850.2,
-      "vwap": 4839.73
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 68.77,
@@ -20648,16 +20641,16 @@
       "volume": 354873,
       "close": 5048.6,
       "vwap": 5056.71
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 52.03,
+      "volume": 412981,
+      "close": 5068.0,
+      "vwap": 5059.03
     }
   ],
   "TMPV": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 53.15,
-      "volume": 7220810,
-      "close": 329.8,
-      "vwap": 328.79
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 44.4,
@@ -20755,16 +20748,16 @@
       "volume": 9865820,
       "close": 322.8,
       "vwap": 325.41
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 47.65,
+      "volume": 5659002,
+      "close": 321.3,
+      "vwap": 321.93
     }
   ],
   "TORNTPHARM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 64.99,
-      "volume": 776537,
-      "close": 4878.5,
-      "vwap": 4885.33
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 64.21,
@@ -20862,16 +20855,16 @@
       "volume": 426573,
       "close": 4971.0,
       "vwap": 4977.74
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 65.74,
+      "volume": 412375,
+      "close": 5013.0,
+      "vwap": 4994.51
     }
   ],
   "TORNTPOWER": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 61.03,
-      "volume": 118024,
-      "close": 1431.1,
-      "vwap": 1431.93
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 69.88,
@@ -20969,16 +20962,16 @@
       "volume": 356402,
       "close": 1264.1,
       "vwap": 1274.94
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 67.75,
+      "volume": 375458,
+      "close": 1243.7,
+      "vwap": 1247.08
     }
   ],
   "TRENT": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 50.99,
-      "volume": 1012733,
-      "close": 3005.2,
-      "vwap": 2980.08
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 43.08,
@@ -21076,16 +21069,16 @@
       "volume": 718320,
       "close": 2942.1,
       "vwap": 2956.7
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 43.47,
+      "volume": 484117,
+      "close": 2953.0,
+      "vwap": 2953.77
     }
   ],
   "TVSMOTOR": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 60.55,
-      "volume": 1925276,
-      "close": 4075.6,
-      "vwap": 4053.88
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 62.29,
@@ -21183,16 +21176,16 @@
       "volume": 444890,
       "close": 4356.8,
       "vwap": 4366.96
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 55.13,
+      "volume": 456943,
+      "close": 4361.1,
+      "vwap": 4364.91
     }
   ],
   "UBL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 50.49,
-      "volume": 78738,
-      "close": 1440.2,
-      "vwap": 1439.72
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 46.57,
@@ -21290,16 +21283,16 @@
       "volume": 61635,
       "close": 1355.5,
       "vwap": 1365.31
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.29,
+      "volume": 110559,
+      "close": 1354.8,
+      "vwap": 1357.03
     }
   ],
   "ULTRACEMCO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 66.98,
-      "volume": 282068,
-      "close": 11998.0,
-      "vwap": 12010.16
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 59.61,
@@ -21397,16 +21390,16 @@
       "volume": 210406,
       "close": 11499.0,
       "vwap": 11562.76
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 61.04,
+      "volume": 251888,
+      "close": 11450.0,
+      "vwap": 11441.86
     }
   ],
   "UNIONBANK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 57.02,
-      "volume": 12582530,
-      "close": 171.08,
-      "vwap": 170.78
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 44.67,
@@ -21504,16 +21497,16 @@
       "volume": 6684017,
       "close": 185.5,
       "vwap": 186.87
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 48.25,
+      "volume": 7514657,
+      "close": 186.9,
+      "vwap": 186.01
     }
   ],
   "UPL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 54.92,
-      "volume": 1140985,
-      "close": 609.15,
-      "vwap": 608.12
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 58.66,
@@ -21611,16 +21604,16 @@
       "volume": 1746720,
       "close": 560.05,
       "vwap": 565.15
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 54.52,
+      "volume": 2733671,
+      "close": 568.0,
+      "vwap": 565.24
     }
   ],
   "VBL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 46.6,
-      "volume": 13449496,
-      "close": 447.2,
-      "vwap": 442.43
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 57.08,
@@ -21718,16 +21711,16 @@
       "volume": 4034092,
       "close": 439.3,
       "vwap": 439.52
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 66.02,
+      "volume": 2990073,
+      "close": 431.85,
+      "vwap": 434.97
     }
   ],
   "VEDL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 44.33,
-      "volume": 4780075,
-      "close": 264.5,
-      "vwap": 263.31
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 40.81,
@@ -21825,16 +21818,16 @@
       "volume": 9772133,
       "close": 264.0,
       "vwap": 266.31
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 56.02,
+      "volume": 8301777,
+      "close": 262.6,
+      "vwap": 262.22
     }
   ],
   "VGUARD": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 29.29,
-      "volume": 8673721,
-      "close": 301.95,
-      "vwap": 306.86
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 9.06,
@@ -21932,16 +21925,16 @@
       "volume": 868328,
       "close": 333.4,
       "vwap": 338.87
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 55.08,
+      "volume": 384575,
+      "close": 333.35,
+      "vwap": 333.0
     }
   ],
   "VMM": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 58.95,
-      "volume": 9891330,
-      "close": 108.24,
-      "vwap": 108.52
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 46.48,
@@ -22039,16 +22032,16 @@
       "volume": 5298866,
       "close": 103.71,
       "vwap": 104.65
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 45.09,
+      "volume": 4398688,
+      "close": 103.4,
+      "vwap": 103.38
     }
   ],
   "VOLTAS": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 35.39,
-      "volume": 322855,
-      "close": 1313.3,
-      "vwap": 1312.11
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 34.84,
@@ -22146,16 +22139,16 @@
       "volume": 995520,
       "close": 1252.9,
       "vwap": 1255.48
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 45.56,
+      "volume": 1178662,
+      "close": 1223.0,
+      "vwap": 1225.5
     }
   ],
   "WAAREEENER": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 27.18,
-      "volume": 1130793,
-      "close": 2736.2,
-      "vwap": 2708.1
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 23.38,
@@ -22253,16 +22246,16 @@
       "volume": 396655,
       "close": 2709.1,
       "vwap": 2710.44
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 42.75,
+      "volume": 438529,
+      "close": 2679.0,
+      "vwap": 2679.21
     }
   ],
   "WIPRO": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 53.23,
-      "volume": 26147867,
-      "close": 183.61,
-      "vwap": 184.13
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 47.03,
@@ -22360,16 +22353,16 @@
       "volume": 7074731,
       "close": 178.06,
       "vwap": 179.39
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 36.45,
+      "volume": 5964187,
+      "close": 179.55,
+      "vwap": 179.24
     }
   ],
   "YESBANK": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 43.19,
-      "volume": 45390757,
-      "close": 22.84,
-      "vwap": 22.87
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 38.43,
@@ -22467,16 +22460,16 @@
       "volume": 49817232,
       "close": 22.46,
       "vwap": 22.61
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 47.4,
+      "volume": 49505267,
+      "close": 22.74,
+      "vwap": 22.66
     }
   ],
   "ZEEL": [
-    {
-      "date": "2026-07-28",
-      "delivery_pct": 37.85,
-      "volume": 10287458,
-      "close": 108.13,
-      "vwap": 107.66
-    },
     {
       "date": "2026-07-29",
       "delivery_pct": 44.2,
@@ -22574,6 +22567,13 @@
       "volume": 24564113,
       "close": 105.32,
       "vwap": 105.27
+    },
+    {
+      "date": "2026-08-18",
+      "delivery_pct": 41.12,
+      "volume": 15207062,
+      "close": 102.22,
+      "vwap": 103.67
     }
   ]
 }

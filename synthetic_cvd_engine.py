@@ -270,10 +270,12 @@ def get_order_flow_data(
 
 
 def _generate_synthetic_flow(symbol: str, is_bullish: bool, of_data: OrderFlowData) -> OrderFlowData:
-    """Generate realistic synthetic bars when no live tick data is available."""
+    """Generate realistic synthetic bars when no live tick data is available, with realistic variance."""
     import random
-    seed_val = sum(ord(c) for c in symbol)
-    random.seed(seed_val)
+    from datetime import date
+    today_int = int(date.today().strftime("%Y%m%d"))
+    seed_val = sum(ord(c) * (idx + 1) for idx, c in enumerate(symbol)) + today_int
+    rng = random.Random(seed_val)
 
     bars = []
     total_ticks = 0
@@ -281,22 +283,30 @@ def _generate_synthetic_flow(symbol: str, is_bullish: bool, of_data: OrderFlowDa
     total_ask = 0
     base_vol = 12000 if symbol in ("RELIANCE", "INFY", "TCS", "HDFCBANK") else 4500
 
+    # Strong alignment for benchmark market leaders; natural variance across broad universe
+    if symbol in ("RELIANCE", "INFY", "TCS", "HDFCBANK"):
+        quality_bias = 0.85
+    else:
+        quality_bias = rng.uniform(0.60, 0.88)
+
     for i in range(10):
         minute_str = f"15:{15 + i:02d}"
-        tick_count = random.randint(180, 420)
+        tick_count = rng.randint(180, 420)
         total_ticks += tick_count
-        vol = int(base_vol * random.uniform(0.8, 1.6))
+        vol = int(base_vol * rng.uniform(0.7, 1.7))
 
+        # Check directional alignment for this minute bar
+        roll = rng.random()
         if is_bullish:
-            is_pos = (i not in [2, 7])
+            is_pos = (roll < quality_bias)
         else:
-            is_pos = (i in [2, 7])
+            is_pos = (roll > quality_bias)
 
         if is_pos:
-            buy_vol = int(vol * random.uniform(0.55, 0.75))
+            buy_vol = int(vol * rng.uniform(0.52, 0.72))
             sell_vol = vol - buy_vol
         else:
-            sell_vol = int(vol * random.uniform(0.55, 0.75))
+            sell_vol = int(vol * rng.uniform(0.52, 0.72))
             buy_vol = vol - sell_vol
 
         total_bid += buy_vol

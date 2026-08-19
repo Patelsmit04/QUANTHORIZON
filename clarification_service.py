@@ -25,7 +25,8 @@ from clarification_budget import check_and_increment_budget, ClarificationBudget
 
 logger = logging.getLogger("ClarificationService")
 
-CLARIFICATION_MODEL = "claude-sonnet-5"
+CLARIFICATION_MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-3-5-sonnet-20241022")
+CLARIFICATION_FALLBACK_MODEL = "claude-3-haiku-20240307"
 
 _CLARIFICATION_TOOL = {
     "name": "record_strategy_clarification",
@@ -108,6 +109,7 @@ def _generate_fallback_clarification(strategy: Dict[str, Any], correction_note: 
         "confirmation_bar_summary": f"Confirmation bar weight: {strategy.get('required_weight_override') or 'Engine Default'}.",
         "gate_summary": f"Fundamentals gate: {'ON' if strategy.get('fundamentals_gate_enabled') else 'OFF'}, News gate: {'ON' if strategy.get('news_gate_enabled') else 'OFF'}.",
         "plain_summary": summary,
+        "clarification_source": "RULE_ANALYZER_FALLBACK",
     }
 
 
@@ -138,19 +140,22 @@ def generate_clarification(strategy: Dict[str, Any], correction_note: Optional[s
             "Produce a revised, accurate clarification incorporating this correction."
         )
 
-    try:
-        response = client.messages.create(
-            model=CLARIFICATION_MODEL,
-            max_tokens=2000,
-            tools=[_CLARIFICATION_TOOL],
-            tool_choice={"type": "tool", "name": "record_strategy_clarification"},
-            messages=[{"role": "user", "content": prompt}],
-        )
-        for block in response.content:
-            if block.type == "tool_use" and block.name == "record_strategy_clarification":
-                return block.input
-    except Exception as e:
-        logger.warning(f"Claude API call failed ({e}) — returning fallback clarification.")
-        return _generate_fallback_clarification(strategy, correction_note)
+    for model_name in (CLARIFICATION_MODEL, CLARIFICATION_FALLBACK_MODEL):
+        try:
+            response = client.messages.create(
+                model=model_name,
+                max_tokens=2000,
+                tools=[_CLARIFICATION_TOOL],
+                tool_choice={"type": "tool", "name": "record_strategy_clarification"},
+                messages=[{"role": "user", "content": prompt}],
+            )
+            for block in response.content:
+                if block.type == "tool_use" and block.name == "record_strategy_clarification":
+                    res = dict(block.input)
+                    res["clarification_source"] = "AI_CLAUDE"
+                    res["model_used"] = model_name
+                    return res
+        except Exception as e:
+            logger.warning(f"Claude API call failed with {model_name} ({e}) — trying fallback.")
 
     return _generate_fallback_clarification(strategy, correction_note)
