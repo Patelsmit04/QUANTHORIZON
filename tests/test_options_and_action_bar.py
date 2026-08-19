@@ -105,6 +105,13 @@ def test_html_contains_option_chain_and_demo_modals():
     assert 'ocMatrixTableBody' in html
     assert 'optTradeStrikeSelect' in html
     assert 'executeOptionsTradeBtn' in html
+    assert 'stockDetailViewSwitcher' in html
+    assert 'stockDetailAnalysisContainer' in html
+    assert 'stockDetailChartContainer' in html
+    assert 'modalViewSwitcher' in html
+    assert 'modalAnalysisContainer' in html
+    assert 'modalChartContainerWrap' in html
+    assert 'modalOptionChainSymbol' in html
 
     with open("static/app.js", "r", encoding="utf-8") as f:
         js = f.read()
@@ -113,3 +120,28 @@ def test_html_contains_option_chain_and_demo_modals():
     assert 'btn-action-analysis' in js
     assert 'openOptionChainModal' in js
     assert 'openOptionsDemoTradeModal' in js
+    assert 'setStockDetailView' in js
+    assert 'setModalView' in js
+
+
+def test_action_bar_contrast_and_view_routing():
+    """Verifies Action Bar Tailwind classes, view routing, and dynamic option chain symbol binding."""
+    with open("static/app.js", "r", encoding="utf-8") as f:
+        js = f.read()
+
+    # Phase 1: Action Bar Tailwind Contrast Classes
+    assert 'text-slate-500 hover:text-amber-600 hover:bg-slate-100' in js
+    assert 'bg-amber-500 hover:bg-amber-600' in js
+    assert 'bg-slate-50 border border-slate-300' in js
+
+    # Phase 2: Mutually Exclusive View Toggling Logic
+    assert "setStockDetailView" in js
+    assert "setModalView" in js
+    assert "stockDetailAnalysisContainer" in js
+    assert "stockDetailChartContainer" in js
+
+    # Phase 3: Dynamic Option Chain Modal Symbol Binding & Loading State
+    assert "modalOptionChainSymbol" in js
+    assert "Fetching live option chain for" in js
+    assert "fetchOptionChain" in js
+

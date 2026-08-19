@@ -1999,23 +1999,23 @@ function initTradexoDashboard() {
                             <!-- Row 3: 4-Button Dedicated Action Bar (Analysis, Paper Trade, Chart, Option Chain) -->
                             <div class="action-bar-4grid" style="display: grid; grid-template-columns: 1fr 1.2fr auto auto; gap: 8px; width: 100%; align-items: center;">
                                 <!-- Button 1: ANALYSIS (Replaces old Details) -->
-                                <button class="btn btn-action-analysis" onclick="openStockModal('${escapeAttr(stock.symbol)}')" style="min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11.5px; font-weight: 800; background: #ffffff; color: #334155; border: 1.5px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s ease;">
+                                <button class="btn btn-action-analysis bg-slate-50 border border-slate-300 text-slate-700 hover:bg-slate-100 hover:text-amber-600 font-semibold text-xs px-4 py-2.5 rounded-lg transition-all" onclick="event.stopPropagation(); openStockModal('${escapeAttr(stock.symbol)}', 'analysis')">
                                     <i class="fa-solid fa-chart-pie text-cyan"></i> ANALYSIS
                                 </button>
 
                                 <!-- Button 2: OPTIONS PAPER TRADE -->
-                                <button class="btn btn-action-trade" onclick="event.stopPropagation(); openOptionsDemoTradeModal({ symbol: '${escapeAttr(stock.symbol)}', ltp: ${stock.ltp || 100}, signal: '${escapeAttr(sigText)}', target_1: ${stock.target_1 || 0}, target_2: ${stock.target_2 || 0}, stop_loss: ${stock.stop_loss || 0}, option_type: '${escapeAttr(stock.option_type || '')}' })" style="min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 900; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; border: none; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);">
+                                <button class="btn btn-action-trade bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-5 py-2.5 rounded-lg shadow-sm transition-all" onclick="event.stopPropagation(); openOptionsDemoTradeModal({ symbol: '${escapeAttr(stock.symbol)}', ltp: ${stock.ltp || 100}, signal: '${escapeAttr(sigText)}', target_1: ${stock.target_1 || 0}, target_2: ${stock.target_2 || 0}, stop_loss: ${stock.stop_loss || 0}, option_type: '${escapeAttr(stock.option_type || '')}' })">
                                     <i class="fa-solid fa-bolt"></i> &#9889; PAPER TRADE
                                 </button>
 
                                 <!-- Button 3: CHART -->
-                                <button class="btn btn-action-icon" onclick="event.stopPropagation(); openStockModal('${escapeAttr(stock.symbol)}')" title="Interactive Candlestick Chart" style="width: 42px; height: 40px; display: flex; align-items: center; justify-content: center; background: #ffffff; color: #d97706; border: 1.5px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s ease;">
-                                    <i class="fa-solid fa-chart-candlestick" style="font-size: 14px;"></i>
+                                <button class="btn btn-action-icon text-slate-500 hover:text-amber-600 hover:bg-slate-100 p-2 rounded-lg cursor-pointer transition-colors" onclick="event.stopPropagation(); openStockModal('${escapeAttr(stock.symbol)}', 'chart')" title="Interactive Candlestick Chart">
+                                    <i class="fa-solid fa-chart-candlestick" style="font-size: 15px;"></i>
                                 </button>
 
                                 <!-- Button 4: OPTION CHAIN -->
-                                <button class="btn btn-action-icon" onclick="event.stopPropagation(); openOptionChainModal('${escapeAttr(stock.symbol)}')" title="Live 1-Second Option Chain" style="width: 42px; height: 40px; display: flex; align-items: center; justify-content: center; background: #ffffff; color: #0284c7; border: 1.5px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s ease;">
-                                    <i class="fa-solid fa-link" style="font-size: 14px;"></i>
+                                <button class="btn btn-action-icon text-slate-500 hover:text-amber-600 hover:bg-slate-100 p-2 rounded-lg cursor-pointer transition-colors" onclick="event.stopPropagation(); openOptionChainModal('${escapeAttr(stock.symbol)}')" title="Live 1-Second Option Chain">
+                                    <i class="fa-solid fa-link" style="font-size: 15px;"></i>
                                 </button>
                             </div>
 
@@ -2243,9 +2243,10 @@ function initTradexoDashboard() {
     // -------------------------------------------------------------
     // 7. STOCK BREAKDOWN MODAL DRAWER
     // -------------------------------------------------------------
-    async function openStockModal(symbol) {
+    async function openStockModal(symbol, initialView = "analysis") {
         try {
             if (stockModal) stockModal.classList.remove("hidden");
+            if (typeof setModalView === "function") setModalView(initialView || "analysis");
             
             const modalSymbol = document.getElementById("modalSymbol");
             const modalScoreVal = document.getElementById("modalScoreVal");
@@ -2584,9 +2585,17 @@ function initTradexoDashboard() {
         if (isFetchingOptionChain) return; // Skip overlapping tick
         isFetchingOptionChain = true;
         try {
-            const cleanSym = symbol.replace(".NS", "").toUpperCase().trim();
+            const rawSym = symbol || currentOptionChainSymbol || "NIFTY";
+            const cleanSym = String(rawSym).replace(".NS", "").toUpperCase().trim();
             const response = await apiFetch(`/api/option-chain/${cleanSym}`);
-            if (!response.ok) return;
+            
+            const tbody = document.getElementById("ocMatrixTableBody");
+            if (!response.ok) {
+                if (!isSilentTick && tbody) {
+                    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:30px;color:#be123c;font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Unable to load live option chain for ${escapeHtml(cleanSym)}.</td></tr>`;
+                }
+                return;
+            }
             const data = await response.json();
             currentOptionChainData = data;
 
@@ -2604,6 +2613,9 @@ function initTradexoDashboard() {
             // Header summary (Phase 2: selective textContent mutations)
             const symEl = document.getElementById("ocModalSymbol");
             if (symEl && symEl.textContent !== (data.symbol || cleanSym)) symEl.textContent = data.symbol || cleanSym;
+
+            const modalOptSym = document.getElementById("modalOptionChainSymbol");
+            if (modalOptSym && modalOptSym.textContent !== (data.symbol || cleanSym)) modalOptSym.textContent = data.symbol || cleanSym;
 
             const ltpEl = document.getElementById("ocModalLtp");
             const newUnderlying = `₹${(data.underlying_value || 0).toFixed(2)}`;
@@ -2646,12 +2658,11 @@ function initTradexoDashboard() {
             }
 
             // Render / In-Place Update Table Body
-            const tbody = document.getElementById("ocMatrixTableBody");
             if (!tbody) return;
 
             const strikes = data.strikes || [];
             if (strikes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:30px;color:#64748b;">No option chain strikes available.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:30px;color:#64748b;font-weight:700;">No option chain strikes available for ${escapeHtml(cleanSym)}.</td></tr>`;
                 return;
             }
 
@@ -2794,12 +2805,47 @@ function initTradexoDashboard() {
             isFetchingOptionChain = false;
         }
     }
+    window.fetchOptionChain = fetchAndRenderOptionChain;
 
     async function openOptionChainModal(symbol) {
         const modal = document.getElementById("optionChainModal");
         if (!modal) return;
         modal.classList.remove("hidden");
-        currentOptionChainSymbol = (symbol || "NIFTY").replace(".NS", "").toUpperCase().trim();
+
+        const rawSym = symbol || "NIFTY";
+        const cleanSym = String(rawSym).replace(".NS", "").toUpperCase().trim();
+        currentOptionChainSymbol = cleanSym;
+
+        // Dynamic Header Binding
+        const ocSymEl = document.getElementById("ocModalSymbol");
+        if (ocSymEl) ocSymEl.textContent = cleanSym;
+        const modalOptSymEl = document.getElementById("modalOptionChainSymbol");
+        if (modalOptSymEl) modalOptSymEl.textContent = cleanSym;
+
+        // Reset summary metrics while loading
+        const ltpEl = document.getElementById("ocModalLtp");
+        if (ltpEl) ltpEl.textContent = "₹--";
+        const lotEl = document.getElementById("ocModalLotSize");
+        if (lotEl) lotEl.textContent = "--";
+        const pcrEl = document.getElementById("ocModalPcr");
+        if (pcrEl) pcrEl.textContent = "--";
+        const painEl = document.getElementById("ocModalMaxPain");
+        if (painEl) painEl.textContent = "--";
+
+        // Immediate Loading State inside Table Body
+        const tbody = document.getElementById("ocMatrixTableBody");
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" style="text-align:center;padding:40px 20px;color:#64748b;font-weight:700;font-size:13px;">
+                        <i class="fa-solid fa-spinner fa-spin" style="margin-right:8px;color:#d97706;font-size:16px;"></i> Fetching live option chain for <strong>${escapeHtml(cleanSym)}</strong>...
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Reset strike cache
+        optionChainStrikeNodes.clear();
 
         // Clear existing interval
         if (optionChainInterval) {
@@ -2808,7 +2854,7 @@ function initTradexoDashboard() {
         }
 
         // Initial fetch
-        await fetchAndRenderOptionChain(currentOptionChainSymbol);
+        await fetchAndRenderOptionChain(currentOptionChainSymbol, false);
 
         // 1-Second Live Polling Loop
         optionChainInterval = setInterval(() => {
@@ -5416,18 +5462,87 @@ function initTradexoDashboard() {
     let currentStockSymbol = null;
     let currentTvTimeframe = "15";
 
-    window.openStockModal = function(symbol) {
+    function setStockDetailView(view = "analysis") {
+        const analysisContainer = document.getElementById("stockDetailAnalysisContainer");
+        const chartContainer = document.getElementById("stockDetailChartContainer");
+        const analysisTab = document.getElementById("btnStockDetailAnalysisTab");
+        const chartTab = document.getElementById("btnStockDetailChartTab");
+
+        if (view === "chart") {
+            if (chartContainer) chartContainer.classList.remove("hidden");
+            if (analysisContainer) analysisContainer.classList.add("hidden");
+            if (chartTab) chartTab.classList.add("active");
+            if (analysisTab) analysisTab.classList.remove("active");
+            if (currentDetailSymbol) {
+                renderLightweightCandleChart(currentDetailSymbol, currentDetailTimeframe || "15");
+            }
+        } else {
+            if (analysisContainer) analysisContainer.classList.remove("hidden");
+            if (chartContainer) chartContainer.classList.add("hidden");
+            if (analysisTab) analysisTab.classList.add("active");
+            if (chartTab) chartTab.classList.remove("active");
+        }
+    }
+    window.setStockDetailView = setStockDetailView;
+
+    function setModalView(view = "analysis") {
+        const analysisContainer = document.getElementById("modalAnalysisContainer");
+        const chartContainer = document.getElementById("modalChartContainerWrap");
+        const analysisTab = document.getElementById("btnModalAnalysisTab");
+        const chartTab = document.getElementById("btnModalChartTab");
+
+        if (view === "chart") {
+            if (chartContainer) chartContainer.classList.remove("hidden");
+            if (analysisContainer) analysisContainer.classList.add("hidden");
+            if (chartTab) chartTab.classList.add("active");
+            if (analysisTab) analysisTab.classList.remove("active");
+            ensureModalChart();
+            if (modalChart) {
+                setTimeout(() => modalChart.timeScale().fitContent(), 50);
+            }
+        } else {
+            if (analysisContainer) analysisContainer.classList.remove("hidden");
+            if (chartContainer) chartContainer.classList.add("hidden");
+            if (analysisTab) analysisTab.classList.add("active");
+            if (chartTab) chartTab.classList.remove("active");
+        }
+    }
+    window.setModalView = setModalView;
+
+    window.openStockModal = function(symbol, initialView = "analysis") {
         if (!symbol) return;
         currentStockSymbol = symbol;
         switchSection("stockDetail");
-        renderStockDetailPage(symbol, currentTvTimeframe);
+        renderStockDetailPage(symbol, currentTvTimeframe, initialView || "analysis");
     };
-    window.openStockChartModal = window.openStockModal;
+    window.openStockChartModal = function(symbol) {
+        window.openStockModal(symbol, "chart");
+    };
 
     const btnBackFromStockDetail = document.getElementById("btnBackFromStockDetail");
     if (btnBackFromStockDetail) {
         btnBackFromStockDetail.addEventListener("click", () => {
             switchSection("scanner");
+        });
+    }
+
+    const stockDetailViewSwitcher = document.getElementById("stockDetailViewSwitcher");
+    if (stockDetailViewSwitcher) {
+        stockDetailViewSwitcher.addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-detail-view]");
+            if (!btn) return;
+            const view = btn.dataset.detailView;
+            setStockDetailView(view);
+        });
+    }
+
+    const modalViewSwitcher = document.getElementById("modalViewSwitcher");
+    if (modalViewSwitcher) {
+        modalViewSwitcher.addEventListener("click", (e) => {
+            const btn = e.target.closest("[data-modal-view]");
+            if (!btn) return;
+            const view = btn.dataset.modalView;
+            setModalView(view);
         });
     }
 
@@ -5474,10 +5589,13 @@ let customPriceLines = [];
 let currentDetailSymbol = null;
 let currentDetailTimeframe = "15";
 
-async function renderStockDetailPage(symbol, timeframe = "15") {
+async function renderStockDetailPage(symbol, timeframe = "15", initialView = "analysis") {
     if (!symbol) return;
     currentDetailSymbol = symbol;
     currentDetailTimeframe = timeframe;
+
+    // Set mutually exclusive view
+    setStockDetailView(initialView || "analysis");
 
     const logoWrap = document.getElementById("stockDetailLogoWrap");
     const symTitle = document.getElementById("stockDetailSymbolTitle");
