@@ -135,6 +135,30 @@ function initTradexoDashboard() {
     let newsRefreshInterval = null;
     let lastProcessedMarketTimestamp = 0;      // Phase 1: Global Timestamp Monotonicity Tracker
     let lastProcessedOptionChainTimestamp = 0; // Phase 1: Option Chain Timestamp Tracker
+    
+    // Phase 1 Concurrency Locks (Promise Overlap & Traffic Jam Prevention)
+    let isFetchingPrices = false;
+    let isFetchingOptionChain = false;
+    let isFetchingScan = false;
+
+    // Phase 3 Visual Heartbeat Telemetry (Proof of 1-sec tick)
+    function triggerHeartbeatPulse() {
+        const hb = document.getElementById("liveTickHeartbeat");
+        if (!hb) return;
+        hb.className = "tick-heartbeat tick-pulse";
+        setTimeout(() => {
+            if (hb.classList.contains("tick-pulse")) {
+                hb.className = "tick-heartbeat";
+            }
+        }, 220);
+    }
+
+    function triggerHeartbeatError() {
+        const hb = document.getElementById("liveTickHeartbeat");
+        if (!hb) return;
+        hb.className = "tick-heartbeat tick-error";
+    }
+
     // Strategy cards rebuild #strategyGrid from scratch on every toggle/edit action, so
     // collapsed/expanded state must survive that — tracked here, not as a DOM class.
     const collapsedStrategyIds = new Set();
@@ -1005,6 +1029,8 @@ function initTradexoDashboard() {
     }
 
     async function fetchScanResults(forceRefresh = false) {
+        if (isFetchingScan && !forceRefresh) return; // Prevent overlapping heavy scan requests
+        isFetchingScan = true;
         try {
             if (forceRefresh) {
                 if (scanProgressBar) scanProgressBar.classList.remove("hidden");
@@ -1056,12 +1082,6 @@ function initTradexoDashboard() {
 
         } catch (error) {
             console.error("Failed to fetch scan results:", error);
-            // M9 audit fix: a hung/failed fetch used to leave the table area blank with the
-            // "SCANNING..." button state (cleared in `finally` below) as the only clue
-            // something was wrong. Only shown when there's no existing data already on
-            // screen — a transient failure on top of an already-populated table shouldn't
-            // blank out data the user can still usefully see; the next auto-refresh or manual
-            // retry will recover it, and the console.error above still captures it either way.
             if (allStocks.length === 0 && emptyState) {
                 const isTimeout = error && error.name === "AbortError";
                 setEmptyStateMessage(
@@ -1073,6 +1093,7 @@ function initTradexoDashboard() {
                 emptyState.classList.remove("hidden");
             }
         } finally {
+            isFetchingScan = false;
             if (forceRefresh) {
                 if (scanProgressBar) scanProgressBar.classList.add("hidden");
                 if (scanBtn) {
@@ -1245,9 +1266,19 @@ function initTradexoDashboard() {
     // Phase 1: Timestamp Monotonicity State & Fast In-Place Price Updater
     let lastBtstStatus = 'pre_btst';
     async function fetchLivePrices() {
+        if (isFetchingPrices) {
+            // Traffic Jam Prevention: previous tick is still in-flight
+            const hb = document.getElementById("liveTickHeartbeat");
+            if (hb) hb.className = "tick-heartbeat tick-lagging";
+            return;
+        }
+        isFetchingPrices = true;
         try {
             const response = await apiFetch('/api/live_prices');
-            if (!response.ok) return;
+            if (!response.ok) {
+                triggerHeartbeatError();
+                return;
+            }
             const data = await response.json();
 
             // Phase 1: Monotonic Timestamp Validation Guard (Discard stale out-of-order responses)
@@ -1257,6 +1288,9 @@ function initTradexoDashboard() {
                 return; // Discard stale asynchronous response
             }
             if (payloadTime) lastProcessedMarketTimestamp = payloadTime;
+
+            // Phase 3: Visual Heartbeat Pulse (Proof of 1-sec tick)
+            triggerHeartbeatPulse();
 
             // Synchronize Market Status Badge & Subtext
             updateMarketStatusBadge(data);
@@ -1469,7 +1503,9 @@ function initTradexoDashboard() {
                 }
             }
         } catch (e) {
-            // Silent — this is a background poll
+            triggerHeartbeatError();
+        } finally {
+            isFetchingPrices = false;
         }
     }
 
@@ -2465,6 +2501,8 @@ function initTradexoDashboard() {
     let currentOptionChainData = null;
 
     async function fetchAndRenderOptionChain(symbol, isSilentTick = false) {
+        if (isFetchingOptionChain) return; // Skip overlapping tick
+        isFetchingOptionChain = true;
         try {
             const cleanSym = symbol.replace(".NS", "").toUpperCase().trim();
             const response = await apiFetch(`/api/option-chain/${cleanSym}`);
@@ -2643,6 +2681,8 @@ function initTradexoDashboard() {
 
         } catch (err) {
             if (!isSilentTick) console.warn("Option chain fetch error:", err);
+        } finally {
+            isFetchingOptionChain = false;
         }
     }
 
