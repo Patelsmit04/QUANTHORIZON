@@ -564,8 +564,7 @@ function initTradexoDashboard() {
     refreshStrategiesNavBadge();
     initNotifications();
     fetchTickerIndices();
-    setInterval(fetchTickerIndices, 1000); // 1-sec real-time index marquee refresh
-    setInterval(fetchLivePrices, 1000); // 1-sec real-time stock & index numbers updater
+    setInterval(fetchLivePrices, 1000); // 1-sec unified real-time stock & index fast-path loop
     setInterval(fetchSplitAccuracy, 60000); // 1-min accuracy score metrics recalculation
     setInterval(fetchWinRatePerformance, 60000); // 1-min win rate performance updater
     scheduleMarketOpenRefresh();
@@ -4153,12 +4152,11 @@ function initTradexoDashboard() {
                 });
             }
 
-            // Immediately apply updates to index ticker nodes and cards
+            // Sync index card and ticker nodes with index signals data
             batchMutateLivePrices({ indices: indices });
 
         } catch (e) {
             console.warn("Error fetching ticker indices:", e);
-            batchMutateLivePrices({ indices: DEFAULT_INDEX_FALLBACKS });
         }
     }
 

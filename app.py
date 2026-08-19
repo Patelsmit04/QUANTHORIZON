@@ -2640,6 +2640,23 @@ def get_index_signals():
             if gift_live:
                 index_data.append(gift_live)
 
+    # Synchronize index_data with latest fast_cache live quotes if available
+    fast_indices = fast_cache.get_index_quotes_snapshot()
+    if fast_indices and index_data:
+        fast_map = {idx.get("index_name"): idx for idx in fast_indices if isinstance(idx, dict)}
+        for idx in index_data:
+            name = idx.get("index_name")
+            if name in fast_map:
+                f_idx = fast_map[name]
+                if f_idx.get("ltp") is not None:
+                    idx["ltp"] = f_idx["ltp"]
+                if f_idx.get("change_pts") is not None:
+                    idx["change_pts"] = f_idx["change_pts"]
+                if f_idx.get("pct_change") is not None:
+                    idx["pct_change"] = f_idx["pct_change"]
+                if f_idx.get("prev_close") is not None:
+                    idx["prev_close"] = f_idx["prev_close"]
+
     # Determine BTST display status based on current IST time
     ist_now = get_ist_now()
     time_in_mins = ist_now.hour * 60 + ist_now.minute
