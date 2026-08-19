@@ -40,3 +40,34 @@ def test_ai_sentinel_idempotent_healing_pass():
     assert "actions_taken" in res1
     res2 = sentinel.run_self_healing_pass(trigger="pytest_heal_2")
     assert "actions_taken" in res2
+
+def test_10_phase_diagnostics_suite():
+    sentinel = AISentinelEngine()
+    report = sentinel.run_10_phase_diagnostics()
+    assert "overall_status" in report
+    assert "overall_score" in report
+    assert "total_latency_ms" in report
+    assert "phases" in report
+    assert len(report["phases"]) == 10
+    
+    # Verify each phase has required telemetry keys
+    for p in report["phases"]:
+        assert "phase" in p
+        assert "name" in p
+        assert "target" in p
+        assert "latency_ms" in p
+        assert "status" in p
+        assert "details" in p
+        assert "healing_action" in p
+        assert p["latency_ms"] >= 0.0
+
+def test_10_phase_diagnostics_endpoint():
+    res = client.get("/api/system/health/diagnostics")
+    assert res.status_code == 200
+    data = res.json()
+    assert "phases" in data
+    assert len(data["phases"]) == 10
+    assert data["total_phases_count"] == 10
+    assert data["passed_phases_count"] >= 8
+    assert data["overall_status"] in ("OPTIMAL", "DEGRADED", "CRITICAL")
+

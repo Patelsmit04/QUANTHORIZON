@@ -3659,6 +3659,17 @@ def api_get_ai_sentinel_status():
     return sanitize_json_data(ai_sentinel.get_sentinel_status())
 
 
+@app.get("/api/system/health/diagnostics")
+@app.get("/api/system_health/diagnostics")
+def api_get_system_health_diagnostics():
+    """
+    Executes the 10-Phase Diagnostic Waterfall Engine with individual phase latencies,
+    status badges, target metrics, and self-healing action hooks.
+    """
+    from ai_sentinel import ai_sentinel
+    return sanitize_json_data(ai_sentinel.run_10_phase_diagnostics())
+
+
 @app.get("/api/ai_sentinel/heal_now")
 @app.post("/api/ai_sentinel/heal_now")
 @app.post("/api/system/heal")

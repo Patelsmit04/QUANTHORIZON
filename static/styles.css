@@ -4607,6 +4607,130 @@ button, .btn, .index-tab-btn, .filter-pill-btn, .filter-chip, .tf-btn, .stock-se
 }
 
 /* ==========================================================================
+   10-PHASE DIAGNOSTIC WATERFALL STYLES
+   ========================================================================== */
+.sentinel-waterfall-master-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    padding: 22px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+}
+
+.sentinel-waterfall-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 16px;
+}
+
+.sentinel-waterfall-heading {
+    font-size: 15.5px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.sentinel-waterfall-subheading {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin: 4px 0 0 0;
+}
+
+.waterfall-phases-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.waterfall-phase-row {
+    display: grid;
+    grid-template-columns: 36px 190px 130px 75px 1fr 110px;
+    align-items: center;
+    gap: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.waterfall-phase-row:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.waterfall-phase-num {
+    font-size: 11.5px;
+    font-weight: 900;
+    color: #d97706;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    text-align: center;
+    padding: 3px 0;
+    font-family: var(--font-mono);
+}
+
+.waterfall-phase-name {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.waterfall-phase-target {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    font-family: var(--font-mono);
+    white-space: nowrap;
+}
+
+.waterfall-phase-latency {
+    font-size: 12px;
+    font-weight: 800;
+    color: #047857;
+    font-family: var(--font-mono);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.waterfall-phase-details {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.waterfall-phase-status {
+    text-align: right;
+}
+
+@media (max-width: 1024px) {
+    .waterfall-phase-row {
+        grid-template-columns: 32px 1fr auto;
+        gap: 8px;
+    }
+    .waterfall-phase-target, .waterfall-phase-details {
+        grid-column: 2 / -1;
+    }
+}
+
+/* ==========================================================================
    FIX 2 & FIX 3 UTILITY CLASSES (Grid & Chart Wrapper)
    ========================================================================== */
 #tradingview_chart_container {

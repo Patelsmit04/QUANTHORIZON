@@ -7277,7 +7277,73 @@ async function fetchPaperPortfolio() {
 // ==========================================================================
 let systemHealthData = null;
 let aiSentinelData = null;
+let waterfallData = null;
 let currentHealthLogFilter = "ALL";
+
+async function fetch10PhaseDiagnostics(isManual = false) {
+    const btn = document.getElementById("btnRun10PhaseDiag");
+    if (btn && isManual) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin text-gold"></i> <span>RUNNING...</span>';
+    }
+    try {
+        const response = await apiFetch("/api/system/health/diagnostics");
+        if (!response.ok) return;
+        const data = await response.json();
+        waterfallData = data;
+        render10PhaseWaterfallUI(data);
+    } catch (e) {
+        console.warn("[TRADEXO] 10-Phase diagnostics error:", e);
+    } finally {
+        if (btn && isManual) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-arrows-rotate text-gold"></i> <span>RUN DIAGNOSTICS</span>';
+        }
+    }
+}
+
+function render10PhaseWaterfallUI(data) {
+    if (!data) return;
+    const latencyEl = document.getElementById("waterfallTotalLatencyVal");
+    if (latencyEl) latencyEl.textContent = `${data.total_latency_ms || 0}ms`;
+
+    const badge = document.getElementById("waterfallOverallBadge");
+    if (badge) {
+        const passed = data.passed_phases_count || 10;
+        const total = data.total_phases_count || 10;
+        const isOptimal = (data.overall_status || 'OPTIMAL') === 'OPTIMAL';
+        badge.className = isOptimal ? "badge badge-bullish" : "badge badge-bearish";
+        badge.textContent = `${passed}/${total} PHASES ${data.overall_status || 'OPTIMAL'}`;
+    }
+
+    const list = document.getElementById("waterfallPhasesList");
+    if (!list) return;
+
+    const phases = data.phases || [];
+    if (phases.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:20px;color:#64748b;">No diagnostic telemetry available.</div>';
+        return;
+    }
+
+    list.innerHTML = phases.map(p => {
+        const isPass = p.status === "OPTIMAL" || p.status === "PASS";
+        const badgeCls = isPass ? "badge-bullish" : (p.status === "DEGRADED" ? "badge-warning" : "badge-bearish");
+        const latCls = (p.latency_ms || 0) < 50 ? "text-bullish" : ((p.latency_ms || 0) < 200 ? "text-amber" : "text-bearish");
+        
+        return `
+            <div class="waterfall-phase-row">
+                <div class="waterfall-phase-num">${String(p.phase).padStart(2, '0')}</div>
+                <div class="waterfall-phase-name" title="${escapeAttr(p.name)}">${escapeHtml(p.name)}</div>
+                <div class="waterfall-phase-target"><i class="fa-solid fa-bullseye" style="font-size:9px;margin-right:3px;"></i>${escapeHtml(p.target)}</div>
+                <div class="waterfall-phase-latency ${latCls}">${p.latency_ms}ms</div>
+                <div class="waterfall-phase-details" title="${escapeAttr(p.details)}">${escapeHtml(p.details)}</div>
+                <div class="waterfall-phase-status">
+                    <span class="badge ${badgeCls}" style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:12px;">${escapeHtml(p.status)}</span>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
 
 async function fetchSystemHealth() {
     try {
@@ -7286,6 +7352,7 @@ async function fetchSystemHealth() {
         const payload = await response.json();
         systemHealthData = payload;
         renderSystemHealthUI(payload);
+        fetch10PhaseDiagnostics();
     } catch (e) {
         console.warn("[TRADEXO] System health fetch error:", e);
     }
@@ -7944,15 +8011,24 @@ function initSystemHealthDiagnostics() {
         });
     }
 
+    const run10DiagBtn = document.getElementById("btnRun10PhaseDiag");
+    if (run10DiagBtn) {
+        run10DiagBtn.addEventListener("click", () => {
+            fetch10PhaseDiagnostics(true);
+        });
+    }
+
     // Initial fetch and 30-sec polling
     fetchSystemHealth();
     fetchAiSentinelStatus();
     fetchDailyHealthHistory();
+    fetch10PhaseDiagnostics();
     setInterval(() => {
         if ((typeof currentActiveSection !== "undefined" && currentActiveSection === "systemHealth") || window.currentActiveSection === "systemHealth") {
             fetchSystemHealth();
             fetchAiSentinelStatus();
             fetchDailyHealthHistory();
+            fetch10PhaseDiagnostics();
         }
     }, 30000);
 }
