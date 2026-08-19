@@ -1271,6 +1271,18 @@ function initTradexoDashboard() {
     // =========================================================================
     // O(1) DOM NODE CACHING & RAF BATCH MUTATION ENGINE
     // =========================================================================
+    function normalizeIndexKey(name) {
+        if (!name) return "";
+        let clean = String(name).toUpperCase().replace(/[^A-Z0-9]/g, "").trim();
+        if (clean === "NIFTYBANK" || clean === "BANKNIFTY" || clean === "NIFTYBANKNIFTY") return "BANKNIFTY";
+        if (clean === "BSESENSEX" || clean === "SENSEX") return "SENSEX";
+        if (clean === "NIFTY50" || clean === "NIFTY") return "NIFTY50";
+        if (clean === "GIFTNIFTY") return "GIFTNIFTY";
+        if (clean === "INDIAVIX" || clean === "VIX") return "INDIAVIX";
+        return clean;
+    }
+    window.normalizeIndexKey = normalizeIndexKey;
+
     function ensureNodeDictionariesPopulated() {
         // 1. Index Ticker Nodes (Marquee Ticker Tape)
         if (indexTickerNodes.length === 0 && indexTickerTrack) {
@@ -1365,18 +1377,20 @@ function initTradexoDashboard() {
                     const idx = indexMap.get(node.key);
                     if (!idx) return;
 
-                    if (node.ltpSpan && idx.ltp != null) {
-                        const formattedLtp = idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    const rawLtp = idx.ltp ?? idx.current_price ?? idx.price;
+                    if (node.ltpSpan && rawLtp != null) {
+                        const formattedLtp = Number(rawLtp).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                         if (node.ltpSpan.textContent !== formattedLtp) {
                             node.ltpSpan.textContent = formattedLtp;
                         }
                     }
 
-                    if (node.changeSpan && idx.change_pts != null) {
-                        const isUp = idx.change_pts >= 0;
+                    const changePts = idx.change_pts ?? idx.change ?? 0;
+                    const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
+                    if (node.changeSpan) {
+                        const isUp = changePts >= 0;
                         const sign = isUp ? '+' : '';
-                        const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                        const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
+                        const pts = Math.abs(changePts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                         const text = `${sign}${pts} (${sign}${pctVal.toFixed(2)}%)`;
                         if (node.changeSpan.textContent !== text) {
                             node.changeSpan.textContent = text;
@@ -1393,16 +1407,18 @@ function initTradexoDashboard() {
                     const idx = indexMap.get(idxKey);
                     if (!idx) return;
 
-                    if (node.ltpEl && idx.ltp != null) {
-                        const formatted = `₹${idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    const rawLtp = idx.ltp ?? idx.current_price ?? idx.price;
+                    if (node.ltpEl && rawLtp != null) {
+                        const formatted = `₹${Number(rawLtp).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                         if (node.ltpEl.textContent !== formatted) node.ltpEl.textContent = formatted;
                     }
 
-                    if (node.changeEl && idx.change_pts != null && idx.pct_change != null) {
-                        const isUp = idx.change_pts >= 0;
+                    const changePts = idx.change_pts ?? idx.change ?? 0;
+                    const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
+                    if (node.changeEl) {
+                        const isUp = changePts >= 0;
                         const sign = isUp ? '+' : '';
-                        const pts = Math.abs(idx.change_pts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                        const pctVal = Math.abs(typeof idx.pct_change === 'number' ? idx.pct_change : (parseFloat(idx.pct_change) || 0));
+                        const pts = Math.abs(changePts).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                         const text = `${sign}${pts} (${sign}${pctVal.toFixed(2)}%)`;
                         const targetClass = `index-card-change ${isUp ? 'text-bullish' : 'text-bearish'}`;
                         if (node.changeEl.className !== targetClass) node.changeEl.className = targetClass;
@@ -1414,9 +1430,10 @@ function initTradexoDashboard() {
                 indexVerdictNodes.forEach((node, idxKey) => {
                     const idx = indexMap.get(idxKey);
                     if (!idx || !node.priceEl) return;
-                    if (idx.ltp != null) {
+                    const rawLtp = idx.ltp ?? idx.current_price ?? idx.price;
+                    if (rawLtp != null) {
                         const tagHtml = node.tagEl ? node.tagEl.outerHTML : '';
-                        const formatted = `₹${idx.ltp.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ${tagHtml}`;
+                        const formatted = `₹${Number(rawLtp).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ${tagHtml}`;
                         if (node.priceEl.innerHTML !== formatted) node.priceEl.innerHTML = formatted;
                     }
                 });
@@ -1567,10 +1584,10 @@ function initTradexoDashboard() {
                     required_pillars: 3,
                 }));
                 filterAndRenderTable();
-            } else {
-                // High-Performance O(1) Dictionary Mutation in requestAnimationFrame
-                batchMutateLivePrices(data);
             }
+
+            // Always run high-performance batch mutation for indices and cached table nodes
+            batchMutateLivePrices(data);
         } catch (e) {
             triggerHeartbeatError();
         } finally {
@@ -4039,6 +4056,7 @@ function initTradexoDashboard() {
     function renderIndexGrid(indices) {
         if (!indexGrid) return;
         indexGrid.innerHTML = "";
+        indexCardNodes.clear();
         indices.forEach(idx => indexGrid.appendChild(buildIndexCard(idx)));
     }
 
@@ -4122,35 +4140,25 @@ function initTradexoDashboard() {
                 if (!indexTickerTrack.children || indexTickerTrack.children.length === 0) {
                     const itemsHtml = indices.map(buildTickerItemHTML).join("");
                     indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
+                }
 
-                    indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                    if (!item.dataset.hasClickListener) {
+                        item.dataset.hasClickListener = 'true';
                         item.addEventListener('click', () => {
                             const idxName = item.dataset.indexName;
                             if (idxName) openIndexChartModal(idxName);
                         });
-                    });
-                }
-
-                // Register into O(1) indexTickerNodes dictionary
-                indexTickerNodes.length = 0;
-                indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
-                    const rawName = item.dataset.indexName || item.querySelector('strong')?.textContent || '';
-                    const idxKey = normalizeIndexKey(rawName);
-                    const spans = item.querySelectorAll('span');
-                    indexTickerNodes.push({
-                        key: idxKey,
-                        item: item,
-                        ltpSpan: spans[0] || null,
-                        changeSpan: spans[1] || spans[2] || null
-                    });
+                    }
                 });
             }
+
+            // Immediately apply updates to index ticker nodes and cards
+            batchMutateLivePrices({ indices: indices });
+
         } catch (e) {
             console.warn("Error fetching ticker indices:", e);
-            if (indexTickerTrack && (!indexTickerTrack.children || indexTickerTrack.children.length === 0)) {
-                const itemsHtml = DEFAULT_INDEX_FALLBACKS.map(buildTickerItemHTML).join("");
-                indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
-            }
+            batchMutateLivePrices({ indices: DEFAULT_INDEX_FALLBACKS });
         }
     }
 
