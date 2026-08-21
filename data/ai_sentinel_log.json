@@ -1,211 +1,6 @@
 {
   "events": [
     {
-      "timestamp": "2026-08-19 22:05:41 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "GRASIM",
-            "HINDALCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-08-19 22:06:12 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "GRASIM",
-            "HINDALCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-08-19 22:06:43 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "GRASIM",
-            "HINDALCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-08-19 22:07:14 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "GRASIM",
-            "HINDALCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-08-19 22:07:53 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "GRASIM",
-            "HINDALCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-08-19 22:08:24 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "GRASIM",
-            "HINDALCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-08-19 22:08:58 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "GRASIM",
-            "HINDALCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-08-19 22:09:29 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "GRASIM",
-            "HINDALCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-08-19 22:10:01 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 2,
-      "actions": [
-        {
-          "step": 4,
-          "action": "AUTO_BACKFILL_EVALUATION",
-          "evaluated_count": 0,
-          "win_rate_pct": 25.0,
-          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 25.0% win rate) and reconciled milestone.",
-          "verified": true,
-          "accuracy_pipeline_check": {
-            "status": "PASS",
-            "pre_total": 32,
-            "post_total": 32,
-            "delta": 0,
-            "expected": 0,
-            "tolerance": 2
-          }
-        },
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "GRASIM",
-            "HINDALCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
       "timestamp": "2026-08-19 22:09:39 IST",
       "trigger": "pytest_1",
       "actions_count": 2,
@@ -2327,10 +2122,282 @@
       "all_verified": false,
       "resulting_score": 100,
       "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-21 18:39:04 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ASIANPAINT",
+            "BAJAJFINSV",
+            "ICICIBANK",
+            "RELIANCE",
+            "TCS",
+            "TITAN",
+            "MARUTI"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ASIANPAINT', 'BAJAJFINSV', 'ICICIBANK']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-21 18:40:05 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 32.1,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 32.1% win rate) and reconciled milestone.",
+          "verified": true,
+          "accuracy_pipeline_check": {
+            "status": "PASS",
+            "pre_total": 52,
+            "post_total": 52,
+            "delta": 0,
+            "expected": 0,
+            "tolerance": 2
+          }
+        },
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ASIANPAINT",
+            "BAJAJFINSV",
+            "ICICIBANK",
+            "RELIANCE",
+            "TCS",
+            "TITAN",
+            "MARUTI"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ASIANPAINT', 'BAJAJFINSV', 'ICICIBANK']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-21 18:40:04 IST",
+      "trigger": "pytest_1",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 4,
+          "action": "AUTO_BACKFILL_EVALUATION",
+          "evaluated_count": 0,
+          "win_rate_pct": 32.1,
+          "description": "Auto-backfilled 9:15 AM gap evaluation (0 trades graded, 32.1% win rate) and reconciled milestone.",
+          "verified": true,
+          "accuracy_pipeline_check": {
+            "status": "PASS",
+            "pre_total": 52,
+            "post_total": 52,
+            "delta": 0,
+            "expected": 0,
+            "tolerance": 2
+          }
+        },
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ASIANPAINT",
+            "BAJAJFINSV",
+            "ICICIBANK",
+            "RELIANCE",
+            "TCS",
+            "TITAN",
+            "MARUTI"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ASIANPAINT', 'BAJAJFINSV', 'ICICIBANK']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-21 18:40:11 IST",
+      "trigger": "pytest_2",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ASIANPAINT",
+            "BAJAJFINSV",
+            "ICICIBANK",
+            "RELIANCE",
+            "TCS",
+            "TITAN",
+            "MARUTI"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ASIANPAINT', 'BAJAJFINSV', 'ICICIBANK']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-21 18:40:28 IST",
+      "trigger": "pytest_expanded_test",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ASIANPAINT",
+            "BAJAJFINSV",
+            "ICICIBANK",
+            "RELIANCE",
+            "TCS",
+            "TITAN",
+            "MARUTI"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ASIANPAINT', 'BAJAJFINSV', 'ICICIBANK']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-21 18:40:32 IST",
+      "trigger": "manual_ui",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ASIANPAINT",
+            "BAJAJFINSV",
+            "ICICIBANK",
+            "RELIANCE",
+            "TCS",
+            "TITAN",
+            "MARUTI"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ASIANPAINT', 'BAJAJFINSV', 'ICICIBANK']) into persistent journal.",
+          "verified": false
+        },
+        {
+          "step": 6,
+          "action": "CLEAR_TRANSIENT_HEALTH_ANOMALIES",
+          "description": "Auto-reconciled process liveness: cleared 2 cold start(s) and 0 transient error(s).",
+          "verified": true
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-21 18:40:35 IST",
+      "trigger": "pytest_heal_1",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ASIANPAINT",
+            "BAJAJFINSV",
+            "ICICIBANK",
+            "RELIANCE",
+            "TCS",
+            "TITAN",
+            "MARUTI"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ASIANPAINT', 'BAJAJFINSV', 'ICICIBANK']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-21 18:40:36 IST",
+      "trigger": "pytest_heal_2",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ASIANPAINT",
+            "BAJAJFINSV",
+            "ICICIBANK",
+            "RELIANCE",
+            "TCS",
+            "TITAN",
+            "MARUTI"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ASIANPAINT', 'BAJAJFINSV', 'ICICIBANK']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-08-21 18:40:40 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 5,
+          "action": "AUTO_RECONCILE_330_LOCK",
+          "locked_count": 0,
+          "symbols": [
+            "ASIANPAINT",
+            "BAJAJFINSV",
+            "ICICIBANK",
+            "RELIANCE",
+            "TCS",
+            "TITAN",
+            "MARUTI"
+          ],
+          "description": "Auto-locked 0 high-conviction candidates (['ASIANPAINT', 'BAJAJFINSV', 'ICICIBANK']) into persistent journal.",
+          "verified": false
+        }
+      ],
+      "all_verified": false,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
     }
   ],
-  "total_fixes_applied": 762,
-  "last_healing_pass": "2026-08-21 18:36:18 IST",
+  "total_fixes_applied": 774,
+  "last_healing_pass": "2026-08-21 18:40:40 IST",
   "last_score": 100,
   "last_all_verified": false
 }

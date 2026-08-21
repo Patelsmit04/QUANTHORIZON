@@ -1,98 +1,10 @@
 {
-  "total_probes": 550,
-  "matching_probes": 521,
-  "divergent_probes": 29,
-  "accuracy_rate_pct": 94.73,
-  "last_probe_time": "2026-08-21 18:36:05 IST",
+  "total_probes": 554,
+  "matching_probes": 524,
+  "divergent_probes": 30,
+  "accuracy_rate_pct": 94.58,
+  "last_probe_time": "2026-08-21 18:40:51 IST",
   "recent_probes": [
-    {
-      "timestamp": "2026-08-18 22:55:37 IST",
-      "latency_ms": 1347.3,
-      "has_divergence": false,
-      "indices": {
-        "NIFTY50": {
-          "app_ltp": null,
-          "ref_spot": 24154.9,
-          "diff_pts": null,
-          "diff_pct": null,
-          "status": "NO_REF_DATA"
-        },
-        "BANKNIFTY": {
-          "app_ltp": null,
-          "ref_spot": 57262.4,
-          "diff_pts": null,
-          "diff_pct": null,
-          "status": "NO_REF_DATA"
-        }
-      },
-      "cached_stocks_sample": {}
-    },
-    {
-      "timestamp": "2026-08-18 22:56:38 IST",
-      "latency_ms": 1296.8,
-      "has_divergence": false,
-      "indices": {
-        "NIFTY50": {
-          "app_ltp": null,
-          "ref_spot": 24154.9,
-          "diff_pts": null,
-          "diff_pct": null,
-          "status": "NO_REF_DATA"
-        },
-        "BANKNIFTY": {
-          "app_ltp": null,
-          "ref_spot": 57262.4,
-          "diff_pts": null,
-          "diff_pct": null,
-          "status": "NO_REF_DATA"
-        }
-      },
-      "cached_stocks_sample": {}
-    },
-    {
-      "timestamp": "2026-08-18 22:57:40 IST",
-      "latency_ms": 986.6,
-      "has_divergence": false,
-      "indices": {
-        "NIFTY50": {
-          "app_ltp": null,
-          "ref_spot": 24154.9,
-          "diff_pts": null,
-          "diff_pct": null,
-          "status": "NO_REF_DATA"
-        },
-        "BANKNIFTY": {
-          "app_ltp": null,
-          "ref_spot": 57262.4,
-          "diff_pts": null,
-          "diff_pct": null,
-          "status": "NO_REF_DATA"
-        }
-      },
-      "cached_stocks_sample": {}
-    },
-    {
-      "timestamp": "2026-08-18 22:58:41 IST",
-      "latency_ms": 1306.0,
-      "has_divergence": false,
-      "indices": {
-        "NIFTY50": {
-          "app_ltp": null,
-          "ref_spot": 24154.9,
-          "diff_pts": null,
-          "diff_pct": null,
-          "status": "NO_REF_DATA"
-        },
-        "BANKNIFTY": {
-          "app_ltp": null,
-          "ref_spot": 57262.4,
-          "diff_pts": null,
-          "diff_pct": null,
-          "status": "NO_REF_DATA"
-        }
-      },
-      "cached_stocks_sample": {}
-    },
     {
       "timestamp": "2026-08-18 22:59:42 IST",
       "latency_ms": 1545.5,
@@ -11054,6 +10966,96 @@
       "cached_stocks_sample": {
         "RELIANCE": 2500.0
       }
+    },
+    {
+      "timestamp": "2026-08-21 18:38:46 IST",
+      "latency_ms": 2161.8,
+      "has_divergence": false,
+      "indices": {
+        "NIFTY50": {
+          "app_ltp": 24252.0,
+          "ref_spot": 24252.0,
+          "diff_pts": 0.0,
+          "diff_pct": 0.0,
+          "status": "MATCH"
+        },
+        "BANKNIFTY": {
+          "app_ltp": 57761.95,
+          "ref_spot": 57761.95,
+          "diff_pts": 0.0,
+          "diff_pct": 0.0,
+          "status": "MATCH"
+        }
+      },
+      "cached_stocks_sample": {}
+    },
+    {
+      "timestamp": "2026-08-21 18:39:48 IST",
+      "latency_ms": 3326.5,
+      "has_divergence": false,
+      "indices": {
+        "NIFTY50": {
+          "app_ltp": 24252.0,
+          "ref_spot": 24252.0,
+          "diff_pts": 0.0,
+          "diff_pct": 0.0,
+          "status": "MATCH"
+        },
+        "BANKNIFTY": {
+          "app_ltp": 57761.95,
+          "ref_spot": 57761.95,
+          "diff_pts": 0.0,
+          "diff_pct": 0.0,
+          "status": "MATCH"
+        }
+      },
+      "cached_stocks_sample": {}
+    },
+    {
+      "timestamp": "2026-08-21 18:40:21 IST",
+      "latency_ms": 1407.9,
+      "has_divergence": true,
+      "indices": {
+        "NIFTY50": {
+          "app_ltp": 24000.0,
+          "ref_spot": 24252.0,
+          "diff_pts": 252.0,
+          "diff_pct": 1.04,
+          "status": "DIVERGENT"
+        },
+        "BANKNIFTY": {
+          "app_ltp": 51000.0,
+          "ref_spot": 57761.95,
+          "diff_pts": 6761.95,
+          "diff_pct": 11.71,
+          "status": "DIVERGENT"
+        }
+      },
+      "cached_stocks_sample": {
+        "RELIANCE": 2500.0
+      }
+    },
+    {
+      "timestamp": "2026-08-21 18:40:51 IST",
+      "latency_ms": 3917.3,
+      "has_divergence": false,
+      "indices": {
+        "NIFTY50": {
+          "app_ltp": 24252.0,
+          "ref_spot": 24252.0,
+          "diff_pts": 0.0,
+          "diff_pct": 0.0,
+          "status": "MATCH"
+        },
+        "BANKNIFTY": {
+          "app_ltp": 57761.95,
+          "ref_spot": 57761.95,
+          "diff_pts": 0.0,
+          "diff_pct": 0.0,
+          "status": "MATCH"
+        }
+      },
+      "cached_stocks_sample": {}
     }
   ]
 }
