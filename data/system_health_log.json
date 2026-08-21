@@ -1,29 +1,14 @@
 {
-  "today_date": "2026-08-19",
-  "cold_starts": [
-    {
-      "timestamp": "2026-08-19 21:23:05 IST",
-      "is_market_hours": false,
-      "details": {
-        "platform": "Vercel"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:23:05 IST",
-      "is_market_hours": false,
-      "details": {
-        "platform": "Render/Local"
-      }
-    }
-  ],
+  "today_date": "2026-08-21",
+  "cold_starts": [],
   "market_transitions": [],
   "evaluations": [
     {
-      "timestamp": "2026-08-19 21:22:42 IST",
+      "timestamp": "2026-08-21 18:35:53 IST",
       "evaluated_count": 0,
       "wins": 0,
       "losses": 0,
-      "win_rate_pct": 25.0,
+      "win_rate_pct": 32.1,
       "status": "SUCCESS",
       "details": {
         "healed_by": "AISentinel",
@@ -33,19 +18,24 @@
   ],
   "locks": [
     {
-      "timestamp": "2026-08-19 21:22:42 IST",
+      "timestamp": "2026-08-21 18:35:53 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-19 21:22:42 IST",
+      "timestamp": "2026-08-21 18:35:53 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "GRASIM",
-        "HINDALCO"
+        "ASIANPAINT",
+        "BAJAJFINSV",
+        "ICICIBANK",
+        "RELIANCE",
+        "TCS",
+        "TITAN",
+        "MARUTI"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -53,19 +43,24 @@
       }
     },
     {
-      "timestamp": "2026-08-19 21:22:43 IST",
+      "timestamp": "2026-08-21 18:35:54 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-19 21:22:43 IST",
+      "timestamp": "2026-08-21 18:35:54 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "GRASIM",
-        "HINDALCO"
+        "ASIANPAINT",
+        "BAJAJFINSV",
+        "ICICIBANK",
+        "RELIANCE",
+        "TCS",
+        "TITAN",
+        "MARUTI"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -73,26 +68,31 @@
       }
     },
     {
-      "timestamp": "2026-08-19 21:22:45 IST",
+      "timestamp": "2026-08-21 18:35:56 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-19 21:22:56 IST",
+      "timestamp": "2026-08-21 18:36:11 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-19 21:22:56 IST",
+      "timestamp": "2026-08-21 18:36:12 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "GRASIM",
-        "HINDALCO"
+        "ASIANPAINT",
+        "BAJAJFINSV",
+        "ICICIBANK",
+        "RELIANCE",
+        "TCS",
+        "TITAN",
+        "MARUTI"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -100,19 +100,24 @@
       }
     },
     {
-      "timestamp": "2026-08-19 21:23:03 IST",
+      "timestamp": "2026-08-21 18:36:15 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-19 21:23:04 IST",
+      "timestamp": "2026-08-21 18:36:15 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "GRASIM",
-        "HINDALCO"
+        "ASIANPAINT",
+        "BAJAJFINSV",
+        "ICICIBANK",
+        "RELIANCE",
+        "TCS",
+        "TITAN",
+        "MARUTI"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -120,19 +125,24 @@
       }
     },
     {
-      "timestamp": "2026-08-19 21:23:07 IST",
+      "timestamp": "2026-08-21 18:36:17 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-19 21:23:07 IST",
+      "timestamp": "2026-08-21 18:36:17 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "GRASIM",
-        "HINDALCO"
+        "ASIANPAINT",
+        "BAJAJFINSV",
+        "ICICIBANK",
+        "RELIANCE",
+        "TCS",
+        "TITAN",
+        "MARUTI"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -140,439 +150,24 @@
       }
     },
     {
-      "timestamp": "2026-08-19 21:23:09 IST",
+      "timestamp": "2026-08-21 18:36:18 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-19 21:23:09 IST",
+      "timestamp": "2026-08-21 18:36:18 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:23:10 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:23:10 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:23:27 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:23:27 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:23:59 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:24:00 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:24:30 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:24:31 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:25:03 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:25:03 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:25:34 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:25:34 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:26:07 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:26:07 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:26:38 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:26:38 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:27:10 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:27:10 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:27:41 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:27:41 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:28:13 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:28:13 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:28:44 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:28:44 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:29:16 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:29:17 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:29:47 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:29:48 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:30:19 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:30:20 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:30:50 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:30:51 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:31:23 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:31:23 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:31:54 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:31:55 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:32:26 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:32:26 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:32:57 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:32:57 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-19 21:33:29 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-19 21:33:29 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "GRASIM",
-        "HINDALCO"
+        "ASIANPAINT",
+        "BAJAJFINSV",
+        "ICICIBANK",
+        "RELIANCE",
+        "TCS",
+        "TITAN",
+        "MARUTI"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -582,5 +177,5 @@
   ],
   "errors": [],
   "warnings": [],
-  "last_health_check": "2026-08-19 21:33:29 IST"
+  "last_health_check": "2026-08-21 18:36:18 IST"
 }

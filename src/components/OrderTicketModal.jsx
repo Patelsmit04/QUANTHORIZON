@@ -112,48 +112,48 @@ export default function OrderTicketModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative text-slate-100 animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+      <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 shadow-2xl relative text-slate-900 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-200">
           <div className="flex items-center gap-2.5">
-            <span className={`px-2.5 py-1 text-xs font-black rounded-md ${isBullish ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}`}>
+            <span className={`px-2.5 py-1 text-xs font-black rounded-md ${isBullish ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
               {isBullish ? 'BUY (CALL)' : 'SELL (PUT)'}
             </span>
-            <h2 className="text-xl font-extrabold tracking-wide">{setup.symbol}</h2>
+            <h2 className="text-xl font-extrabold tracking-wide text-slate-900">{setup.symbol}</h2>
           </div>
           <button 
             onClick={onClose} 
-            className="text-slate-400 hover:text-white transition-colors text-2xl leading-none"
+            className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg w-8 h-8 flex items-center justify-center transition-colors text-2xl leading-none"
           >
             &times;
           </button>
         </div>
 
         {/* Live LTP & Account Info */}
-        <div className="flex items-center justify-between bg-slate-950/60 border border-slate-800/80 rounded-xl px-4 py-3 my-4">
-          <span className="text-xs text-slate-400 font-medium">LIVE LTP:</span>
-          <span className={`text-lg font-mono font-black ${isBullish ? 'text-emerald-400' : 'text-rose-400'}`}>
+        <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 my-4">
+          <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">LIVE LTP:</span>
+          <span className={`text-lg font-mono font-black ${isBullish ? 'text-emerald-700' : 'text-rose-700'}`}>
             ₹{Number(setup.entry_price || 100.0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
 
         {/* Order Type Toggle */}
         <div className="mb-4">
-          <label className="text-[11px] font-bold text-slate-400 tracking-wider uppercase block mb-1.5">ORDER TYPE</label>
+          <label className="text-[11px] font-bold text-slate-700 tracking-wider uppercase block mb-1.5">ORDER TYPE</label>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => setOrderType('MARKET')}
-              className={`py-2 px-3 text-xs font-bold rounded-lg transition-all ${orderType === 'MARKET' ? 'bg-yellow-500 text-slate-950 font-black shadow-lg shadow-yellow-500/20' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}
+              className={`py-2 px-3 text-xs font-bold rounded-lg transition-all ${orderType === 'MARKET' ? 'bg-amber-500 text-white font-black shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'}`}
             >
               MARKET (Slippage Sim)
             </button>
             <button
               type="button"
               onClick={() => setOrderType('LIMIT')}
-              className={`py-2 px-3 text-xs font-bold rounded-lg transition-all ${orderType === 'LIMIT' ? 'bg-yellow-500 text-slate-950 font-black shadow-lg shadow-yellow-500/20' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}
+              className={`py-2 px-3 text-xs font-bold rounded-lg transition-all ${orderType === 'LIMIT' ? 'bg-amber-500 text-white font-black shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'}`}
             >
               LIMIT
             </button>
@@ -163,13 +163,13 @@ export default function OrderTicketModal({
         {/* Limit Price Input */}
         {orderType === 'LIMIT' && (
           <div className="mb-4">
-            <label className="text-[11px] font-bold text-slate-400 tracking-wider uppercase block mb-1.5">LIMIT PRICE (₹)</label>
+            <label className="text-[11px] font-bold text-slate-700 tracking-wider uppercase block mb-1.5">LIMIT PRICE (₹)</label>
             <input
               type="number"
               step="0.05"
               value={limitPrice}
               onChange={(e) => setLimitPrice(parseFloat(e.target.value) || 0)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-bold text-white focus:outline-none focus:border-yellow-500"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
             />
           </div>
         )}
@@ -177,21 +177,21 @@ export default function OrderTicketModal({
         {/* Sizing Method & Risk Presets */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-1.5">
-            <label className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">POSITION SIZING</label>
-            <span className="text-[11px] font-bold text-yellow-500">Virtual Equity: ₹{accountEquity.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
+            <label className="text-[11px] font-bold text-slate-700 tracking-wider uppercase">POSITION SIZING</label>
+            <span className="text-[11px] font-bold text-amber-700">Virtual Equity: ₹{accountEquity.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</span>
           </div>
           <div className="grid grid-cols-2 gap-2 mb-2">
             <button
               type="button"
               onClick={() => setSizingMode('RISK')}
-              className={`py-1.5 text-xs font-bold rounded-md transition-all ${sizingMode === 'RISK' ? 'bg-yellow-500 text-slate-950' : 'bg-slate-800 text-slate-300'}`}
+              className={`py-1.5 text-xs font-bold rounded-md transition-all ${sizingMode === 'RISK' ? 'bg-amber-500 text-white font-bold shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'}`}
             >
               RISK % ALLOCATION
             </button>
             <button
               type="button"
               onClick={() => setSizingMode('FIXED')}
-              className={`py-1.5 text-xs font-bold rounded-md transition-all ${sizingMode === 'FIXED' ? 'bg-yellow-500 text-slate-950' : 'bg-slate-800 text-slate-300'}`}
+              className={`py-1.5 text-xs font-bold rounded-md transition-all ${sizingMode === 'FIXED' ? 'bg-amber-500 text-white font-bold shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'}`}
             >
               FIXED QUANTITY
             </button>
@@ -204,7 +204,7 @@ export default function OrderTicketModal({
                   key={pct}
                   type="button"
                   onClick={() => setRiskPercent(pct)}
-                  className={`py-1 text-xs font-semibold rounded ${riskPercent === pct ? 'bg-yellow-500 text-slate-950 font-bold' : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300'}`}
+                  className={`py-1 text-xs font-semibold rounded transition-all ${riskPercent === pct ? 'bg-amber-500 text-white font-bold shadow-sm' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'}`}
                 >
                   {pct}%
                 </button>
@@ -216,8 +216,8 @@ export default function OrderTicketModal({
         {/* Quantity & Lot Size */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-1.5">
-            <label className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">QUANTITY</label>
-            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+            <label className="text-[11px] font-bold text-slate-700 tracking-wider uppercase">QUANTITY</label>
+            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">
               {lotSize > 1 ? `LOT: ${lotSize}` : 'EQUITY (1x)'}
             </span>
           </div>
@@ -225,7 +225,7 @@ export default function OrderTicketModal({
             <button
               type="button"
               onClick={() => setQuantity((prev) => Math.max(lotSize, prev - lotSize))}
-              className="px-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg"
+              className="px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black rounded-lg border border-slate-300 transition-colors"
             >
               -
             </button>
@@ -235,12 +235,12 @@ export default function OrderTicketModal({
               min={lotSize}
               value={quantity}
               onChange={(e) => setQuantity(Math.max(lotSize, parseInt(e.target.value, 10) || lotSize))}
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-center text-sm font-black text-white focus:outline-none focus:border-yellow-500"
+              className="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-black text-slate-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
             />
             <button
               type="button"
               onClick={() => setQuantity((prev) => prev + lotSize)}
-              className="px-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg"
+              className="px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black rounded-lg border border-slate-300 transition-colors"
             >
               +
             </button>
@@ -250,44 +250,44 @@ export default function OrderTicketModal({
         {/* Target & Stop Loss Inputs */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div>
-            <label className="text-[11px] font-bold text-emerald-400 tracking-wider uppercase block mb-1">TARGET (TP)</label>
+            <label className="text-[11px] font-bold text-emerald-700 tracking-wider uppercase block mb-1">TARGET (TP)</label>
             <input
               type="number"
               step="0.05"
               value={targetPrice}
               onChange={(e) => setTargetPrice(parseFloat(e.target.value) || 0)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-bold text-emerald-400 focus:outline-none focus:border-emerald-500"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-emerald-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
             />
           </div>
           <div>
-            <label className="text-[11px] font-bold text-rose-400 tracking-wider uppercase block mb-1">STOP LOSS (SL)</label>
+            <label className="text-[11px] font-bold text-rose-700 tracking-wider uppercase block mb-1">STOP LOSS (SL)</label>
             <input
               type="number"
               step="0.05"
               value={stopLoss}
               onChange={(e) => setStopLoss(parseFloat(e.target.value) || 0)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-bold text-rose-400 focus:outline-none focus:border-rose-500"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-rose-700 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
             />
           </div>
         </div>
 
         {/* Cost & Risk Breakdown Summary */}
-        <div className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 mb-5 space-y-1.5 text-xs">
-          <div className="flex justify-between text-slate-400">
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 mb-5 space-y-1.5 text-xs">
+          <div className="flex justify-between text-slate-600">
             <span>Trade Value:</span>
-            <span className="font-semibold text-white">₹{tradeValue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <span className="font-semibold text-slate-900">₹{tradeValue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
-          <div className="flex justify-between text-slate-400">
+          <div className="flex justify-between text-slate-600">
             <span>Risk at Stop Loss:</span>
-            <span className="font-semibold text-rose-400">₹{riskAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({riskPctOfAccount}%)</span>
+            <span className="font-semibold text-rose-700">₹{riskAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ({riskPctOfAccount}%)</span>
           </div>
-          <div className="flex justify-between text-slate-400">
+          <div className="flex justify-between text-slate-600">
             <span>Simulated Costs (₹20 + 0.1% STT):</span>
-            <span className="font-semibold text-yellow-500">₹{estimatedCharges.toFixed(2)}</span>
+            <span className="font-semibold text-amber-700">₹{estimatedCharges.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-white font-bold pt-2 border-t border-slate-800/80">
+          <div className="flex justify-between text-slate-900 font-bold pt-2 border-t border-slate-200">
             <span>Total Margin Required:</span>
-            <span className="text-yellow-400 font-mono text-sm">₹{totalMarginRequired.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <span className="text-amber-700 font-mono text-sm font-black">₹{totalMarginRequired.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
         </div>
 
@@ -296,7 +296,7 @@ export default function OrderTicketModal({
           type="button"
           disabled={isSubmitting}
           onClick={handleSubmit}
-          className="w-full py-3.5 bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-slate-950 font-black text-sm tracking-wider uppercase rounded-xl transition-all shadow-lg shadow-yellow-500/25 active:scale-[0.98]"
+          className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-black text-sm tracking-wider uppercase rounded-xl transition-all shadow-sm active:scale-[0.98]"
         >
           {isSubmitting ? 'ROUTING ORDER...' : 'CONFIRM PAPER TRADE'}
         </button>

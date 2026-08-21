@@ -411,6 +411,14 @@ def close_paper_position(position_id: str, exit_price: Optional[float] = None) -
             exit_price = get_current_live_price(sym)
             if exit_price <= 0:
                 exit_price = entry
+            # Apply punitive exit slippage (mirrors entry slippage model)
+            exit_slippage_pct = random.uniform(0.0005, 0.0010)
+            if "BUY" in order_type:
+                # Selling: slippage lowers the fill price
+                exit_price = round(exit_price * (1.0 - exit_slippage_pct), 2)
+            else:
+                # Covering: slippage raises the fill price
+                exit_price = round(exit_price * (1.0 + exit_slippage_pct), 2)
 
         is_bull = "BUY" in order_type
         if is_bull:

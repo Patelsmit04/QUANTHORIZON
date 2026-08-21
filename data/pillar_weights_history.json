@@ -416,5 +416,85 @@
       "Pillar 5: Marubozu Close": 0.85,
       "Pillar 6: Institutional Flow": 1.15
     }
+  },
+  {
+    "date": "2026-08-20",
+    "action": "APPLIED",
+    "sample_size": 72,
+    "changes": {
+      "Pillar 1: Futures OI": {
+        "from": 1.15,
+        "to": 1.08,
+        "recommended": 1.08
+      },
+      "Pillar 2: Vol Persistence": {
+        "from": 0.85,
+        "to": 0.977,
+        "recommended": 0.99
+      },
+      "Pillar 3: Relative Strength": {
+        "from": 0.85,
+        "to": 0.95,
+        "recommended": 0.95
+      },
+      "Pillar 4: Volume Spike": {
+        "from": 0.85,
+        "to": 0.95,
+        "recommended": 0.95
+      },
+      "Pillar 5: Marubozu Close": {
+        "from": 0.85,
+        "to": 0.95,
+        "recommended": 0.95
+      },
+      "Pillar 6: Institutional Flow": {
+        "from": 1.15,
+        "to": 1.08,
+        "recommended": 1.08
+      }
+    },
+    "weights": {
+      "Pillar 1: Futures OI": 1.08,
+      "Pillar 2: Vol Persistence": 0.977,
+      "Pillar 3: Relative Strength": 0.95,
+      "Pillar 4: Volume Spike": 0.95,
+      "Pillar 5: Marubozu Close": 0.95,
+      "Pillar 6: Institutional Flow": 1.08
+    }
+  },
+  {
+    "date": "2026-08-21",
+    "action": "APPLIED",
+    "sample_size": 74,
+    "changes": {
+      "Pillar 1: Futures OI": {
+        "from": 1.08,
+        "to": 1.1,
+        "recommended": 1.1
+      },
+      "Pillar 2: Vol Persistence": {
+        "from": 0.977,
+        "to": 0.97,
+        "recommended": 0.97
+      },
+      "Pillar 3: Relative Strength": {
+        "from": 0.95,
+        "to": 0.94,
+        "recommended": 0.94
+      },
+      "Pillar 6: Institutional Flow": {
+        "from": 1.08,
+        "to": 1.1,
+        "recommended": 1.1
+      }
+    },
+    "weights": {
+      "Pillar 1: Futures OI": 1.1,
+      "Pillar 2: Vol Persistence": 0.97,
+      "Pillar 3: Relative Strength": 0.94,
+      "Pillar 4: Volume Spike": 0.95,
+      "Pillar 5: Marubozu Close": 0.95,
+      "Pillar 6: Institutional Flow": 1.1
+    }
   }
 ]

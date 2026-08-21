@@ -1,19 +1,19 @@
 /**
- * BTST SCANNER — DASHBOARD JAVASCRIPT APPLICATION ENGINE (AUTONOMOUS BACKGROUND SCANNER)
+ * BTST SCANNER  —  DASHBOARD JAVASCRIPT APPLICATION ENGINE (AUTONOMOUS BACKGROUND SCANNER)
  */
 var lastBtstStatus = "pre_btst";
 var currentActiveSection = "scanner";
 window.currentActiveSection = "scanner";
 
 // M9 audit fix: native fetch() has no timeout, and nothing in this file attached one to any
-// of its ~18 call sites — a hung backend left "SCANNING..." (or an equivalent stuck state) up
+// of its ~18 call sites  —  a hung backend left "SCANNING..." (or an equivalent stuck state) up
 // indefinitely with no visible error. apiFetch() is a drop-in fetch() replacement used
 // everywhere below: it aborts after DEFAULT_FETCH_TIMEOUT_MS (override per-call via
 // options.timeoutMs) and attaches the stored API key header automatically, since mutating
-// endpoints (strategy CRUD, lock/evaluate picks, execute, notifications) now require one —
+// endpoints (strategy CRUD, lock/evaluate picks, execute, notifications) now require one  — 
 // see promptForApiKey() below. Uses window.fetch explicitly so this definition itself isn't
 // M9 audit fix: native fetch() has no timeout, and nothing in this file attached one to any
-// of its ~18 call sites — a hung backend left "SCANNING..." (or an equivalent stuck state) up
+// of its ~18 call sites  —  a hung backend left "SCANNING..." (or an equivalent stuck state) up
 // indefinitely with no visible error. apiFetch() is a drop-in fetch() replacement used
 // everywhere below: it aborts after DEFAULT_FETCH_TIMEOUT_MS (override per-call via
 // options.timeoutMs) and attaches the stored API key header automatically.
@@ -133,6 +133,7 @@ function initTradexoDashboard() {
     let heavyScanInterval = null;          // Phase 3: 60-Second Slow Conviction Scoring Loop
     let autoRefreshInterval = null;        // Legacy handle alias
     let newsRefreshInterval = null;
+    let paperPortfolioInterval = null;
     let lastProcessedMarketTimestamp = 0;      // Phase 1: Global Timestamp Monotonicity Tracker
     let lastProcessedOptionChainTimestamp = 0; // Phase 1: Option Chain Timestamp Tracker
     
@@ -173,10 +174,10 @@ function initTradexoDashboard() {
     }
 
     // Strategy cards rebuild #strategyGrid from scratch on every toggle/edit action, so
-    // collapsed/expanded state must survive that — tracked here, not as a DOM class.
+    // collapsed/expanded state must survive that  —  tracked here, not as a DOM class.
     const collapsedStrategyIds = new Set();
 
-    // Sidebar / Mobile Drawer DOM — #appSidebar is the single nav source for both the
+    // Sidebar / Mobile Drawer DOM  —  #appSidebar is the single nav source for both the
     // desktop persistent rail and the mobile full-height drawer (see styles.css .app-sidebar).
     const mobileMenuToggle = document.getElementById("mobileMenuToggle");
     const appSidebar = document.getElementById("appSidebar");
@@ -381,7 +382,7 @@ function initTradexoDashboard() {
     const historyOutcomeFilter = document.getElementById("historyOutcomeFilter");
     const historyInstitutionalFlowFilter = document.getElementById("historyInstitutionalFlowFilter");
 
-    // AI Clarification Review Modal (M9) — see index.html comment for why this exists
+    // AI Clarification Review Modal (M9)  —  see index.html comment for why this exists
     const clarificationModal = document.getElementById("clarificationModal");
     const closeClarificationBtn = document.getElementById("closeClarificationBtn");
     const clarificationSummaryBody = document.getElementById("clarificationSummaryBody");
@@ -392,11 +393,11 @@ function initTradexoDashboard() {
     const clarificationResubmitBtn = document.getElementById("clarificationResubmitBtn");
     let clarificationStrategyId = null;
 
-    // API key button (M9) — prompts for/stores the key apiFetch() attaches to mutating requests
+    // API key button (M9)  —  prompts for/stores the key apiFetch() attaches to mutating requests
     const apiKeyBtn = document.getElementById("apiKeyBtn");
     const apiKeyBtnMobile = document.getElementById("apiKeyBtnMobile");
 
-    // Notifications DOM (M5) — bell/badge/panel + toast, fed live over /ws/live
+    // Notifications DOM (M5)  —  bell/badge/panel + toast, fed live over /ws/live
     const notifBell = document.getElementById("notifBell");
     const notifBadge = document.getElementById("notifBadge");
     const notifBellMobileTop = document.getElementById("notifBellMobileTop");
@@ -572,7 +573,7 @@ function initTradexoDashboard() {
 
     // Event Listeners
     
-    // Mobile Navigation Drawer Open/Close Helpers — #appSidebar doubles as the mobile drawer
+    // Mobile Navigation Drawer Open/Close Helpers  —  #appSidebar doubles as the mobile drawer
     // (see .app-sidebar / .app-sidebar.active in styles.css under the 1023px breakpoint).
     function openMobileDrawer() {
         if (appSidebar) appSidebar.classList.add("active");
@@ -642,7 +643,7 @@ function initTradexoDashboard() {
     currentActiveSection = "scanner";
     window.currentActiveSection = "scanner";
 
-    // Unified Section Switcher — #sidebarNav is the single nav source for both the desktop
+    // Unified Section Switcher  —  #sidebarNav is the single nav source for both the desktop
     // rail and the mobile drawer (see appSidebar above), so only one active-state loop is needed.
     function switchSection(section, opts = {}) {
         if (!section) return;
@@ -711,6 +712,20 @@ function initTradexoDashboard() {
             clearInterval(newsRefreshInterval);
             newsRefreshInterval = null;
         }
+        // Paper Trading: live MTM polling every 5 seconds while section is active
+        if (section === "paperTrading") {
+            fetchPaperPortfolio();
+            if (paperPortfolioInterval) clearInterval(paperPortfolioInterval);
+            paperPortfolioInterval = setInterval(() => {
+                const paperSection = document.getElementById("paperTradingSection");
+                if (paperSection && !paperSection.classList.contains("hidden")) {
+                    fetchPaperPortfolio();
+                }
+            }, 5000);
+        } else if (paperPortfolioInterval) {
+            clearInterval(paperPortfolioInterval);
+            paperPortfolioInterval = null;
+        }
         if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); }
         if (section === "strategies") fetchStrategies();
         if (section === "history") fetchHistorySection();
@@ -718,7 +733,6 @@ function initTradexoDashboard() {
         if (section === "orderFlow") fetchOrderFlowSection();
         if (section === "accuracy") fetchSplitAccuracy();
         if (section === "liveTrades") fetchLiveTradesSection();
-        if (section === "paperTrading") fetchPaperPortfolio();
 
         if (!opts.fromHash && SECTION_HASHES[section]) {
             suppressHashUpdate = true;
@@ -823,7 +837,7 @@ function initTradexoDashboard() {
     const expandedTickers = new Set();
     const expandedFlowDetails = new Set();
 
-    // Mobile card collapse/expand — one delegated listener for every row's chevron, rather
+    // Mobile card collapse/expand  —  one delegated listener for every row's chevron, rather
     // than a per-row listener re-registered on every filterAndRenderTable() re-render.
     if (stocksTableBody) {
         stocksTableBody.addEventListener("click", (e) => {
@@ -960,6 +974,10 @@ function initTradexoDashboard() {
         const istMins = istNow.getHours() * 60 + istNow.getMinutes();
         const isWeekend = day === 0 || day === 6;
 
+        const isOpen = Boolean(data && data.is_open !== undefined ? data.is_open : (istMins >= 555 && istMins < 930 && !isWeekend));
+        const isPreMarket = Boolean(data && data.market_status === "PRE_MARKET" ? true : (istMins >= 540 && istMins < 555 && !isWeekend));
+        const isHoliday = Boolean(data && data.market_status === "HOLIDAY" ? true : isWeekend);
+
         if (topbarBadge) {
             topbarBadge.className = "market-status-pill";
 
@@ -967,74 +985,58 @@ function initTradexoDashboard() {
                 topbarBadge.classList.add("market-status-holiday");
                 if (topbarText) topbarText.textContent = "MARKET CLOSED";
                 if (topbarTime) topbarTime.textContent = "(WEEKEND / SETTLED)";
-                if (scannerStatusText) { scannerStatusText.textContent = "WEEKEND CLOSED"; scannerStatusText.style.color = "#94a3b8"; }
+                if (scannerStatusText) { scannerStatusText.textContent = "WEEKEND CLOSED"; scannerStatusText.style.color = "var(--ink-muted, #94a3b8)"; }
             } else if (istMins >= 540 && istMins < 555) {
                 // 09:00 - 09:15 AM IST
                 topbarBadge.classList.add("market-status-premarket");
                 if (topbarText) topbarText.textContent = "PRE-MARKET";
                 if (topbarTime) topbarTime.textContent = "(09:00 - 09:15 IST)";
-                if (scannerStatusText) { scannerStatusText.textContent = "PRE-MARKET SESSION"; scannerStatusText.style.color = "#3b82f6"; }
+                if (scannerStatusText) { scannerStatusText.textContent = "PRE-MARKET SESSION"; scannerStatusText.style.color = "var(--primary, #3b82f6)"; }
             } else if (istMins >= 555 && istMins < 914) {
                 // 09:15 AM - 03:14 PM IST
                 topbarBadge.classList.add("market-status-open");
                 if (topbarText) topbarText.textContent = "REGULAR SESSION";
                 if (topbarTime) topbarTime.textContent = "(09:15 - 15:14 IST)";
-                if (scannerStatusText) { scannerStatusText.textContent = "MARKET LIVE"; scannerStatusText.style.color = "#10b981"; }
+                if (scannerStatusText) { scannerStatusText.textContent = "MARKET LIVE"; scannerStatusText.style.color = "var(--bullish, #047857)"; }
             } else if (istMins >= 914 && istMins < 925) {
                 // 03:14 - 03:25 PM IST (BTST Power Hour)
                 topbarBadge.classList.add("market-status-powerhour");
                 if (topbarText) topbarText.textContent = "⚡ POWER HOUR (VETO ACTIVE)";
                 if (topbarTime) topbarTime.textContent = "(15:14 - 15:25 IST)";
-                if (scannerStatusText) { scannerStatusText.textContent = "POWER HOUR VETO ACTIVE"; scannerStatusText.style.color = "#d97706"; }
+                if (scannerStatusText) { scannerStatusText.textContent = "POWER HOUR VETO ACTIVE"; scannerStatusText.style.color = "var(--gold, #d97706)"; }
             } else if (istMins >= 925 && istMins < 930) {
                 // 03:25 - 03:30 PM IST (Closing Lock Sequence)
                 topbarBadge.classList.add("market-status-closinglock");
                 if (topbarText) topbarText.textContent = "🔒 CLOSING LOCK (CAS)";
                 if (topbarTime) topbarTime.textContent = "(15:25 - 15:30 IST)";
-                if (scannerStatusText) { scannerStatusText.textContent = "PICKS LOCKED FOR BTST"; scannerStatusText.style.color = "#0284c7"; }
+                if (scannerStatusText) { scannerStatusText.textContent = "PICKS LOCKED FOR BTST"; scannerStatusText.style.color = "var(--cat-blue, #0284c7)"; }
             } else {
                 // 03:30 PM - 09:00 AM IST
                 topbarBadge.classList.add("market-status-closed");
                 if (topbarText) topbarText.textContent = "MARKET CLOSED";
                 if (topbarTime) topbarTime.textContent = "(LAST CLOSE FROZEN)";
-                if (scannerStatusText) { scannerStatusText.textContent = "MARKET CLOSED"; scannerStatusText.style.color = "#94a3b8"; }
-            }
-        }
-
-        if (scannerStatusText) {
-            if (isOpen) {
-                scannerStatusText.textContent = "MARKET OPEN";
-                scannerStatusText.style.color = "var(--bullish-green, #10b981)";
-            } else if (isPreMarket) {
-                scannerStatusText.textContent = "PRE-MARKET SESSION";
-                scannerStatusText.style.color = "var(--primary, #3b82f6)";
-            } else if (isHoliday) {
-                scannerStatusText.textContent = "TRADING HOLIDAY";
-                scannerStatusText.style.color = "var(--gold, #f59e0b)";
-            } else {
-                scannerStatusText.textContent = "MARKET CLOSED";
-                scannerStatusText.style.color = "var(--ink-muted, #94a3b8)";
+                if (scannerStatusText) { scannerStatusText.textContent = "MARKET CLOSED"; scannerStatusText.style.color = "var(--ink-muted, #94a3b8)"; }
             }
         }
 
         if (scannerStatusDot) {
             if (isOpen) {
                 scannerStatusDot.classList.add("live-pulse");
-                scannerStatusDot.style.background = "var(--bullish-green, #10b981)";
+                scannerStatusDot.style.background = "var(--bullish, #047857)";
             } else if (isPreMarket) {
                 scannerStatusDot.classList.add("live-pulse");
                 scannerStatusDot.style.background = "var(--primary, #3b82f6)";
             } else {
                 scannerStatusDot.classList.remove("live-pulse");
-                scannerStatusDot.style.background = isHoliday ? "var(--gold, #f59e0b)" : "var(--ink-muted, #64748b)";
+                scannerStatusDot.style.background = isHoliday ? "var(--gold, #d97706)" : "var(--ink-muted, #94a3b8)";
             }
         }
 
         if (scannerTimer) {
             if (isOpen) {
-                scannerTimer.textContent = data.scan_mode || "LIVE 5-PILLAR MATRIX SCANNING";
+                scannerTimer.textContent = (data && data.scan_mode) || "LIVE 5-PILLAR MATRIX SCANNING";
             } else {
-                const timeStr = data.timestamp ? ` (as of ${data.timestamp})` : "";
+                const timeStr = (data && data.timestamp) ? ` (as of ${data.timestamp})` : "";
                 scannerTimer.textContent = `OFF-MARKET SNAPSHOT • LAST CLOSE FROZEN${timeStr}`;
             }
         }
@@ -1099,8 +1101,8 @@ function initTradexoDashboard() {
                 setEmptyStateMessage(
                     isTimeout ? "Request Timed Out" : "Couldn't Load Scan Data",
                     isTimeout
-                        ? "The server took too long to respond. Click “SCAN NOW” to try again."
-                        : "Couldn't reach the server. Check your connection and click “SCAN NOW” to try again."
+                        ? "The server took too long to respond. Click 'SCAN NOW' to try again."
+                        : "Couldn't reach the server. Check your connection and click 'SCAN NOW' to try again."
                 );
                 emptyState.classList.remove("hidden");
             }
@@ -1165,7 +1167,7 @@ function initTradexoDashboard() {
         console.log(`[TRADEXO] 9:15:00 AM IST market open refresh scheduled in ${(msUntilTarget / 60000).toFixed(1)} minutes (at ${targetDate.toLocaleTimeString('en-IN')})`);
 
         setTimeout(() => {
-            console.log('[TRADEXO] 9:15:00 AM IST — hard refreshing for new market day...');
+            console.log('[TRADEXO] 9:15:00 AM IST  —  hard refreshing for new market day...');
             location.reload();
         }, Math.max(1000, msUntilTarget));
     }
@@ -1195,7 +1197,7 @@ function initTradexoDashboard() {
             const formatWinRateText = (item) => {
                 const total = item.total_setups || item.total_evaluated || 0;
                 const wr = item.win_rate_pct || 0;
-                if (total === 0) return "N/A — No trades yet";
+                if (total === 0) return "N/A  —  No trades yet";
                 if (total < 10) return `${wr}% Win Rate (${total}/${total} - N<10 sample)`;
                 return `${wr}% Win Rate`;
             };
@@ -1254,7 +1256,7 @@ function initTradexoDashboard() {
 
         if (day !== 0 && day !== 6 && istMins >= 555 && istMins <= 560) {
             // 9:15-9:20 AM: force refresh accuracy every 30 sec
-            console.log('[TRADEXO] 9:15 AM window — forcing accuracy refresh...');
+            console.log('[TRADEXO] 9:15 AM window  —  forcing accuracy refresh...');
             fetchScanResults(true);
             fetchWinRatePerformance();
             fetchSplitAccuracy();
@@ -1806,7 +1808,7 @@ function initTradexoDashboard() {
 
         if (visibleCount) visibleCount.textContent = filtered.length;
 
-        // ── LIVE STOCKS VIEW: Render card grid instead of table ──
+        // ▶▶ LIVE STOCKS VIEW: Render card grid instead of table ▶▶
         if (currentStockView === "live") {
             if (btstTableWrapper) btstTableWrapper.classList.add("hidden");
             if (liveStocksGrid) liveStocksGrid.classList.remove("hidden");
@@ -1869,7 +1871,7 @@ function initTradexoDashboard() {
             return;
         }
 
-        // ── BTST STOCKS VIEW: Table rendering ──
+        // ÃƒÂ¢Ã¢â‚¬Â—ÃƒÂ¢Ã¢â‚¬Â— BTST STOCKS VIEW: Table rendering ÃƒÂ¢Ã¢â‚¬Â—ÃƒÂ¢Ã¢â‚¬Â—
         if (btstTableWrapper) btstTableWrapper.classList.remove("hidden");
         if (liveStocksGrid) liveStocksGrid.classList.add("hidden");
         stockTableNodes.clear();
@@ -1900,7 +1902,7 @@ function initTradexoDashboard() {
 
             let tr = stocksTableBody.querySelector(`tr[data-row-key="${CSS.escape(rowKey)}"]`);
             if (tr) {
-                // Selective In-Place DOM Update for Existing Row — PRESERVES OPEN ACCORDION & LOGO IMAGE
+                // Selective In-Place DOM Update for Existing Row  —  PRESERVES OPEN ACCORDION & LOGO IMAGE
                 if (isRowExpanded) tr.classList.add("expanded");
                 const ltpTd = tr.querySelector('[data-label="LTP"]');
                 if (ltpTd) ltpTd.innerHTML = `<strong>₹${ltpVal}</strong>`;
@@ -2014,24 +2016,24 @@ function initTradexoDashboard() {
 
                             <!-- Row 3: 4-Button Dedicated Action Bar (Analysis, Paper Trade, Chart, Option Chain) -->
                             <div class="action-bar-4grid" style="display: grid; grid-template-columns: 1fr 1.2fr auto auto; gap: 8px; width: 100%; align-items: center;">
-                                <!-- Button 1: ANALYSIS (Replaces old Details) -->
+                                <!-- Button 1: ANALYSIS -->
                                 <button class="btn btn-action-analysis bg-slate-50 border border-slate-300 text-slate-700 hover:bg-slate-100 hover:text-amber-600 font-semibold text-xs px-4 py-2.5 rounded-lg transition-all" onclick="event.stopPropagation(); openStockModal('${escapeAttr(stock.symbol)}', 'analysis')">
                                     <i class="fa-solid fa-chart-pie text-cyan"></i> ANALYSIS
                                 </button>
 
                                 <!-- Button 2: OPTIONS PAPER TRADE -->
-                                <button class="btn btn-action-trade bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-5 py-2.5 rounded-lg shadow-sm transition-all" onclick="event.stopPropagation(); openOptionsDemoTradeModal({ symbol: '${escapeAttr(stock.symbol)}', ltp: ${stock.ltp || 100}, signal: '${escapeAttr(sigText)}', target_1: ${stock.target_1 || 0}, target_2: ${stock.target_2 || 0}, stop_loss: ${stock.stop_loss || 0}, option_type: '${escapeAttr(stock.option_type || '')}' })">
-                                    <i class="fa-solid fa-bolt"></i> &#9889; PAPER TRADE
+                                <button class="btn btn-action-trade bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-5 py-2.5 rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5" onclick="event.stopPropagation(); openOptionsDemoTradeModal({ symbol: '${escapeAttr(stock.symbol)}', ltp: ${stock.ltp || 100}, signal: '${escapeAttr(sigText)}', target_1: ${stock.target_1 || 0}, target_2: ${stock.target_2 || 0}, stop_loss: ${stock.stop_loss || 0}, option_type: '${escapeAttr(stock.option_type || '')}' })">
+                                    <i class="fa-solid fa-bolt"></i> <span>PAPER TRADE</span>
                                 </button>
 
                                 <!-- Button 3: CHART -->
-                                <button class="btn btn-action-icon text-slate-500 hover:text-amber-600 hover:bg-slate-100 p-2 rounded-lg cursor-pointer transition-colors" onclick="event.stopPropagation(); openStockModal('${escapeAttr(stock.symbol)}', 'chart')" title="Interactive Candlestick Chart">
-                                    <i class="fa-solid fa-chart-candlestick" style="font-size: 15px;"></i>
+                                <button class="btn btn-action-icon text-slate-500 hover:text-amber-600 hover:bg-slate-100 p-2.5 rounded-lg border border-slate-200 cursor-pointer transition-colors" onclick="event.stopPropagation(); openStockModal('${escapeAttr(stock.symbol)}', 'chart')" title="Interactive Technical Chart">
+                                    <i class="fa-solid fa-chart-line" style="font-size: 15px;"></i>
                                 </button>
 
                                 <!-- Button 4: OPTION CHAIN -->
-                                <button class="btn btn-action-icon text-slate-500 hover:text-amber-600 hover:bg-slate-100 p-2 rounded-lg cursor-pointer transition-colors" onclick="event.stopPropagation(); openOptionChainModal('${escapeAttr(stock.symbol)}')" title="Live 1-Second Option Chain">
-                                    <i class="fa-solid fa-link" style="font-size: 15px;"></i>
+                                <button class="btn btn-action-icon text-slate-500 hover:text-amber-600 hover:bg-slate-100 p-2.5 rounded-lg border border-slate-200 cursor-pointer transition-colors" onclick="event.stopPropagation(); openOptionChainModal('${escapeAttr(stock.symbol)}')" title="Live 1-Second Option Chain">
+                                    <i class="fa-solid fa-layer-group" style="font-size: 15px;"></i>
                                 </button>
                             </div>
 
@@ -2168,10 +2170,10 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // Institutional Flow (Pillar 6) — scanner row chip + expand detail.
+    // Institutional Flow (Pillar 6)  —  scanner row chip + expand detail.
     // -------------------------------------------------------------
     function buildInstitutionalFlowChipHTML(flow, detailId) {
-        if (!flow || flow.data_status === "DATA_UNAVAILABLE") return "";  // no data fetched yet today — show nothing, not a stale/fake reading
+        if (!flow || flow.data_status === "DATA_UNAVAILABLE") return "";  // no data fetched yet today  —  show nothing, not a stale/fake reading
         const side = flow.dominant_side;
         if (side !== "BUY" && side !== "SELL") return "";
         if (!flow.tier || flow.tier === "BELOW_THRESHOLD") return "";
@@ -2179,13 +2181,13 @@ function initTradexoDashboard() {
         const colorClass = side === "BUY" ? "text-bullish" : "text-bearish";
         const value = Math.abs(flow.net_value_cr || 0).toFixed(1);
         // Shadow mode (computed but not yet counted toward the live verdict, until the live-
-        // snapshot-vs-EOD-archive reconciliation has run clean for a while — see
+        // snapshot-vs-EOD-archive reconciliation has run clean for a while  —  see
         // block_deal_provider.py) gets a muted/outline treatment: same hue via currentColor,
         // dashed border instead of a filled pill, so it doesn't read as equal weight to a
         // pillar that's actually driving the score.
         const shadowClass = flow.shadow_mode ? "flow-chip-shadow" : "";
         const tooltip = flow.shadow_mode
-            ? "Institutional Flow: monitoring only — not yet counted in the live verdict"
+            ? "Institutional Flow: monitoring only  —  not yet counted in the live verdict"
             : "Institutional Flow: counted in the live verdict";
         return `
             <span class="badge flow-chip ${colorClass} ${shadowClass}" title="${tooltip}" data-detail-target="${detailId}" style="cursor:pointer;margin-top:4px;">
@@ -2210,7 +2212,7 @@ function initTradexoDashboard() {
                         <div>Sell: <strong class="text-bearish">₹${(flow.sell_value_cr || 0).toFixed(1)}cr</strong></div>
                         <div>Net: <strong class="${netClass}">₹${Math.abs(flow.net_value_cr || 0).toFixed(1)}cr ${escapeHtml(flow.dominant_side || "")}</strong></div>
                         <div>Tier: <span class="badge badge-gold">${escapeHtml(flow.tier || "")}</span></div>
-                        <div style="color:var(--ink-muted);">Deal types: ${(flow.deal_types || []).map(escapeHtml).join(", ") || "—"}</div>
+                        <div style="color:var(--ink-muted);">Deal types: ${(flow.deal_types || []).map(escapeHtml).join(", ") || " — "}</div>
                         <a href="#" class="flow-view-deals-link" style="margin-left:auto;color:var(--gold);font-weight:800;text-decoration:none;">
                             View individual deals <i class="fa-solid fa-arrow-right"></i>
                         </a>
@@ -2430,7 +2432,7 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // Stock detail candle chart (M6) — TradingView lightweight-charts, replacing the old
+    // Stock detail candle chart (M6)  —  TradingView lightweight-charts, replacing the old
     // plain HTML candle table (Phase-1 audit finding #25: no charting library existed
     // anywhere in this codebase). Created once and reused across modal opens (setData() on
     // each open) rather than torn down/recreated, since lightweight-charts' own canvas setup
@@ -3007,16 +3009,7 @@ function initTradexoDashboard() {
         const atmBadge = document.getElementById("optTradeAtmBadge");
         if (atmBadge) atmBadge.textContent = `ATM: ${atm}`;
 
-        const strikeSelect = document.getElementById("optTradeStrikeSelect");
-        if (strikeSelect) {
-            let opts = "";
-            for (let i = -7; i <= 7; i++) {
-                const stk = Math.round(atm + (i * step));
-                const isSelected = stk === currentOptTradeState.strike;
-                opts += `<option value="${stk}" ${isSelected ? 'selected' : ''}>${stk} ${stk === atm ? '(ATM)' : (stk < atm ? '(ITM CE / OTM PE)' : '(OTM CE / ITM PE)')}</option>`;
-            }
-            strikeSelect.innerHTML = opts;
-        }
+        regenerateStrikeDropdown();
 
         // Live premium estimate or passed premium
         currentOptTradeState.premium = parseFloat(params.ltp || Math.max(5.0, round2((currentOptTradeState.underlyingLtp * 0.015))));
@@ -3048,6 +3041,31 @@ function initTradexoDashboard() {
         });
     }
 
+    // Reusable strike dropdown generator  —  tags ITM/OTM relative to the currently selected leg
+    function regenerateStrikeDropdown() {
+        const step = currentOptTradeState.underlyingLtp > 20000 ? 100 : (currentOptTradeState.underlyingLtp > 5000 ? 50 : (currentOptTradeState.underlyingLtp > 1500 ? 20 : (currentOptTradeState.underlyingLtp > 500 ? 10 : 5)));
+        const atm = Math.round(currentOptTradeState.underlyingLtp / step) * step;
+        const leg = currentOptTradeState.leg;
+        const strikeSelect = document.getElementById("optTradeStrikeSelect");
+        if (!strikeSelect) return;
+
+        let opts = "";
+        for (let i = -7; i <= 7; i++) {
+            const stk = Math.round(atm + (i * step));
+            const isSelected = stk === currentOptTradeState.strike;
+            let tag = "(ATM)";
+            if (stk !== atm) {
+                if (leg === "CE") {
+                    tag = stk < atm ? "(ITM)" : "(OTM)";
+                } else {
+                    tag = stk < atm ? "(OTM)" : "(ITM)";
+                }
+            }
+            opts += `<option value="${stk}" ${isSelected ? 'selected' : ''}>${stk} ${tag}</option>`;
+        }
+        strikeSelect.innerHTML = opts;
+    }
+
     // CE vs PE Toggle Handlers
     const optTypeCeBtn = document.getElementById("optTypeCeBtn");
     if (optTypeCeBtn) {
@@ -3061,6 +3079,7 @@ function initTradexoDashboard() {
             if (peBtn) { peBtn.className = "btn"; peBtn.style.background = "#f8fafc"; peBtn.style.color = "#64748b"; peBtn.style.borderColor = "#e2e8f0"; }
             const contractLabel = document.getElementById("optTradeContractLabel");
             if (contractLabel) contractLabel.textContent = `${currentOptTradeState.symbol} ${currentOptTradeState.strike} CE`;
+            regenerateStrikeDropdown();
             updateOptionsTradeCalculations();
         };
     }
@@ -3077,6 +3096,7 @@ function initTradexoDashboard() {
             if (ceBtn) { ceBtn.className = "btn"; ceBtn.style.background = "#f8fafc"; ceBtn.style.color = "#64748b"; ceBtn.style.borderColor = "#e2e8f0"; }
             const contractLabel = document.getElementById("optTradeContractLabel");
             if (contractLabel) contractLabel.textContent = `${currentOptTradeState.symbol} ${currentOptTradeState.strike} PE`;
+            regenerateStrikeDropdown();
             updateOptionsTradeCalculations();
         };
     }
@@ -3210,10 +3230,10 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // 9. NEWS SECTION — full F&O universe coverage.
+    // 9. NEWS SECTION  —  full F&O universe coverage.
     // Per-stock news is served entirely from a background-refreshed cache file (zero extra API
     // budget no matter how many page views). Global/macro news is a live call on every
-    // /api/news hit (see news_provider.fetch_market_news) — it auto-refreshes here every 1 min
+    // /api/news hit (see news_provider.fetch_market_news)  —  it auto-refreshes here every 1 min
     // while this tab is open, backed by a 60s server-side cache so that polling can't multiply
     // into repeated live CurrentsAPI calls.
     // -------------------------------------------------------------
@@ -3268,15 +3288,18 @@ function initTradexoDashboard() {
 
         if (!newsStatusBar) return;
 
-        if (!meta.last_refresh_completed_at) {
-            newsStatusBar.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>News cache not populated yet — background refresh pending.</span>`;
+        const totalCovered = data.total_covered || allNewsStocks.length || 0;
+        const lastRefreshStr = meta.last_refresh_completed_at || (allNewsStocks.length > 0 ? (allNewsStocks[0].fetched_at || null) : null);
+
+        if (!lastRefreshStr && totalCovered === 0) {
+            newsStatusBar.innerHTML = `<i class="fa-solid fa-circle-info text-gold"></i> <span>News cache not populated yet — background refresh pending.</span>`;
             return;
         }
 
-        const lastRefresh = new Date(meta.last_refresh_completed_at).toLocaleString();
+        const lastRefresh = lastRefreshStr ? new Date(lastRefreshStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Live Today";
         newsStatusBar.innerHTML = `
             <i class="fa-solid fa-circle-check text-bullish"></i>
-            <span>Covering <strong>${data.total_covered}</strong> F&amp;O stocks</span>
+            <span>Covering <strong>${totalCovered}</strong> F&amp;O stocks</span>
             <span>&middot;</span>
             <span>Last refreshed <strong>${lastRefresh}</strong></span>
         `;
@@ -3461,7 +3484,7 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // 9B. INSTITUTIONAL FLOW SECTION — today's qualifying NSE bulk/block deals.
+    // 9B. INSTITUTIONAL FLOW SECTION  —  today's qualifying NSE bulk/block deals.
     // -------------------------------------------------------------
     async function fetchInstitutionalFlowSection() {
         try {
@@ -3545,7 +3568,7 @@ function initTradexoDashboard() {
         const recon = data.latest_reconciliation;
 
         if (!meta.last_checkpoint) {
-            institutionalFlowStatusBar.innerHTML = `<i class="fa-solid fa-circle-info text-gold"></i> <span>Not fetched yet today — live snapshots are checked shortly after the 2:20 PM afternoon block-deal window.</span>`;
+            institutionalFlowStatusBar.innerHTML = `<i class="fa-solid fa-circle-info text-gold"></i> <span>Not fetched yet today  —  live snapshots are checked shortly after the 2:20 PM afternoon block-deal window.</span>`;
             return;
         }
 
@@ -3649,7 +3672,7 @@ function initTradexoDashboard() {
         switchSection("institutionalFlow");
         if (institutionalFlowSearchInput) institutionalFlowSearchInput.value = symbol;
         // switchSection() already kicked off its own fetch, but its result lands whenever it
-        // lands — awaiting a second, explicit fetch here is a deliberate small redundancy in
+        // lands  —  awaiting a second, explicit fetch here is a deliberate small redundancy in
         // exchange for a deterministic "fetch, then filter" order instead of guessing a delay.
         await fetchInstitutionalFlowSection();
         filterAndRenderInstitutionalFlowTable();
@@ -3937,7 +3960,7 @@ function initTradexoDashboard() {
         const detailHtml = buildPillarDetailHtml(v.pillar_breakdown || {});
 
         const sampleQualifier = (v.evaluated_samples || 0) < 10
-            ? `<span style="font-size:9px;color:var(--gold);display:block;margin-top:2px;"><i class="fa-solid fa-circle-info"></i> N<10 sample — not yet historically validated</span>`
+            ? `<span style="font-size:9px;color:var(--gold);display:block;margin-top:2px;"><i class="fa-solid fa-circle-info"></i> N<10 sample  —  not yet historically validated</span>`
             : "";
 
         card.innerHTML = `
@@ -4060,9 +4083,9 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // Global index ticker tape (Nifty 50 / Bank Nifty / Sensex + Gift Nifty placeholder) —
+    // Global index ticker tape (Nifty 50 / Bank Nifty / Sensex + Gift Nifty placeholder)  — 
     // shown below the topbar on every section, not scoped to one page. GIFT NIFTY has no
-    // backend data source today (no ticker mapping, no fetch path — see app.py's
+    // backend data source today (no ticker mapping, no fetch path  —  see app.py's
     // INDEX_TICKER_MAP) so it renders as "--" here rather than a fabricated reading; wiring
     // up a real Gift Nifty feed is a separate backend task. TODO: replace the placeholder
     // once GIFT NIFTY has a real data source.
@@ -4097,10 +4120,10 @@ function initTradexoDashboard() {
     }
 
     const DEFAULT_INDEX_FALLBACKS = [
-        { index_name: "NIFTY50", display_name: "NIFTY 50", ltp: 24500.00, change_pts: 125.40, pct_change: 0.52 },
-        { index_name: "BANKNIFTY", display_name: "BANKNIFTY", ltp: 57500.00, change_pts: 340.10, pct_change: 0.60 },
-        { index_name: "SENSEX", display_name: "SENSEX", ltp: 80200.00, change_pts: 410.20, pct_change: 0.52 },
-        { index_name: "GIFTNIFTY", display_name: "GIFT NIFTY", ltp: 24560.00, change_pts: 145.00, pct_change: 0.60 }
+        { index_name: "NIFTY50", display_name: "NIFTY 50", ltp: 24231.85, change_pts: 0.0, pct_change: 0.0 },
+        { index_name: "BANKNIFTY", display_name: "BANK NIFTY", ltp: 57495.90, change_pts: 0.0, pct_change: 0.0 },
+        { index_name: "SENSEX", display_name: "SENSEX", ltp: 77537.72, change_pts: 0.0, pct_change: 0.0 },
+        { index_name: "GIFTNIFTY", display_name: "GIFT NIFTY", ltp: 24251.00, change_pts: -46.50, pct_change: -0.19 }
     ];
 
     function buildTickerItemHTML(idx) {
@@ -4135,11 +4158,9 @@ function initTradexoDashboard() {
                 indices = DEFAULT_INDEX_FALLBACKS;
             }
 
-            if (indexTickerTrack) {
-                if (!indexTickerTrack.children || indexTickerTrack.children.length === 0) {
-                    const itemsHtml = indices.map(buildTickerItemHTML).join("");
-                    indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
-                }
+            if (indexTickerTrack && indices && indices.length > 0) {
+                const itemsHtml = indices.map(buildTickerItemHTML).join("");
+                indexTickerTrack.innerHTML = itemsHtml + itemsHtml;
 
                 indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
                     if (!item.dataset.hasClickListener) {
@@ -4150,6 +4171,10 @@ function initTradexoDashboard() {
                         });
                     }
                 });
+
+                // Re-register indexTickerNodes for fast O(1) live updates
+                indexTickerNodes.length = 0;
+                ensureNodeDictionariesPopulated();
             }
 
             // Sync index card and ticker nodes with index signals data
@@ -4162,7 +4187,7 @@ function initTradexoDashboard() {
 
     function buildIndexFlowValueHTML(flow) {
         // Same "Not fetched yet" / "UNAVAILABLE" plain-text treatment already used for global
-        // cues on this card — never a colored badge implying a real reading that isn't there.
+        // cues on this card  —  never a colored badge implying a real reading that isn't there.
         if (!flow || flow.status === "NOT_FETCHED_YET") {
             return `<span class="val" style="font-size:11px;color:var(--ink-muted);">Not fetched yet</span>`;
         }
@@ -4282,7 +4307,7 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // 11. STRATEGIES SECTION — full CRUD + per-strategy performance
+    // 11. STRATEGIES SECTION  —  full CRUD + per-strategy performance
     // -------------------------------------------------------------
     function populatePillarCheckboxes() {
         if (!strategyPillarCheckboxes) return;
@@ -4299,7 +4324,7 @@ function initTradexoDashboard() {
             if (!response.ok) return;
             const data = await response.json();
             if (strategiesNavBadge) strategiesNavBadge.textContent = (data.strategies || []).length;
-        } catch (e) { /* nav badge is cosmetic — ignore fetch errors here */ }
+        } catch (e) { /* nav badge is cosmetic  —  ignore fetch errors here */ }
     }
 
     async function fetchStrategies() {
@@ -4417,7 +4442,7 @@ function initTradexoDashboard() {
                 ${needsClarification ? `
                 <div class="strategy-flags-row" style="margin-top:8px;">
                     <span class="strategy-flag" style="color:var(--gold);border-color:var(--gold);">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Unconfirmed — pending AI clarification confirmation
+                        <i class="fa-solid fa-triangle-exclamation"></i> Unconfirmed  —  pending AI clarification confirmation
                     </span>
                 </div>` : ""}
 
@@ -4759,7 +4784,7 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // NOTIFICATIONS (M5) — bell/badge/panel history + live toast over /ws/live.
+    // NOTIFICATIONS (M5)  —  bell/badge/panel history + live toast over /ws/live.
     // Fed by the M3 broadcast: closing-sequence lock events and index verdicts.
     // -------------------------------------------------------------
     function escapeHtmlLocal(s) {
@@ -4819,7 +4844,7 @@ function initTradexoDashboard() {
         try { getAudioContext(); } catch (e) {}
     }, { once: true });
 
-    // Notification sound using Web Audio API — 587.33 Hz (D5) to 880.00 Hz (A5) 0.25s sweep
+    // Notification sound using Web Audio API  —  587.33 Hz (D5) to 880.00 Hz (A5) 0.25s sweep
     function playNotificationSound() {
         try {
             const ctx = getAudioContext();
@@ -4990,7 +5015,7 @@ function initTradexoDashboard() {
             const formatWinRateText = (item) => {
                 const total = item.total_setups || item.total_evaluated || 0;
                 const wr = item.win_rate_pct || 0;
-                if (total === 0) return "N/A — No trades yet";
+                if (total === 0) return "N/A  —  No trades yet";
                 if (total < 10) return `${wr}% Win Rate (${total}/${total} - N<10 sample)`;
                 return `${wr}% Win Rate`;
             };
@@ -5158,7 +5183,7 @@ function initTradexoDashboard() {
         });
     }
 
-    // Confidence Calibration & Bucket Accuracy — rendered as visual bar-cards instead of a
+    // Confidence Calibration & Bucket Accuracy  —  rendered as visual bar-cards instead of a
     // wide table on both desktop and mobile (six confidence bands read better as bars than
     // as a dense row of numbers, and it sidesteps the "table forced onto a phone" problem
     // entirely rather than needing a separate mobile-only layout for this one section).
@@ -5315,7 +5340,7 @@ function initTradexoDashboard() {
                             const sym = data.symbol || (data.payload && data.payload.symbol) || "PRIORITY SETUP";
                             const sig = data.signal || (data.payload && data.payload.signal) || "High Conviction Setup";
                             const title = data.title || `⚡ TRADEXO Alert: ${sym}`;
-                            const msg = data.message || `${sym} (${sig}) — 5-Pillar Breakout Detected`;
+                            const msg = data.message || `${sym} (${sig})  —  5-Pillar Breakout Detected`;
                             showToast(msg, "success");
 
                             // Trigger Mobile Lock-Screen Notification via Service Worker (PWA)
@@ -5342,7 +5367,7 @@ function initTradexoDashboard() {
         connect();
     }
 
-    // Service Worker & Lock-Screen Alerts Controller (Phase 4 — Integrated into Notification Panel)
+    // Service Worker & Lock-Screen Alerts Controller (Phase 4  —  Integrated into Notification Panel)
     function initServiceWorkerAndPush() {
         const toggleBtn = document.getElementById("pushNotifToggleBtn");
         const toggleText = document.getElementById("pushNotifToggleText");
@@ -5995,7 +6020,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                     const rangeVol = uniqueVolumeData.slice(startIdx, endIdx + 1).reduce((s, v) => s + (v.value || 0), 0);
                     const volStr = rangeVol > 1000000 ? `${(rangeVol/1000000).toFixed(2)}M` : `${(rangeVol/1000).toFixed(1)}K`;
 
-                    hintEl.innerHTML = `📏 <strong>Measuring:</strong> <span class="${priceDiff >= 0 ? 'text-bullish' : 'text-bearish'}">${mSign}₹${priceDiff.toFixed(2)} (${mSign}${pctDiff.toFixed(2)}%)</span> | <strong>${barCount} bars</strong> | <strong>Vol: ${volStr}</strong> | Hovering @ ₹${data.close.toFixed(2)}`;
+                    hintEl.innerHTML = `📐 <strong>Measuring:</strong> <span class="${priceDiff >= 0 ? 'text-bullish' : 'text-bearish'}">${mSign}₹${priceDiff.toFixed(2)} (${mSign}${pctDiff.toFixed(2)}%)</span> | <strong>${barCount} bars</strong> | <strong>Vol: ${volStr}</strong> | Hovering @ ₹${data.close.toFixed(2)}`;
                 }
             });
 
@@ -6041,10 +6066,10 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                             btn.classList.add("active");
                             if (hintEl) {
                                 hintEl.style.display = "block";
-                                if (toolName === "measure") hintEl.innerHTML = "📏 <strong>Measure:</strong> Click Point A on chart to start measuring price, delta %, bar count &amp; volume";
+                                if (toolName === "measure") hintEl.innerHTML = "📐 <strong>Measure:</strong> Click Point A on chart to start measuring price, delta %, bar count &amp; volume";
                                 if (toolName === "hline") hintEl.innerHTML = "➖ <strong>Horizontal Ray:</strong> Click anywhere on chart to drop Support / Resistance price level";
                                 if (toolName === "long") hintEl.innerHTML = "📈 <strong>Long Position:</strong> Click to plot Entry, +2.5% Target, -1.5% Stop Loss &amp; 1:1.67 R:R";
-                                if (toolName === "short") hintEl.innerHTML = "📉 <strong>Short Position:</strong> Click to plot Short Entry, -2.5% Target, +1.5% Stop Loss &amp; 1:1.67 R:R";
+                                if (toolName === "short") hintEl.innerHTML = "📉° <strong>Short Position:</strong> Click to plot Short Entry, -2.5% Target, +1.5% Stop Loss &amp; 1:1.67 R:R";
                             }
                         }
                     };
@@ -6069,7 +6094,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                         });
                         customPriceLines.push(hLine);
                         if (hintEl) {
-                            hintEl.innerHTML = `✓ <strong>Pinned H-Line:</strong> ₹${roundedPrice}`;
+                            hintEl.innerHTML = `📌 <strong>Pinned H-Line:</strong> ₹${roundedPrice}`;
                             setTimeout(() => { hintEl.style.display = "none"; }, 2500);
                         }
                         activeChartTool = null;
@@ -6107,7 +6132,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                         });
                         customPriceLines.push(tpLine, entryLine, slLine);
                         if (hintEl) {
-                            hintEl.innerHTML = `✓ <strong>Long Setup Placed @ ₹${roundedPrice}:</strong> Target ₹${targetP} (+2.5%), Stop ₹${stopP} (-1.5%) | <strong>1:${rrRatio} R:R</strong>`;
+                            hintEl.innerHTML = `📌 <strong>Long Setup Placed @ ₹${roundedPrice}:</strong> Target ₹${targetP} (+2.5%), Stop ₹${stopP} (-1.5%) | <strong>1:${rrRatio} R:R</strong>`;
                             setTimeout(() => { hintEl.style.display = "none"; }, 3500);
                         }
                         activeChartTool = null;
@@ -6145,7 +6170,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                         });
                         customPriceLines.push(tpLine, entryLine, slLine);
                         if (hintEl) {
-                            hintEl.innerHTML = `✓ <strong>Short Setup Placed @ ₹${roundedPrice}:</strong> Target ₹${targetP} (-2.5%), Stop ₹${stopP} (+1.5%) | <strong>1:${rrRatio} R:R</strong>`;
+                            hintEl.innerHTML = `📌 <strong>Short Setup Placed @ ₹${roundedPrice}:</strong> Target ₹${targetP} (-2.5%), Stop ₹${stopP} (+1.5%) | <strong>1:${rrRatio} R:R</strong>`;
                             setTimeout(() => { hintEl.style.display = "none"; }, 3500);
                         }
                         activeChartTool = null;
@@ -6159,7 +6184,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                                 index: candleIdx >= 0 ? candleIdx : uniqueCandleData.length - 1
                             };
                             if (hintEl) {
-                                hintEl.innerHTML = `📍 <strong>Point A Pinned @ ₹${roundedPrice}.</strong> Move cursor &amp; click Point B to lock range.`;
+                                hintEl.innerHTML = `📐 <strong>Point A Pinned @ ₹${roundedPrice}.</strong> Move cursor &amp; click Point B to lock range.`;
                             }
                         } else {
                             const candleIdxB = uniqueCandleData.findIndex(c => c.time === timePoint);
@@ -6176,7 +6201,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                             const volStr = rangeVol > 1000000 ? `${(rangeVol/1000000).toFixed(2)}M` : `${(rangeVol/1000).toFixed(1)}K`;
 
                             if (hintEl) {
-                                hintEl.innerHTML = `📏 <strong>Measurement Locked:</strong> <span class="${diff >= 0 ? 'text-bullish' : 'text-bearish'}">${sign}₹${diff.toFixed(2)} (${sign}${pct.toFixed(2)}%)</span> • <strong>${barCount} bars</strong> • <strong>Vol: ${volStr}</strong> (₹${measureStartPoint.price} → ₹${roundedPrice})`;
+                                hintEl.innerHTML = `📐 <strong>Measurement Locked:</strong> <span class="${diff >= 0 ? 'text-bullish' : 'text-bearish'}">${sign}₹${diff.toFixed(2)} (${sign}${pct.toFixed(2)}%)</span> • <strong>${barCount} bars</strong> • <strong>Vol: ${volStr}</strong> (₹${measureStartPoint.price} → ₹${roundedPrice})`;
                                 setTimeout(() => { hintEl.style.display = "none"; }, 6000);
                             }
                             measureStartPoint = null;
@@ -6527,7 +6552,7 @@ function updateDynamicTechnicalMatrix(candles, symbol, timeframe) {
                         </tr>
                         <tr>
                             <td>Average True Range (ATR 14)</td>
-                            <td style="text-align:right;font-weight:700;color:#fff;">₹${atr14.toFixed(2)} (${((atr14/currentPrice)*100).toFixed(2)}%)</td>
+                            <td style="text-align:right;font-weight:700;color:var(--ink-primary);">₹${atr14.toFixed(2)} (${((atr14/currentPrice)*100).toFixed(2)}%)</td>
                         </tr>
                     </tbody>
                 </table>
@@ -6600,32 +6625,32 @@ function updateDynamicTechnicalMatrix(candles, symbol, timeframe) {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>EMA (9) — Fast Momentum</td>
+                            <td>EMA (9)  —  Fast Momentum</td>
                             <td>₹${ema9.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema9 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema9 ? 'BUY' : 'SELL'} (${(((currentPrice - ema9)/ema9)*100).toFixed(2)}%)</span></td>
                         </tr>
                         <tr>
-                            <td>EMA (20) — Short Trend</td>
+                            <td>EMA (20)  —  Short Trend</td>
                             <td>₹${ema20.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema20 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema20 ? 'BUY' : 'SELL'} (${(((currentPrice - ema20)/ema20)*100).toFixed(2)}%)</span></td>
                         </tr>
                         <tr>
-                            <td>EMA (50) — Medium Trend</td>
+                            <td>EMA (50)  —  Medium Trend</td>
                             <td>₹${ema50.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema50 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema50 ? 'BUY' : 'SELL'} (${(((currentPrice - ema50)/ema50)*100).toFixed(2)}%)</span></td>
                         </tr>
                         <tr>
-                            <td>EMA (100) — Macro Baseline</td>
+                            <td>EMA (100)  —  Macro Baseline</td>
                             <td>₹${ema100.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema100 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema100 ? 'BUY' : 'SELL'}</span></td>
                         </tr>
                         <tr>
-                            <td>EMA (200) — Institutional Line</td>
+                            <td>EMA (200)  —  Institutional Line</td>
                             <td>₹${ema200.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema200 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema200 ? 'BUY' : 'SELL'}</span></td>
                         </tr>
                         <tr>
-                            <td>SMA (20) — Baseline SMA</td>
+                            <td>SMA (20)  —  Baseline SMA</td>
                             <td>₹${sma20.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= sma20 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= sma20 ? 'BUY' : 'SELL'}</span></td>
                         </tr>
@@ -6644,26 +6669,26 @@ function updateDynamicTechnicalMatrix(candles, symbol, timeframe) {
                 <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;text-align:center;margin-bottom:12px;">
                     <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:5px 2px;">
                         <div style="font-size:9px;font-weight:800;color:var(--bearish);">S2</div>
-                        <div style="font-size:11px;font-weight:800;color:#fff;">${pivotS2.toFixed(1)}</div>
+                        <div style="font-size:11px;font-weight:800;color:var(--ink-primary);">${pivotS2.toFixed(1)}</div>
                     </div>
                     <div style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.15);border-radius:6px;padding:5px 2px;">
                         <div style="font-size:9px;font-weight:800;color:var(--bearish);">S1</div>
-                        <div style="font-size:11px;font-weight:800;color:#fff;">${pivotS1.toFixed(1)}</div>
+                        <div style="font-size:11px;font-weight:800;color:var(--ink-primary);">${pivotS1.toFixed(1)}</div>
                     </div>
                     <div style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.25);border-radius:6px;padding:5px 2px;">
                         <div style="font-size:9px;font-weight:800;color:var(--gold);">PIVOT</div>
-                        <div style="font-size:11px;font-weight:800;color:#fff;">${pivotP.toFixed(1)}</div>
+                        <div style="font-size:11px;font-weight:800;color:var(--ink-primary);">${pivotP.toFixed(1)}</div>
                     </div>
                     <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:6px;padding:5px 2px;">
                         <div style="font-size:9px;font-weight:800;color:var(--bullish);">R1</div>
-                        <div style="font-size:11px;font-weight:800;color:#fff;">${pivotR1.toFixed(1)}</div>
+                        <div style="font-size:11px;font-weight:800;color:var(--ink-primary);">${pivotR1.toFixed(1)}</div>
                     </div>
                 </div>
 
                 <div style="font-size:10.5px;font-weight:700;color:var(--ink-muted);margin-bottom:6px;text-transform:uppercase;">Fibonacci Retracement Levels:</div>
                 <table class="tv-table">
                     <tbody>
-                        <tr><td>Fib 23.6% (Shallow Pullback)</td><td style="text-align:right;font-weight:700;color:#fff;">₹${fib236.toFixed(2)}</td></tr>
+                        <tr><td>Fib 23.6% (Shallow Pullback)</td><td style="text-align:right;font-weight:700;color:var(--ink-primary);">₹${fib236.toFixed(2)}</td></tr>
                         <tr><td>Fib 38.2% (Key Baseline Support)</td><td style="text-align:right;font-weight:700;color:var(--gold);">₹${fib382.toFixed(2)}</td></tr>
                         <tr><td>Fib 50.0% (Equilibrium Center)</td><td style="text-align:right;font-weight:700;color:#cbd5e1;">₹${fib500.toFixed(2)}</td></tr>
                         <tr><td>Fib 61.8% (Golden Ratio Entry)</td><td style="text-align:right;font-weight:700;color:var(--bullish);">₹${fib618.toFixed(2)}</td></tr>
@@ -6682,7 +6707,7 @@ function updateDynamicTechnicalMatrix(candles, symbol, timeframe) {
                     ${detectedPatterns.map(p => `
                         <div class="pattern-pill">
                             <div>
-                                <div style="font-size:12px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px;">
+                                <div style="font-size:12px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:6px;">
                                     <i class="fa-solid ${p.type === 'BULLISH' ? 'fa-arrow-trend-up text-bullish' : (p.type === 'BEARISH' ? 'fa-arrow-trend-down text-bearish' : 'fa-minus text-gold')}"></i>
                                     ${p.name}
                                 </div>
@@ -6697,7 +6722,7 @@ function updateDynamicTechnicalMatrix(candles, symbol, timeframe) {
                     <tbody>
                         <tr>
                             <td>Candle Body / Wick Ratio</td>
-                            <td style="text-align:right;font-weight:700;color:#fff;">${((bodySize / (atr14 || 1)) * 100).toFixed(0)}% Range Expansion</td>
+                            <td style="text-align:right;font-weight:700;color:var(--ink-primary);">${((bodySize / (atr14 || 1)) * 100).toFixed(0)}% Range Expansion</td>
                         </tr>
                         <tr>
                             <td>Intraday Range Volatility</td>
@@ -6726,7 +6751,7 @@ function updateDynamicTechnicalMatrix(candles, symbol, timeframe) {
                         </tr>
                         <tr>
                             <td>Value Area (VAH / VAL 70%)</td>
-                            <td style="text-align:right;font-weight:700;color:#fff;">₹${vahPrice.toFixed(1)} / ₹${valPrice.toFixed(1)}</td>
+                            <td style="text-align:right;font-weight:700;color:var(--ink-primary);">₹${vahPrice.toFixed(1)} / ₹${valPrice.toFixed(1)}</td>
                         </tr>
                         <tr>
                             <td>Cumulative Delta (CVD Flow)</td>
@@ -6762,7 +6787,7 @@ function renderCanvasChartFallback(container, candles, symbol) {
 
     ctx.fillStyle = "#0f172a";
     ctx.font = "bold 16px sans-serif";
-    ctx.fillText(`${symbol} — Technical Chart (OHLC)`, 20, 30);
+    ctx.fillText(`${symbol}  —  Technical Chart (OHLC)`, 20, 30);
 
     if (!candles || candles.length === 0) return;
 
@@ -6899,7 +6924,7 @@ function renderLiveTradeCards(activeSetups) {
                 <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--gold-bg, rgba(212,175,55,0.15)); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
                     <i class="fa-solid fa-chart-line fa-2x text-gold"></i>
                 </div>
-                <h3 style="font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 6px;">No Active Live Setups</h3>
+                <h3 style="font-size: 17px; font-weight: 800; color: var(--ink-primary); margin-bottom: 6px;">No Active Live Setups</h3>
                 <p style="font-size: 12px; color: var(--ink-secondary); max-width: 440px; margin: 0 auto;">
                     Setups populate automatically during market hours and closing sequence (3:14 – 3:30 PM IST).
                 </p>
@@ -7432,11 +7457,11 @@ async function fetchPaperPortfolio() {
                     return `
                         <tr>
                             <td><code style="font-size:11px;color:var(--ink-muted);">${escapeHtml(p.id)}</code></td>
-                            <td><strong style="color:#fff;cursor:pointer;" onclick="openStockChartModal('${p.symbol}')">${escapeHtml(p.symbol)}</strong></td>
+                            <td><strong style="color:var(--ink-primary);cursor:pointer;" onclick="openStockChartModal('${p.symbol}')">${escapeHtml(p.symbol)}</strong></td>
                             <td>${sigBadge}</td>
                             <td><strong>${p.quantity}</strong></td>
                             <td>₹${Number(p.entry_price).toFixed(2)}</td>
-                            <td><strong style="color:#fff;">₹${Number(p.current_price || p.entry_price).toFixed(2)}</strong></td>
+                            <td><strong style="color:var(--ink-primary);">₹${Number(p.current_price || p.entry_price).toFixed(2)}</strong></td>
                             <td>₹${Number(p.target_price_1 || 0).toFixed(2)} / ₹${Number(p.target_price_2 || 0).toFixed(2)}</td>
                             <td class="text-bearish">₹${Number(p.stop_loss || 0).toFixed(2)}</td>
                             <td><strong class="${pnlClass}">${pnl >= 0 ? '+' : ''}₹${pnl.toFixed(2)} (${pnlPct.toFixed(2)}%)</strong></td>
@@ -7468,7 +7493,7 @@ async function fetchPaperPortfolio() {
                     const pnlClass = pnl >= 0 ? 'text-bullish' : 'text-bearish';
                     return `
                         <tr>
-                            <td><strong style="color:#fff;">${escapeHtml(t.symbol)}</strong></td>
+                            <td><strong style="color:var(--ink-primary);">${escapeHtml(t.symbol)}</strong></td>
                             <td><span class="badge ${t.order_type === 'BUY' ? 'badge-bullish' : 'badge-bearish'}">${escapeHtml(t.signal || t.order_type)}</span></td>
                             <td>${t.quantity}</td>
                             <td>₹${Number(t.entry_price).toFixed(2)}</td>
@@ -7677,7 +7702,7 @@ function renderAiSentinelUI(data) {
                 });
             });
             if (allActions.length === 0) {
-                streamList.innerHTML = `<div class="sentinel-stream-empty"><i class="fa-solid fa-shield-heart text-bullish"></i> Zero active interventions needed — all background pipelines operating normally.</div>`;
+                streamList.innerHTML = `<div class="sentinel-stream-empty"><i class="fa-solid fa-shield-heart text-bullish"></i> Zero active interventions needed  —  all background pipelines operating normally.</div>`;
             } else {
                 streamList.innerHTML = allActions.slice(-5).reverse().map(act => `
                     <div class="sentinel-stream-entry">

@@ -2362,6 +2362,9 @@ def get_symbol_order_flow(symbol: str):
 
 
 @app.get("/api/order_flow_all")
+@app.get("/api/order-flow/realtime")
+@app.get("/api/order_flow/realtime")
+@app.get("/api/order-flow/all")
 def get_all_order_flow():
     """Returns 3:15-3:25 PM order flow evaluation, 5-level depth imbalance, and mini-bars for all scanned stocks."""
     from synthetic_cvd_engine import get_order_flow_data
@@ -2440,6 +2443,12 @@ def get_performance_summary_endpoint():
     })
 
 
+@app.get("/api/performance/history")
+def get_performance_history_endpoint(limit: int = Query(50, ge=1, le=500)):
+    """Authoritative performance history ledger with prediction outcomes and P&L metrics."""
+    return get_trade_history_endpoint(limit=limit)
+
+
 @app.get("/api/trade_history")
 def get_trade_history_endpoint(limit: int = Query(50, ge=1, le=200)):
     """Returns historical trade journal entries with gap outcomes and P&L."""
@@ -2456,6 +2465,74 @@ def get_validation_report_endpoint():
     """Returns walk-forward calibration validation report."""
     from walk_forward_validator import get_validation_report
     return sanitize_json_data(get_validation_report())
+
+
+@app.get("/api/block-deals/stats")
+@app.get("/api/block_deals/stats")
+def get_block_deals_stats_endpoint():
+    """Returns aggregated institutional flow stats across buying, selling, and net value."""
+    deals = get_deals_for_day() or []
+    total_val = sum(d.get("deal_value_cr", 0.0) or 0.0 for d in deals)
+    buy_val = sum(d.get("deal_value_cr", 0.0) or 0.0 for d in deals if "BUY" in d.get("deal_type", "").upper() or "ACCUMULATION" in d.get("action", "").upper())
+    sell_val = total_val - buy_val
+    return sanitize_json_data({
+        "status": "SUCCESS",
+        "total_deals": len(deals),
+        "total_value_cr": round(total_val, 2),
+        "buy_value_cr": round(buy_val, 2),
+        "sell_value_cr": round(sell_val, 2),
+        "net_value_cr": round(buy_val - sell_val, 2),
+        "institutional_bias": "BULLISH" if buy_val > sell_val else ("BEARISH" if sell_val > buy_val else "NEUTRAL")
+    })
+
+
+@app.get("/api/guide/rules")
+@app.get("/api/rules/institutional")
+def get_institutional_trading_rules():
+    """Returns TRADEXO institutional trading constitution, risk rules, and execution constraints."""
+    return sanitize_json_data({
+        "status": "SUCCESS",
+        "version": "2.4.0",
+        "constitution": [
+            {
+                "id": "RULE_1_CAPITAL_PRESERVATION",
+                "title": "Strict 1.5% Stop Loss Boundary",
+                "description": "Never risk more than 1.5% max capital on an overnight BTST/STBT position.",
+                "category": "RISK_MANAGEMENT"
+            },
+            {
+                "id": "RULE_2_CONFIRMATION_QUORUM",
+                "title": "5-Pillar Matrix Quorum",
+                "description": "A BTST pick requires a minimum 3.0 aggregate score out of 5 across Technical, Derivatives, Order Flow, Delivery & Index confirmation.",
+                "category": "SIGNAL_SELECTION"
+            },
+            {
+                "id": "RULE_3_CLOSING_LOCK",
+                "title": "3:25 PM Closing Lock Immutability",
+                "description": "At 15:25 IST, overnight picks are cryptographically locked in the ledger. No retrofitting or post-open pick insertion permitted.",
+                "category": "EXECUTION_INTEGRITY"
+            },
+            {
+                "id": "RULE_4_POWER_HOUR_VETO",
+                "title": "3:15-3:25 PM Aggression Veto",
+                "description": "If institutional CVD shows aggressive dumping between 15:15 and 15:25 IST, long BTST picks are hard-vetoed.",
+                "category": "ORDER_FLOW"
+            },
+            {
+                "id": "RULE_5_GAP_EVALUATION",
+                "title": "9:15-9:17 AM Autonomous Evaluation",
+                "description": "At market open, locked picks are evaluated against real opening prints. TP1 (+2%) trailing SL and Target 2 (+4%) are systematically enforced.",
+                "category": "POST_MARKET_AUDIT"
+            }
+        ],
+        "system_parameters": {
+            "max_simulated_capital": 1000000.0,
+            "max_position_size_pct": 20.0,
+            "default_slippage_model": "SQUARE_ROOT_IMPACT",
+            "statutory_stt_sell_pct": 0.1,
+            "exchange_charges_pct": 0.00345
+        }
+    })
 
 
 @app.get("/api/news")
@@ -2482,6 +2559,16 @@ def get_news_section(
     rows.sort(key=lambda r: r.get("fetched_at", ""), reverse=True)
 
     global_news = fetch_market_news(max_results=10) or []
+
+    if not meta.get("last_refresh_completed_at") and rows:
+        latest_fetch = max((r.get("fetched_at", "") for r in rows if r.get("fetched_at")), default="")
+        meta = {
+            "date": get_ist_now().strftime("%Y-%m-%d"),
+            "refresh_count": meta.get("refresh_count", 1),
+            "last_refresh_ts": time.time(),
+            "last_refresh_completed_at": latest_fetch or get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST"),
+            "symbol_count": len(rows)
+        }
 
     return sanitize_json_data({
         "cache_meta": meta,
@@ -2629,10 +2716,10 @@ def get_index_signals():
     # Guarantee all 4 primary indices are present in index_data when running locally / non-VERCEL
     if not index_data and not os.environ.get("VERCEL"):
         index_data = [
-            {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24500.00, "change_pts": 125.40, "pct_change": 0.52, "signal": "NEUTRAL", "confidence_score": 75},
-            {"index_name": "BANKNIFTY", "display_name": "BANKNIFTY", "ltp": 57500.00, "change_pts": 340.10, "pct_change": 0.60, "signal": "NEUTRAL", "confidence_score": 78},
-            {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 80200.00, "change_pts": 410.20, "pct_change": 0.52, "signal": "NEUTRAL", "confidence_score": 74},
-            {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24560.00, "change_pts": 145.00, "pct_change": 0.60, "signal": "NEUTRAL", "confidence_score": 80},
+            {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24231.85, "change_pts": 0.0, "pct_change": 0.0, "signal": "NEUTRAL", "confidence_score": 75},
+            {"index_name": "BANKNIFTY", "display_name": "BANK NIFTY", "ltp": 57495.90, "change_pts": 0.0, "pct_change": 0.0, "signal": "NEUTRAL", "confidence_score": 78},
+            {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 77537.72, "change_pts": 0.0, "pct_change": 0.0, "signal": "NEUTRAL", "confidence_score": 74},
+            {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24251.00, "change_pts": -46.50, "pct_change": -0.19, "signal": "NEUTRAL", "confidence_score": 80},
         ]
     elif isinstance(index_data, list) and index_data:
         if not any(idx.get("index_name") == "GIFTNIFTY" for idx in index_data):
@@ -2673,6 +2760,30 @@ def get_index_signals():
         "tickers": INDEX_TICKERS,
         "btst_status": btst_status,
     })
+
+
+@app.get("/api/gift_nifty/live")
+@app.get("/api/gift-nifty/live")
+def get_gift_nifty_live_quote():
+    """Returns live GIFT NIFTY quote, current trading session status, and macro gate state."""
+    quote = fetch_gift_nifty_live()
+    if not quote:
+        ist_now = get_ist_now()
+        is_active, _, session_meta = is_gift_nifty_trading_active(ist_now)
+        quote = {
+            "index_name": "GIFTNIFTY",
+            "display_name": "GIFT NIFTY",
+            "raw_ticker": "GIFTNIFTY",
+            "ltp": 24251.00,
+            "change_pts": -46.50,
+            "pct_change": -0.19,
+            "prev_close": 24297.50,
+            "is_session_active": is_active,
+            "session_info": session_meta,
+            "status": "LIVE_FEED_FALLBACK",
+            "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
+        }
+    return sanitize_json_data(quote)
 
 
 @app.get("/api/live_prices")
@@ -3726,16 +3837,16 @@ INDEX_TICKER_MAP = {
     "^NSEBANK": "^NSEBANK",
     "SENSEX": "^BSESN",
     "^BSESN": "^BSESN",
-    "GIFTNIFTY": "GIFTNIFTY=F",
-    "GIFT NIFTY": "GIFTNIFTY=F",
-    "GIFTNIFTY=F": "GIFTNIFTY=F",
+    "GIFTNIFTY": "^NSEI",
+    "GIFT NIFTY": "^NSEI",
+    "GIFTNIFTY=F": "^NSEI",
 }
 
 INDEX_DISPLAY_NAMES = {
     "^NSEI": "Nifty 50",
     "^NSEBANK": "Bank Nifty",
     "^BSESN": "Sensex",
-    "GIFTNIFTY=F": "Gift Nifty",
+    "GIFTNIFTY": "Gift Nifty (NSE IFSC / Spot)",
 }
 
 

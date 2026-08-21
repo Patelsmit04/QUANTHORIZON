@@ -230,5 +230,16 @@
     "symbols_only_in_archive": [],
     "value_mismatches": [],
     "status": "CLEAN"
+  },
+  {
+    "date": "2026-08-20",
+    "run_at": "2026-08-20T21:33:09.409639+05:30",
+    "live_snapshot_checkpoint_used": null,
+    "live_symbol_count": 0,
+    "archive_symbol_count": null,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "ARCHIVE_UNAVAILABLE"
   }
 ]

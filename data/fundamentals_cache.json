@@ -4,10 +4,10 @@
     "shortName": "ADANI ENERGY SOLUTION LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 1884205875200,
-    "trailingPE": 63.638992,
-    "forwardPE": 42.6139,
-    "priceToBook": 7.278783,
+    "marketCap": 1885673619456,
+    "trailingPE": 63.426575,
+    "forwardPE": 42.64709,
+    "priceToBook": 7.2844524,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -23,65 +23,61 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "ADANIGREEN": {
     "longName": "Adani Green Energy Limited",
     "shortName": "ADANI GREEN ENERGY LTD",
-    "sector": "Utilities",
-    "industry": "Utilities - Renewable",
-    "marketCap": 2129798758400,
-    "trailingPE": 123.61377,
-    "forwardPE": 41.186123,
-    "priceToBook": 11.040901,
+    "sector": null,
+    "industry": null,
+    "marketCap": 2174272536576,
+    "trailingPE": 126.801155,
+    "forwardPE": 42.046158,
+    "priceToBook": 11.271454,
     "returnOnEquity": null,
-    "profitMargins": 0.13095,
-    "debtToEquity": 346.548,
-    "earningsGrowth": 0.185,
-    "revenueGrowth": 0.166,
-    "earningsQuarterlyGrowth": 0.185,
-    "heldPercentInsiders": 0.82274,
-    "heldPercentInstitutions": 0.16976999,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
-      "verdict": "CAUTION",
-      "checks_run": 5,
+      "verdict": "STABLE",
+      "checks_run": 1,
       "checks_possible": 5,
-      "red_flags": [
-        "High leverage (Debt/Equity 347%)"
-      ],
+      "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (123.6x) — priced for perfection"
+        "Very high P/E (126.8x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "360ONE": {
     "longName": "360 One Wam Limited",
     "shortName": "360 ONE WAM LIMITED",
-    "sector": "Financial Services",
-    "industry": "Asset Management",
-    "marketCap": 480129253376,
-    "trailingPE": 39.215687,
-    "forwardPE": 28.80964,
-    "priceToBook": 4.8653173,
+    "sector": null,
+    "industry": null,
+    "marketCap": 487860142080,
+    "trailingPE": 39.86037,
+    "forwardPE": 29.273525,
+    "priceToBook": 4.943657,
     "returnOnEquity": null,
-    "profitMargins": 0.26455998,
-    "debtToEquity": 161.977,
-    "earningsGrowth": 0.128,
-    "revenueGrowth": 0.299,
-    "earningsQuarterlyGrowth": 0.161,
-    "heldPercentInsiders": 0.15213999,
-    "heldPercentInstitutions": 0.65272003,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
-      "yellow_flags": [
-        "Elevated leverage (Debt/Equity 162%)"
-      ]
+      "yellow_flags": []
     },
-    "as_of_date": "2026-08-16"
+    "as_of_date": "2026-08-21"
   },
   "ABB": {
     "longName": "ABB India Limited",
@@ -112,40 +108,12 @@
   "ABCAPITAL": {
     "longName": "Aditya Birla Capital Limited",
     "shortName": "ADITYA BIRLA CAPITAL LTD.",
-    "sector": "Financial Services",
-    "industry": "Financial Conglomerates",
-    "marketCap": 1083870150656,
-    "trailingPE": 25.581396,
-    "forwardPE": 15.611873,
-    "priceToBook": 3.0135608,
-    "returnOnEquity": null,
-    "profitMargins": 0.119449995,
-    "debtToEquity": 495.936,
-    "earningsGrowth": 0.391,
-    "revenueGrowth": 0.314,
-    "earningsQuarterlyGrowth": 0.407,
-    "heldPercentInsiders": 0.68735003,
-    "heldPercentInstitutions": 0.15976,
-    "quality": {
-      "verdict": "CAUTION",
-      "checks_run": 5,
-      "checks_possible": 5,
-      "red_flags": [
-        "High leverage (Debt/Equity 496%)"
-      ],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "AARTIIND": {
-    "longName": "Aarti Industries Limited",
-    "shortName": "AARTI INDUSTRIES LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 191175098368,
-    "trailingPE": 36.025288,
-    "forwardPE": 26.249771,
-    "priceToBook": 3.1992643,
+    "marketCap": 1130399924224,
+    "trailingPE": 26.714102,
+    "forwardPE": 16.28208,
+    "priceToBook": 3.142931,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -161,7 +129,33 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
+  },
+  "AARTIIND": {
+    "longName": "Aarti Industries Limited",
+    "shortName": "AARTI INDUSTRIES LTD",
+    "sector": null,
+    "industry": null,
+    "marketCap": 191229509632,
+    "trailingPE": 36.585705,
+    "forwardPE": 26.257242,
+    "priceToBook": 3.200175,
+    "returnOnEquity": null,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 1,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
   },
   "ADANIENT": {
     "longName": "Adani Enterprises Limited",
@@ -194,10 +188,10 @@
     "shortName": "ACC LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 242001444864,
-    "trailingPE": 12.704061,
-    "forwardPE": 13.122455,
-    "priceToBook": 1.1775918,
+    "marketCap": 245513076736,
+    "trailingPE": 12.89858,
+    "forwardPE": 13.312872,
+    "priceToBook": 1.1946795,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -213,7 +207,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "ABFRL": {
     "longName": "Aditya Birla Fashion and Retail Limited",
@@ -246,10 +240,10 @@
     "shortName": "ADANI PORT & SEZ LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 3875028860928,
-    "trailingPE": 28.725876,
-    "forwardPE": 21.51894,
-    "priceToBook": 4.0382237,
+    "marketCap": 3916730466304,
+    "trailingPE": 28.970688,
+    "forwardPE": 21.750519,
+    "priceToBook": 4.0816817,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -265,17 +259,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "APLAPOLLO": {
     "longName": "APL Apollo Tubes Limited",
     "shortName": "APL APOLLO TUBES LTD",
     "sector": "Basic Materials",
     "industry": "Steel",
-    "marketCap": 589135609856,
-    "trailingPE": 48.004524,
-    "forwardPE": 33.38769,
-    "priceToBook": 11.12486,
+    "marketCap": 593911349248,
+    "trailingPE": 48.284424,
+    "forwardPE": 33.57249,
+    "priceToBook": 11.215041,
     "returnOnEquity": null,
     "profitMargins": 0.052259997,
     "debtToEquity": 9.396,
@@ -283,7 +277,7 @@
     "revenueGrowth": 0.085,
     "earningsQuarterlyGrowth": 0.109,
     "heldPercentInsiders": 0.3691,
-    "heldPercentInstitutions": 0.52814,
+    "heldPercentInstitutions": 0.52823,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -291,7 +285,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "APOLLOHOSP": {
     "longName": "Apollo Hospitals Enterprise Limited",
@@ -380,10 +374,10 @@
     "shortName": "AMBUJA CEMENTS LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 1012562984960,
-    "trailingPE": 22.816349,
-    "forwardPE": 28.037493,
-    "priceToBook": 1.6972449,
+    "marketCap": 1029956698112,
+    "trailingPE": 23.027779,
+    "forwardPE": 28.519117,
+    "priceToBook": 1.7263999,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -399,35 +393,33 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "ALKEM": {
     "longName": "Alkem Laboratories Limited",
     "shortName": "ALKEM LABORATORIES LTD.",
-    "sector": "Healthcare",
-    "industry": "Drug Manufacturers - Specialty & Generic",
-    "marketCap": 643558604800,
-    "trailingPE": 29.790237,
-    "forwardPE": 24.103212,
-    "priceToBook": 4.656686,
+    "sector": null,
+    "industry": null,
+    "marketCap": 645650972672,
+    "trailingPE": 29.850748,
+    "forwardPE": 24.181578,
+    "priceToBook": 4.671826,
     "returnOnEquity": null,
-    "profitMargins": 0.14306,
-    "debtToEquity": 14.267,
-    "earningsGrowth": -0.217,
-    "revenueGrowth": 0.109,
-    "earningsQuarterlyGrowth": -0.217,
-    "heldPercentInsiders": 0.62444,
-    "heldPercentInstitutions": 0.27477,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
-      "yellow_flags": [
-        "Earnings declining sharply (-21.7%)"
-      ]
+      "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "ADANIPOWER": {
     "longName": "Adani Power Limited",
@@ -484,66 +476,40 @@
   "ASHOKLEY": {
     "longName": "Ashok Leyland Limited",
     "shortName": "ASHOK LEYLAND LTD",
-    "sector": null,
-    "industry": null,
-    "marketCap": 1040259678208,
-    "trailingPE": 29.91554,
-    "forwardPE": 21.722548,
-    "priceToBook": 7.304298,
+    "sector": "Industrials",
+    "industry": "Farm & Heavy Construction Machinery",
+    "marketCap": 1016176836608,
+    "trailingPE": 29.173695,
+    "forwardPE": 21.115353,
+    "priceToBook": 7.1351976,
     "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "profitMargins": 0.06021,
+    "debtToEquity": 344.737,
+    "earningsGrowth": 0.01,
+    "revenueGrowth": 0.116,
+    "earningsQuarterlyGrowth": 0.008,
+    "heldPercentInsiders": 0.36363998,
+    "heldPercentInstitutions": 0.34349,
     "quality": {
-      "verdict": "STABLE",
-      "checks_run": 1,
+      "verdict": "CAUTION",
+      "checks_run": 5,
       "checks_possible": 5,
-      "red_flags": [],
+      "red_flags": [
+        "High leverage (Debt/Equity 345%)"
+      ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-17"
+    "as_of_date": "2026-08-21"
   },
   "AXISBANK": {
     "longName": "Axis Bank Limited",
     "shortName": "AXIS BANK LIMITED",
-    "sector": "Financial Services",
-    "industry": "Banks - Regional",
-    "marketCap": 3844438228992,
-    "trailingPE": 13.723747,
-    "forwardPE": 9.762846,
-    "priceToBook": 1.7211416,
-    "returnOnEquity": 0.13352999,
-    "profitMargins": 0.36031,
-    "debtToEquity": null,
-    "earningsGrowth": 0.218,
-    "revenueGrowth": 0.14,
-    "earningsQuarterlyGrowth": 0.222,
-    "heldPercentInsiders": 0.03328,
-    "heldPercentInstitutions": 0.71276003,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 4,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": [
-        "Low promoter/insider holding (3.3%)"
-      ]
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "ASTRAL": {
-    "longName": "Astral Limited",
-    "shortName": "ASTRAL LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 415037652992,
-    "trailingPE": 72.09053,
-    "forwardPE": 45.876884,
-    "priceToBook": 10.227875,
+    "marketCap": 3878057672704,
+    "trailingPE": 13.849917,
+    "forwardPE": 9.848222,
+    "priceToBook": 1.736193,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -559,45 +525,43 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
-  "ATGL": {
-    "longName": "Adani Total Gas Limited",
-    "shortName": "ADANI TOTAL GAS LIMITED",
-    "sector": "Utilities",
-    "industry": "Utilities - Regulated Gas",
-    "marketCap": 711907016704,
-    "trailingPE": 112.37846,
-    "forwardPE": null,
-    "priceToBook": 14.63387,
+  "ASTRAL": {
+    "longName": "Astral Limited",
+    "shortName": "ASTRAL LIMITED",
+    "sector": "Industrials",
+    "industry": "Building Products & Equipment",
+    "marketCap": 410631798784,
+    "trailingPE": 71.19236,
+    "forwardPE": 45.389874,
+    "priceToBook": 10.1193,
     "returnOnEquity": null,
-    "profitMargins": 0.100839995,
-    "debtToEquity": 58.65,
-    "earningsGrowth": -0.14,
-    "revenueGrowth": 0.272,
-    "earningsQuarterlyGrowth": -0.142,
-    "heldPercentInsiders": 0.79767996,
-    "heldPercentInstitutions": 0.07296,
+    "profitMargins": 0.084809996,
+    "debtToEquity": 6.168,
+    "earningsGrowth": 0.48,
+    "revenueGrowth": 0.159,
+    "earningsQuarterlyGrowth": 0.48,
+    "heldPercentInsiders": 0.85843,
+    "heldPercentInstitutions": 0.28685,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
       "checks_possible": 5,
       "red_flags": [],
-      "yellow_flags": [
-        "Very high P/E (112.4x) — priced for perfection"
-      ]
+      "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
   },
-  "ASIANPAINT": {
-    "longName": "Asian Paints Limited",
-    "shortName": "ASIAN PAINTS LIMITED",
+  "ATGL": {
+    "longName": "Adani Total Gas Limited",
+    "shortName": "ADANI TOTAL GAS LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 2519700602880,
-    "trailingPE": 52.864037,
-    "forwardPE": 43.382374,
-    "priceToBook": 11.796756,
+    "marketCap": 710587252736,
+    "trailingPE": 112.954544,
+    "forwardPE": null,
+    "priceToBook": 14.60674,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -611,9 +575,37 @@
       "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
+      "yellow_flags": [
+        "Very high P/E (113.0x) — priced for perfection"
+      ]
+    },
+    "as_of_date": "2026-08-21"
+  },
+  "ASIANPAINT": {
+    "longName": "Asian Paints Limited",
+    "shortName": "ASIAN PAINTS LIMITED",
+    "sector": "Basic Materials",
+    "industry": "Specialty Chemicals",
+    "marketCap": 2530821013504,
+    "trailingPE": 53.097343,
+    "forwardPE": 43.573833,
+    "priceToBook": 11.84882,
+    "returnOnEquity": null,
+    "profitMargins": 0.12813,
+    "debtToEquity": 17.847,
+    "earningsGrowth": 0.399,
+    "revenueGrowth": 0.179,
+    "earningsQuarterlyGrowth": 0.4,
+    "heldPercentInsiders": 0.52881,
+    "heldPercentInstitutions": 0.27044,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 5,
+      "checks_possible": 5,
+      "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
   },
   "AUROPHARMA": {
     "longName": "Aurobindo Pharma Limited",
@@ -646,10 +638,10 @@
     "shortName": "AU SMALL FINANCE BANK LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 805703712768,
-    "trailingPE": 28.502913,
-    "forwardPE": 17.711754,
-    "priceToBook": 4.025281,
+    "marketCap": 830046404608,
+    "trailingPE": 29.018066,
+    "forwardPE": 18.246876,
+    "priceToBook": 4.1468964,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -665,7 +657,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
   },
   "BAJAJ-AUTO": {
     "longName": "Bajaj Auto Limited",
@@ -698,10 +690,10 @@
     "shortName": "BAJAJ HOLDINGS & INVS LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 1266520162304,
-    "trailingPE": 14.302592,
+    "marketCap": 1259842568192,
+    "trailingPE": 14.23076,
     "forwardPE": null,
-    "priceToBook": 1.7313877,
+    "priceToBook": 1.7222592,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -717,7 +709,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BANDHANBNK": {
     "longName": "Bandhan Bank Limited",
@@ -750,10 +742,10 @@
     "shortName": "BAJAJ FINANCE LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 6719830228992,
-    "trailingPE": 33.124805,
-    "forwardPE": 21.403152,
-    "priceToBook": 5.891753,
+    "marketCap": 6811899920384,
+    "trailingPE": 33.671585,
+    "forwardPE": 21.675667,
+    "priceToBook": 5.9724774,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -769,17 +761,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BAJAJFINSV": {
     "longName": "Bajaj Finserv Ltd.",
     "shortName": "BAJAJ FINSERV LTD.",
     "sector": null,
     "industry": null,
-    "marketCap": 3218412142592,
-    "trailingPE": 31.842937,
-    "forwardPE": 21.41015,
-    "priceToBook": 4.1267915,
+    "marketCap": 3252497416192,
+    "trailingPE": 32.210777,
+    "forwardPE": 21.411842,
+    "priceToBook": 4.170497,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -795,17 +787,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
   },
   "BANKBARODA": {
     "longName": "Bank of Baroda Limited",
     "shortName": "BANK OF BARODA",
     "sector": null,
     "industry": null,
-    "marketCap": 1266983763968,
-    "trailingPE": 6.978069,
-    "forwardPE": 5.751138,
-    "priceToBook": 0.7515729,
+    "marketCap": 1277326524416,
+    "trailingPE": 7.0490866,
+    "forwardPE": 5.7980866,
+    "priceToBook": 0.7577082,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -821,17 +813,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BANKINDIA": {
     "longName": "Bank of India Limited",
     "shortName": "BANK OF INDIA",
     "sector": "Financial Services",
     "industry": "Banks - Regional",
-    "marketCap": 646934102016,
-    "trailingPE": 5.2610145,
-    "forwardPE": 5.4716983,
-    "priceToBook": 0.71140707,
+    "marketCap": 650075373568,
+    "trailingPE": 5.245775,
+    "forwardPE": 5.498267,
+    "priceToBook": 0.71486145,
     "returnOnEquity": 0.13697,
     "profitMargins": 0.34992,
     "debtToEquity": null,
@@ -839,7 +831,7 @@
     "revenueGrowth": 0.185,
     "earningsQuarterlyGrowth": 0.805,
     "heldPercentInsiders": 0.73383003,
-    "heldPercentInstitutions": 0.15245,
+    "heldPercentInstitutions": 0.15239,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 4,
@@ -847,17 +839,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
   },
   "BDL": {
     "longName": "Bharat Dynamics Limited",
     "shortName": "BHARAT DYNAMICS LIMITED",
     "sector": "Industrials",
     "industry": "Aerospace & Defense",
-    "marketCap": 494492811264,
-    "trailingPE": 94.93314,
-    "forwardPE": 43.66456,
-    "priceToBook": 11.651106,
+    "marketCap": 498158436352,
+    "trailingPE": 95.56962,
+    "forwardPE": 43.78113,
+    "priceToBook": 11.737474,
     "returnOnEquity": 0.1019,
     "profitMargins": 0.17214,
     "debtToEquity": 0.007,
@@ -875,7 +867,7 @@
       ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BEL": {
     "longName": "Bharat Electronics Limited",
@@ -908,10 +900,10 @@
     "shortName": "BHARAT FORGE LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 989165387776,
-    "trailingPE": 140.84412,
-    "forwardPE": 42.940014,
-    "priceToBook": 10.325484,
+    "marketCap": 986296877056,
+    "trailingPE": 138.92256,
+    "forwardPE": 42.815487,
+    "priceToBook": 10.295541,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -926,20 +918,20 @@
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (140.8x) — priced for perfection"
+        "Very high P/E (138.9x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BHARTIARTL": {
     "longName": "Bharti Airtel Limited",
     "shortName": "BHARTI AIRTEL LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 11990700392448,
-    "trailingPE": 40.234455,
-    "forwardPE": 23.376688,
-    "priceToBook": 7.4071503,
+    "marketCap": 12140428656640,
+    "trailingPE": 40.736862,
+    "forwardPE": 23.668594,
+    "priceToBook": 7.4996433,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -955,17 +947,43 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BHEL": {
     "longName": "Bharat Heavy Electricals Limited",
     "shortName": "BHEL",
+    "sector": "Industrials",
+    "industry": "Specialty Industrial Machinery",
+    "marketCap": 1438092230656,
+    "trailingPE": 59.084408,
+    "forwardPE": 29.963732,
+    "priceToBook": 5.50014,
+    "returnOnEquity": null,
+    "profitMargins": 0.06758,
+    "debtToEquity": 31.312,
+    "earningsGrowth": null,
+    "revenueGrowth": 0.403,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": 0.59821,
+    "heldPercentInstitutions": 0.23806,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 4,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
+  },
+  "BIOCON": {
+    "longName": "Biocon Limited",
+    "shortName": "BIOCON LIMITED.",
     "sector": null,
     "industry": null,
-    "marketCap": 1461770125312,
-    "trailingPE": 60.229557,
-    "forwardPE": 30.45708,
-    "priceToBook": 5.590699,
+    "marketCap": 676637442048,
+    "trailingPE": 121.505844,
+    "forwardPE": 37.759182,
+    "priceToBook": 1.9775194,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -979,47 +997,21 @@
       "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "BIOCON": {
-    "longName": "Biocon Limited",
-    "shortName": "BIOCON LIMITED.",
-    "sector": "Healthcare",
-    "industry": "Biotechnology",
-    "marketCap": 672078233600,
-    "trailingPE": 120.68713,
-    "forwardPE": 37.50476,
-    "priceToBook": 1.9641949,
-    "returnOnEquity": null,
-    "profitMargins": 0.0286,
-    "debtToEquity": 42.145,
-    "earningsGrowth": 2.346,
-    "revenueGrowth": 0.1,
-    "earningsQuarterlyGrowth": 3.494,
-    "heldPercentInsiders": 0.48115003,
-    "heldPercentInstitutions": 0.30888,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 5,
-      "checks_possible": 5,
-      "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (120.7x) — priced for perfection"
+        "Very high P/E (121.5x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BOSCHLTD": {
     "longName": "Bosch Limited",
     "shortName": "BOSCH LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 1429381054464,
-    "trailingPE": 60.637913,
-    "forwardPE": 42.474308,
-    "priceToBook": 9.627771,
+    "marketCap": 1421712031744,
+    "trailingPE": 60.28768,
+    "forwardPE": 42.24642,
+    "priceToBook": 9.576116,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1035,17 +1027,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BLUESTARCO": {
     "longName": "Blue Star Limited",
     "shortName": "BLUE STAR LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 306949816320,
-    "trailingPE": 60.37202,
-    "forwardPE": 38.409966,
-    "priceToBook": 8.945315,
+    "marketCap": 310835511296,
+    "trailingPE": 61.0622,
+    "forwardPE": 39.17502,
+    "priceToBook": 9.058555,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1061,17 +1053,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
   },
   "BPCL": {
     "longName": "Bharat Petroleum Corporation Limited",
     "shortName": "BHARAT PETROLEUM CORP  LT",
     "sector": null,
     "industry": null,
-    "marketCap": 1311683641344,
-    "trailingPE": 7.65777,
-    "forwardPE": 7.6910205,
-    "priceToBook": 1.3098779,
+    "marketCap": 1328773857280,
+    "trailingPE": 7.7556114,
+    "forwardPE": 7.7912292,
+    "priceToBook": 1.3269447,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1087,17 +1079,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BRITANNIA": {
     "longName": "Britannia Industries Limited",
     "shortName": "BRITANNIA INDUSTRIES LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 1313454817280,
-    "trailingPE": 50.374134,
-    "forwardPE": 41.89791,
-    "priceToBook": 25.72097,
+    "marketCap": 1292258377728,
+    "trailingPE": 49.588684,
+    "forwardPE": 41.221767,
+    "priceToBook": 25.305887,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1113,36 +1105,33 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "CDSL": {
     "longName": "Central Depository Services (India) Limited",
     "shortName": "CENTRAL DEPO SER (I) LTD",
-    "sector": "Financial Services",
-    "industry": "Capital Markets",
-    "marketCap": 277760999424,
-    "trailingPE": 59.01421,
-    "forwardPE": 44.68167,
-    "priceToBook": 14.173128,
-    "returnOnEquity": 0.23913,
-    "profitMargins": 0.36923,
-    "debtToEquity": 0.11,
-    "earningsGrowth": -0.199,
-    "revenueGrowth": 0.042,
-    "earningsQuarterlyGrowth": -0.2,
-    "heldPercentInsiders": 0.0,
-    "heldPercentInstitutions": 0.14984,
+    "sector": null,
+    "industry": null,
+    "marketCap": 290280112128,
+    "trailingPE": 61.78381,
+    "forwardPE": 46.69554,
+    "priceToBook": 14.811933,
+    "returnOnEquity": null,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
-      "verdict": "STABLE_WITH_CAUTION",
-      "checks_run": 5,
+      "verdict": "STABLE",
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
-      "yellow_flags": [
-        "Earnings declining sharply (-19.9%)",
-        "Low promoter/insider holding (0.0%)"
-      ]
+      "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "BSE": {
     "longName": "BSE Limited",
@@ -1175,10 +1164,10 @@
     "shortName": "COMPUTER AGE MNGT SER LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 187290845184,
-    "trailingPE": 37.92358,
-    "forwardPE": 28.869057,
-    "priceToBook": 14.161003,
+    "marketCap": 186968064000,
+    "trailingPE": 37.915405,
+    "forwardPE": 28.819304,
+    "priceToBook": 14.136598,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1194,43 +1183,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "CANBK": {
     "longName": "Canara Bank",
     "shortName": "CANARA BANK",
-    "sector": "Financial Services",
-    "industry": "Banks - Regional",
-    "marketCap": 1189162516480,
-    "trailingPE": 5.9835696,
-    "forwardPE": 5.6309524,
-    "priceToBook": 1.0102956,
-    "returnOnEquity": null,
-    "profitMargins": 0.43126,
-    "debtToEquity": null,
-    "earningsGrowth": 0.622,
-    "revenueGrowth": -0.129,
-    "earningsQuarterlyGrowth": 0.622,
-    "heldPercentInsiders": 0.64359003,
-    "heldPercentInstitutions": 0.18197,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 4,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-17"
-  },
-  "CGPOWER": {
-    "longName": "CG Power and Industrial Solutions Limited",
-    "shortName": "CG POWER AND IND SOL LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 1359692169216,
-    "trailingPE": 108.42336,
-    "forwardPE": 61.994083,
-    "priceToBook": 17.05329,
+    "marketCap": 1178821853184,
+    "trailingPE": 5.934247,
+    "forwardPE": 5.581988,
+    "priceToBook": 1.0015104,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1244,49 +1207,73 @@
       "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
+  },
+  "CGPOWER": {
+    "longName": "CG Power and Industrial Solutions Limited",
+    "shortName": "CG POWER AND IND SOL LTD",
+    "sector": "Industrials",
+    "industry": "Electrical Equipment & Parts",
+    "marketCap": 1365915205632,
+    "trailingPE": 109.88593,
+    "forwardPE": 62.277817,
+    "priceToBook": 17.13134,
+    "returnOnEquity": null,
+    "profitMargins": 0.0975,
+    "debtToEquity": 1.446,
+    "earningsGrowth": 0.131,
+    "revenueGrowth": 0.14,
+    "earningsQuarterlyGrowth": 0.163,
+    "heldPercentInsiders": 0.60003,
+    "heldPercentInstitutions": 0.2049,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 5,
+      "checks_possible": 5,
+      "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (108.4x) — priced for perfection"
+        "Very high P/E (109.9x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "CHOLAFIN": {
     "longName": "Cholamandalam Investment and Finance Company Limited",
     "shortName": "CHOLAMANDALAM IN & FIN CO",
-    "sector": "Financial Services",
-    "industry": "Credit Services",
-    "marketCap": 1600092635136,
-    "trailingPE": 27.706299,
-    "forwardPE": 19.08162,
-    "priceToBook": 5.2408967,
+    "sector": null,
+    "industry": null,
+    "marketCap": 1591039492096,
+    "trailingPE": 27.549541,
+    "forwardPE": 18.97366,
+    "priceToBook": 5.2112446,
     "returnOnEquity": null,
-    "profitMargins": 0.40549,
-    "debtToEquity": 695.283,
-    "earningsGrowth": 0.437,
-    "revenueGrowth": 0.346,
-    "earningsQuarterlyGrowth": 0.456,
-    "heldPercentInsiders": 0.51972,
-    "heldPercentInstitutions": 0.3925,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
-      "verdict": "CAUTION",
-      "checks_run": 5,
+      "verdict": "STABLE",
+      "checks_run": 1,
       "checks_possible": 5,
-      "red_flags": [
-        "High leverage (Debt/Equity 695%)"
-      ],
+      "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "CIPLA": {
     "longName": "Cipla Limited",
     "shortName": "CIPLA LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 1148767174656,
-    "trailingPE": 34.141655,
-    "forwardPE": 22.403547,
-    "priceToBook": 3.336047,
+    "marketCap": 1157007278080,
+    "trailingPE": 34.34532,
+    "forwardPE": 22.564247,
+    "priceToBook": 3.3599763,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1302,17 +1289,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "COALINDIA": {
     "longName": "Coal India Limited",
     "shortName": "COAL INDIA LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 2465091289088,
-    "trailingPE": 7.914523,
-    "forwardPE": 7.061816,
-    "priceToBook": 2.0695364,
+    "marketCap": 2497137606656,
+    "trailingPE": 8.015826,
+    "forwardPE": 7.1536202,
+    "priceToBook": 2.0964406,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1328,71 +1315,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "COCHINSHIP": {
     "longName": "Cochin Shipyard Limited",
     "shortName": "COCHIN SHIPYARD LIMITED",
-    "sector": "Industrials",
-    "industry": "Aerospace & Defense",
-    "marketCap": 390674972672,
-    "trailingPE": 57.46904,
-    "forwardPE": 33.221478,
-    "priceToBook": 6.652004,
-    "returnOnEquity": 0.12517,
-    "profitMargins": 0.14272,
-    "debtToEquity": 28.466,
-    "earningsGrowth": -0.038,
-    "revenueGrowth": -0.156,
-    "earningsQuarterlyGrowth": -0.037,
-    "heldPercentInsiders": 0.63335,
-    "heldPercentInstitutions": 0.07384,
-    "quality": {
-      "verdict": "CAUTION",
-      "checks_run": 5,
-      "checks_possible": 5,
-      "red_flags": [
-        "Both earnings (-3.8%) and revenue (-15.6%) shrinking"
-      ],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "CONCOR": {
-    "longName": "Container Corporation of India Limited",
-    "shortName": "CONTAINER CORP OF IND LTD",
-    "sector": "Industrials",
-    "industry": "Railroads",
-    "marketCap": 391738163200,
-    "trailingPE": 31.401098,
-    "forwardPE": 22.04672,
-    "priceToBook": 3.0267987,
-    "returnOnEquity": null,
-    "profitMargins": 0.13670999,
-    "debtToEquity": 7.39,
-    "earningsGrowth": 0.006,
-    "revenueGrowth": 0.003,
-    "earningsQuarterlyGrowth": 0.001,
-    "heldPercentInsiders": 0.57878,
-    "heldPercentInstitutions": 0.41274,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 5,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "CROMPTON": {
-    "longName": "Crompton Greaves Consumer Electricals Limited",
-    "shortName": "CROMPT GREA CON ELEC LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 158081105920,
-    "trailingPE": null,
-    "forwardPE": 21.918938,
-    "priceToBook": 5.329194,
+    "marketCap": 389491097600,
+    "trailingPE": 57.140102,
+    "forwardPE": 33.120804,
+    "priceToBook": 6.6318464,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1402,23 +1335,79 @@
     "heldPercentInsiders": null,
     "heldPercentInstitutions": null,
     "quality": {
-      "verdict": "UNKNOWN",
-      "checks_run": 0,
+      "verdict": "STABLE",
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
+  },
+  "CONCOR": {
+    "longName": "Container Corporation of India Limited",
+    "shortName": "CONTAINER CORP OF IND LTD",
+    "sector": null,
+    "industry": null,
+    "marketCap": 392271298560,
+    "trailingPE": 31.482271,
+    "forwardPE": 22.076725,
+    "priceToBook": 3.0309181,
+    "returnOnEquity": null,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 1,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
+  },
+  "CROMPTON": {
+    "longName": "Crompton Greaves Consumer Electricals Limited",
+    "shortName": "CROMPT GREA CON ELEC LTD",
+    "sector": "Consumer Cyclical",
+    "industry": "Furnishings, Fixtures & Appliances",
+    "marketCap": 162266546176,
+    "trailingPE": null,
+    "forwardPE": 22.49251,
+    "priceToBook": 5.470293,
+    "returnOnEquity": null,
+    "profitMargins": -0.02688,
+    "debtToEquity": 5.797,
+    "earningsGrowth": 0.147,
+    "revenueGrowth": 0.118,
+    "earningsQuarterlyGrowth": 0.149,
+    "heldPercentInsiders": 0.0,
+    "heldPercentInstitutions": 0.81241,
+    "quality": {
+      "verdict": "CAUTION",
+      "checks_run": 4,
+      "checks_possible": 5,
+      "red_flags": [
+        "Negative profit margin (-2.7%)"
+      ],
+      "yellow_flags": [
+        "Low promoter/insider holding (0.0%)"
+      ]
+    },
+    "as_of_date": "2026-08-21"
   },
   "COFORGE": {
     "longName": "Coforge Limited",
     "shortName": "COFORGE LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 802642722816,
-    "trailingPE": 37.18417,
-    "forwardPE": 25.406921,
-    "priceToBook": 6.3849864,
+    "marketCap": 837438210048,
+    "trailingPE": 38.81206,
+    "forwardPE": 26.50834,
+    "priceToBook": 6.6617827,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1434,17 +1423,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "CUB": {
     "longName": "City Union Bank Limited",
     "shortName": "CITY UNION BANK LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 218993704960,
-    "trailingPE": 15.620495,
-    "forwardPE": 11.420626,
-    "priceToBook": 2.0727327,
+    "marketCap": 215298080768,
+    "trailingPE": 15.356891,
+    "forwardPE": 11.227897,
+    "priceToBook": 2.0377543,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1460,25 +1449,25 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "DALBHARAT": {
     "longName": "Dalmia Bharat Limited",
     "shortName": "DALMIA BHARAT LIMITED",
     "sector": "Basic Materials",
     "industry": "Building Materials",
-    "marketCap": 351991496704,
-    "trailingPE": 37.522514,
-    "forwardPE": 25.629934,
-    "priceToBook": 1.9560937,
+    "marketCap": 352930136064,
+    "trailingPE": 37.257233,
+    "forwardPE": 25.701914,
+    "priceToBook": 1.9613099,
     "returnOnEquity": null,
     "profitMargins": 0.062030002,
     "debtToEquity": 40.987,
     "earningsGrowth": -0.521,
     "revenueGrowth": 0.07,
     "earningsQuarterlyGrowth": -0.522,
-    "heldPercentInsiders": 0.61174,
-    "heldPercentInstitutions": 0.24519,
+    "heldPercentInsiders": 0.61146,
+    "heldPercentInstitutions": 0.30078,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -1488,17 +1477,71 @@
         "Earnings declining sharply (-52.1%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "CYIENT": {
     "longName": "Cyient Limited",
     "shortName": "CYIENT LIMITED",
+    "sector": "Industrials",
+    "industry": "Conglomerates",
+    "marketCap": 92916350976,
+    "trailingPE": 26.22356,
+    "forwardPE": 12.624182,
+    "priceToBook": 1.7356062,
+    "returnOnEquity": null,
+    "profitMargins": 0.04955,
+    "debtToEquity": 7.528,
+    "earningsGrowth": -0.324,
+    "revenueGrowth": 0.213,
+    "earningsQuarterlyGrowth": -0.323,
+    "heldPercentInsiders": 0.24947001,
+    "heldPercentInstitutions": 0.47382,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 5,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": [
+        "Earnings declining sharply (-32.4%)"
+      ]
+    },
+    "as_of_date": "2026-08-21"
+  },
+  "DEEPAKNTR": {
+    "longName": "Deepak Nitrite Limited",
+    "shortName": "DEEPAK NITRITE LTD",
+    "sector": "Basic Materials",
+    "industry": "Chemicals",
+    "marketCap": 238292271104,
+    "trailingPE": 30.710142,
+    "forwardPE": 28.159998,
+    "priceToBook": 4.0825624,
+    "returnOnEquity": null,
+    "profitMargins": 0.091359995,
+    "debtToEquity": 27.903,
+    "earningsGrowth": 2.074,
+    "revenueGrowth": 0.364,
+    "earningsQuarterlyGrowth": 2.075,
+    "heldPercentInsiders": 0.49805,
+    "heldPercentInstitutions": 0.25429,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 5,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
+  },
+  "DIVISLAB": {
+    "longName": "Divi's Laboratories Limited",
+    "shortName": "DIVI S LABORATORIES LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 93108912128,
-    "trailingPE": 26.247065,
-    "forwardPE": 12.650345,
-    "priceToBook": 1.7392032,
+    "marketCap": 2282233266176,
+    "trailingPE": 88.7753,
+    "forwardPE": 57.18709,
+    "priceToBook": 13.616335,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -1514,69 +1557,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
-  },
-  "DEEPAKNTR": {
-    "longName": "Deepak Nitrite Limited",
-    "shortName": "DEEPAK NITRITE LTD",
-    "sector": "Basic Materials",
-    "industry": "Chemicals",
-    "marketCap": 241183817728,
-    "trailingPE": 30.914335,
-    "forwardPE": 28.501703,
-    "priceToBook": 4.1321025,
-    "returnOnEquity": null,
-    "profitMargins": 0.091359995,
-    "debtToEquity": 27.903,
-    "earningsGrowth": 2.074,
-    "revenueGrowth": 0.364,
-    "earningsQuarterlyGrowth": 2.075,
-    "heldPercentInsiders": 0.49805,
-    "heldPercentInstitutions": 0.25474,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 5,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "DIVISLAB": {
-    "longName": "Divi's Laboratories Limited",
-    "shortName": "DIVI S LABORATORIES LTD",
-    "sector": "Healthcare",
-    "industry": "Drug Manufacturers - Specialty & Generic",
-    "marketCap": 2272410992640,
-    "trailingPE": 88.211044,
-    "forwardPE": 56.940968,
-    "priceToBook": 13.557733,
-    "returnOnEquity": null,
-    "profitMargins": 0.26046,
-    "debtToEquity": 0.042,
-    "earningsGrowth": 0.657,
-    "revenueGrowth": 0.278,
-    "earningsQuarterlyGrowth": 0.655,
-    "heldPercentInsiders": 0.51992,
-    "heldPercentInstitutions": 0.30291998,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 5,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "DELHIVERY": {
     "longName": "Delhivery Limited",
     "shortName": "DELHIVERY LIMITED",
     "sector": "Industrials",
     "industry": "Integrated Freight & Logistics",
-    "marketCap": 337125113856,
-    "trailingPE": 368.85245,
-    "forwardPE": 40.854015,
-    "priceToBook": 3.467166,
+    "marketCap": 337649532928,
+    "trailingPE": 369.42624,
+    "forwardPE": 40.917564,
+    "priceToBook": 3.4725595,
     "returnOnEquity": null,
     "profitMargins": 0.00839,
     "debtToEquity": 15.098,
@@ -1584,7 +1575,7 @@
     "revenueGrowth": 0.278,
     "earningsQuarterlyGrowth": -0.65,
     "heldPercentInsiders": 0.19864,
-    "heldPercentInstitutions": 0.57038,
+    "heldPercentInstitutions": 0.56687,
     "quality": {
       "verdict": "STABLE_WITH_CAUTION",
       "checks_run": 5,
@@ -1592,20 +1583,20 @@
       "red_flags": [],
       "yellow_flags": [
         "Earnings declining sharply (-65.0%)",
-        "Very high P/E (368.9x) — priced for perfection"
+        "Very high P/E (369.4x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "DLF": {
     "longName": "DLF Limited",
     "shortName": "DLF LIMITED",
     "sector": "Real Estate",
     "industry": "Real Estate - Development",
-    "marketCap": 1658211270656,
-    "trailingPE": 37.258068,
-    "forwardPE": 26.20803,
-    "priceToBook": 3.646548,
+    "marketCap": 1678508687360,
+    "trailingPE": 37.69316,
+    "forwardPE": 26.528831,
+    "priceToBook": 3.6911838,
     "returnOnEquity": 0.10102,
     "profitMargins": 0.65791,
     "debtToEquity": 0.673,
@@ -1613,7 +1604,7 @@
     "revenueGrowth": -0.529,
     "earningsQuarterlyGrowth": 0.041,
     "heldPercentInsiders": 0.7414,
-    "heldPercentInstitutions": 0.14488,
+    "heldPercentInstitutions": 0.14485,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -1621,17 +1612,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "DIXON": {
     "longName": "Dixon Technologies (India) Limited",
     "shortName": "DIXON TECHNO (INDIA) LTD",
     "sector": "Technology",
     "industry": "Consumer Electronics",
-    "marketCap": 879316959232,
-    "trailingPE": 42.40807,
-    "forwardPE": 51.39525,
-    "priceToBook": 16.109612,
+    "marketCap": 902908084224,
+    "trailingPE": 42.372883,
+    "forwardPE": 52.73385,
+    "priceToBook": 16.541815,
     "returnOnEquity": null,
     "profitMargins": 0.03639,
     "debtToEquity": 18.457,
@@ -1639,7 +1630,7 @@
     "revenueGrowth": 0.211,
     "earningsQuarterlyGrowth": 1.949,
     "heldPercentInsiders": 0.40137002,
-    "heldPercentInstitutions": 0.35756,
+    "heldPercentInstitutions": 0.35671002,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -1647,17 +1638,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "DRREDDY": {
     "longName": "Dr. Reddy's Laboratories Limited",
     "shortName": "DR. REDDY S LABORATORIES",
     "sector": "Healthcare",
     "industry": "Drug Manufacturers - Specialty & Generic",
-    "marketCap": 974610104320,
-    "trailingPE": 29.44878,
-    "forwardPE": 19.699488,
-    "priceToBook": 2.5417874,
+    "marketCap": 978525159424,
+    "trailingPE": 29.537338,
+    "forwardPE": 19.77862,
+    "priceToBook": 2.551998,
     "returnOnEquity": 0.088369995,
     "profitMargins": 0.09996,
     "debtToEquity": 18.605,
@@ -1665,7 +1656,7 @@
     "revenueGrowth": -0.056,
     "earningsQuarterlyGrowth": -0.687,
     "heldPercentInsiders": 0.30129,
-    "heldPercentInstitutions": 0.51952,
+    "heldPercentInstitutions": 0.51939,
     "quality": {
       "verdict": "CAUTION",
       "checks_run": 5,
@@ -1675,25 +1666,25 @@
       ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "EICHERMOT": {
     "longName": "Eicher Motors Limited",
     "shortName": "EICHER MOTORS LTD",
     "sector": "Consumer Cyclical",
     "industry": "Auto Manufacturers",
-    "marketCap": 2193565548544,
-    "trailingPE": 38.03551,
-    "forwardPE": 29.416136,
-    "priceToBook": 8.732643,
+    "marketCap": 2198918791168,
+    "trailingPE": 38.11563,
+    "forwardPE": 29.487923,
+    "priceToBook": 8.753955,
     "returnOnEquity": null,
     "profitMargins": 0.23211999,
     "debtToEquity": 2.048,
     "earningsGrowth": 0.213,
     "revenueGrowth": 0.315,
     "earningsQuarterlyGrowth": 0.213,
-    "heldPercentInsiders": 0.49795,
-    "heldPercentInstitutions": 0.29424998,
+    "heldPercentInsiders": 0.51333,
+    "heldPercentInstitutions": 0.28783,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -1701,17 +1692,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "ETERNAL": {
     "longName": "Eternal Limited",
     "shortName": "ETERNAL LIMITED",
     "sector": "Consumer Cyclical",
     "industry": "Internet Retail",
-    "marketCap": 2945725759488,
-    "trailingPE": 727.2727,
-    "forwardPE": 83.63084,
-    "priceToBook": 9.45934,
+    "marketCap": 3019369086976,
+    "trailingPE": 713.04346,
+    "forwardPE": 87.26653,
+    "priceToBook": 9.695824,
     "returnOnEquity": null,
     "profitMargins": 0.00642,
     "debtToEquity": 14.826,
@@ -1719,27 +1710,27 @@
     "revenueGrowth": 1.82,
     "earningsQuarterlyGrowth": 2.68,
     "heldPercentInsiders": 0.23399,
-    "heldPercentInstitutions": 0.51131,
+    "heldPercentInstitutions": 0.51138,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (727.3x) — priced for perfection"
+        "Very high P/E (713.0x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "ESCORTS": {
     "longName": "Escorts Kubota Limited",
     "shortName": "ESCORTS KUBOTA LIMITED",
     "sector": "Industrials",
     "industry": "Farm & Heavy Construction Machinery",
-    "marketCap": 336122675200,
-    "trailingPE": 24.332138,
-    "forwardPE": 21.982845,
-    "priceToBook": 2.7623055,
+    "marketCap": 339610566656,
+    "trailingPE": 24.586586,
+    "forwardPE": 22.210957,
+    "priceToBook": 2.7909696,
     "returnOnEquity": null,
     "profitMargins": 0.11291,
     "debtToEquity": 1.309,
@@ -1747,7 +1738,7 @@
     "revenueGrowth": 0.283,
     "earningsQuarterlyGrowth": -0.724,
     "heldPercentInsiders": 0.76063,
-    "heldPercentInstitutions": 0.1263,
+    "heldPercentInstitutions": 0.12585,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -1757,17 +1748,17 @@
         "Earnings declining sharply (-72.4%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "EXIDEIND": {
     "longName": "Exide Industries Limited",
     "shortName": "EXIDE INDUSTRIES LTD",
     "sector": "Consumer Cyclical",
     "industry": "Auto Parts",
-    "marketCap": 390574997504,
-    "trailingPE": 41.848816,
-    "forwardPE": 24.816856,
-    "priceToBook": 2.8089201,
+    "marketCap": 390659997696,
+    "trailingPE": 41.972603,
+    "forwardPE": 24.822258,
+    "priceToBook": 2.8095315,
     "returnOnEquity": null,
     "profitMargins": 0.04948,
     "debtToEquity": 11.308,
@@ -1775,7 +1766,7 @@
     "revenueGrowth": 0.177,
     "earningsQuarterlyGrowth": 0.284,
     "heldPercentInsiders": 0.50942004,
-    "heldPercentInstitutions": 0.24420999,
+    "heldPercentInstitutions": 0.24518,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -1783,25 +1774,25 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "FEDERALBNK": {
     "longName": "The Federal Bank Limited",
     "shortName": "FEDERAL BANK LTD",
     "sector": "Financial Services",
     "industry": "Banks - Regional",
-    "marketCap": 886052749312,
-    "trailingPE": 19.207708,
-    "forwardPE": 13.293812,
-    "priceToBook": 2.2087474,
+    "marketCap": 891485683712,
+    "trailingPE": 19.315142,
+    "forwardPE": 13.375324,
+    "priceToBook": 2.2222905,
     "returnOnEquity": null,
     "profitMargins": 0.30721,
     "debtToEquity": null,
     "earningsGrowth": 0.327,
     "revenueGrowth": 0.214,
     "earningsQuarterlyGrowth": 0.368,
-    "heldPercentInsiders": 0.09648,
-    "heldPercentInstitutions": 0.60847,
+    "heldPercentInsiders": 0.1091,
+    "heldPercentInstitutions": 0.59778,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 4,
@@ -1809,17 +1800,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "FORCEMOT": {
     "longName": "Force Motors Limited",
     "shortName": "FORCE MOTORS LIMITED",
     "sector": "Consumer Cyclical",
     "industry": "Auto Manufacturers",
-    "marketCap": 235024990208,
-    "trailingPE": 18.775,
+    "marketCap": 234142171136,
+    "trailingPE": 18.711369,
     "forwardPE": null,
-    "priceToBook": 5.703064,
+    "priceToBook": 5.681642,
     "returnOnEquity": null,
     "profitMargins": 0.13607,
     "debtToEquity": null,
@@ -1827,7 +1818,7 @@
     "revenueGrowth": 0.062,
     "earningsQuarterlyGrowth": 0.228,
     "heldPercentInsiders": 0.63240004,
-    "heldPercentInstitutions": 0.0617,
+    "heldPercentInstitutions": 0.06132,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 4,
@@ -1835,17 +1826,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "GMRAIRPORT": {
     "longName": "GMR Airports Limited",
     "shortName": "GMR AIRPORTS LIMITED",
     "sector": "Industrials",
     "industry": "Airports & Air Services",
-    "marketCap": 1082295058432,
-    "trailingPE": 256.25,
-    "forwardPE": 65.87954,
-    "priceToBook": -43.103447,
+    "marketCap": 1051990753280,
+    "trailingPE": 255.46155,
+    "forwardPE": 64.202034,
+    "priceToBook": -41.89655,
     "returnOnEquity": null,
     "profitMargins": 0.030720001,
     "debtToEquity": null,
@@ -1853,27 +1844,27 @@
     "revenueGrowth": 0.237,
     "earningsQuarterlyGrowth": null,
     "heldPercentInsiders": 0.71444,
-    "heldPercentInstitutions": 0.16506,
+    "heldPercentInstitutions": 0.16527,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 3,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (256.2x) — priced for perfection"
+        "Very high P/E (255.5x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "GNFC": {
     "longName": "Gujarat Narmada Valley Fertilizers & Chemicals Limited",
     "shortName": "GUJ NAR VAL FER & CHEM L",
     "sector": "Basic Materials",
     "industry": "Chemicals",
-    "marketCap": 88502378496,
-    "trailingPE": 8.537207,
-    "forwardPE": 9.607593,
-    "priceToBook": 0.9713012,
+    "marketCap": 85637029888,
+    "trailingPE": 8.261979,
+    "forwardPE": 9.296538,
+    "priceToBook": 0.93985444,
     "returnOnEquity": null,
     "profitMargins": 0.12331,
     "debtToEquity": 0.066,
@@ -1881,7 +1872,7 @@
     "revenueGrowth": 0.398,
     "earningsQuarterlyGrowth": 2.759,
     "heldPercentInsiders": 0.43472,
-    "heldPercentInstitutions": 0.16947001,
+    "heldPercentInstitutions": 0.16768,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -1889,17 +1880,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "GODFRYPHLP": {
     "longName": "Godfrey Phillips India Limited",
     "shortName": "GODFREY PHILLIPS INDIA LT",
     "sector": "Consumer Defensive",
     "industry": "Tobacco",
-    "marketCap": 330306977792,
-    "trailingPE": 24.154217,
-    "forwardPE": 18.890278,
-    "priceToBook": 5.316689,
+    "marketCap": 330213392384,
+    "trailingPE": 24.13911,
+    "forwardPE": 18.884924,
+    "priceToBook": 5.3151827,
     "returnOnEquity": null,
     "profitMargins": 0.22389999,
     "debtToEquity": 3.757,
@@ -1917,17 +1908,17 @@
       ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "GOKULAGRO": {
     "longName": "Gokul Agro Resources Limited",
     "shortName": "GOKUL AGRO RESOURCES LTD",
     "sector": "Consumer Defensive",
     "industry": "Packaged Foods",
-    "marketCap": 71711973376,
-    "trailingPE": 17.066011,
+    "marketCap": 71647059968,
+    "trailingPE": 17.002802,
     "forwardPE": null,
-    "priceToBook": 5.0517607,
+    "priceToBook": 5.047188,
     "returnOnEquity": null,
     "profitMargins": 0.017239999,
     "debtToEquity": 41.405,
@@ -1943,17 +1934,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "GRANULES": {
     "longName": "Granules India Limited",
     "shortName": "GRANULES INDIA LIMITED",
     "sector": "Healthcare",
     "industry": "Drug Manufacturers - Specialty & Generic",
-    "marketCap": 208434397184,
-    "trailingPE": 31.188358,
-    "forwardPE": 21.180035,
-    "priceToBook": 4.099012,
+    "marketCap": 212646936576,
+    "trailingPE": 31.86595,
+    "forwardPE": 21.608091,
+    "priceToBook": 4.1818547,
     "returnOnEquity": null,
     "profitMargins": 0.1176,
     "debtToEquity": 29.735,
@@ -1969,25 +1960,25 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "GRASIM": {
     "longName": "Grasim Industries Limited",
     "shortName": "GRASIM INDUSTRIES LTD",
     "sector": "Basic Materials",
     "industry": "Building Materials",
-    "marketCap": 2217886351360,
-    "trailingPE": 38.96104,
-    "forwardPE": 21.651768,
-    "priceToBook": 2.143509,
+    "marketCap": 2243660087296,
+    "trailingPE": 39.465523,
+    "forwardPE": 21.903378,
+    "priceToBook": 2.1684182,
     "returnOnEquity": null,
     "profitMargins": 0.03093,
     "debtToEquity": 135.044,
     "earningsGrowth": 0.513,
     "revenueGrowth": 0.214,
     "earningsQuarterlyGrowth": 0.513,
-    "heldPercentInsiders": 0.4871,
-    "heldPercentInstitutions": 0.24357,
+    "heldPercentInsiders": 0.48814,
+    "heldPercentInstitutions": 0.23948,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -1997,17 +1988,17 @@
         "Elevated leverage (Debt/Equity 135%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HAL": {
     "longName": "Hindustan Aeronautics Limited",
     "shortName": "HINDUSTAN AERONAUTICS LTD",
     "sector": "Industrials",
     "industry": "Aerospace & Defense",
-    "marketCap": 3355243970560,
-    "trailingPE": 36.041668,
-    "forwardPE": 29.171124,
-    "priceToBook": 8.1753235,
+    "marketCap": 3343874785280,
+    "trailingPE": 35.857716,
+    "forwardPE": 29.072277,
+    "priceToBook": 8.147621,
     "returnOnEquity": null,
     "profitMargins": 0.27591,
     "debtToEquity": 0.16,
@@ -2015,7 +2006,7 @@
     "revenueGrowth": 0.144,
     "earningsQuarterlyGrowth": 0.149,
     "heldPercentInsiders": 0.71639,
-    "heldPercentInstitutions": 0.15827,
+    "heldPercentInstitutions": 0.15939,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2023,17 +2014,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HAVELLS": {
     "longName": "Havells India Limited",
     "shortName": "HAVELLS INDIA LIMITED",
     "sector": "Industrials",
     "industry": "Electrical Equipment & Parts",
-    "marketCap": 807671889920,
-    "trailingPE": 49.519047,
-    "forwardPE": 39.340332,
-    "priceToBook": 8.53771,
+    "marketCap": 795748204544,
+    "trailingPE": 48.638283,
+    "forwardPE": 38.75955,
+    "priceToBook": 8.411668,
     "returnOnEquity": null,
     "profitMargins": 0.06923,
     "debtToEquity": 2.801,
@@ -2041,7 +2032,7 @@
     "revenueGrowth": 0.195,
     "earningsQuarterlyGrowth": -0.165,
     "heldPercentInsiders": 0.6352,
-    "heldPercentInstitutions": 0.23849002,
+    "heldPercentInstitutions": 0.23806,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2051,25 +2042,25 @@
         "Earnings declining sharply (-16.6%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HCLTECH": {
     "longName": "HCL Technologies Limited",
     "shortName": "HCL TECHNOLOGIES LTD",
     "sector": "Technology",
     "industry": "Information Technology Services",
-    "marketCap": 3584599785472,
-    "trailingPE": 20.619455,
-    "forwardPE": 16.539043,
-    "priceToBook": 4.851133,
+    "marketCap": 3524261052416,
+    "trailingPE": 20.285002,
+    "forwardPE": 16.260645,
+    "priceToBook": 4.769475,
     "returnOnEquity": 0.24067,
     "profitMargins": 0.12966,
     "debtToEquity": 7.058,
     "earningsGrowth": 0.084,
     "revenueGrowth": 0.03,
     "earningsQuarterlyGrowth": 0.084,
-    "heldPercentInsiders": 0.62792,
-    "heldPercentInstitutions": 0.28291,
+    "heldPercentInsiders": 0.62791,
+    "heldPercentInstitutions": 0.28219,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2077,25 +2068,25 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HDFCAMC": {
     "longName": "HDFC Asset Management Company Limited",
     "shortName": "HDFC AMC LIMITED",
     "sector": "Financial Services",
     "industry": "Asset Management",
-    "marketCap": 1094135185408,
-    "trailingPE": 37.2892,
-    "forwardPE": 29.016373,
-    "priceToBook": 11.845067,
+    "marketCap": 1119133499392,
+    "trailingPE": 38.107754,
+    "forwardPE": 29.686079,
+    "priceToBook": 12.115698,
     "returnOnEquity": null,
     "profitMargins": 0.61625,
     "debtToEquity": 2.364,
     "earningsGrowth": 0.118,
     "revenueGrowth": 0.134,
     "earningsQuarterlyGrowth": 0.12,
-    "heldPercentInsiders": 0.56712,
-    "heldPercentInstitutions": 0.27346,
+    "heldPercentInsiders": 0.56709,
+    "heldPercentInstitutions": 0.27386,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2103,17 +2094,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HDFCBANK": {
     "longName": "HDFC Bank Limited",
     "shortName": "HDFC BANK LTD",
     "sector": "Financial Services",
     "industry": "Banks - Regional",
-    "marketCap": 11095920082944,
-    "trailingPE": 15.730828,
-    "forwardPE": 11.501597,
-    "priceToBook": 1.8282789,
+    "marketCap": 11203026878464,
+    "trailingPE": 15.889618,
+    "forwardPE": 11.61262,
+    "priceToBook": 1.845927,
     "returnOnEquity": 0.13838,
     "profitMargins": 0.26787,
     "debtToEquity": null,
@@ -2121,7 +2112,7 @@
     "revenueGrowth": 0.166,
     "earningsQuarterlyGrowth": 0.184,
     "heldPercentInsiders": 0.00153,
-    "heldPercentInstitutions": 0.61024,
+    "heldPercentInstitutions": 0.61076,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 4,
@@ -2131,17 +2122,17 @@
         "Low promoter/insider holding (0.2%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HDFCLIFE": {
     "longName": "HDFC Life Insurance Company Limited",
     "shortName": "HDFC LIFE INS CO LTD",
     "sector": "Financial Services",
     "industry": "Insurance - Life",
-    "marketCap": 1164808814592,
-    "trailingPE": 58.612022,
-    "forwardPE": 44.78235,
-    "priceToBook": 5.9720273,
+    "marketCap": 1204989591552,
+    "trailingPE": 59.848972,
+    "forwardPE": 46.327145,
+    "priceToBook": 6.1780357,
     "returnOnEquity": 0.10828,
     "profitMargins": 0.019,
     "debtToEquity": 15.885,
@@ -2149,7 +2140,7 @@
     "revenueGrowth": 0.143,
     "earningsQuarterlyGrowth": 0.119,
     "heldPercentInsiders": 0.55571,
-    "heldPercentInstitutions": 0.27926,
+    "heldPercentInstitutions": 0.2907,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2157,43 +2148,45 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HEROMOTOCO": {
     "longName": "Hero MotoCorp Limited",
     "shortName": "HERO MOTOCORP LIMITED",
-    "sector": null,
-    "industry": null,
-    "marketCap": 1142706143232,
-    "trailingPE": 20.964603,
-    "forwardPE": 17.53418,
-    "priceToBook": 5.286207,
+    "sector": "Consumer Cyclical",
+    "industry": "Auto Manufacturers",
+    "marketCap": 1147809824768,
+    "trailingPE": 21.076809,
+    "forwardPE": 17.612492,
+    "priceToBook": 5.309817,
     "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "profitMargins": 0.10724,
+    "debtToEquity": 3.57,
+    "earningsGrowth": -0.172,
+    "revenueGrowth": 0.349,
+    "earningsQuarterlyGrowth": -0.172,
+    "heldPercentInsiders": 0.37422,
+    "heldPercentInstitutions": 0.38372,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 1,
+      "checks_run": 5,
       "checks_possible": 5,
       "red_flags": [],
-      "yellow_flags": []
+      "yellow_flags": [
+        "Earnings declining sharply (-17.2%)"
+      ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HINDALCO": {
     "longName": "Hindalco Industries Limited",
     "shortName": "HINDALCO  INDUSTRIES  LTD",
     "sector": "Basic Materials",
     "industry": "Aluminum",
-    "marketCap": 2306299658240,
-    "trailingPE": 14.087457,
-    "forwardPE": 9.328256,
-    "priceToBook": 1.6885698,
+    "marketCap": 2295311630336,
+    "trailingPE": 14.022241,
+    "forwardPE": 9.283812,
+    "priceToBook": 1.6805248,
     "returnOnEquity": null,
     "profitMargins": 0.05549,
     "debtToEquity": 72.598,
@@ -2201,7 +2194,7 @@
     "revenueGrowth": 0.321,
     "earningsQuarterlyGrowth": 0.752,
     "heldPercentInsiders": 0.37572,
-    "heldPercentInstitutions": 0.40275002,
+    "heldPercentInstitutions": 0.40277,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2209,17 +2202,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HINDUNILVR": {
     "longName": "Hindustan Unilever Limited",
     "shortName": "HINDUSTAN UNILEVER LTD.",
     "sector": "Consumer Defensive",
     "industry": "Household & Personal Products",
-    "marketCap": 4747818958848,
-    "trailingPE": 44.9344,
-    "forwardPE": 37.959816,
-    "priceToBook": 9.741318,
+    "marketCap": 4734426546176,
+    "trailingPE": 44.757885,
+    "forwardPE": 37.852737,
+    "priceToBook": 9.71384,
     "returnOnEquity": null,
     "profitMargins": 0.22644,
     "debtToEquity": 3.016,
@@ -2227,7 +2220,7 @@
     "revenueGrowth": 0.05,
     "earningsQuarterlyGrowth": -0.03,
     "heldPercentInsiders": 0.62274,
-    "heldPercentInstitutions": 0.20847,
+    "heldPercentInstitutions": 0.20767,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2235,17 +2228,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HINDZINC": {
     "longName": "Hindustan Zinc Limited",
     "shortName": "HINDUSTAN ZINC LIMITED",
     "sector": "Basic Materials",
     "industry": "Other Industrial Metals & Mining",
-    "marketCap": 2353502617600,
-    "trailingPE": 13.787128,
-    "forwardPE": 12.684833,
-    "priceToBook": 10.400329,
+    "marketCap": 2513642192896,
+    "trailingPE": 14.725247,
+    "forwardPE": 13.547949,
+    "priceToBook": 11.108,
     "returnOnEquity": null,
     "profitMargins": 0.38068,
     "debtToEquity": 39.034,
@@ -2253,7 +2246,7 @@
     "revenueGrowth": 0.717,
     "earningsQuarterlyGrowth": 1.448,
     "heldPercentInsiders": 0.8865,
-    "heldPercentInstitutions": 0.05231,
+    "heldPercentInstitutions": 0.05233,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2261,25 +2254,25 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HONAUT": {
     "longName": "Honeywell Automation India Limited",
     "shortName": "HONEYWELL AUTOMATION IND",
     "sector": "Industrials",
     "industry": "Electrical Equipment & Parts",
-    "marketCap": 319743557632,
-    "trailingPE": 58.06182,
-    "forwardPE": 43.536926,
-    "priceToBook": 7.1600738,
+    "marketCap": 324698079232,
+    "trailingPE": 58.79903,
+    "forwardPE": 44.21154,
+    "priceToBook": 7.2710214,
     "returnOnEquity": null,
     "profitMargins": 0.117180005,
     "debtToEquity": 2.476,
     "earningsGrowth": 0.209,
     "revenueGrowth": 0.018,
     "earningsQuarterlyGrowth": 0.209,
-    "heldPercentInsiders": 0.75163,
-    "heldPercentInstitutions": 0.13406,
+    "heldPercentInsiders": 0.75148004,
+    "heldPercentInstitutions": 0.13715,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2287,17 +2280,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HUDCO": {
     "longName": "Housing and Urban Development Corporation Limited",
     "shortName": "HSG & URBAN DEV CORPN LTD",
     "sector": "Financial Services",
     "industry": "Credit Services",
-    "marketCap": 376997838848,
-    "trailingPE": 8.912448,
-    "forwardPE": 7.846667,
-    "priceToBook": 1.7150403,
+    "marketCap": 372533559296,
+    "trailingPE": 8.757176,
+    "forwardPE": 7.75375,
+    "priceToBook": 1.6947315,
     "returnOnEquity": null,
     "profitMargins": 0.90679,
     "debtToEquity": 645.775,
@@ -2305,7 +2298,7 @@
     "revenueGrowth": 0.098,
     "earningsQuarterlyGrowth": 0.35,
     "heldPercentInsiders": 0.75,
-    "heldPercentInstitutions": 0.105059996,
+    "heldPercentInstitutions": 0.10551,
     "quality": {
       "verdict": "CAUTION",
       "checks_run": 5,
@@ -2315,17 +2308,17 @@
       ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "HYUNDAI": {
     "longName": null,
     "shortName": "HYUNDAI MOTOR INDIA LTD",
     "sector": "Consumer Cyclical",
     "industry": "Auto Manufacturers",
-    "marketCap": 1766870614016,
-    "trailingPE": 35.653385,
-    "forwardPE": 23.791029,
-    "priceToBook": 8.829525,
+    "marketCap": 1802866262016,
+    "trailingPE": 36.36185,
+    "forwardPE": 24.275711,
+    "priceToBook": 9.009404,
     "returnOnEquity": null,
     "profitMargins": 0.07004,
     "debtToEquity": 5.484,
@@ -2333,7 +2326,7 @@
     "revenueGrowth": -0.005,
     "earningsQuarterlyGrowth": -0.351,
     "heldPercentInsiders": 0.825,
-    "heldPercentInstitutions": 0.13332,
+    "heldPercentInstitutions": 0.13377,
     "quality": {
       "verdict": "CAUTION",
       "checks_run": 5,
@@ -2343,17 +2336,17 @@
       ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "ICICIBANK": {
     "longName": "ICICI Bank Limited",
     "shortName": "ICICI BANK LTD.",
     "sector": "Financial Services",
     "industry": "Banks - Regional",
-    "marketCap": 10056934359040,
-    "trailingPE": 18.151218,
-    "forwardPE": 14.914893,
-    "priceToBook": 2.6434026,
+    "marketCap": 10186053910528,
+    "trailingPE": 18.353367,
+    "forwardPE": 15.106383,
+    "priceToBook": 2.6773407,
     "returnOnEquity": 0.16073999,
     "profitMargins": 0.27531,
     "debtToEquity": null,
@@ -2361,7 +2354,7 @@
     "revenueGrowth": 0.114,
     "earningsQuarterlyGrowth": 0.139,
     "heldPercentInsiders": 0.03531,
-    "heldPercentInstitutions": 0.5899,
+    "heldPercentInstitutions": 0.59007,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 4,
@@ -2371,17 +2364,17 @@
         "Low promoter/insider holding (3.5%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "ICICIGI": {
     "longName": "ICICI Lombard General Insurance Company Limited",
     "shortName": "ICICI LOMBARD GIC LIMITED",
     "sector": "Financial Services",
     "industry": "Insurance - Diversified",
-    "marketCap": 807086260224,
-    "trailingPE": 33.38913,
-    "forwardPE": 22.978664,
-    "priceToBook": 4.731726,
+    "marketCap": 807735656448,
+    "trailingPE": 33.388397,
+    "forwardPE": 22.997154,
+    "priceToBook": 4.7355337,
     "returnOnEquity": 0.1463,
     "profitMargins": 0.08764,
     "debtToEquity": null,
@@ -2389,7 +2382,7 @@
     "revenueGrowth": 0.109,
     "earningsQuarterlyGrowth": -0.46,
     "heldPercentInsiders": 0.02498,
-    "heldPercentInstitutions": 0.83162004,
+    "heldPercentInstitutions": 0.83174,
     "quality": {
       "verdict": "STABLE_WITH_CAUTION",
       "checks_run": 4,
@@ -2400,51 +2393,25 @@
         "Low promoter/insider holding (2.5%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "IDBI": {
     "longName": "IDBI Bank Limited",
     "shortName": "IDBI BANK LIMITED",
-    "sector": null,
-    "industry": null,
-    "marketCap": 867933945856,
-    "trailingPE": 9.310266,
-    "forwardPE": 16.473469,
-    "priceToBook": 1.228615,
-    "returnOnEquity": null,
-    "profitMargins": null,
+    "sector": "Financial Services",
+    "industry": "Banks - Regional",
+    "marketCap": 884277575680,
+    "trailingPE": 9.366743,
+    "forwardPE": 16.783672,
+    "priceToBook": 1.2517503,
+    "returnOnEquity": 0.13874,
+    "profitMargins": 0.48589,
     "debtToEquity": null,
     "earningsGrowth": null,
     "revenueGrowth": null,
     "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 1,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "IDEA": {
-    "longName": "Vodafone Idea Limited",
-    "shortName": "VODAFONE IDEA LIMITED",
-    "sector": "Communication Services",
-    "industry": "Telecom Services",
-    "marketCap": 1524386496512,
-    "trailingPE": 3.91922,
-    "forwardPE": -9.326157,
-    "priceToBook": -4.2597637,
-    "returnOnEquity": null,
-    "profitMargins": 0.82278,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": 0.061,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": 0.74638003,
-    "heldPercentInstitutions": 0.09498999,
+    "heldPercentInsiders": 0.45554,
+    "heldPercentInstitutions": 0.49778,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 3,
@@ -2452,17 +2419,43 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
+  },
+  "IDEA": {
+    "longName": "Vodafone Idea Limited",
+    "shortName": "VODAFONE IDEA LIMITED",
+    "sector": "Communication Services",
+    "industry": "Telecom Services",
+    "marketCap": 1510301892608,
+    "trailingPE": 3.9942691,
+    "forwardPE": -9.239987,
+    "priceToBook": -4.224242,
+    "returnOnEquity": null,
+    "profitMargins": 0.82278,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": 0.061,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": 0.74638003,
+    "heldPercentInstitutions": 0.09528,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 3,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
   },
   "ICICIPRULI": {
     "longName": "ICICI Prudential Life Insurance Company Limited",
     "shortName": "ICICI PRU LIFE INS CO LTD",
     "sector": "Financial Services",
     "industry": "Insurance - Life",
-    "marketCap": 724151369728,
-    "trailingPE": 43.02326,
-    "forwardPE": 35.187157,
-    "priceToBook": 5.3107224,
+    "marketCap": 746622484480,
+    "trailingPE": 44.243984,
+    "forwardPE": 36.27905,
+    "priceToBook": 5.4755197,
     "returnOnEquity": 0.12579,
     "profitMargins": 0.025510002,
     "debtToEquity": 19.037,
@@ -2470,7 +2463,7 @@
     "revenueGrowth": -0.831,
     "earningsQuarterlyGrowth": 0.619,
     "heldPercentInsiders": 0.23651,
-    "heldPercentInstitutions": 0.69781995,
+    "heldPercentInstitutions": 0.69731003,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2478,17 +2471,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "IDFCFIRSTB": {
     "longName": "IDFC First Bank Limited",
     "shortName": "IDFC FIRST BANK LIMITED",
     "sector": "Financial Services",
     "industry": "Banks - Regional",
-    "marketCap": 737028079616,
-    "trailingPE": 33.00772,
-    "forwardPE": 12.826341,
-    "priceToBook": 1.5512611,
+    "marketCap": 747890802688,
+    "trailingPE": 33.49421,
+    "forwardPE": 12.932223,
+    "priceToBook": 1.5741245,
     "returnOnEquity": null,
     "profitMargins": 0.32775003,
     "debtToEquity": null,
@@ -2496,7 +2489,7 @@
     "revenueGrowth": -0.011,
     "earningsQuarterlyGrowth": -0.236,
     "heldPercentInsiders": 0.12868,
-    "heldPercentInstitutions": 0.45189998,
+    "heldPercentInstitutions": 0.45145,
     "quality": {
       "verdict": "CAUTION",
       "checks_run": 4,
@@ -2506,17 +2499,17 @@
       ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "IGL": {
     "longName": "Indraprastha Gas Limited",
     "shortName": "INDRAPRASTHA GAS LTD",
     "sector": "Utilities",
     "industry": "Utilities - Regulated Gas",
-    "marketCap": 213696233472,
-    "trailingPE": 16.71851,
-    "forwardPE": 11.141273,
-    "priceToBook": 1.8560537,
+    "marketCap": 207018213376,
+    "trailingPE": 16.213816,
+    "forwardPE": 10.793107,
+    "priceToBook": 1.798052,
     "returnOnEquity": null,
     "profitMargins": 0.080819994,
     "debtToEquity": 0.848,
@@ -2534,17 +2527,17 @@
         "Earnings declining sharply (-43.8%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "IEX": {
     "longName": "Indian Energy Exchange Limited",
     "shortName": "INDIAN ENERGY EXC LTD",
     "sector": "Financial Services",
     "industry": "Capital Markets",
-    "marketCap": 109383933952,
-    "trailingPE": 21.578949,
-    "forwardPE": 19.339622,
-    "priceToBook": 8.067161,
+    "marketCap": 110006444032,
+    "trailingPE": 21.701756,
+    "forwardPE": 19.449684,
+    "priceToBook": 8.113071,
     "returnOnEquity": null,
     "profitMargins": 0.66222,
     "debtToEquity": 0.818,
@@ -2552,7 +2545,7 @@
     "revenueGrowth": 0.101,
     "earningsQuarterlyGrowth": 0.116,
     "heldPercentInsiders": 0.13441,
-    "heldPercentInstitutions": 0.35156,
+    "heldPercentInstitutions": 0.35164002,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2560,17 +2553,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "INDHOTEL": {
     "longName": "The Indian Hotels Company Limited",
     "shortName": "THE INDIAN HOTELS CO. LTD",
     "sector": "Consumer Cyclical",
     "industry": "Lodging",
-    "marketCap": 1029639634944,
-    "trailingPE": 47.90397,
-    "forwardPE": 38.711044,
-    "priceToBook": 7.8885665,
+    "marketCap": 1039105523712,
+    "trailingPE": 48.40849,
+    "forwardPE": 39.06693,
+    "priceToBook": 7.9610887,
     "returnOnEquity": null,
     "profitMargins": 0.20868999,
     "debtToEquity": 18.987,
@@ -2578,7 +2571,7 @@
     "revenueGrowth": 0.151,
     "earningsQuarterlyGrowth": 0.208,
     "heldPercentInsiders": 0.39348,
-    "heldPercentInstitutions": 0.37759998,
+    "heldPercentInstitutions": 0.37658,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2586,17 +2579,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "INDIACEM": {
     "longName": "The India Cements Limited",
     "shortName": "THE INDIA CEMENTS LIMITED",
     "sector": "Basic Materials",
     "industry": "Building Materials",
-    "marketCap": 171853283328,
-    "trailingPE": 123.23334,
-    "forwardPE": 22.005955,
-    "priceToBook": 1.1316262,
+    "marketCap": 172411092992,
+    "trailingPE": 123.63333,
+    "forwardPE": 22.077381,
+    "priceToBook": 1.1352992,
     "returnOnEquity": null,
     "profitMargins": 0.020650001,
     "debtToEquity": 12.888,
@@ -2604,27 +2597,27 @@
     "revenueGrowth": -0.005,
     "earningsQuarterlyGrowth": null,
     "heldPercentInsiders": 0.7523,
-    "heldPercentInstitutions": 0.13891,
+    "heldPercentInstitutions": 0.13941,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 4,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (123.2x) — priced for perfection"
+        "Very high P/E (123.6x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "INDIGO": {
     "longName": "InterGlobe Aviation Limited",
     "shortName": "INTERGLOBE AVIATION LTD",
     "sector": "Industrials",
     "industry": "Airlines",
-    "marketCap": 2007959601152,
+    "marketCap": 1975866228736,
     "trailingPE": null,
-    "forwardPE": 22.793655,
-    "priceToBook": 28.800081,
+    "forwardPE": 21.968878,
+    "priceToBook": 28.339767,
     "returnOnEquity": null,
     "profitMargins": 0.03793,
     "debtToEquity": 866.462,
@@ -2644,17 +2637,17 @@
         "Earnings declining sharply (-77.6%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "INDUSTOWER": {
     "longName": "Indus Towers Limited",
     "shortName": "INDUS TOWERS LIMITED",
     "sector": "Communication Services",
     "industry": "Telecom Services",
-    "marketCap": 982094184448,
-    "trailingPE": 13.736628,
-    "forwardPE": 12.183659,
-    "priceToBook": 2.3731685,
+    "marketCap": 990928830464,
+    "trailingPE": 13.860199,
+    "forwardPE": 12.29326,
+    "priceToBook": 2.394517,
     "returnOnEquity": 0.18912001,
     "profitMargins": 0.21776,
     "debtToEquity": 51.79,
@@ -2662,7 +2655,7 @@
     "revenueGrowth": 0.046,
     "earningsQuarterlyGrowth": 0.007,
     "heldPercentInsiders": 0.51313996,
-    "heldPercentInstitutions": 0.32685003,
+    "heldPercentInstitutions": 0.33165002,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2670,17 +2663,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "INDUSINDBK": {
     "longName": "IndusInd Bank Limited",
     "shortName": "INDUSIND BANK LIMITED",
     "sector": "Financial Services",
     "industry": "Banks - Regional",
-    "marketCap": 792152178688,
-    "trailingPE": 59.876328,
-    "forwardPE": 12.8966255,
-    "priceToBook": 1.2043469,
+    "marketCap": 783503720448,
+    "trailingPE": 59.750446,
+    "forwardPE": 12.755823,
+    "priceToBook": 1.1911981,
     "returnOnEquity": null,
     "profitMargins": 0.076469995,
     "debtToEquity": null,
@@ -2688,7 +2681,7 @@
     "revenueGrowth": 0.01,
     "earningsQuarterlyGrowth": 0.717,
     "heldPercentInsiders": 0.16339001,
-    "heldPercentInstitutions": 0.5401,
+    "heldPercentInstitutions": 0.54047,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 4,
@@ -2696,17 +2689,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "INFY": {
     "longName": "Infosys Limited",
     "shortName": "INFOSYS LIMITED",
     "sector": "Technology",
     "industry": "Information Technology Services",
-    "marketCap": 4535328702464,
-    "trailingPE": 14.492043,
-    "forwardPE": 14.008454,
-    "priceToBook": 4.94598,
+    "marketCap": 4540188327936,
+    "trailingPE": 14.335039,
+    "forwardPE": 14.023202,
+    "priceToBook": 4.95128,
     "returnOnEquity": 0.32,
     "profitMargins": 0.16370001,
     "debtToEquity": 9.541,
@@ -2714,7 +2707,7 @@
     "revenueGrowth": 0.029,
     "earningsQuarterlyGrowth": 0.012,
     "heldPercentInsiders": 0.16542,
-    "heldPercentInstitutions": 0.52496,
+    "heldPercentInstitutions": 0.52214,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2722,43 +2715,43 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "IOC": {
     "longName": "Indian Oil Corporation Limited",
     "shortName": "INDIAN OIL CORP LTD",
-    "sector": null,
-    "industry": null,
-    "marketCap": 1924724817920,
-    "trailingPE": 5.574642,
-    "forwardPE": 7.2696514,
-    "priceToBook": 0.8549636,
+    "sector": "Energy",
+    "industry": "Oil & Gas Refining & Marketing",
+    "marketCap": 1919076270080,
+    "trailingPE": 5.5628324,
+    "forwardPE": 7.2480927,
+    "priceToBook": 0.8524545,
     "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
+    "profitMargins": 0.0392,
+    "debtToEquity": 58.446,
     "earningsGrowth": null,
-    "revenueGrowth": null,
+    "revenueGrowth": 0.385,
     "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "heldPercentInsiders": 0.73394996,
+    "heldPercentInstitutions": 0.14272,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 1,
+      "checks_run": 4,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "IRB": {
     "longName": "IRB Infrastructure Developers Limited",
     "shortName": "IRB INFRA DEV LTD.",
     "sector": "Industrials",
     "industry": "Infrastructure Operations",
-    "marketCap": 229240438784,
-    "trailingPE": 24.333334,
-    "forwardPE": 13.407458,
-    "priceToBook": 1.0736508,
+    "marketCap": 228878106624,
+    "trailingPE": 24.294874,
+    "forwardPE": 13.386267,
+    "priceToBook": 1.0719539,
     "returnOnEquity": null,
     "profitMargins": 0.15478,
     "debtToEquity": 95.6,
@@ -2766,7 +2759,7 @@
     "revenueGrowth": -0.089,
     "earningsQuarterlyGrowth": 0.513,
     "heldPercentInsiders": 0.67629,
-    "heldPercentInstitutions": 0.14609,
+    "heldPercentInstitutions": 0.14759,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2774,17 +2767,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "IRFC": {
     "longName": "Indian Railway Finance Corporation Limited",
     "shortName": "INDIAN RAILWAY FIN CORP L",
     "sector": "Financial Services",
     "industry": "Credit Services",
-    "marketCap": 1113175359488,
-    "trailingPE": 15.515484,
-    "forwardPE": 11.668493,
-    "priceToBook": 1.9598279,
+    "marketCap": 1129118957568,
+    "trailingPE": 15.483871,
+    "forwardPE": 11.835616,
+    "priceToBook": 1.9878978,
     "returnOnEquity": null,
     "profitMargins": 0.97271,
     "debtToEquity": 773.347,
@@ -2792,7 +2785,7 @@
     "revenueGrowth": 0.103,
     "earningsQuarterlyGrowth": 0.104,
     "heldPercentInsiders": 0.82899004,
-    "heldPercentInstitutions": 0.0481,
+    "heldPercentInstitutions": 0.0479,
     "quality": {
       "verdict": "CAUTION",
       "checks_run": 5,
@@ -2802,17 +2795,17 @@
       ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "IRCTC": {
     "longName": "Indian Railway Catering & Tourism Corporation Limited",
     "shortName": "INDIAN RAIL TOUR CORP LTD",
     "sector": "Consumer Cyclical",
     "industry": "Travel Services",
-    "marketCap": 390680018944,
-    "trailingPE": 28.066093,
-    "forwardPE": 21.80134,
-    "priceToBook": 9.067531,
+    "marketCap": 387359997952,
+    "trailingPE": 27.763762,
+    "forwardPE": 21.616072,
+    "priceToBook": 8.990476,
     "returnOnEquity": null,
     "profitMargins": 0.25677,
     "debtToEquity": 1.874,
@@ -2820,7 +2813,7 @@
     "revenueGrowth": 0.181,
     "earningsQuarterlyGrowth": -0.002,
     "heldPercentInsiders": 0.62397,
-    "heldPercentInstitutions": 0.16815001,
+    "heldPercentInstitutions": 0.16795999,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2828,77 +2821,79 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "ITC": {
     "longName": "ITC Limited",
     "shortName": "ITC LTD",
-    "sector": null,
-    "industry": null,
-    "marketCap": 3346078105600,
-    "trailingPE": 16.84858,
-    "forwardPE": 15.946559,
-    "priceToBook": 4.614733,
+    "sector": "Consumer Defensive",
+    "industry": "Tobacco",
+    "marketCap": 3375523168256,
+    "trailingPE": 17.007576,
+    "forwardPE": 16.086885,
+    "priceToBook": 4.655342,
     "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "profitMargins": 0.25937998,
+    "debtToEquity": 3.293,
+    "earningsGrowth": -0.16,
+    "revenueGrowth": -0.111,
+    "earningsQuarterlyGrowth": -0.162,
+    "heldPercentInsiders": 0.2949,
+    "heldPercentInstitutions": 0.52159,
     "quality": {
-      "verdict": "STABLE",
-      "checks_run": 1,
+      "verdict": "CAUTION",
+      "checks_run": 5,
       "checks_possible": 5,
-      "red_flags": [],
+      "red_flags": [
+        "Both earnings (-16.0%) and revenue (-11.1%) shrinking"
+      ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "JKCEMENT": {
     "longName": "J.K. Cement Limited",
     "shortName": "JK CEMENT LIMITED",
-    "sector": null,
-    "industry": null,
-    "marketCap": 407667277824,
-    "trailingPE": 43.14335,
-    "forwardPE": 27.088825,
-    "priceToBook": 5.7929897,
+    "sector": "Basic Materials",
+    "industry": "Building Materials",
+    "marketCap": 405658304512,
+    "trailingPE": 42.892155,
+    "forwardPE": 26.955332,
+    "priceToBook": 5.764442,
     "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "profitMargins": 0.06559,
+    "debtToEquity": 87.522,
+    "earningsGrowth": -0.145,
+    "revenueGrowth": 0.28,
+    "earningsQuarterlyGrowth": -0.173,
+    "heldPercentInsiders": 0.54268,
+    "heldPercentInstitutions": 0.38138,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 1,
+      "checks_run": 5,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "JSWSTEEL": {
     "longName": "JSW Steel Limited",
     "shortName": "JSW STEEL LIMITED",
     "sector": "Basic Materials",
     "industry": "Steel",
-    "marketCap": 3138609741824,
-    "trailingPE": 12.695498,
-    "forwardPE": 17.648016,
-    "priceToBook": 3.1367557,
+    "marketCap": 3157893316608,
+    "trailingPE": 12.7684555,
+    "forwardPE": 17.756445,
+    "priceToBook": 3.1560278,
     "returnOnEquity": null,
     "profitMargins": 0.13065,
     "debtToEquity": 95.374,
     "earningsGrowth": 1.13,
     "revenueGrowth": 0.098,
     "earningsQuarterlyGrowth": 1.13,
-    "heldPercentInsiders": 0.63628,
-    "heldPercentInstitutions": 0.17851,
+    "heldPercentInsiders": 0.63624,
+    "heldPercentInstitutions": 0.18084,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2906,17 +2901,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "JSWENERGY": {
     "longName": "JSW Energy Limited",
     "shortName": "JSW ENERGY LIMITED",
     "sector": "Utilities",
     "industry": "Utilities - Independent Power Producers",
-    "marketCap": 996719329280,
-    "trailingPE": 42.763367,
-    "forwardPE": 32.01557,
-    "priceToBook": 3.1064396,
+    "marketCap": 998551715840,
+    "trailingPE": 42.774727,
+    "forwardPE": 32.074432,
+    "priceToBook": 3.1121504,
     "returnOnEquity": null,
     "profitMargins": 0.10373,
     "debtToEquity": 229.16,
@@ -2924,7 +2919,7 @@
     "revenueGrowth": 0.012,
     "earningsQuarterlyGrowth": -0.366,
     "heldPercentInsiders": 0.66706,
-    "heldPercentInstitutions": 0.21392,
+    "heldPercentInstitutions": 0.21400999,
     "quality": {
       "verdict": "CAUTION",
       "checks_run": 5,
@@ -2936,17 +2931,17 @@
         "Earnings declining sharply (-39.5%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "JIOFIN": {
     "longName": "Jio Financial Services Limited",
     "shortName": "JIO FIN SERVICES LTD",
     "sector": "Financial Services",
     "industry": "Asset Management",
-    "marketCap": 1605553881088,
-    "trailingPE": 75.51242,
-    "forwardPE": 54.517937,
-    "priceToBook": 1.1499933,
+    "marketCap": 1611166515200,
+    "trailingPE": 75.541794,
+    "forwardPE": 54.70852,
+    "priceToBook": 1.1540135,
     "returnOnEquity": null,
     "profitMargins": 0.55006003,
     "debtToEquity": 16.286,
@@ -2954,7 +2949,7 @@
     "revenueGrowth": 2.082,
     "earningsQuarterlyGrowth": 1.557,
     "heldPercentInsiders": 0.50187,
-    "heldPercentInstitutions": 0.19990999,
+    "heldPercentInstitutions": 0.199,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2962,25 +2957,25 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "JINDALSTEL": {
     "longName": "Jindal Steel Limited",
     "shortName": "JINDAL STEEL LIMITED",
     "sector": "Basic Materials",
     "industry": "Steel",
-    "marketCap": 1134499201024,
-    "trailingPE": 41.822956,
-    "forwardPE": 12.670223,
-    "priceToBook": 2.2284756,
+    "marketCap": 1147523170304,
+    "trailingPE": 42.176517,
+    "forwardPE": 12.815675,
+    "priceToBook": 2.2540584,
     "returnOnEquity": null,
     "profitMargins": 0.04818,
     "debtToEquity": 43.613,
     "earningsGrowth": -0.437,
     "revenueGrowth": 0.259,
     "earningsQuarterlyGrowth": -0.435,
-    "heldPercentInsiders": 0.63868,
-    "heldPercentInstitutions": 0.21705,
+    "heldPercentInsiders": 0.63858,
+    "heldPercentInstitutions": 0.22726999,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -2990,25 +2985,25 @@
         "Earnings declining sharply (-43.7%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "JUBLFOOD": {
     "longName": "Jubilant FoodWorks Limited",
     "shortName": "JUBILANT FOODWORKS LTD",
     "sector": "Consumer Cyclical",
     "industry": "Restaurants",
-    "marketCap": 327719223296,
-    "trailingPE": 88.03887,
-    "forwardPE": 54.047955,
-    "priceToBook": 14.297601,
+    "marketCap": 333276577792,
+    "trailingPE": 89.21655,
+    "forwardPE": 54.96007,
+    "priceToBook": 14.540054,
     "returnOnEquity": null,
     "profitMargins": 0.04415,
     "debtToEquity": 2.655,
     "earningsGrowth": null,
     "revenueGrowth": 0.203,
     "earningsQuarterlyGrowth": -0.184,
-    "heldPercentInsiders": 0.40737,
-    "heldPercentInstitutions": 0.45286998,
+    "heldPercentInsiders": 0.40721,
+    "heldPercentInstitutions": 0.45598,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 4,
@@ -3016,17 +3011,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "KALYANKJIL": {
     "longName": "Kalyan Jewellers India Limited",
     "shortName": "KALYAN JEWELLERS IND LTD",
     "sector": "Consumer Cyclical",
     "industry": "Luxury Goods",
-    "marketCap": 614693404672,
-    "trailingPE": 43.00578,
-    "forwardPE": 31.21979,
-    "priceToBook": 9.731692,
+    "marketCap": 623316828160,
+    "trailingPE": 43.45212,
+    "forwardPE": 31.657768,
+    "priceToBook": 9.8682165,
     "returnOnEquity": null,
     "profitMargins": 0.036730003,
     "debtToEquity": 96.966,
@@ -3034,7 +3029,7 @@
     "revenueGrowth": 0.457,
     "earningsQuarterlyGrowth": 0.32,
     "heldPercentInsiders": 0.62861997,
-    "heldPercentInstitutions": 0.19639999,
+    "heldPercentInstitutions": 0.19572,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3042,17 +3037,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "KAYNES": {
     "longName": "Kaynes Technology India Limited",
     "shortName": "KAYNES TECHNOLOGY IND LTD",
     "sector": "Technology",
     "industry": "Electronic Components",
-    "marketCap": 257011744768,
-    "trailingPE": 74.93728,
-    "forwardPE": 42.534027,
-    "priceToBook": 5.514362,
+    "marketCap": 261495472128,
+    "trailingPE": 76.09547,
+    "forwardPE": 43.276062,
+    "priceToBook": 5.6105633,
     "returnOnEquity": null,
     "profitMargins": 0.08866999,
     "debtToEquity": 19.168,
@@ -3060,7 +3055,7 @@
     "revenueGrowth": 0.405,
     "earningsQuarterlyGrowth": -0.244,
     "heldPercentInsiders": 0.54909,
-    "heldPercentInstitutions": 0.16253,
+    "heldPercentInstitutions": 0.15832,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3068,25 +3063,25 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "KEI": {
     "longName": "KEI Industries Limited",
     "shortName": "KEI INDUSTRIES LTD.",
     "sector": "Industrials",
     "industry": "Electrical Equipment & Parts",
-    "marketCap": 543116525568,
-    "trailingPE": 55.43618,
-    "forwardPE": 38.721012,
-    "priceToBook": 8.148731,
+    "marketCap": 528441835520,
+    "trailingPE": 52.936222,
+    "forwardPE": 37.674793,
+    "priceToBook": 7.9285574,
     "returnOnEquity": null,
     "profitMargins": 0.08076,
     "debtToEquity": 3.796,
     "earningsGrowth": 0.4,
     "revenueGrowth": 0.23,
     "earningsQuarterlyGrowth": 0.4,
-    "heldPercentInsiders": 0.36005002,
-    "heldPercentInstitutions": 0.43904,
+    "heldPercentInsiders": 0.35996,
+    "heldPercentInstitutions": 0.44296002,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3094,25 +3089,25 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "KPITTECH": {
     "longName": "KPIT Technologies Limited",
     "shortName": "KPIT TECHNOLOGIES LIMITED",
     "sector": "Technology",
     "industry": "Software - Infrastructure",
-    "marketCap": 160369049600,
-    "trailingPE": 27.657276,
-    "forwardPE": 18.712332,
-    "priceToBook": 4.52903,
+    "marketCap": 160423510016,
+    "trailingPE": 27.537384,
+    "forwardPE": 18.718685,
+    "priceToBook": 4.530567,
     "returnOnEquity": null,
     "profitMargins": 0.08839,
     "debtToEquity": 23.624,
     "earningsGrowth": -0.318,
     "revenueGrowth": 0.089,
     "earningsQuarterlyGrowth": -0.318,
-    "heldPercentInsiders": 0.45294997,
-    "heldPercentInstitutions": 0.29762,
+    "heldPercentInsiders": 0.45286998,
+    "heldPercentInstitutions": 0.29676,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3122,25 +3117,25 @@
         "Earnings declining sharply (-31.8%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "LALPATHLAB": {
     "longName": "Dr. Lal PathLabs Limited",
     "shortName": "DR. LAL PATH LABS LTD.",
     "sector": "Healthcare",
     "industry": "Diagnostics & Research",
-    "marketCap": 315120451584,
-    "trailingPE": 58.391087,
-    "forwardPE": 43.4898,
-    "priceToBook": 12.563911,
+    "marketCap": 316289286144,
+    "trailingPE": 58.62581,
+    "forwardPE": 43.65111,
+    "priceToBook": 12.610514,
     "returnOnEquity": null,
     "profitMargins": 0.18745,
     "debtToEquity": 7.83,
     "earningsGrowth": 0.278,
     "revenueGrowth": 0.191,
     "earningsQuarterlyGrowth": 0.28,
-    "heldPercentInsiders": 0.54738,
-    "heldPercentInstitutions": 0.33003,
+    "heldPercentInsiders": 0.54735,
+    "heldPercentInstitutions": 0.32866,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3148,33 +3143,33 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "KOTAKBANK": {
     "longName": "Kotak Mahindra Bank Limited",
     "shortName": "KOTAK MAHINDRA BANK LTD",
-    "sector": null,
-    "industry": null,
-    "marketCap": 3881608151040,
-    "trailingPE": 19.139284,
-    "forwardPE": 15.273973,
-    "priceToBook": 2.1418653,
+    "sector": "Financial Services",
+    "industry": "Banks - Regional",
+    "marketCap": 4006436143104,
+    "trailingPE": 19.764475,
+    "forwardPE": 15.765166,
+    "priceToBook": 2.210745,
     "returnOnEquity": null,
-    "profitMargins": null,
+    "profitMargins": 0.28467,
     "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "earningsGrowth": 0.225,
+    "revenueGrowth": 0.21,
+    "earningsQuarterlyGrowth": 0.225,
+    "heldPercentInsiders": 0.30534,
+    "heldPercentInstitutions": 0.47465,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 1,
+      "checks_run": 4,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "LICHSGFIN": {
     "longName": "LIC Housing Finance Limited",
@@ -3182,7 +3177,7 @@
     "sector": "Financial Services",
     "industry": "Mortgage Finance",
     "marketCap": 273381294080,
-    "trailingPE": 4.7637305,
+    "trailingPE": 4.7651005,
     "forwardPE": 4.543724,
     "priceToBook": 0.659974,
     "returnOnEquity": null,
@@ -3192,7 +3187,7 @@
     "revenueGrowth": 0.145,
     "earningsQuarterlyGrowth": 0.099,
     "heldPercentInsiders": 0.02342,
-    "heldPercentInstitutions": 0.75364995,
+    "heldPercentInstitutions": 0.7532,
     "quality": {
       "verdict": "CAUTION",
       "checks_run": 5,
@@ -3204,7 +3199,7 @@
         "Low promoter/insider holding (2.3%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "LIQUIDBEES": {
     "longName": "Nippon India ETF Nifty 1D Rate Liquid BeES",
@@ -3230,17 +3225,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "LT": {
     "longName": "Larsen & Toubro Limited",
     "shortName": "LARSEN & TOUBRO LTD.",
     "sector": "Industrials",
     "industry": "Engineering & Construction",
-    "marketCap": 5560287625216,
-    "trailingPE": 33.479416,
-    "forwardPE": 22.421186,
-    "priceToBook": 5.0867877,
+    "marketCap": 5631419875328,
+    "trailingPE": 33.99784,
+    "forwardPE": 22.708017,
+    "priceToBook": 5.1518626,
     "returnOnEquity": null,
     "profitMargins": 0.05588,
     "debtToEquity": 97.64,
@@ -3248,7 +3243,7 @@
     "revenueGrowth": 0.081,
     "earningsQuarterlyGrowth": 0.14,
     "heldPercentInsiders": 0.18086,
-    "heldPercentInstitutions": 0.52676,
+    "heldPercentInstitutions": 0.52688,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3256,17 +3251,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "LTF": {
     "longName": "L&T Finance Limited",
     "shortName": "L&T FINANCE LIMITED",
     "sector": "Financial Services",
     "industry": "Credit Services",
-    "marketCap": 790406823936,
-    "trailingPE": 24.873816,
-    "forwardPE": 16.138044,
-    "priceToBook": 2.8139107,
+    "marketCap": 794792361984,
+    "trailingPE": 25.01183,
+    "forwardPE": 16.237364,
+    "priceToBook": 2.8295238,
     "returnOnEquity": null,
     "profitMargins": 0.33076,
     "debtToEquity": 393.442,
@@ -3274,7 +3269,7 @@
     "revenueGrowth": 0.293,
     "earningsQuarterlyGrowth": 0.287,
     "heldPercentInsiders": 0.65957,
-    "heldPercentInstitutions": 0.1882,
+    "heldPercentInstitutions": 0.1881,
     "quality": {
       "verdict": "CAUTION",
       "checks_run": 5,
@@ -3284,25 +3279,25 @@
       ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MANKIND": {
     "longName": "Mankind Pharma Limited",
     "shortName": "MANKIND PHARMA LIMITED",
     "sector": "Healthcare",
     "industry": "Drug Manufacturers - Specialty & Generic",
-    "marketCap": 988712337408,
-    "trailingPE": 48.363636,
-    "forwardPE": 33.952564,
-    "priceToBook": 6.0631385,
+    "marketCap": 984582389760,
+    "trailingPE": 48.337387,
+    "forwardPE": 33.81074,
+    "priceToBook": 6.037812,
     "returnOnEquity": null,
     "profitMargins": 0.13859999,
     "debtToEquity": 38.111,
     "earningsGrowth": 0.296,
     "revenueGrowth": 0.129,
     "earningsQuarterlyGrowth": 0.296,
-    "heldPercentInsiders": 0.75397,
-    "heldPercentInstitutions": 0.19749,
+    "heldPercentInsiders": 0.75401,
+    "heldPercentInstitutions": 0.19511999,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3310,17 +3305,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "M&MFIN": {
     "longName": "Mahindra & Mahindra Financial Services Limited",
     "shortName": "M&M FIN. SERVICES LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 541381820416,
-    "trailingPE": 16.62116,
-    "forwardPE": 12.782093,
-    "priceToBook": 2.0316427,
+    "marketCap": 530265178112,
+    "trailingPE": 16.279863,
+    "forwardPE": 12.519628,
+    "priceToBook": 1.9899251,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -3336,69 +3331,71 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "LTTS": {
     "longName": "L&T Technology Services Limited",
     "shortName": "L&T TECHNOLOGY SER. LTD.",
-    "sector": null,
-    "industry": null,
-    "marketCap": 375609950208,
-    "trailingPE": 29.326653,
-    "forwardPE": 21.81088,
-    "priceToBook": 5.7986417,
+    "sector": "Technology",
+    "industry": "Information Technology Services",
+    "marketCap": 382367137792,
+    "trailingPE": 29.883934,
+    "forwardPE": 22.203255,
+    "priceToBook": 5.902958,
     "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "profitMargins": 0.11684,
+    "debtToEquity": 8.911,
+    "earningsGrowth": 0.128,
+    "revenueGrowth": 0.026,
+    "earningsQuarterlyGrowth": 0.13,
+    "heldPercentInsiders": 0.73563004,
+    "heldPercentInstitutions": 0.13149,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 1,
+      "checks_run": 5,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "M&M": {
     "longName": "Mahindra & Mahindra Limited",
     "shortName": "MAHINDRA & MAHINDRA LTD",
-    "sector": null,
-    "industry": null,
-    "marketCap": 4100602986496,
-    "trailingPE": 20.794008,
-    "forwardPE": 21.677267,
-    "priceToBook": 4.099517,
+    "sector": "Consumer Cyclical",
+    "industry": "Auto Manufacturers",
+    "marketCap": 4097240727552,
+    "trailingPE": 20.756737,
+    "forwardPE": 21.659492,
+    "priceToBook": 4.096155,
     "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "profitMargins": 0.08609,
+    "debtToEquity": 125.278,
+    "earningsGrowth": 0.334,
+    "revenueGrowth": 0.275,
+    "earningsQuarterlyGrowth": 0.336,
+    "heldPercentInsiders": 0.25214002,
+    "heldPercentInstitutions": 0.53218,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 1,
+      "checks_run": 5,
       "checks_possible": 5,
       "red_flags": [],
-      "yellow_flags": []
+      "yellow_flags": [
+        "Elevated leverage (Debt/Equity 125%)"
+      ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MANAPPURAM": {
     "longName": "Manappuram Finance Limited",
     "shortName": "MANAPPURAM FINANCE LTD",
     "sector": "Financial Services",
     "industry": "Credit Services",
-    "marketCap": 319374295040,
-    "trailingPE": 20.91021,
-    "forwardPE": 11.290429,
-    "priceToBook": 1.9897819,
+    "marketCap": 335812657152,
+    "trailingPE": 21.825397,
+    "forwardPE": 11.715761,
+    "priceToBook": 2.0921972,
     "returnOnEquity": null,
     "profitMargins": 0.30516002,
     "debtToEquity": 360.191,
@@ -3406,7 +3403,7 @@
     "revenueGrowth": 0.801,
     "earningsQuarterlyGrowth": 3.224,
     "heldPercentInsiders": 0.31912002,
-    "heldPercentInstitutions": 0.38901,
+    "heldPercentInstitutions": 0.39828998,
     "quality": {
       "verdict": "CAUTION",
       "checks_run": 5,
@@ -3416,17 +3413,17 @@
       ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MARUTI": {
     "longName": "Maruti Suzuki India Limited",
     "shortName": "MARUTI SUZUKI INDIA LTD.",
     "sector": "Consumer Cyclical",
     "industry": "Auto Manufacturers",
-    "marketCap": 4304171171840,
-    "trailingPE": 30.027857,
-    "forwardPE": 22.639826,
-    "priceToBook": 4.016704,
+    "marketCap": 4264870805504,
+    "trailingPE": 29.76739,
+    "forwardPE": 22.433107,
+    "priceToBook": 3.9800284,
     "returnOnEquity": null,
     "profitMargins": 0.07269,
     "debtToEquity": 0.096,
@@ -3434,7 +3431,7 @@
     "revenueGrowth": 0.359,
     "earningsQuarterlyGrowth": -0.091,
     "heldPercentInsiders": 0.61585,
-    "heldPercentInstitutions": 0.25982,
+    "heldPercentInstitutions": 0.26081,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3442,17 +3439,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MARICO": {
     "longName": "Marico Limited",
     "shortName": "MARICO LIMITED",
     "sector": "Consumer Defensive",
     "industry": "Household & Personal Products",
-    "marketCap": 1101750075392,
-    "trailingPE": 58.37912,
-    "forwardPE": 43.625114,
-    "priceToBook": 26.209492,
+    "marketCap": 1100777914368,
+    "trailingPE": 58.207676,
+    "forwardPE": 43.58662,
+    "priceToBook": 26.186365,
     "returnOnEquity": null,
     "profitMargins": 0.13159999,
     "debtToEquity": 12.394,
@@ -3460,7 +3457,7 @@
     "revenueGrowth": 0.214,
     "earningsQuarterlyGrowth": 0.25,
     "heldPercentInsiders": 0.59023,
-    "heldPercentInstitutions": 0.2521,
+    "heldPercentInstitutions": 0.25261,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3468,43 +3465,43 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MAZDOCK": {
     "longName": "Mazagon Dock Shipbuilders Limited",
     "shortName": "MAZAGON DOCK SHIPBUIL LTD",
-    "sector": "Industrials",
-    "industry": "Aerospace & Defense",
-    "marketCap": 1034185670656,
-    "trailingPE": 38.559185,
-    "forwardPE": 32.31113,
-    "priceToBook": 10.6017065,
+    "sector": null,
+    "industry": null,
+    "marketCap": 1029425790976,
+    "trailingPE": 38.341347,
+    "forwardPE": 32.16242,
+    "priceToBook": 10.552912,
     "returnOnEquity": null,
-    "profitMargins": 0.20120001,
-    "debtToEquity": 4.481,
-    "earningsGrowth": 0.215,
-    "revenueGrowth": 0.121,
-    "earningsQuarterlyGrowth": 0.215,
-    "heldPercentInsiders": 0.81218004,
-    "heldPercentInstitutions": 0.059580002,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MCX": {
     "longName": "Multi Commodity Exchange of India Limited",
     "shortName": "MULTI COMMODITY EXCHANGE",
     "sector": "Financial Services",
     "industry": "Financial Data & Stock Exchanges",
-    "marketCap": 756670398464,
-    "trailingPE": 49.140495,
-    "forwardPE": 37.34187,
-    "priceToBook": 17.98102,
+    "marketCap": 810627366912,
+    "trailingPE": 52.79297,
+    "forwardPE": 40.00466,
+    "priceToBook": 19.26322,
     "returnOnEquity": null,
     "profitMargins": 0.5556,
     "debtToEquity": 0.113,
@@ -3512,7 +3509,7 @@
     "revenueGrowth": 0.853,
     "earningsQuarterlyGrowth": 1.035,
     "heldPercentInsiders": 0.19534999,
-    "heldPercentInstitutions": 0.52434,
+    "heldPercentInstitutions": 0.52467,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3520,43 +3517,43 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MOTHERSON": {
     "longName": "Samvardhana Motherson International Limited",
     "shortName": "SAMVRDHNA MTHRSN INTL LTD",
-    "sector": "Consumer Cyclical",
-    "industry": "Auto Parts",
-    "marketCap": 1793363148800,
-    "trailingPE": 40.935097,
-    "forwardPE": 24.576204,
-    "priceToBook": 4.376285,
+    "sector": null,
+    "industry": null,
+    "marketCap": 1783779950592,
+    "trailingPE": 40.913048,
+    "forwardPE": 24.444876,
+    "priceToBook": 4.352899,
     "returnOnEquity": null,
-    "profitMargins": 0.033570003,
-    "debtToEquity": 43.908,
-    "earningsGrowth": 1.042,
-    "revenueGrowth": 0.166,
-    "earningsQuarterlyGrowth": 1.016,
-    "heldPercentInsiders": 0.59464,
-    "heldPercentInstitutions": 0.27559,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MFSL": {
     "longName": "Max Financial Services Limited",
     "shortName": "MAX FINANCIAL SERV LTD",
     "sector": "Financial Services",
     "industry": "Insurance - Life",
-    "marketCap": 531002818560,
-    "trailingPE": 492.38852,
-    "forwardPE": 112.59586,
-    "priceToBook": 19.39924,
+    "marketCap": 544362889216,
+    "trailingPE": 503.1746,
+    "forwardPE": 115.21902,
+    "priceToBook": 19.887327,
     "returnOnEquity": null,
     "profitMargins": 0.00221,
     "debtToEquity": 12.673,
@@ -3564,28 +3561,28 @@
     "revenueGrowth": -0.402,
     "earningsQuarterlyGrowth": null,
     "heldPercentInsiders": 0.02078,
-    "heldPercentInstitutions": 0.81644,
+    "heldPercentInstitutions": 0.81793,
     "quality": {
       "verdict": "STABLE_WITH_CAUTION",
       "checks_run": 4,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (492.4x) — priced for perfection",
+        "Very high P/E (503.2x) — priced for perfection",
         "Low promoter/insider holding (2.1%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "METROPOLIS": {
     "longName": "Metropolis Healthcare Limited",
     "shortName": "METROPOLIS HEALTHCARE LTD",
     "sector": "Healthcare",
     "industry": "Diagnostics & Research",
-    "marketCap": 115100098560,
-    "trailingPE": 56.80655,
-    "forwardPE": 35.663315,
-    "priceToBook": 7.6044064,
+    "marketCap": 115504504832,
+    "trailingPE": 57.240498,
+    "forwardPE": 35.78862,
+    "priceToBook": 7.6311245,
     "returnOnEquity": null,
     "profitMargins": 0.117910005,
     "debtToEquity": 15.212,
@@ -3593,7 +3590,7 @@
     "revenueGrowth": 0.166,
     "earningsQuarterlyGrowth": 0.258,
     "heldPercentInsiders": 0.47839,
-    "heldPercentInstitutions": 0.44601002,
+    "heldPercentInstitutions": 0.44483003,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3601,17 +3598,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MGL": {
     "longName": "Mahanagar Gas Limited",
     "shortName": "MAHANAGAR GAS LTD.",
     "sector": "Utilities",
     "industry": "Utilities - Regulated Gas",
-    "marketCap": 111421333504,
-    "trailingPE": 15.567209,
-    "forwardPE": 12.063819,
-    "priceToBook": 1.7335178,
+    "marketCap": 110058192896,
+    "trailingPE": 15.372515,
+    "forwardPE": 11.916229,
+    "priceToBook": 1.7123097,
     "returnOnEquity": null,
     "profitMargins": 0.08382,
     "debtToEquity": 3.461,
@@ -3619,7 +3616,7 @@
     "revenueGrowth": 0.139,
     "earningsQuarterlyGrowth": -0.393,
     "heldPercentInsiders": 0.42501,
-    "heldPercentInstitutions": 0.3157,
+    "heldPercentInstitutions": 0.33506,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3629,17 +3626,17 @@
         "Earnings declining sharply (-39.3%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MPHASIS": {
     "longName": "Mphasis Limited",
     "shortName": "MPHASIS LIMITED",
     "sector": "Technology",
     "industry": "Information Technology Services",
-    "marketCap": 462635958272,
-    "trailingPE": 24.254702,
-    "forwardPE": 19.1212,
-    "priceToBook": 4.0812583,
+    "marketCap": 463685451776,
+    "trailingPE": 24.270874,
+    "forwardPE": 19.164713,
+    "priceToBook": 4.0905166,
     "returnOnEquity": 0.17743999,
     "profitMargins": 0.115559995,
     "debtToEquity": 24.675,
@@ -3647,7 +3644,7 @@
     "revenueGrowth": 0.175,
     "earningsQuarterlyGrowth": 0.108,
     "heldPercentInsiders": 0.31203,
-    "heldPercentInstitutions": 0.57308996,
+    "heldPercentInstitutions": 0.57344,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3655,17 +3652,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MOTILALOFS": {
     "longName": "Motilal Oswal Financial Services Limited",
     "shortName": "MOTILAL OSWAL FIN LTD",
     "sector": "Financial Services",
     "industry": "Capital Markets",
-    "marketCap": 567282368512,
-    "trailingPE": 29.719242,
-    "forwardPE": 15.963664,
-    "priceToBook": 4.3994994,
+    "marketCap": 596125220864,
+    "trailingPE": 29.738659,
+    "forwardPE": 16.77532,
+    "priceToBook": 4.623187,
     "returnOnEquity": null,
     "profitMargins": 0.22963,
     "debtToEquity": 165.8,
@@ -3673,7 +3670,7 @@
     "revenueGrowth": 0.239,
     "earningsQuarterlyGrowth": 0.096,
     "heldPercentInsiders": 0.52762,
-    "heldPercentInstitutions": 0.29001,
+    "heldPercentInstitutions": 0.29022,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3683,17 +3680,17 @@
         "Elevated leverage (Debt/Equity 166%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MRF": {
     "longName": "MRF Limited",
     "shortName": "MRF LTD",
     "sector": "Consumer Cyclical",
     "industry": "Auto Parts",
-    "marketCap": 566743924736,
-    "trailingPE": 23.441145,
-    "forwardPE": 19.962132,
-    "priceToBook": 2.702054,
+    "marketCap": 562651267072,
+    "trailingPE": 23.240313,
+    "forwardPE": 19.817976,
+    "priceToBook": 2.6825414,
     "returnOnEquity": null,
     "profitMargins": 0.075840004,
     "debtToEquity": 15.288,
@@ -3701,7 +3698,7 @@
     "revenueGrowth": 0.096,
     "earningsQuarterlyGrowth": -0.01,
     "heldPercentInsiders": 0.47884998,
-    "heldPercentInstitutions": 0.1823,
+    "heldPercentInstitutions": 0.18194,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3709,7 +3706,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "MUTHOOTFIN": {
     "longName": "Muthoot Finance Limited",
@@ -3744,10 +3741,10 @@
     "shortName": "NBCC (INDIA) LIMITED",
     "sector": "Industrials",
     "industry": "Engineering & Construction",
-    "marketCap": 235413012480,
-    "trailingPE": 31.705456,
-    "forwardPE": 31.139288,
-    "priceToBook": 7.8373036,
+    "marketCap": 239975989248,
+    "trailingPE": 32.32,
+    "forwardPE": 31.742857,
+    "priceToBook": 7.9892135,
     "returnOnEquity": null,
     "profitMargins": 0.05691,
     "debtToEquity": 0.008,
@@ -3755,7 +3752,7 @@
     "revenueGrowth": -0.059,
     "earningsQuarterlyGrowth": 0.172,
     "heldPercentInsiders": 0.61754,
-    "heldPercentInstitutions": 0.15107,
+    "heldPercentInstitutions": 0.14765,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3763,17 +3760,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "NESTLEIND": {
     "longName": "Nestlé India Limited",
     "shortName": "NESTLE INDIA LIMITED",
     "sector": "Consumer Defensive",
     "industry": "Packaged Foods",
-    "marketCap": 2824980660224,
-    "trailingPE": 74.21479,
-    "forwardPE": 54.25926,
-    "priceToBook": 54.78069,
+    "marketCap": 2848313049088,
+    "trailingPE": 74.48815,
+    "forwardPE": 59.49803,
+    "priceToBook": 55.233143,
     "returnOnEquity": null,
     "profitMargins": 0.15623,
     "debtToEquity": 8.621,
@@ -3781,7 +3778,7 @@
     "revenueGrowth": 0.252,
     "earningsQuarterlyGrowth": 0.483,
     "heldPercentInsiders": 0.62765,
-    "heldPercentInstitutions": 0.17216,
+    "heldPercentInstitutions": 0.17176001,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3789,71 +3786,71 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "NTPC": {
     "longName": "NTPC Limited",
     "shortName": "NTPC LTD",
-    "sector": "Utilities",
-    "industry": "Utilities - Regulated Electric",
-    "marketCap": 3263413092352,
-    "trailingPE": 10.292048,
-    "forwardPE": 11.897729,
-    "priceToBook": 1.6068734,
+    "sector": null,
+    "industry": null,
+    "marketCap": 3296866598912,
+    "trailingPE": 10.397553,
+    "forwardPE": 12.019694,
+    "priceToBook": 1.6233456,
     "returnOnEquity": null,
-    "profitMargins": 0.14531,
-    "debtToEquity": 118.127,
-    "earningsGrowth": -0.016,
-    "revenueGrowth": 0.08,
-    "earningsQuarterlyGrowth": -0.016,
-    "heldPercentInsiders": 0.53998,
-    "heldPercentInstitutions": 0.38455,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "NACLIND": {
     "longName": "NACL Industries Limited",
     "shortName": "NACL INDUSTRIES LIMITED",
-    "sector": "Basic Materials",
-    "industry": "Agricultural Inputs",
-    "marketCap": 40755998720,
-    "trailingPE": 347.98,
+    "sector": null,
+    "industry": null,
+    "marketCap": 39814340608,
+    "trailingPE": 346.87753,
     "forwardPE": null,
-    "priceToBook": 5.966326,
+    "priceToBook": 5.8284755,
     "returnOnEquity": null,
-    "profitMargins": 0.0081400005,
-    "debtToEquity": 45.68,
-    "earningsGrowth": 0.369,
-    "revenueGrowth": -0.145,
-    "earningsQuarterlyGrowth": 0.598,
-    "heldPercentInsiders": 0.7424,
-    "heldPercentInstitutions": 1.0000001e-05,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (348.0x) — priced for perfection"
+        "Very high P/E (346.9x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "NATIONALUM": {
     "longName": "National Aluminium Company Limited",
     "shortName": "NATIONAL ALUMINIUM CO LTD",
     "sector": "Basic Materials",
     "industry": "Aluminum",
-    "marketCap": 709949980672,
-    "trailingPE": 10.49837,
-    "forwardPE": 9.958809,
-    "priceToBook": 3.2856207,
+    "marketCap": 724459454464,
+    "trailingPE": 10.75675,
+    "forwardPE": 10.171871,
+    "priceToBook": 3.3527696,
     "returnOnEquity": null,
     "profitMargins": 0.34908,
     "debtToEquity": 0.277,
@@ -3861,7 +3858,7 @@
     "revenueGrowth": 0.393,
     "earningsQuarterlyGrowth": 0.909,
     "heldPercentInsiders": 0.51278,
-    "heldPercentInstitutions": 0.21697001,
+    "heldPercentInstitutions": 0.22096,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3869,17 +3866,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "NAM-INDIA": {
     "longName": "Nippon Life India Asset Management Limited",
     "shortName": "NIPPON L I A M LTD",
     "sector": "Financial Services",
     "industry": "Asset Management",
-    "marketCap": 778536812544,
-    "trailingPE": 48.140823,
-    "forwardPE": 36.518494,
-    "priceToBook": 16.668036,
+    "marketCap": 800287227904,
+    "trailingPE": 49.50534,
+    "forwardPE": 37.53873,
+    "priceToBook": 17.133701,
     "returnOnEquity": null,
     "profitMargins": 0.52507997,
     "debtToEquity": 1.617,
@@ -3887,7 +3884,7 @@
     "revenueGrowth": 0.245,
     "earningsQuarterlyGrowth": 0.272,
     "heldPercentInsiders": 0.00551,
-    "heldPercentInstitutions": 0.90153,
+    "heldPercentInstitutions": 0.90108,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3897,17 +3894,17 @@
         "Low promoter/insider holding (0.6%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "NMDC": {
     "longName": "NMDC Limited",
     "shortName": "NMDC LTD.",
     "sector": "Basic Materials",
     "industry": "Steel",
-    "marketCap": 732797927424,
-    "trailingPE": 9.82901,
-    "forwardPE": 8.062605,
-    "priceToBook": 2.1474211,
+    "marketCap": 743875674112,
+    "trailingPE": 9.977595,
+    "forwardPE": 8.184487,
+    "priceToBook": 2.1798837,
     "returnOnEquity": null,
     "profitMargins": 0.23216999,
     "debtToEquity": 18.802,
@@ -3915,7 +3912,7 @@
     "revenueGrowth": 0.008,
     "earningsQuarterlyGrowth": 0.004,
     "heldPercentInsiders": 0.60797,
-    "heldPercentInstitutions": 0.19997999,
+    "heldPercentInstitutions": 0.20018,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -3923,17 +3920,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "NYKAA": {
     "longName": "FSN E-Commerce Ventures Limited",
     "shortName": "FSN E COMMERCE VENTURES",
     "sector": "Consumer Cyclical",
     "industry": "Internet Retail",
-    "marketCap": 937887137792,
-    "trailingPE": 363.72223,
-    "forwardPE": 111.521065,
-    "priceToBook": 65.1832,
+    "marketCap": 956939960320,
+    "trailingPE": 375.2809,
+    "forwardPE": 113.786575,
+    "priceToBook": 66.50737,
     "returnOnEquity": null,
     "profitMargins": 0.02405,
     "debtToEquity": 82.829,
@@ -3941,17 +3938,17 @@
     "revenueGrowth": 0.291,
     "earningsQuarterlyGrowth": 2.431,
     "heldPercentInsiders": 0.5614,
-    "heldPercentInstitutions": 0.32942,
+    "heldPercentInstitutions": 0.31408,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (363.7x) — priced for perfection"
+        "Very high P/E (375.3x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "OBEROIRLTY": {
     "longName": "Oberoi Realty Limited",
@@ -3982,38 +3979,38 @@
   "OIL": {
     "longName": "Oil India Limited",
     "shortName": "OIL INDIA LTD",
-    "sector": "Energy",
-    "industry": "Oil & Gas Integrated",
-    "marketCap": 772394713088,
-    "trailingPE": 9.133487,
-    "forwardPE": 7.551539,
-    "priceToBook": 1.3315368,
+    "sector": null,
+    "industry": null,
+    "marketCap": 772638703616,
+    "trailingPE": 9.248443,
+    "forwardPE": 7.4634957,
+    "priceToBook": 1.3319575,
     "returnOnEquity": null,
-    "profitMargins": 0.21685,
-    "debtToEquity": 58.741,
-    "earningsGrowth": 0.914,
-    "revenueGrowth": 0.577,
-    "earningsQuarterlyGrowth": 0.914,
-    "heldPercentInsiders": 0.67726,
-    "heldPercentInstitutions": 0.22494,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "PETRONET": {
     "longName": "Petronet LNG Limited",
     "shortName": "PETRONET LNG LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 432225026048,
-    "trailingPE": 10.272727,
-    "forwardPE": 10.159104,
-    "priceToBook": 1.9391766,
+    "marketCap": 439500046336,
+    "trailingPE": 10.335097,
+    "forwardPE": 10.330098,
+    "priceToBook": 1.971816,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4029,125 +4026,123 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "PAYTM": {
     "longName": "One97 Communications Limited",
     "shortName": "ONE 97 COMMUNICATIONS LTD",
-    "sector": "Technology",
-    "industry": "Software - Infrastructure",
-    "marketCap": 1015234297856,
-    "trailingPE": 157.56218,
-    "forwardPE": 50.095303,
-    "priceToBook": 6.334735,
+    "sector": null,
+    "industry": null,
+    "marketCap": 1046329229312,
+    "trailingPE": 161.58415,
+    "forwardPE": 51.62964,
+    "priceToBook": 6.5287576,
     "returnOnEquity": null,
-    "profitMargins": 0.07249,
-    "debtToEquity": 1.073,
-    "earningsGrowth": 0.799,
-    "revenueGrowth": 0.277,
-    "earningsQuarterlyGrowth": 0.796,
-    "heldPercentInsiders": 0.27938998,
-    "heldPercentInstitutions": 0.4756,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": [
-        "Very high P/E (157.6x) — priced for perfection"
+        "Very high P/E (161.6x) — priced for perfection"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "PAGEIND": {
     "longName": "Page Industries Limited",
     "shortName": "PAGE INDUSTRIES LTD",
-    "sector": "Consumer Cyclical",
-    "industry": "Apparel Manufacturing",
-    "marketCap": 393062514688,
-    "trailingPE": 52.013992,
-    "forwardPE": 40.54681,
-    "priceToBook": 26.15885,
+    "sector": null,
+    "industry": null,
+    "marketCap": 395739463680,
+    "trailingPE": 52.43789,
+    "forwardPE": 40.822952,
+    "priceToBook": 26.337004,
     "returnOnEquity": null,
-    "profitMargins": 0.14126,
-    "debtToEquity": 18.422,
-    "earningsGrowth": -0.04,
-    "revenueGrowth": 0.079,
-    "earningsQuarterlyGrowth": -0.04,
-    "heldPercentInsiders": 0.4643,
-    "heldPercentInstitutions": 0.43903,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "PERSISTENT": {
     "longName": "Persistent Systems Limited",
     "shortName": "PERSISTENT SYSTEMS LTD",
-    "sector": "Technology",
-    "industry": "Information Technology Services",
-    "marketCap": 860833054720,
-    "trailingPE": 45.197277,
-    "forwardPE": 31.098171,
-    "priceToBook": 10.998201,
+    "sector": null,
+    "industry": null,
+    "marketCap": 885439397888,
+    "trailingPE": 46.45873,
+    "forwardPE": 31.987095,
+    "priceToBook": 11.312578,
     "returnOnEquity": null,
-    "profitMargins": 0.12236,
-    "debtToEquity": 6.092,
-    "earningsGrowth": 0.121,
-    "revenueGrowth": 0.291,
-    "earningsQuarterlyGrowth": 0.137,
-    "heldPercentInsiders": 0.33164,
-    "heldPercentInstitutions": 0.43602002,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "PFC": {
     "longName": "Power Finance Corporation Limited",
     "shortName": "POWER FIN CORP LTD.",
-    "sector": "Financial Services",
-    "industry": "Credit Services",
-    "marketCap": 1235723091968,
-    "trailingPE": 4.744077,
-    "forwardPE": 4.142146,
-    "priceToBook": 0.864557,
+    "sector": null,
+    "industry": null,
+    "marketCap": 1197936869376,
+    "trailingPE": 4.598429,
+    "forwardPE": 4.0154867,
+    "priceToBook": 0.8381204,
     "returnOnEquity": null,
-    "profitMargins": 0.54484004,
-    "debtToEquity": 536.837,
-    "earningsGrowth": 0.021,
-    "revenueGrowth": 0.008,
-    "earningsQuarterlyGrowth": 0.021,
-    "heldPercentInsiders": 0.55999,
-    "heldPercentInstitutions": 0.25125,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
-      "verdict": "CAUTION",
-      "checks_run": 5,
+      "verdict": "STABLE",
+      "checks_run": 1,
       "checks_possible": 5,
-      "red_flags": [
-        "High leverage (Debt/Equity 537%)"
-      ],
+      "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "PFIZER": {
     "longName": "Pfizer Limited",
     "shortName": "PFIZER LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 219557085184,
-    "trailingPE": 29.844536,
-    "forwardPE": 23.007189,
-    "priceToBook": 5.2239437,
+    "marketCap": 227741368320,
+    "trailingPE": 30.943562,
+    "forwardPE": 23.864813,
+    "priceToBook": 5.4186735,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4163,7 +4158,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
   },
   "PIDILITIND": {
     "longName": "Pidilite Industries Limited",
@@ -4196,10 +4191,10 @@
     "shortName": "PI INDUSTRIES LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 380023898112,
-    "trailingPE": 32.655457,
-    "forwardPE": 23.587572,
-    "priceToBook": 3.3838546,
+    "marketCap": 378779893760,
+    "trailingPE": 32.54856,
+    "forwardPE": 23.510359,
+    "priceToBook": 3.3727777,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4215,45 +4210,43 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "POWERGRID": {
     "longName": "Power Grid Corporation of India Limited",
     "shortName": "POWER GRID CORP. LTD.",
-    "sector": "Utilities",
-    "industry": "Utilities - Regulated Electric",
-    "marketCap": 2450709020672,
-    "trailingPE": 12.816148,
-    "forwardPE": 13.487022,
-    "priceToBook": 2.4386632,
+    "sector": null,
+    "industry": null,
+    "marketCap": 2533484396544,
+    "trailingPE": 13.339863,
+    "forwardPE": 13.942561,
+    "priceToBook": 2.5210316,
     "returnOnEquity": null,
-    "profitMargins": 0.33797002,
-    "debtToEquity": 150.813,
-    "earningsGrowth": -0.008,
-    "revenueGrowth": 0.027,
-    "earningsQuarterlyGrowth": -0.009,
-    "heldPercentInsiders": 0.52908003,
-    "heldPercentInstitutions": 0.35911998,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
-      "yellow_flags": [
-        "Elevated leverage (Debt/Equity 151%)"
-      ]
+      "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "PIRAMALFIN": {
     "longName": null,
     "shortName": "PIRAMAL FINANCE LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 464982507520,
-    "trailingPE": 27.582787,
-    "forwardPE": 14.124498,
-    "priceToBook": 1.6523284,
+    "marketCap": 492871548928,
+    "trailingPE": 29.19411,
+    "forwardPE": 14.971667,
+    "priceToBook": 1.7514328,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4269,17 +4262,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "POLYCAB": {
     "longName": "Polycab India Limited",
     "shortName": "POLYCAB INDIA LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 1376804405248,
-    "trailingPE": 49.509777,
-    "forwardPE": 35.900417,
-    "priceToBook": 11.377584,
+    "marketCap": 1350593937408,
+    "trailingPE": 47.239197,
+    "forwardPE": 35.216972,
+    "priceToBook": 11.160987,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4295,7 +4288,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "PREMIER": {
     "longName": "Premier Limited",
@@ -4328,10 +4321,10 @@
     "shortName": "PVR INOX LIMITED",
     "sector": "Communication Services",
     "industry": "Entertainment",
-    "marketCap": 117928337408,
-    "trailingPE": 42.122063,
-    "forwardPE": 20.494762,
-    "priceToBook": 1.600097,
+    "marketCap": 119489716224,
+    "trailingPE": 42.82999,
+    "forwardPE": 20.766115,
+    "priceToBook": 1.6212825,
     "returnOnEquity": null,
     "profitMargins": 0.0652,
     "debtToEquity": 91.874,
@@ -4347,71 +4340,45 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "RAIN": {
     "longName": "Rain Industries Limited",
     "shortName": "RAIN INDUSTRIES LIMITED",
-    "sector": null,
-    "industry": null,
-    "marketCap": 69132484608,
-    "trailingPE": 12.870381,
-    "forwardPE": -135.22368,
-    "priceToBook": 0.9280631,
-    "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 1,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "RAMCOCEM": {
-    "longName": "The Ramco Cements Limited",
-    "shortName": "THE RAMCO CEMENTS LIMITED",
     "sector": "Basic Materials",
-    "industry": "Building Materials",
-    "marketCap": 213182988288,
-    "trailingPE": 33.059727,
-    "forwardPE": 34.282063,
-    "priceToBook": 2.633999,
-    "returnOnEquity": null,
-    "profitMargins": 0.06988,
-    "debtToEquity": 47.897,
-    "earningsGrowth": -0.633,
-    "revenueGrowth": 0.096,
-    "earningsQuarterlyGrowth": -0.633,
-    "heldPercentInsiders": 0.49148,
-    "heldPercentInstitutions": 0.3111,
+    "industry": "Specialty Chemicals",
+    "marketCap": 70165069824,
+    "trailingPE": 13.070802,
+    "forwardPE": -137.24342,
+    "priceToBook": 0.9419249,
+    "returnOnEquity": 0.08547,
+    "profitMargins": 0.029089998,
+    "debtToEquity": 130.481,
+    "earningsGrowth": 3.894,
+    "revenueGrowth": 0.174,
+    "earningsQuarterlyGrowth": 3.88,
+    "heldPercentInsiders": 0.47882998,
+    "heldPercentInstitutions": 0.07418,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": [
-        "Earnings declining sharply (-63.3%)"
+        "Elevated leverage (Debt/Equity 130%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
-  "RBLBANK": {
-    "longName": "RBL Bank Limited",
-    "shortName": "RBL BANK LIMITED",
+  "RAMCOCEM": {
+    "longName": "The Ramco Cements Limited",
+    "shortName": "THE RAMCO CEMENTS LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 591366258688,
-    "trailingPE": 31.528925,
-    "forwardPE": 19.174295,
-    "priceToBook": 1.407957,
+    "marketCap": 212438663168,
+    "trailingPE": 32.932236,
+    "forwardPE": 34.162365,
+    "priceToBook": 2.6248026,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4427,7 +4394,33 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
+  },
+  "RBLBANK": {
+    "longName": "RBL Bank Limited",
+    "shortName": "RBL BANK LIMITED",
+    "sector": null,
+    "industry": null,
+    "marketCap": 608417480704,
+    "trailingPE": 32.384487,
+    "forwardPE": 19.744047,
+    "priceToBook": 1.4485533,
+    "returnOnEquity": null,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 1,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
   },
   "RECLTD": {
     "longName": "REC Limited",
@@ -4462,10 +4455,10 @@
     "shortName": "RELIANCE INDUSTRIES LTD",
     "sector": "Energy",
     "industry": "Oil & Gas Refining & Marketing",
-    "marketCap": 17741071253504,
-    "trailingPE": 23.724213,
-    "forwardPE": 18.304209,
-    "priceToBook": 1.9624428,
+    "marketCap": 17808733765632,
+    "trailingPE": 23.801771,
+    "forwardPE": 18.37402,
+    "priceToBook": 1.9699272,
     "returnOnEquity": null,
     "profitMargins": 0.066149995,
     "debtToEquity": 36.653,
@@ -4473,7 +4466,7 @@
     "revenueGrowth": 0.297,
     "earningsQuarterlyGrowth": -0.224,
     "heldPercentInsiders": 0.51798,
-    "heldPercentInstitutions": 0.28092,
+    "heldPercentInstitutions": 0.28085,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -4483,17 +4476,17 @@
         "Earnings declining sharply (-22.4%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "SBIN": {
     "longName": "State Bank of India",
     "shortName": "STATE BANK OF INDIA",
     "sector": "Financial Services",
     "industry": "Banks - Regional",
-    "marketCap": 9795530653696,
-    "trailingPE": 11.346092,
-    "forwardPE": 10.135716,
-    "priceToBook": 1.5749971,
+    "marketCap": 9680148496384,
+    "trailingPE": 11.218442,
+    "forwardPE": 10.007059,
+    "priceToBook": 1.556445,
     "returnOnEquity": 0.15177,
     "profitMargins": 0.22376,
     "debtToEquity": null,
@@ -4501,7 +4494,7 @@
     "revenueGrowth": 0.103,
     "earningsQuarterlyGrowth": 0.137,
     "heldPercentInsiders": 0.57231,
-    "heldPercentInstitutions": 0.28961,
+    "heldPercentInstitutions": 0.29121,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 4,
@@ -4509,17 +4502,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-17"
+    "as_of_date": "2026-08-21"
   },
   "SBILIFE": {
     "longName": "SBI Life Insurance Company Limited",
     "shortName": "SBI LIFE INSURANCE CO LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 1786363641856,
-    "trailingPE": 69.06129,
-    "forwardPE": 50.954147,
-    "priceToBook": 8.872102,
+    "marketCap": 1798905528320,
+    "trailingPE": 69.384674,
+    "forwardPE": 51.31189,
+    "priceToBook": 8.934391,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4535,43 +4528,43 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "SIEMENS": {
     "longName": "Siemens Limited",
     "shortName": "SIEMENS LTD",
-    "sector": "Industrials",
-    "industry": "Specialty Industrial Machinery",
-    "marketCap": 1404183117824,
-    "trailingPE": 83.39679,
-    "forwardPE": 58.197433,
-    "priceToBook": 10.145688,
+    "sector": null,
+    "industry": null,
+    "marketCap": 1395992428544,
+    "trailingPE": 82.80524,
+    "forwardPE": 57.85796,
+    "priceToBook": 10.086507,
     "returnOnEquity": null,
-    "profitMargins": 0.19017,
-    "debtToEquity": 2.213,
-    "earningsGrowth": 4.061,
-    "revenueGrowth": 0.148,
-    "earningsQuarterlyGrowth": 4.067,
-    "heldPercentInsiders": 0.76905996,
-    "heldPercentInstitutions": 0.1105,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-17"
+    "as_of_date": "2026-08-21"
   },
   "SBICARD": {
     "longName": "SBI Cards and Payment Services Limited",
     "shortName": "SBI CARDS & PAY SER LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 585260138496,
-    "trailingPE": 25.689222,
-    "forwardPE": 17.249369,
-    "priceToBook": 3.7232563,
+    "marketCap": 617615982592,
+    "trailingPE": 27.10944,
+    "forwardPE": 18.333416,
+    "priceToBook": 3.9290948,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4587,33 +4580,33 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
   },
   "ONGC": {
     "longName": "Oil and Natural Gas Corporation Limited",
     "shortName": "OIL AND NATURAL GAS CORP.",
-    "sector": "Energy",
-    "industry": "Oil & Gas Integrated",
-    "marketCap": 2994106531840,
-    "trailingPE": 6.876625,
-    "forwardPE": 5.7287283,
-    "priceToBook": 0.80541456,
+    "sector": null,
+    "industry": null,
+    "marketCap": 2973978066944,
+    "trailingPE": 6.8303957,
+    "forwardPE": 5.6902156,
+    "priceToBook": 0.79999995,
     "returnOnEquity": null,
-    "profitMargins": 0.06181,
-    "debtToEquity": 42.548,
-    "earningsGrowth": 0.214,
-    "revenueGrowth": 0.257,
-    "earningsQuarterlyGrowth": 0.214,
-    "heldPercentInsiders": 0.69209,
-    "heldPercentInstitutions": 0.22752,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "SRF": {
     "longName": "SRF Limited",
@@ -4698,42 +4691,12 @@
   "SUNDARMFIN": {
     "longName": "Sundaram Finance Limited",
     "shortName": "SUNDARAM FINANCE LTD",
-    "sector": "Financial Services",
-    "industry": "Credit Services",
-    "marketCap": 494336835584,
-    "trailingPE": 21.817871,
-    "forwardPE": 20.256075,
-    "priceToBook": 3.3458014,
-    "returnOnEquity": null,
-    "profitMargins": 0.4609,
-    "debtToEquity": 409.161,
-    "earningsGrowth": 0.338,
-    "revenueGrowth": 0.268,
-    "earningsQuarterlyGrowth": 0.339,
-    "heldPercentInsiders": 0.0,
-    "heldPercentInstitutions": 0.16131,
-    "quality": {
-      "verdict": "CAUTION",
-      "checks_run": 5,
-      "checks_possible": 5,
-      "red_flags": [
-        "High leverage (Debt/Equity 409%)"
-      ],
-      "yellow_flags": [
-        "Low promoter/insider holding (0.0%)"
-      ]
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "SOLARINDS": {
-    "longName": "Solar Industries India Limited",
-    "shortName": "SOLAR INDUSTRIES (I) LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 1784554455040,
-    "trailingPE": 89.21511,
-    "forwardPE": 56.017185,
-    "priceToBook": 28.429165,
+    "marketCap": 499781566464,
+    "trailingPE": 22.526081,
+    "forwardPE": 20.47918,
+    "priceToBook": 3.3826528,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4749,17 +4712,43 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
+  },
+  "SOLARINDS": {
+    "longName": "Solar Industries India Limited",
+    "shortName": "SOLAR INDUSTRIES (I) LTD",
+    "sector": null,
+    "industry": null,
+    "marketCap": 1800752070656,
+    "trailingPE": 90.72673,
+    "forwardPE": 56.52563,
+    "priceToBook": 28.687206,
+    "returnOnEquity": null,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 1,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
   },
   "SUNTV": {
     "longName": "Sun TV Network Limited",
     "shortName": "SUN TV NETWORK LIMITED",
     "sector": "Communication Services",
     "industry": "Broadcasting",
-    "marketCap": 189515284480,
-    "trailingPE": 12.387944,
-    "forwardPE": 10.806742,
-    "priceToBook": 1.495773,
+    "marketCap": 186027638784,
+    "trailingPE": 12.159969,
+    "forwardPE": 10.607865,
+    "priceToBook": 1.4682462,
     "returnOnEquity": null,
     "profitMargins": 0.33966,
     "debtToEquity": 0.837,
@@ -4767,7 +4756,7 @@
     "revenueGrowth": 0.13,
     "earningsQuarterlyGrowth": 0.17,
     "heldPercentInsiders": 0.78472,
-    "heldPercentInstitutions": 0.14729999,
+    "heldPercentInstitutions": 0.14718,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -4775,17 +4764,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "SWIGGY": {
     "longName": null,
     "shortName": "SWIGGY LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 713688481792,
+    "marketCap": 740150476800,
     "trailingPE": null,
-    "forwardPE": -51.48404,
-    "priceToBook": 3.8762004,
+    "forwardPE": -52.75739,
+    "priceToBook": 4.019922,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4801,7 +4790,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "SUNPHARMA": {
     "longName": "Sun Pharmaceutical Industries Limited",
@@ -4858,30 +4847,28 @@
   "TATACHEM": {
     "longName": "Tata Chemicals Limited",
     "shortName": "TATA CHEMICALS LTD",
-    "sector": "Basic Materials",
-    "industry": "Chemicals",
-    "marketCap": 162101411840,
+    "sector": null,
+    "industry": null,
+    "marketCap": 159668486144,
     "trailingPE": null,
-    "forwardPE": 20.46409,
-    "priceToBook": 0.76441336,
+    "forwardPE": 20.156952,
+    "priceToBook": 0.7529406,
     "returnOnEquity": null,
-    "profitMargins": -0.14319,
-    "debtToEquity": 36.081,
+    "profitMargins": null,
+    "debtToEquity": null,
     "earningsGrowth": null,
-    "revenueGrowth": 0.144,
+    "revenueGrowth": null,
     "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": 0.38709998,
-    "heldPercentInstitutions": 0.26885998,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
-      "verdict": "CAUTION",
-      "checks_run": 3,
+      "verdict": "UNKNOWN",
+      "checks_run": 0,
       "checks_possible": 5,
-      "red_flags": [
-        "Negative profit margin (-14.3%)"
-      ],
+      "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TATACOMM": {
     "longName": "Tata Communications Limited",
@@ -4912,12 +4899,38 @@
   "TATACONSUM": {
     "longName": "Tata Consumer Products Limited",
     "shortName": "TATA CONSUMER PRODUCT LTD",
+    "sector": "Consumer Defensive",
+    "industry": "Packaged Foods",
+    "marketCap": 1038184808448,
+    "trailingPE": 64.080635,
+    "forwardPE": 43.868988,
+    "priceToBook": 4.764414,
+    "returnOnEquity": null,
+    "profitMargins": 0.078379996,
+    "debtToEquity": 12.159,
+    "earningsGrowth": 0.279,
+    "revenueGrowth": 0.119,
+    "earningsQuarterlyGrowth": 0.278,
+    "heldPercentInsiders": 0.34372002,
+    "heldPercentInstitutions": 0.34402,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 5,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
+  },
+  "TATAELXSI": {
+    "longName": "Tata Elxsi Limited",
+    "shortName": "TATA ELXSI LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 1056988921856,
-    "trailingPE": 64.49275,
-    "forwardPE": 44.663563,
-    "priceToBook": 4.850709,
+    "marketCap": 231006765056,
+    "trailingPE": 35.30084,
+    "forwardPE": 25.792242,
+    "priceToBook": 7.595201,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -4933,43 +4946,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
-  },
-  "TATAELXSI": {
-    "longName": "Tata Elxsi Limited",
-    "shortName": "TATA ELXSI LIMITED",
-    "sector": "Technology",
-    "industry": "Software - Application",
-    "marketCap": 227997696000,
-    "trailingPE": 34.82112,
-    "forwardPE": 25.456274,
-    "priceToBook": 7.496267,
-    "returnOnEquity": null,
-    "profitMargins": 0.1674,
-    "debtToEquity": 5.336,
-    "earningsGrowth": 0.181,
-    "revenueGrowth": 0.145,
-    "earningsQuarterlyGrowth": 0.182,
-    "heldPercentInsiders": 0.44855,
-    "heldPercentInstitutions": 0.15041,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 5,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TATAPOWER": {
     "longName": "The Tata Power Company Limited",
     "shortName": "TATA POWER CO LTD",
     "sector": "Utilities",
     "industry": "Utilities - Independent Power Producers",
-    "marketCap": 1210714161152,
-    "trailingPE": 31.365894,
-    "forwardPE": 22.61795,
-    "priceToBook": 3.0669484,
+    "marketCap": 1196015484928,
+    "trailingPE": 30.985098,
+    "forwardPE": 22.343359,
+    "priceToBook": 3.0297143,
     "returnOnEquity": null,
     "profitMargins": 0.060890004,
     "debtToEquity": 168.051,
@@ -4977,7 +4964,7 @@
     "revenueGrowth": 0.056,
     "earningsQuarterlyGrowth": 0.11,
     "heldPercentInsiders": 0.48708,
-    "heldPercentInstitutions": 0.21616,
+    "heldPercentInstitutions": 0.2163,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -4987,17 +4974,17 @@
         "Elevated leverage (Debt/Equity 168%)"
       ]
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TATATECH": {
     "longName": "Tata Technologies Limited",
     "shortName": "TATA TECHNOLOGIES LIMITED",
     "sector": "Technology",
     "industry": "Information Technology Services",
-    "marketCap": 329937420288,
-    "trailingPE": 59.266956,
-    "forwardPE": 34.46689,
-    "priceToBook": 8.408009,
+    "marketCap": 333267042304,
+    "trailingPE": 59.64753,
+    "forwardPE": 34.814716,
+    "priceToBook": 8.49286,
     "returnOnEquity": null,
     "profitMargins": 0.094,
     "debtToEquity": 23.908,
@@ -5005,7 +4992,7 @@
     "revenueGrowth": 0.338,
     "earningsQuarterlyGrowth": 0.061,
     "heldPercentInsiders": 0.60245997,
-    "heldPercentInstitutions": 0.079229996,
+    "heldPercentInstitutions": 0.07836,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -5013,17 +5000,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TATASTEEL": {
     "longName": "Tata Steel Limited",
     "shortName": "TATA STEEL LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 2295274143744,
-    "trailingPE": 20.79096,
-    "forwardPE": 10.27933,
-    "priceToBook": 2.2482343,
+    "marketCap": 2282799759360,
+    "trailingPE": 20.701357,
+    "forwardPE": 10.223464,
+    "priceToBook": 2.2360156,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -5039,97 +5026,95 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TCS": {
     "longName": "Tata Consultancy Services Limited",
     "shortName": "TATA CONSULTANCY SERV LT",
-    "sector": "Technology",
-    "industry": "Information Technology Services",
-    "marketCap": 8281802145792,
-    "trailingPE": 16.621885,
-    "forwardPE": 14.092419,
-    "priceToBook": 7.554106,
-    "returnOnEquity": 0.47743,
-    "profitMargins": 0.18052,
-    "debtToEquity": 10.211,
-    "earningsGrowth": 0.046,
-    "revenueGrowth": 0.139,
-    "earningsQuarterlyGrowth": 0.046,
-    "heldPercentInsiders": 0.71794,
-    "heldPercentInstitutions": 0.1774,
+    "sector": null,
+    "industry": null,
+    "marketCap": 8328837070848,
+    "trailingPE": 16.667873,
+    "forwardPE": 14.172454,
+    "priceToBook": 7.5970087,
+    "returnOnEquity": null,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TECHM": {
     "longName": "Tech Mahindra Limited",
     "shortName": "TECH MAHINDRA LIMITED",
-    "sector": "Technology",
-    "industry": "Information Technology Services",
-    "marketCap": 1408400883712,
-    "trailingPE": 27.818024,
-    "forwardPE": 18.30193,
-    "priceToBook": 4.754073,
+    "sector": null,
+    "industry": null,
+    "marketCap": 1403262599168,
+    "trailingPE": 27.409586,
+    "forwardPE": 18.235159,
+    "priceToBook": 4.736729,
     "returnOnEquity": null,
-    "profitMargins": 0.086780004,
-    "debtToEquity": 7.269,
-    "earningsGrowth": 0.283,
-    "revenueGrowth": 0.177,
-    "earningsQuarterlyGrowth": 0.285,
-    "heldPercentInsiders": 0.37096,
-    "heldPercentInstitutions": 0.44564998,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TITAN": {
     "longName": "Titan Company Limited",
     "shortName": "TITAN COMPANY LIMITED",
-    "sector": "Consumer Cyclical",
-    "industry": "Luxury Goods",
-    "marketCap": 4496898916352,
-    "trailingPE": 77.81361,
-    "forwardPE": 57.232407,
-    "priceToBook": 28.652517,
+    "sector": null,
+    "industry": null,
+    "marketCap": 4512959430656,
+    "trailingPE": 78.4045,
+    "forwardPE": 57.229996,
+    "priceToBook": 28.754848,
     "returnOnEquity": null,
-    "profitMargins": 0.062319998,
-    "debtToEquity": 195.001,
-    "earningsGrowth": 0.628,
-    "revenueGrowth": 0.293,
-    "earningsQuarterlyGrowth": 0.629,
-    "heldPercentInsiders": 0.58706003,
-    "heldPercentInstitutions": 0.21893999,
+    "profitMargins": null,
+    "debtToEquity": null,
+    "earningsGrowth": null,
+    "revenueGrowth": null,
+    "earningsQuarterlyGrowth": null,
+    "heldPercentInsiders": null,
+    "heldPercentInstitutions": null,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 5,
+      "checks_run": 1,
       "checks_possible": 5,
       "red_flags": [],
-      "yellow_flags": [
-        "Elevated leverage (Debt/Equity 195%)"
-      ]
+      "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TORNTPOWER": {
     "longName": "Torrent Power Limited",
     "shortName": "TORRENT POWER LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 626704842752,
-    "trailingPE": 28.030201,
-    "forwardPE": 20.740086,
-    "priceToBook": 3.2854226,
+    "marketCap": 628720467968,
+    "trailingPE": 27.07682,
+    "forwardPE": 20.80679,
+    "priceToBook": 3.295989,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -5145,17 +5130,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TORNTPHARM": {
     "longName": "Torrent Pharmaceuticals Limited",
     "shortName": "TORRENT PHARMACEUTICALS L",
     "sector": null,
     "industry": null,
-    "marketCap": 1906784206848,
-    "trailingPE": 80.04151,
-    "forwardPE": 53.815853,
-    "priceToBook": 20.225779,
+    "marketCap": 1862471254016,
+    "trailingPE": 78.26886,
+    "forwardPE": 52.565193,
+    "priceToBook": 19.755741,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -5171,7 +5156,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "TMPV": {
     "longName": "Tata Motors Passenger Vehicles Limited",
@@ -5228,38 +5213,40 @@
   "TVSMOTOR": {
     "longName": "TVS Motor Company Limited",
     "shortName": "TVS MOTOR COMPANY  LTD",
-    "sector": null,
-    "industry": null,
-    "marketCap": 2072509153280,
-    "trailingPE": 60.302822,
-    "forwardPE": 38.170605,
-    "priceToBook": 62.02409,
+    "sector": "Consumer Cyclical",
+    "industry": "Auto Manufacturers",
+    "marketCap": 2086243139584,
+    "trailingPE": 60.97222,
+    "forwardPE": 38.416077,
+    "priceToBook": 62.43511,
     "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "profitMargins": 0.05691,
+    "debtToEquity": 306.09,
+    "earningsGrowth": 0.671,
+    "revenueGrowth": 0.343,
+    "earningsQuarterlyGrowth": 0.671,
+    "heldPercentInsiders": 0.52267,
+    "heldPercentInstitutions": 0.30253,
     "quality": {
-      "verdict": "STABLE",
-      "checks_run": 1,
+      "verdict": "CAUTION",
+      "checks_run": 5,
       "checks_possible": 5,
-      "red_flags": [],
+      "red_flags": [
+        "High leverage (Debt/Equity 306%)"
+      ],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "UBL": {
     "longName": "United Breweries Limited",
     "shortName": "UNITED BREWERIES LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 358401179648,
-    "trailingPE": 90.36667,
-    "forwardPE": 48.55381,
-    "priceToBook": 7.9243054,
+    "marketCap": 356656119808,
+    "trailingPE": 90.530205,
+    "forwardPE": 48.317398,
+    "priceToBook": 7.8857217,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -5275,7 +5262,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
   },
   "ULTRACEMCO": {
     "longName": "UltraTech Cement Limited",
@@ -5308,10 +5295,10 @@
     "shortName": "UNION BANK OF INDIA",
     "sector": null,
     "industry": null,
-    "marketCap": 1426720817152,
-    "trailingPE": 7.039548,
-    "forwardPE": 6.981943,
-    "priceToBook": 1.0225966,
+    "marketCap": 1400384913408,
+    "trailingPE": 6.7843933,
+    "forwardPE": 6.853063,
+    "priceToBook": 1.0037205,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -5327,17 +5314,17 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "UPL": {
     "longName": "UPL Limited",
     "shortName": "UPL LIMITED",
     "sector": null,
     "industry": null,
-    "marketCap": 480121389056,
-    "trailingPE": 23.316912,
-    "forwardPE": 12.054503,
-    "priceToBook": 1.3819683,
+    "marketCap": 480966672384,
+    "trailingPE": 23.357964,
+    "forwardPE": 12.0757265,
+    "priceToBook": 1.3844013,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -5353,7 +5340,7 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
   "VEDL": {
     "longName": "Vedanta Limited",
@@ -5384,46 +5371,20 @@
   "VBL": {
     "longName": "Varun Beverages Limited",
     "shortName": "VARUN BEVERAGES LIMITED",
-    "sector": null,
-    "industry": null,
-    "marketCap": 1460717486080,
-    "trailingPE": 43.0988,
-    "forwardPE": 36.961815,
-    "priceToBook": 7.459709,
-    "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 1,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "VMM": {
-    "longName": null,
-    "shortName": "VISHAL MEGA MART LIMITED",
-    "sector": "Consumer Cyclical",
-    "industry": "Department Stores",
-    "marketCap": 484409212928,
-    "trailingPE": 54.421055,
-    "forwardPE": 38.108578,
-    "priceToBook": 6.506009,
-    "returnOnEquity": null,
-    "profitMargins": 0.0661,
-    "debtToEquity": 26.817,
-    "earningsGrowth": 0.25,
-    "revenueGrowth": 0.187,
-    "earningsQuarterlyGrowth": 0.256,
-    "heldPercentInsiders": 0.40023,
-    "heldPercentInstitutions": 0.48141,
+    "sector": "Consumer Defensive",
+    "industry": "Beverages - Non-Alcoholic",
+    "marketCap": 1454798143488,
+    "trailingPE": 43.053055,
+    "forwardPE": 36.812035,
+    "priceToBook": 6.6821,
+    "returnOnEquity": 0.16853,
+    "profitMargins": 0.14035,
+    "debtToEquity": 15.869,
+    "earningsGrowth": 0.157,
+    "revenueGrowth": 0.204,
+    "earningsQuarterlyGrowth": 0.155,
+    "heldPercentInsiders": 0.60587,
+    "heldPercentInstitutions": 0.24091999,
     "quality": {
       "verdict": "STABLE",
       "checks_run": 5,
@@ -5431,33 +5392,59 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
   },
-  "VOLTAS": {
-    "longName": "Voltas Limited",
-    "shortName": "VOLTAS LTD",
-    "sector": null,
-    "industry": null,
-    "marketCap": 414565498880,
-    "trailingPE": 92.39675,
-    "forwardPE": 38.541294,
-    "priceToBook": 6.501749,
+  "VMM": {
+    "longName": null,
+    "shortName": "VISHAL MEGA MART LIMITED",
+    "sector": "Consumer Cyclical",
+    "industry": "Department Stores",
+    "marketCap": 484549754880,
+    "trailingPE": 54.72487,
+    "forwardPE": 38.119633,
+    "priceToBook": 6.507897,
     "returnOnEquity": null,
-    "profitMargins": null,
-    "debtToEquity": null,
-    "earningsGrowth": null,
-    "revenueGrowth": null,
-    "earningsQuarterlyGrowth": null,
-    "heldPercentInsiders": null,
-    "heldPercentInstitutions": null,
+    "profitMargins": 0.0661,
+    "debtToEquity": 26.817,
+    "earningsGrowth": 0.25,
+    "revenueGrowth": 0.187,
+    "earningsQuarterlyGrowth": 0.256,
+    "heldPercentInsiders": 0.40023,
+    "heldPercentInstitutions": 0.48053002,
     "quality": {
       "verdict": "STABLE",
-      "checks_run": 1,
+      "checks_run": 5,
       "checks_possible": 5,
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-18"
+    "as_of_date": "2026-08-21"
+  },
+  "VOLTAS": {
+    "longName": "Voltas Limited",
+    "shortName": "VOLTAS LTD",
+    "sector": "Consumer Cyclical",
+    "industry": "Furnishings, Fixtures & Appliances",
+    "marketCap": 408642650112,
+    "trailingPE": 91.21123,
+    "forwardPE": 38.12723,
+    "priceToBook": 6.4088593,
+    "returnOnEquity": null,
+    "profitMargins": 0.02999,
+    "debtToEquity": 15.51,
+    "earningsGrowth": 0.52,
+    "revenueGrowth": 0.187,
+    "earningsQuarterlyGrowth": 0.522,
+    "heldPercentInsiders": 0.36661997,
+    "heldPercentInstitutions": 0.43396,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 5,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
   },
   "VGUARD": {
     "longName": "V-Guard Industries Limited",
@@ -5514,64 +5501,12 @@
   "WIPRO": {
     "longName": "Wipro Limited",
     "shortName": "WIPRO LTD",
-    "sector": "Technology",
-    "industry": "Information Technology Services",
-    "marketCap": 1776222076928,
-    "trailingPE": 14.261318,
-    "forwardPE": 12.913411,
-    "priceToBook": 2.292518,
-    "returnOnEquity": 0.16128999,
-    "profitMargins": 0.13919,
-    "debtToEquity": 27.398,
-    "earningsGrowth": 0.009,
-    "revenueGrowth": 0.106,
-    "earningsQuarterlyGrowth": 0.006,
-    "heldPercentInsiders": 0.72695,
-    "heldPercentInstitutions": 0.14812,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 5,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "YESBANK": {
-    "longName": "Yes Bank Limited",
-    "shortName": "YES BANK LIMITED",
-    "sector": "Financial Services",
-    "industry": "Banks - Regional",
-    "marketCap": 713758277632,
-    "trailingPE": 18.949999,
-    "forwardPE": 12.519338,
-    "priceToBook": 1.3670794,
-    "returnOnEquity": 0.074650005,
-    "profitMargins": 0.23185,
-    "debtToEquity": null,
-    "earningsGrowth": 0.118,
-    "revenueGrowth": 0.198,
-    "earningsQuarterlyGrowth": 0.206,
-    "heldPercentInsiders": 0.44164002,
-    "heldPercentInstitutions": 0.18335,
-    "quality": {
-      "verdict": "STABLE",
-      "checks_run": 4,
-      "checks_possible": 5,
-      "red_flags": [],
-      "yellow_flags": []
-    },
-    "as_of_date": "2026-08-19"
-  },
-  "ZEEL": {
-    "longName": "Zee Entertainment Enterprises Limited",
-    "shortName": "ZEE ENTERTAINMENT ENT LTD",
     "sector": null,
     "industry": null,
-    "marketCap": 98184298496,
-    "trailingPE": 48.4455,
-    "forwardPE": 12.827173,
-    "priceToBook": 0.8262606,
+    "marketCap": 1788488843264,
+    "trailingPE": 14.348412,
+    "forwardPE": 13.001956,
+    "priceToBook": 2.3083503,
     "returnOnEquity": null,
     "profitMargins": null,
     "debtToEquity": null,
@@ -5587,10 +5522,64 @@
       "red_flags": [],
       "yellow_flags": []
     },
-    "as_of_date": "2026-08-19"
+    "as_of_date": "2026-08-21"
+  },
+  "YESBANK": {
+    "longName": "Yes Bank Limited",
+    "shortName": "YES BANK LIMITED",
+    "sector": "Financial Services",
+    "industry": "Banks - Regional",
+    "marketCap": 715641520128,
+    "trailingPE": 18.999998,
+    "forwardPE": 12.55237,
+    "priceToBook": 1.3706864,
+    "returnOnEquity": 0.074650005,
+    "profitMargins": 0.23185,
+    "debtToEquity": null,
+    "earningsGrowth": 0.118,
+    "revenueGrowth": 0.198,
+    "earningsQuarterlyGrowth": 0.206,
+    "heldPercentInsiders": 0.44164002,
+    "heldPercentInstitutions": 0.18173,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 4,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": []
+    },
+    "as_of_date": "2026-08-21"
+  },
+  "ZEEL": {
+    "longName": "Zee Entertainment Enterprises Limited",
+    "shortName": "ZEE ENTERTAINMENT ENT LTD",
+    "sector": "Communication Services",
+    "industry": "Broadcasting",
+    "marketCap": 103332683776,
+    "trailingPE": 50.985786,
+    "forwardPE": 13.499779,
+    "priceToBook": 0.86958635,
+    "returnOnEquity": null,
+    "profitMargins": 0.025139999,
+    "debtToEquity": 2.26,
+    "earningsGrowth": -0.473,
+    "revenueGrowth": 0.045,
+    "earningsQuarterlyGrowth": -0.469,
+    "heldPercentInsiders": 0.05035,
+    "heldPercentInstitutions": 0.26857,
+    "quality": {
+      "verdict": "STABLE",
+      "checks_run": 5,
+      "checks_possible": 5,
+      "red_flags": [],
+      "yellow_flags": [
+        "Earnings declining sharply (-47.3%)"
+      ]
+    },
+    "as_of_date": "2026-08-21"
   },
   "_meta": {
-    "last_refresh_completed": "2026-08-19",
-    "symbol_count": 191
+    "last_refresh_completed": "2026-08-21",
+    "symbol_count": 180
   }
 }

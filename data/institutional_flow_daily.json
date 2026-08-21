@@ -1,2188 +1,4 @@
 {
-  "2026-08-14": {
-    "live_trigger": {
-      "ASIANTILES": {
-        "symbol": "ASIANTILES",
-        "buy_value_cr": 12.35,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 12.35,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "GCSL": {
-        "symbol": "GCSL",
-        "buy_value_cr": 25.43,
-        "sell_value_cr": 13.93,
-        "buy_count": 2,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 11.5,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "KERNEX": {
-        "symbol": "KERNEX",
-        "buy_value_cr": 52.82,
-        "sell_value_cr": 51.36,
-        "buy_count": 2,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 1.46,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "MIDHANI": {
-        "symbol": "MIDHANI",
-        "buy_value_cr": 47.48,
-        "sell_value_cr": 47.5,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -0.03,
-        "dominant_side": "SELL",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "MOREPENLAB": {
-        "symbol": "MOREPENLAB",
-        "buy_value_cr": 22.5,
-        "sell_value_cr": 25.95,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -3.45,
-        "dominant_side": "SELL",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "MOTISONS": {
-        "symbol": "MOTISONS",
-        "buy_value_cr": 15.82,
-        "sell_value_cr": 14.66,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 1.17,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "MUNJALAU": {
-        "symbol": "MUNJALAU",
-        "buy_value_cr": 83.68,
-        "sell_value_cr": 73.67,
-        "buy_count": 6,
-        "sell_count": 5,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 10.01,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "NELCO": {
-        "symbol": "NELCO",
-        "buy_value_cr": 15.86,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 15.86,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "PANAMAPET": {
-        "symbol": "PANAMAPET",
-        "buy_value_cr": 16.84,
-        "sell_value_cr": 16.83,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 0.01,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "RATNAVEER": {
-        "symbol": "RATNAVEER",
-        "buy_value_cr": 51.04,
-        "sell_value_cr": 39.2,
-        "buy_count": 2,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 11.84,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "RGL": {
-        "symbol": "RGL",
-        "buy_value_cr": 12.99,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 12.99,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "RHETAN": {
-        "symbol": "RHETAN",
-        "buy_value_cr": 37.28,
-        "sell_value_cr": 34.83,
-        "buy_count": 2,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 2.45,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "SEAMECLTD": {
-        "symbol": "SEAMECLTD",
-        "buy_value_cr": 30.7,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 30.7,
-        "dominant_side": "BUY",
-        "tier": "MODERATE",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "THYROCARE": {
-        "symbol": "THYROCARE",
-        "buy_value_cr": 469.38,
-        "sell_value_cr": 884.9,
-        "buy_count": 4,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -415.52,
-        "dominant_side": "SELL",
-        "tier": "STRONG",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "URBANCO": {
-        "symbol": "URBANCO",
-        "buy_value_cr": 428.4,
-        "sell_value_cr": 402.99,
-        "buy_count": 1,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 25.41,
-        "dominant_side": "BUY",
-        "tier": "MODERATE",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "YATRA": {
-        "symbol": "YATRA",
-        "buy_value_cr": 24.48,
-        "sell_value_cr": 13.51,
-        "buy_count": 2,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 10.97,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "APOLLOPIPE": {
-        "symbol": "APOLLOPIPE",
-        "buy_value_cr": 12.59,
-        "sell_value_cr": 12.55,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 0.03,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      },
-      "PRUDENT": {
-        "symbol": "PRUDENT",
-        "buy_value_cr": 0.0,
-        "sell_value_cr": 76.48,
-        "buy_count": 0,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -76.48,
-        "dominant_side": "SELL",
-        "tier": "MODERATE",
-        "as_of": "2026-08-14T16:36:49.395822+05:30"
-      }
-    },
-    "last_checkpoint": "eod_archive",
-    "last_updated": "2026-08-14T19:57:21.791382+05:30",
-    "deals_by_checkpoint": {
-      "live_trigger": [
-        {
-          "symbol": "THYROCARE",
-          "side": "SELL",
-          "value_cr": 821.7242,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "BUY",
-          "value_cr": 428.4003,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "SELL",
-          "value_cr": 272.0,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 187.1832,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 149.76,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "SELL",
-          "value_cr": 130.9875,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 82.4531,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "PRUDENT",
-          "side": "SELL",
-          "value_cr": 76.4812,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "SELL",
-          "value_cr": 63.171,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 49.9824,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MIDHANI",
-          "side": "SELL",
-          "value_cr": 47.5047,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MIDHANI",
-          "side": "BUY",
-          "value_cr": 47.4781,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "RATNAVEER",
-          "side": "SELL",
-          "value_cr": 39.2027,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "RATNAVEER",
-          "side": "BUY",
-          "value_cr": 39.0757,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "BUY",
-          "value_cr": 31.8549,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "SELL",
-          "value_cr": 31.3162,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "SEAMECLTD",
-          "side": "BUY",
-          "value_cr": 30.6985,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MOREPENLAB",
-          "side": "SELL",
-          "value_cr": 25.9482,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "BUY",
-          "value_cr": 25.4181,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "SELL",
-          "value_cr": 24.2899,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MOREPENLAB",
-          "side": "BUY",
-          "value_cr": 22.4968,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "BUY",
-          "value_cr": 20.9623,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 20.0725,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "SELL",
-          "value_cr": 20.0435,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 20.0287,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "PANAMAPET",
-          "side": "BUY",
-          "value_cr": 16.8435,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "PANAMAPET",
-          "side": "SELL",
-          "value_cr": 16.8323,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "NELCO",
-          "side": "BUY",
-          "value_cr": 15.8581,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MOTISONS",
-          "side": "BUY",
-          "value_cr": 15.8226,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 15.5154,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 15.5059,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "GCSL",
-          "side": "BUY",
-          "value_cr": 14.8675,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MOTISONS",
-          "side": "SELL",
-          "value_cr": 14.6553,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 14.2156,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 14.0034,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "GCSL",
-          "side": "SELL",
-          "value_cr": 13.9307,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "YATRA",
-          "side": "SELL",
-          "value_cr": 13.5107,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "RGL",
-          "side": "BUY",
-          "value_cr": 12.9869,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "YATRA",
-          "side": "BUY",
-          "value_cr": 12.9825,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "APOLLOPIPE",
-          "side": "BUY",
-          "value_cr": 12.5862,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "APOLLOPIPE",
-          "side": "SELL",
-          "value_cr": 12.5538,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "ASIANTILES",
-          "side": "BUY",
-          "value_cr": 12.3484,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 12.1512,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 12.1359,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 11.975,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "RATNAVEER",
-          "side": "BUY",
-          "value_cr": 11.9626,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "BUY",
-          "value_cr": 11.8643,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "YATRA",
-          "side": "BUY",
-          "value_cr": 11.4941,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 11.4877,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "GCSL",
-          "side": "BUY",
-          "value_cr": 10.5659,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "SELL",
-          "value_cr": 10.5399,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 10.2668,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:36:49.395822+05:30"
-        }
-      ],
-      "final_check": [
-        {
-          "symbol": "THYROCARE",
-          "side": "SELL",
-          "value_cr": 821.7242,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "BUY",
-          "value_cr": 428.4003,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "SELL",
-          "value_cr": 272.0,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 187.1832,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 149.76,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "SELL",
-          "value_cr": 130.9875,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 82.4531,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "PRUDENT",
-          "side": "SELL",
-          "value_cr": 76.4812,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "SELL",
-          "value_cr": 63.171,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 49.9824,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MIDHANI",
-          "side": "SELL",
-          "value_cr": 47.5047,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MIDHANI",
-          "side": "BUY",
-          "value_cr": 47.4781,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "RATNAVEER",
-          "side": "SELL",
-          "value_cr": 39.2027,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "RATNAVEER",
-          "side": "BUY",
-          "value_cr": 39.0757,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "BUY",
-          "value_cr": 31.8549,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "SELL",
-          "value_cr": 31.3162,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "SEAMECLTD",
-          "side": "BUY",
-          "value_cr": 30.6985,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MOREPENLAB",
-          "side": "SELL",
-          "value_cr": 25.9482,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "BUY",
-          "value_cr": 25.4181,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "SELL",
-          "value_cr": 24.2899,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MOREPENLAB",
-          "side": "BUY",
-          "value_cr": 22.4968,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "BUY",
-          "value_cr": 20.9623,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 20.0725,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "SELL",
-          "value_cr": 20.0435,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 20.0287,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "PANAMAPET",
-          "side": "BUY",
-          "value_cr": 16.8435,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "PANAMAPET",
-          "side": "SELL",
-          "value_cr": 16.8323,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "NELCO",
-          "side": "BUY",
-          "value_cr": 15.8581,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MOTISONS",
-          "side": "BUY",
-          "value_cr": 15.8226,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 15.5154,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 15.5059,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "GCSL",
-          "side": "BUY",
-          "value_cr": 14.8675,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MOTISONS",
-          "side": "SELL",
-          "value_cr": 14.6553,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 14.2156,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 14.0034,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "GCSL",
-          "side": "SELL",
-          "value_cr": 13.9307,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "YATRA",
-          "side": "SELL",
-          "value_cr": 13.5107,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "RGL",
-          "side": "BUY",
-          "value_cr": 12.9869,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "YATRA",
-          "side": "BUY",
-          "value_cr": 12.9825,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "APOLLOPIPE",
-          "side": "BUY",
-          "value_cr": 12.5862,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "APOLLOPIPE",
-          "side": "SELL",
-          "value_cr": 12.5538,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "ASIANTILES",
-          "side": "BUY",
-          "value_cr": 12.3484,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 12.1512,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 12.1359,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 11.975,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "RATNAVEER",
-          "side": "BUY",
-          "value_cr": 11.9626,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "BUY",
-          "value_cr": 11.8643,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "YATRA",
-          "side": "BUY",
-          "value_cr": 11.4941,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 11.4877,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "GCSL",
-          "side": "BUY",
-          "value_cr": 10.5659,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "SELL",
-          "value_cr": 10.5399,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 10.2668,
-          "deal_type": "bulk",
-          "deal_date": "13-Aug-2026",
-          "as_of": "2026-08-14T16:44:37.681544+05:30"
-        }
-      ],
-      "eod_archive": [
-        {
-          "symbol": "THYROCARE",
-          "side": "SELL",
-          "value_cr": 821.7242,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "SELL",
-          "value_cr": 821.7242,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "BUY",
-          "value_cr": 428.4003,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "BUY",
-          "value_cr": 428.4003,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "SELL",
-          "value_cr": 272.0,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "SELL",
-          "value_cr": 272.0,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 187.1832,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 187.1832,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 149.76,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 149.76,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "SELL",
-          "value_cr": 130.9875,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "SELL",
-          "value_cr": 130.9875,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 82.4531,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 82.4531,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "PRUDENT",
-          "side": "SELL",
-          "value_cr": 76.4812,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "SELL",
-          "value_cr": 63.171,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 49.9824,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 49.9824,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MIDHANI",
-          "side": "SELL",
-          "value_cr": 47.5047,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 47.4864,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MIDHANI",
-          "side": "BUY",
-          "value_cr": 47.4781,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 40.56,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 39.9984,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "RATNAVEER",
-          "side": "SELL",
-          "value_cr": 39.2027,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "RATNAVEER",
-          "side": "BUY",
-          "value_cr": 39.0757,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 35.0064,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "BUY",
-          "value_cr": 31.8549,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "SELL",
-          "value_cr": 31.3162,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "SEAMECLTD",
-          "side": "BUY",
-          "value_cr": 30.6985,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 30.0144,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 28.4544,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 27.9999,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 27.7584,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MOREPENLAB",
-          "side": "SELL",
-          "value_cr": 25.9482,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "BUY",
-          "value_cr": 25.4181,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "URBANCO",
-          "side": "SELL",
-          "value_cr": 25.4128,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 25.0224,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 25.0224,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "THYROCARE",
-          "side": "BUY",
-          "value_cr": 25.0224,
-          "deal_type": "block",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "SELL",
-          "value_cr": 24.2899,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MOREPENLAB",
-          "side": "BUY",
-          "value_cr": 22.4968,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "BUY",
-          "value_cr": 20.9623,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 20.0725,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "KERNEX",
-          "side": "SELL",
-          "value_cr": 20.0435,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 20.0287,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "PANAMAPET",
-          "side": "BUY",
-          "value_cr": 16.8435,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "PANAMAPET",
-          "side": "SELL",
-          "value_cr": 16.8323,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "NELCO",
-          "side": "BUY",
-          "value_cr": 15.8581,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MOTISONS",
-          "side": "BUY",
-          "value_cr": 15.8226,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 15.5154,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 15.5059,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "GCSL",
-          "side": "BUY",
-          "value_cr": 14.8675,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MOTISONS",
-          "side": "SELL",
-          "value_cr": 14.6553,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 14.2156,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 14.0034,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "GCSL",
-          "side": "SELL",
-          "value_cr": 13.9307,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "YATRA",
-          "side": "SELL",
-          "value_cr": 13.5107,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "RGL",
-          "side": "BUY",
-          "value_cr": 12.9869,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "YATRA",
-          "side": "BUY",
-          "value_cr": 12.9825,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "APOLLOPIPE",
-          "side": "BUY",
-          "value_cr": 12.5862,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "APOLLOPIPE",
-          "side": "SELL",
-          "value_cr": 12.5538,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "ASIANTILES",
-          "side": "BUY",
-          "value_cr": 12.3484,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 12.1512,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 12.1359,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "SELL",
-          "value_cr": 11.975,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "RATNAVEER",
-          "side": "BUY",
-          "value_cr": 11.9626,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "BUY",
-          "value_cr": 11.8643,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "YATRA",
-          "side": "BUY",
-          "value_cr": 11.4941,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 11.4877,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "GCSL",
-          "side": "BUY",
-          "value_cr": 10.5659,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "RHETAN",
-          "side": "SELL",
-          "value_cr": 10.5399,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        },
-        {
-          "symbol": "MUNJALAU",
-          "side": "BUY",
-          "value_cr": 10.2668,
-          "deal_type": "bulk",
-          "deal_date": "13-AUG-2026",
-          "as_of": "2026-08-14T19:57:21.791382+05:30"
-        }
-      ]
-    },
-    "final_check": {
-      "APOLLOPIPE": {
-        "symbol": "APOLLOPIPE",
-        "buy_value_cr": 12.59,
-        "sell_value_cr": 12.55,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 0.03,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "ASIANTILES": {
-        "symbol": "ASIANTILES",
-        "buy_value_cr": 12.35,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 12.35,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "GCSL": {
-        "symbol": "GCSL",
-        "buy_value_cr": 25.43,
-        "sell_value_cr": 13.93,
-        "buy_count": 2,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 11.5,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "KERNEX": {
-        "symbol": "KERNEX",
-        "buy_value_cr": 52.82,
-        "sell_value_cr": 51.36,
-        "buy_count": 2,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 1.46,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "MIDHANI": {
-        "symbol": "MIDHANI",
-        "buy_value_cr": 47.48,
-        "sell_value_cr": 47.5,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -0.03,
-        "dominant_side": "SELL",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "MOREPENLAB": {
-        "symbol": "MOREPENLAB",
-        "buy_value_cr": 22.5,
-        "sell_value_cr": 25.95,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -3.45,
-        "dominant_side": "SELL",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "MOTISONS": {
-        "symbol": "MOTISONS",
-        "buy_value_cr": 15.82,
-        "sell_value_cr": 14.66,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 1.17,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "MUNJALAU": {
-        "symbol": "MUNJALAU",
-        "buy_value_cr": 83.68,
-        "sell_value_cr": 73.67,
-        "buy_count": 6,
-        "sell_count": 5,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 10.01,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "NELCO": {
-        "symbol": "NELCO",
-        "buy_value_cr": 15.86,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 15.86,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "PANAMAPET": {
-        "symbol": "PANAMAPET",
-        "buy_value_cr": 16.84,
-        "sell_value_cr": 16.83,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 0.01,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "RATNAVEER": {
-        "symbol": "RATNAVEER",
-        "buy_value_cr": 51.04,
-        "sell_value_cr": 39.2,
-        "buy_count": 2,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 11.84,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "RGL": {
-        "symbol": "RGL",
-        "buy_value_cr": 12.99,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 12.99,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "RHETAN": {
-        "symbol": "RHETAN",
-        "buy_value_cr": 37.28,
-        "sell_value_cr": 34.83,
-        "buy_count": 2,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 2.45,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "SEAMECLTD": {
-        "symbol": "SEAMECLTD",
-        "buy_value_cr": 30.7,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 30.7,
-        "dominant_side": "BUY",
-        "tier": "MODERATE",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "THYROCARE": {
-        "symbol": "THYROCARE",
-        "buy_value_cr": 469.38,
-        "sell_value_cr": 884.9,
-        "buy_count": 4,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -415.52,
-        "dominant_side": "SELL",
-        "tier": "STRONG",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "URBANCO": {
-        "symbol": "URBANCO",
-        "buy_value_cr": 428.4,
-        "sell_value_cr": 402.99,
-        "buy_count": 1,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 25.41,
-        "dominant_side": "BUY",
-        "tier": "MODERATE",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "YATRA": {
-        "symbol": "YATRA",
-        "buy_value_cr": 24.48,
-        "sell_value_cr": 13.51,
-        "buy_count": 2,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 10.97,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      },
-      "PRUDENT": {
-        "symbol": "PRUDENT",
-        "buy_value_cr": 0.0,
-        "sell_value_cr": 76.48,
-        "buy_count": 0,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -76.48,
-        "dominant_side": "SELL",
-        "tier": "MODERATE",
-        "as_of": "2026-08-14T16:44:37.681544+05:30"
-      }
-    },
-    "eod_archive": {
-      "APOLLOPIPE": {
-        "symbol": "APOLLOPIPE",
-        "buy_value_cr": 12.59,
-        "sell_value_cr": 12.55,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 0.03,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "ASIANTILES": {
-        "symbol": "ASIANTILES",
-        "buy_value_cr": 12.35,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 12.35,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "GCSL": {
-        "symbol": "GCSL",
-        "buy_value_cr": 25.43,
-        "sell_value_cr": 13.93,
-        "buy_count": 2,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 11.5,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "KERNEX": {
-        "symbol": "KERNEX",
-        "buy_value_cr": 52.82,
-        "sell_value_cr": 51.36,
-        "buy_count": 2,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 1.46,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "MIDHANI": {
-        "symbol": "MIDHANI",
-        "buy_value_cr": 47.48,
-        "sell_value_cr": 47.5,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -0.03,
-        "dominant_side": "SELL",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "MOREPENLAB": {
-        "symbol": "MOREPENLAB",
-        "buy_value_cr": 22.5,
-        "sell_value_cr": 25.95,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -3.45,
-        "dominant_side": "SELL",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "MOTISONS": {
-        "symbol": "MOTISONS",
-        "buy_value_cr": 15.82,
-        "sell_value_cr": 14.66,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 1.17,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "MUNJALAU": {
-        "symbol": "MUNJALAU",
-        "buy_value_cr": 83.68,
-        "sell_value_cr": 73.67,
-        "buy_count": 6,
-        "sell_count": 5,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 10.01,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "NELCO": {
-        "symbol": "NELCO",
-        "buy_value_cr": 15.86,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 15.86,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "PANAMAPET": {
-        "symbol": "PANAMAPET",
-        "buy_value_cr": 16.84,
-        "sell_value_cr": 16.83,
-        "buy_count": 1,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 0.01,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "RATNAVEER": {
-        "symbol": "RATNAVEER",
-        "buy_value_cr": 51.04,
-        "sell_value_cr": 39.2,
-        "buy_count": 2,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 11.84,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "RGL": {
-        "symbol": "RGL",
-        "buy_value_cr": 12.99,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 12.99,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "RHETAN": {
-        "symbol": "RHETAN",
-        "buy_value_cr": 37.28,
-        "sell_value_cr": 34.83,
-        "buy_count": 2,
-        "sell_count": 2,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 2.45,
-        "dominant_side": "BUY",
-        "tier": "BELOW_THRESHOLD",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "SEAMECLTD": {
-        "symbol": "SEAMECLTD",
-        "buy_value_cr": 30.7,
-        "sell_value_cr": 0.0,
-        "buy_count": 1,
-        "sell_count": 0,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 30.7,
-        "dominant_side": "BUY",
-        "tier": "MODERATE",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "THYROCARE": {
-        "symbol": "THYROCARE",
-        "buy_value_cr": 1291.1,
-        "sell_value_cr": 1706.62,
-        "buy_count": 19,
-        "sell_count": 3,
-        "deal_types": [
-          "block",
-          "bulk"
-        ],
-        "net_value_cr": -415.52,
-        "dominant_side": "SELL",
-        "tier": "STRONG",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "URBANCO": {
-        "symbol": "URBANCO",
-        "buy_value_cr": 856.8,
-        "sell_value_cr": 831.39,
-        "buy_count": 2,
-        "sell_count": 5,
-        "deal_types": [
-          "block",
-          "bulk"
-        ],
-        "net_value_cr": 25.41,
-        "dominant_side": "BUY",
-        "tier": "MODERATE",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "YATRA": {
-        "symbol": "YATRA",
-        "buy_value_cr": 24.48,
-        "sell_value_cr": 13.51,
-        "buy_count": 2,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": 10.97,
-        "dominant_side": "BUY",
-        "tier": "WEAK",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      },
-      "PRUDENT": {
-        "symbol": "PRUDENT",
-        "buy_value_cr": 0.0,
-        "sell_value_cr": 76.48,
-        "buy_count": 0,
-        "sell_count": 1,
-        "deal_types": [
-          "bulk"
-        ],
-        "net_value_cr": -76.48,
-        "dominant_side": "SELL",
-        "tier": "MODERATE",
-        "as_of": "2026-08-14T19:57:21.791382+05:30"
-      }
-    }
-  },
   "2026-08-17": {
     "live_trigger": {
       "DHOOTTRANS": {
@@ -8846,6 +6662,1192 @@
         "dominant_side": "SELL",
         "tier": "WEAK",
         "as_of": "2026-08-19T20:11:14.695802+05:30"
+      }
+    }
+  },
+  "2026-08-21": {
+    "live_trigger": {
+      "BALRAMCHIN": {
+        "symbol": "BALRAMCHIN",
+        "buy_value_cr": 349.09,
+        "sell_value_cr": 347.98,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.11,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "BLEL": {
+        "symbol": "BLEL",
+        "buy_value_cr": 326.41,
+        "sell_value_cr": 316.59,
+        "buy_count": 13,
+        "sell_count": 12,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 9.82,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "CREDENT": {
+        "symbol": "CREDENT",
+        "buy_value_cr": 11.15,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 11.15,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "DWARKESH": {
+        "symbol": "DWARKESH",
+        "buy_value_cr": 13.13,
+        "sell_value_cr": 13.22,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.09,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "INDOBORAX": {
+        "symbol": "INDOBORAX",
+        "buy_value_cr": 42.6,
+        "sell_value_cr": 40.47,
+        "buy_count": 3,
+        "sell_count": 3,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 2.13,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "KFINTECH": {
+        "symbol": "KFINTECH",
+        "buy_value_cr": 1178.0,
+        "sell_value_cr": 1400.0,
+        "buy_count": 6,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -222.0,
+        "dominant_side": "SELL",
+        "tier": "STRONG",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "KIRIINDUS": {
+        "symbol": "KIRIINDUS",
+        "buy_value_cr": 15.71,
+        "sell_value_cr": 15.72,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.01,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "MARSONS": {
+        "symbol": "MARSONS",
+        "buy_value_cr": 10.98,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.98,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "MOREPENLAB": {
+        "symbol": "MOREPENLAB",
+        "buy_value_cr": 55.64,
+        "sell_value_cr": 56.78,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -1.14,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "NXT-INFRA": {
+        "symbol": "NXT-INFRA",
+        "buy_value_cr": 179.49,
+        "sell_value_cr": 179.49,
+        "buy_count": 2,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.0,
+        "dominant_side": "NONE",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "RATNAVEER": {
+        "symbol": "RATNAVEER",
+        "buy_value_cr": 104.67,
+        "sell_value_cr": 99.08,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 5.59,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "SBC": {
+        "symbol": "SBC",
+        "buy_value_cr": 10.39,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.39,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "SHIPROCKET": {
+        "symbol": "SHIPROCKET",
+        "buy_value_cr": 123.9,
+        "sell_value_cr": 123.95,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.05,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "SIRCA": {
+        "symbol": "SIRCA",
+        "buy_value_cr": 13.54,
+        "sell_value_cr": 13.58,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.05,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "SOLARA": {
+        "symbol": "SOLARA",
+        "buy_value_cr": 17.75,
+        "sell_value_cr": 17.71,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.04,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "TFCILTD": {
+        "symbol": "TFCILTD",
+        "buy_value_cr": 13.48,
+        "sell_value_cr": 32.68,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -19.2,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "ZAGGLE": {
+        "symbol": "ZAGGLE",
+        "buy_value_cr": 97.9,
+        "sell_value_cr": 97.28,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.62,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "AMRUTANJAN": {
+        "symbol": "AMRUTANJAN",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 11.15,
+        "buy_count": 0,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -11.15,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      },
+      "SHANTIGOLD": {
+        "symbol": "SHANTIGOLD",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 11.16,
+        "buy_count": 0,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -11.16,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:42:01.687432+05:30"
+      }
+    },
+    "last_checkpoint": "final_check",
+    "last_updated": "2026-08-21T17:50:39.286416+05:30",
+    "deals_by_checkpoint": {
+      "live_trigger": [
+        {
+          "symbol": "KFINTECH",
+          "side": "SELL",
+          "value_cr": 1400.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 400.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 237.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 185.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "NXT-INFRA",
+          "side": "SELL",
+          "value_cr": 179.4881,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 165.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 100.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "BUY",
+          "value_cr": 96.65,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "SELL",
+          "value_cr": 96.5832,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "BUY",
+          "value_cr": 96.5167,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "SELL",
+          "value_cr": 94.5142,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 91.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "NXT-INFRA",
+          "side": "BUY",
+          "value_cr": 89.8614,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "NXT-INFRA",
+          "side": "BUY",
+          "value_cr": 89.6268,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "SELL",
+          "value_cr": 80.3498,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "BUY",
+          "value_cr": 79.6604,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "SELL",
+          "value_cr": 76.53,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "BUY",
+          "value_cr": 76.2613,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "SELL",
+          "value_cr": 64.143,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "BUY",
+          "value_cr": 64.1164,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "SHIPROCKET",
+          "side": "SELL",
+          "value_cr": 63.673,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "SHIPROCKET",
+          "side": "BUY",
+          "value_cr": 63.6434,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "SHIPROCKET",
+          "side": "SELL",
+          "value_cr": 60.2737,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "SHIPROCKET",
+          "side": "BUY",
+          "value_cr": 60.2536,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "BUY",
+          "value_cr": 57.2134,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "SELL",
+          "value_cr": 55.0483,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "SELL",
+          "value_cr": 33.8338,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "BUY",
+          "value_cr": 33.8068,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "SELL",
+          "value_cr": 33.7463,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "BUY",
+          "value_cr": 33.3366,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "TFCILTD",
+          "side": "SELL",
+          "value_cr": 32.6807,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "BUY",
+          "value_cr": 32.6709,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "SELL",
+          "value_cr": 32.5085,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "SELL",
+          "value_cr": 31.2028,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "BUY",
+          "value_cr": 31.1887,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "MOREPENLAB",
+          "side": "SELL",
+          "value_cr": 29.0983,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "MOREPENLAB",
+          "side": "BUY",
+          "value_cr": 28.0848,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "MOREPENLAB",
+          "side": "SELL",
+          "value_cr": 27.6866,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "MOREPENLAB",
+          "side": "BUY",
+          "value_cr": 27.5592,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "BUY",
+          "value_cr": 25.0638,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:42:01.687432+05:30"
+        }
+      ],
+      "final_check": [
+        {
+          "symbol": "KFINTECH",
+          "side": "SELL",
+          "value_cr": 1400.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 400.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 237.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 185.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "NXT-INFRA",
+          "side": "SELL",
+          "value_cr": 179.4881,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 165.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 100.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "BUY",
+          "value_cr": 96.65,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "SELL",
+          "value_cr": 96.5832,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "BUY",
+          "value_cr": 96.5167,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "SELL",
+          "value_cr": 94.5142,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "KFINTECH",
+          "side": "BUY",
+          "value_cr": 91.0,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "NXT-INFRA",
+          "side": "BUY",
+          "value_cr": 89.8614,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "NXT-INFRA",
+          "side": "BUY",
+          "value_cr": 89.6268,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "SELL",
+          "value_cr": 80.3498,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "BUY",
+          "value_cr": 79.6604,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "SELL",
+          "value_cr": 76.53,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BALRAMCHIN",
+          "side": "BUY",
+          "value_cr": 76.2613,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "SELL",
+          "value_cr": 64.143,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "BUY",
+          "value_cr": 64.1164,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "SHIPROCKET",
+          "side": "SELL",
+          "value_cr": 63.673,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "SHIPROCKET",
+          "side": "BUY",
+          "value_cr": 63.6434,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "SHIPROCKET",
+          "side": "SELL",
+          "value_cr": 60.2737,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "SHIPROCKET",
+          "side": "BUY",
+          "value_cr": 60.2536,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "BUY",
+          "value_cr": 57.2134,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "SELL",
+          "value_cr": 55.0483,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "SELL",
+          "value_cr": 33.8338,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "BUY",
+          "value_cr": 33.8068,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "SELL",
+          "value_cr": 33.7463,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "BUY",
+          "value_cr": 33.3366,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "TFCILTD",
+          "side": "SELL",
+          "value_cr": 32.6807,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "BUY",
+          "value_cr": 32.6709,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "SELL",
+          "value_cr": 32.5085,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "SELL",
+          "value_cr": 31.2028,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "BLEL",
+          "side": "BUY",
+          "value_cr": 31.1887,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "MOREPENLAB",
+          "side": "SELL",
+          "value_cr": 29.0983,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "MOREPENLAB",
+          "side": "BUY",
+          "value_cr": 28.0848,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "MOREPENLAB",
+          "side": "SELL",
+          "value_cr": 27.6866,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "MOREPENLAB",
+          "side": "BUY",
+          "value_cr": 27.5592,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        },
+        {
+          "symbol": "ZAGGLE",
+          "side": "BUY",
+          "value_cr": 25.0638,
+          "deal_type": "bulk",
+          "deal_date": "20-Aug-2026",
+          "as_of": "2026-08-21T17:50:39.267969+05:30"
+        }
+      ]
+    },
+    "final_check": {
+      "INDOBORAX": {
+        "symbol": "INDOBORAX",
+        "buy_value_cr": 42.6,
+        "sell_value_cr": 40.47,
+        "buy_count": 3,
+        "sell_count": 3,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 2.13,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "KFINTECH": {
+        "symbol": "KFINTECH",
+        "buy_value_cr": 1178.0,
+        "sell_value_cr": 1400.0,
+        "buy_count": 6,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -222.0,
+        "dominant_side": "SELL",
+        "tier": "STRONG",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "BALRAMCHIN": {
+        "symbol": "BALRAMCHIN",
+        "buy_value_cr": 349.09,
+        "sell_value_cr": 347.98,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.11,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "BLEL": {
+        "symbol": "BLEL",
+        "buy_value_cr": 326.41,
+        "sell_value_cr": 316.59,
+        "buy_count": 13,
+        "sell_count": 12,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 9.82,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "CREDENT": {
+        "symbol": "CREDENT",
+        "buy_value_cr": 11.15,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 11.15,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "DWARKESH": {
+        "symbol": "DWARKESH",
+        "buy_value_cr": 13.13,
+        "sell_value_cr": 13.22,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.09,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "KIRIINDUS": {
+        "symbol": "KIRIINDUS",
+        "buy_value_cr": 15.71,
+        "sell_value_cr": 15.72,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.01,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "MARSONS": {
+        "symbol": "MARSONS",
+        "buy_value_cr": 10.98,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.98,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "MOREPENLAB": {
+        "symbol": "MOREPENLAB",
+        "buy_value_cr": 55.64,
+        "sell_value_cr": 56.78,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -1.14,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "NXT-INFRA": {
+        "symbol": "NXT-INFRA",
+        "buy_value_cr": 179.49,
+        "sell_value_cr": 179.49,
+        "buy_count": 2,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.0,
+        "dominant_side": "NONE",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "RATNAVEER": {
+        "symbol": "RATNAVEER",
+        "buy_value_cr": 104.67,
+        "sell_value_cr": 99.08,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 5.59,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "SBC": {
+        "symbol": "SBC",
+        "buy_value_cr": 10.39,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.39,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "SHIPROCKET": {
+        "symbol": "SHIPROCKET",
+        "buy_value_cr": 123.9,
+        "sell_value_cr": 123.95,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.05,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "SIRCA": {
+        "symbol": "SIRCA",
+        "buy_value_cr": 13.54,
+        "sell_value_cr": 13.58,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.05,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "SOLARA": {
+        "symbol": "SOLARA",
+        "buy_value_cr": 17.75,
+        "sell_value_cr": 17.71,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.04,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "TFCILTD": {
+        "symbol": "TFCILTD",
+        "buy_value_cr": 13.48,
+        "sell_value_cr": 32.68,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -19.2,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "ZAGGLE": {
+        "symbol": "ZAGGLE",
+        "buy_value_cr": 97.9,
+        "sell_value_cr": 97.28,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.62,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "AMRUTANJAN": {
+        "symbol": "AMRUTANJAN",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 11.15,
+        "buy_count": 0,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -11.15,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
+      },
+      "SHANTIGOLD": {
+        "symbol": "SHANTIGOLD",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 11.16,
+        "buy_count": 0,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -11.16,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-08-21T17:50:39.249963+05:30"
       }
     }
   }

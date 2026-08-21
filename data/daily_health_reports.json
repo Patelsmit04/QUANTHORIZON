@@ -97,5 +97,120 @@
     "errors_count": 0,
     "errors": [],
     "market_transitions": []
+  },
+  "2026-08-20": {
+    "date": "2026-08-20",
+    "generated_at": "2026-08-21 09:46:40 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-08-20 18:01:47 IST",
+          "evaluated_count": 17,
+          "wins": 8,
+          "losses": 18,
+          "win_rate_pct": 30.8,
+          "status": "SUCCESS",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-08-20 18:02:01 IST",
+          "evaluated_count": 17,
+          "wins": 0,
+          "losses": 0,
+          "win_rate_pct": 30.8,
+          "status": "SUCCESS",
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_backfill"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-08-20 18:02:15 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 1,
+          "symbols": [
+            "RELIANCE"
+          ],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-08-20 18:03:30 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 2,
+          "symbols": [
+            "GRASIM",
+            "HINDALCO"
+          ],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-08-20 18:03:32 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-08-20 18:03:38 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 4,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-08-21": {
+    "date": "2026-08-21",
+    "generated_at": "2026-08-21 10:46:00 IST",
+    "health_score": 75,
+    "status": "DEGRADED",
+    "status_label": "Degraded",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-08-21 10:43:53 IST",
+          "evaluated_count": 0,
+          "wins": 0,
+          "losses": 0,
+          "win_rate_pct": 32.1,
+          "status": "SUCCESS",
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_backfill"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-08-21 10:44:18 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 1,
+          "symbols": [
+            "RELIANCE"
+          ],
+          "details": {}
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 2,
+      "market_hours_cold_starts": 2
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
   }
 }

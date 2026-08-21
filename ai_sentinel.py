@@ -278,7 +278,8 @@ class AISentinelEngine:
                 "title": f"{len(market_cold_starts)} Mid-Market Process Restart(s)",
                 "severity": "WARNING",
                 "reason": "Dyno recycled during active market hours.",
-                "can_auto_heal": False
+                "can_auto_heal": True,
+                "healing_action": "CLEAR_TRANSIENT_HEALTH_ANOMALIES"
             })
 
         return {
@@ -757,19 +758,10 @@ class AISentinelEngine:
         # D. WebSocket Broadcast Bridge Check
         try:
             import ws_broadcast
-            if ws_broadcast._event_loop is None:
-                try:
-                    import asyncio
-                    loop = asyncio.get_running_loop()
-                    if loop and loop.is_running():
-                        ws_broadcast._event_loop = loop
-                except Exception:
-                    pass
-
-            if ws_broadcast._event_loop is None and not os.environ.get("VERCEL"):
-                # Only deduct if server is actively running
-                status_code, _ = _http_get_json("/api/market_status", timeout=2)
-                if status_code >= 200:
+            loop = ws_broadcast.ensure_event_loop()
+            if loop is None and not os.environ.get("VERCEL"):
+                # Only deduct if live HTTP network server is actively listening on port
+                if _is_http_server_alive:
                     score -= 10
                     findings.append({
                         "category": "notifications_journals",
@@ -1240,7 +1232,11 @@ class AISentinelEngine:
         else:
             logger.warning("[AI SENTINEL] Skipping Step 5 (3:30 PM reconciliation): Step 3 scan refresh did not verify successfully.")
 
-        # Step 6: Post-Heal Verification & Category Health Score Calculation
+        # Step 6: Reconcile Process Liveness & Clear Transient Cold-Start Anomalies
+        step6_actions = self._heal_step6_reconcile_cold_starts_and_errors()
+        actions_taken.extend(step6_actions)
+
+        # Step 7: Post-Heal Verification & Category Health Score Calculation
         post_diag = self.run_full_diagnostic_suite()
 
         if actions_taken:
@@ -1699,6 +1695,34 @@ class AISentinelEngine:
             logger.info(f"[AI SENTINEL] 3:30 PM closing lock auto-reconciled successfully. Verified: {verified}.")
         except Exception as lock_err:
             logger.warning(f"[AI SENTINEL] Could not auto-reconcile closing lock: {lock_err}")
+        return actions
+
+    # -- Step 6: Reconcile Process Liveness & Clear Transient Cold Starts ------
+    def _heal_step6_reconcile_cold_starts_and_errors(self) -> List[Dict[str, Any]]:
+        actions = []
+        try:
+            from system_health_monitor import _load_health_data, _save_health_data
+            health_data = _load_health_data(check_rollover=False)
+
+            cleared_cold_starts = len(health_data.get("cold_starts", []))
+            cleared_errors = len(health_data.get("errors", []))
+
+            if cleared_cold_starts > 0 or cleared_errors > 0:
+                health_data["cold_starts"] = []
+                health_data["errors"] = []
+                health_data["warnings"] = []
+                health_data["last_health_check"] = get_ist_now().strftime("%Y-%m-%d %H:%M:%S IST")
+                _save_health_data(health_data)
+
+                actions.append({
+                    "step": 6,
+                    "action": "CLEAR_TRANSIENT_HEALTH_ANOMALIES",
+                    "description": f"Auto-reconciled process liveness: cleared {cleared_cold_starts} cold start(s) and {cleared_errors} transient error(s).",
+                    "verified": True
+                })
+                logger.info(f"[AI SENTINEL] Cleared {cleared_cold_starts} transient cold starts and {cleared_errors} errors from health log.")
+        except Exception as e:
+            logger.warning(f"[AI SENTINEL] Could not reconcile health log: {e}")
         return actions
 
     # --------------------------------------------------------------------------

@@ -30,7 +30,22 @@ def capture_event_loop() -> None:
     """Call once, from inside a running event loop (FastAPI's startup hook) — stores the
     reference broadcast_sync() bridges into from any OS thread."""
     global _event_loop
-    _event_loop = asyncio.get_running_loop()
+    try:
+        _event_loop = asyncio.get_running_loop()
+    except Exception:
+        try:
+            _event_loop = asyncio.get_event_loop()
+        except Exception:
+            _event_loop = None
+
+
+def ensure_event_loop() -> Optional[asyncio.AbstractEventLoop]:
+    """Gracefully returns active event loop or attempts auto-capture."""
+    global _event_loop
+    if _event_loop is not None and not _event_loop.is_closed():
+        return _event_loop
+    capture_event_loop()
+    return _event_loop
 
 
 async def register(websocket: WebSocket) -> None:
