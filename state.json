@@ -1,10 +1,10 @@
 {
   "current_status": "HEALTHY",
-  "consecutive_failures": 0,
-  "consecutive_successes": 2,
-  "last_check": "2026-08-23T22:47:08.384Z",
+  "consecutive_failures": 1,
+  "consecutive_successes": 0,
+  "last_check": "2026-08-23T23:01:38.835Z",
   "last_success": "2026-08-23T22:47:08.384Z",
-  "last_failure": "2026-08-23T22:00:44.853Z",
+  "last_failure": "2026-08-23T23:01:38.835Z",
   "down_since": null,
   "history": [
     {
@@ -272,14 +272,21 @@
       "status_code": 200,
       "response_time_ms": 9373.4,
       "error": null
+    },
+    {
+      "timestamp": "2026-08-23T23:01:38.835Z",
+      "success": false,
+      "status_code": null,
+      "response_time_ms": 12043.2,
+      "error": "TIMEOUT"
     }
   ],
   "stats": {
-    "uptime_pct": 36.84,
+    "uptime_pct": 35.9,
     "avg_response_time_ms": 8192.4,
     "min_response_time_ms": 2371.9,
     "max_response_time_ms": 10731.5,
-    "total_checks": 38,
-    "failed_checks": 24
+    "total_checks": 39,
+    "failed_checks": 25
   }
 }
