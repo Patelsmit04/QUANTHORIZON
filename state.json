@@ -1,0 +1,26 @@
+{
+  "current_status": "HEALTHY",
+  "consecutive_failures": 0,
+  "consecutive_successes": 1,
+  "last_check": "2026-08-23T09:01:12.742Z",
+  "last_success": "2026-08-23T09:01:12.742Z",
+  "last_failure": null,
+  "down_since": null,
+  "history": [
+    {
+      "timestamp": "2026-08-23T09:01:12.742Z",
+      "success": true,
+      "status_code": 200,
+      "response_time_ms": 2371.9,
+      "error": null
+    }
+  ],
+  "stats": {
+    "uptime_pct": 100.0,
+    "avg_response_time_ms": 2371.9,
+    "min_response_time_ms": 2371.9,
+    "max_response_time_ms": 2371.9,
+    "total_checks": 1,
+    "failed_checks": 0
+  }
+}

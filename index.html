@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUANTHORIZON — Uptime Monitor</title>
+<style>
+  :root {
+    --bg: #0b0e14;
+    --card: #131722;
+    --border: #232838;
+    --ink: #e6e9f0;
+    --ink-muted: #8a91a5;
+    --green: #1baf7a;
+    --red: #e5484d;
+    --gold: #c99433;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    padding: 24px 16px 64px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .sub { color: var(--ink-muted); font-size: 0.85rem; margin-bottom: 24px; }
+  .status-banner {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card); margin-bottom: 20px;
+  }
+  .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+  .dot.healthy { background: var(--green); box-shadow: 0 0 12px var(--green); }
+  .dot.down { background: var(--red); box-shadow: 0 0 12px var(--red); }
+  .dot.unknown { background: var(--ink-muted); }
+  .status-text { font-size: 1.1rem; font-weight: 700; }
+  .status-sub { color: var(--ink-muted); font-size: 0.8rem; }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px; margin-bottom: 24px;
+  }
+  .tile {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .tile .label { color: var(--ink-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tile .value { font-size: 1.3rem; font-weight: 700; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--ink-muted); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; }
+  .ok { color: var(--green); }
+  .fail { color: var(--red); }
+  .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .table-scroll { max-height: 420px; overflow-y: auto; }
+  .footer-note { color: var(--ink-muted); font-size: 0.75rem; margin-top: 20px; }
+  .err { color: var(--red); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>QUANTHORIZON — Uptime Monitor</h1>
+  <div class="sub">Independent external health monitor. Checks <code>/health</code> every ~5 minutes.</div>
+
+  <div class="status-banner">
+    <div class="dot unknown" id="statusDot"></div>
+    <div>
+      <div class="status-text" id="statusText">Loading…</div>
+      <div class="status-sub" id="statusSub"></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="tile"><div class="label">Uptime</div><div class="value" id="tileUptime">—</div></div>
+    <div class="tile"><div class="label">Avg Response</div><div class="value" id="tileAvg">—</div></div>
+    <div class="tile"><div class="label">Last Check</div><div class="value" id="tileLastCheck">—</div></div>
+    <div class="tile"><div class="label">Consecutive Failures</div><div class="value" id="tileFailures">—</div></div>
+    <div class="tile"><div class="label">Last Failure</div><div class="value" id="tileLastFailure">—</div></div>
+    <div class="tile"><div class="label">Total Checks</div><div class="value" id="tileTotal">—</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Time (UTC)</th><th>Status</th><th>Response</th><th>Result</th></tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer-note" id="loadError"></div>
+</div>
+
+<script>
+  function fmtTime(iso) {
+    if (!iso) return "—";
+    try { return new Date(iso).toLocaleString(); } catch (e) { return iso; }
+  }
+
+  async function load() {
+    try {
+      const res = await fetch("state.json?_=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("state.json HTTP " + res.status);
+      const state = await res.json();
+      render(state);
+    } catch (e) {
+      document.getElementById("loadError").textContent =
+        "Could not load state.json: " + e.message + " (it appears after the first monitor run).";
+    }
+  }
+
+  function render(state) {
+    const dot = document.getElementById("statusDot");
+    const text = document.getElementById("statusText");
+    const sub = document.getElementById("statusSub");
+
+    const status = state.current_status || "UNKNOWN";
+    dot.className = "dot " + (status === "HEALTHY" ? "healthy" : status === "DOWN" ? "down" : "unknown");
+    text.textContent = status === "HEALTHY" ? "🟢 HEALTHY" : status === "DOWN" ? "🔴 DOWN" : "⚪ UNKNOWN";
+    sub.textContent = "Last check: " + fmtTime(state.last_check);
+
+    const stats = state.stats || {};
+    document.getElementById("tileUptime").textContent =
+      stats.uptime_pct != null ? stats.uptime_pct + "%" : "—";
+    document.getElementById("tileAvg").textContent =
+      stats.avg_response_time_ms != null ? Math.round(stats.avg_response_time_ms) + " ms" : "—";
+    document.getElementById("tileLastCheck").textContent = fmtTime(state.last_check);
+    document.getElementById("tileFailures").textContent = state.consecutive_failures ?? "—";
+    document.getElementById("tileLastFailure").textContent = fmtTime(state.last_failure);
+    document.getElementById("tileTotal").textContent = stats.total_checks ?? "—";
+
+    const body = document.getElementById("historyBody");
+    body.innerHTML = "";
+    const history = (state.history || []).slice().reverse().slice(0, 100);
+    for (const h of history) {
+      const tr = document.createElement("tr");
+      const resultClass = h.success ? "ok" : "fail";
+      const resultText = h.success ? "HEALTHY" : (h.error || "FAILED");
+      tr.innerHTML =
+        "<td>" + fmtTime(h.timestamp) + "</td>" +
+        "<td>" + (h.status_code ?? "—") + "</td>" +
+        "<td>" + Math.round(h.response_time_ms) + " ms</td>" +
+        "<td class=\"" + resultClass + "\">" + resultText + "</td>";
+      body.appendChild(tr);
+    }
+  }
+
+  load();
+  setInterval(load, 60000);
+</script>
+</body>
+</html>
