@@ -73,12 +73,8 @@ jobs:
           git commit -m "chore(monitor): health check $(date -u +%Y-%m-%dT%H:%M:%SZ)" || echo "Nothing to commit"
           git push origin monitoring-data
 
-      # Deliberately NOT failing the job on a DOWN result anymore. This used to exit 1 here so
-      # GitHub's default run-failure email became a free alert channel -- but paired with
-      # Render's free-tier spin-down and GitHub Actions' schedule trigger being best-effort
-      # (observed gaps of 25-47 min against a 5 min cron, well past Render's ~15 min idle
-      # timeout), that meant every run found the site cold and this mailed a failure notice,
-      # 166/166 runs straight. State history, the dashboard, and any configured Telegram/
-      # Discord/Slack alert channel (see alerts.py) still update/fire exactly as before --
-      # this only stops GitHub Actions itself from flagging the run red and emailing on it.
-      # An external uptime service now owns the "please tell me if this goes down" job.
+      - name: Fail this run if the site is currently DOWN
+        if: steps.healthcheck.outcome == 'failure'
+        run: |
+          echo "::error::Site is DOWN (consecutive failure threshold reached) -- see health check step output above."
+          exit 1

@@ -40,12 +40,9 @@ it been down", 24/7, not just during market hours.
 | Slack | `SLACK_WEBHOOK_URL` | Create an Incoming Webhook app in your workspace, copy the webhook URL |
 
 With none configured, the monitor still runs, tracks history, and updates the dashboard — it
-just logs "no alert channel configured" instead of sending a message. The workflow deliberately
-does not fail its own GitHub Actions job on a DOWN result (see health-monitor.yml's comments) —
-that used to double as a free email fallback, but paired with Render free-tier spin-down plus
-GitHub Actions' schedule trigger running well off its nominal cadence, it meant every scheduled
-run found the site cold and mailed a failure notice. Pair this with a real external uptime
-service (below) for alerting; this workflow's job is history/dashboard, not the alert channel.
+just logs "no alert channel configured" instead of sending a message. A DOWN run also fails
+the GitHub Actions job itself, which GitHub will email you about by default even with zero
+channels configured above — a free fallback signal.
 
 **3. (Optional) Enable GitHub Pages** for the live dashboard: Settings → Pages → Source:
 Deploy from branch → Branch: `monitoring-data` → `/ (root)`. After the first workflow run

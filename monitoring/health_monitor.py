@@ -18,9 +18,9 @@ What one run does:
        RECOVERY alert (with computed downtime duration) on the next successful check after a
        DOWN state -- not on every single failure/success, which would be noise.
 
-Exit code is non-zero when the site is currently considered DOWN. health-monitor.yml no longer
-propagates that into a failed job/GitHub email (see its comments) now that an external uptime
-service is the primary alert channel -- the exit code is kept for anyone running this by hand.
+Exit code is non-zero when the site is currently considered DOWN, purely so a failing run also
+shows up as a red run in the GitHub Actions UI / triggers GitHub's own run-failure
+notifications as a free extra signal -- it is not a script bug.
 """
 
 import os
