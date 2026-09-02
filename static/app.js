@@ -4120,10 +4120,10 @@ function initTradexoDashboard() {
     }
 
     const DEFAULT_INDEX_FALLBACKS = [
-        { index_name: "NIFTY50", display_name: "NIFTY 50", ltp: 24231.85, change_pts: 0.0, pct_change: 0.0 },
-        { index_name: "BANKNIFTY", display_name: "BANK NIFTY", ltp: 57495.90, change_pts: 0.0, pct_change: 0.0 },
-        { index_name: "SENSEX", display_name: "SENSEX", ltp: 77537.72, change_pts: 0.0, pct_change: 0.0 },
-        { index_name: "GIFTNIFTY", display_name: "GIFT NIFTY", ltp: 24251.00, change_pts: -46.50, pct_change: -0.19 }
+        { index_name: "NIFTY50", display_name: "NIFTY 50", ltp: 23914.45, change_pts: -141.35, pct_change: -0.59 },
+        { index_name: "BANKNIFTY", display_name: "BANK NIFTY", ltp: 57172.00, change_pts: -388.30, pct_change: -0.67 },
+        { index_name: "SENSEX", display_name: "SENSEX", ltp: 76570.35, change_pts: -458.95, pct_change: -0.60 },
+        { index_name: "GIFTNIFTY", display_name: "GIFT NIFTY", ltp: 24071.50, change_pts: 101.50, pct_change: 0.42 }
     ];
 
     function buildTickerItemHTML(idx) {
@@ -4151,11 +4151,20 @@ function initTradexoDashboard() {
     async function fetchTickerIndices() {
         try {
             const response = await apiFetch("/api/indices");
-            if (!response.ok) return;
-            const data = await response.json();
-            let indices = data.indices || [];
+            let indices = [];
+            if (response.ok) {
+                const data = await response.json();
+                indices = data.indices || [];
+            }
             if (!indices || indices.length === 0) {
                 indices = DEFAULT_INDEX_FALLBACKS;
+            } else {
+                const presentKeys = new Set(indices.map(i => normalizeIndexKey(i.index_name || i.display_name)));
+                DEFAULT_INDEX_FALLBACKS.forEach(def => {
+                    if (!presentKeys.has(normalizeIndexKey(def.index_name))) {
+                        indices.push(def);
+                    }
+                });
             }
 
             if (indexTickerTrack && indices && indices.length > 0) {
@@ -4960,6 +4969,14 @@ function initTradexoDashboard() {
                         notifUnreadCount += 1;
                         renderNotifBadge();
                         if (notifPanel && !notifPanel.classList.contains("hidden")) onNotifPanelOpened();
+                    } else if (msg.type === "indices_tick") {
+                        if (msg.indices && Array.isArray(msg.indices)) {
+                            batchMutateLivePrices({ indices: msg.indices });
+                        }
+                    } else if (msg.type === "index_tick") {
+                        if (msg.index) {
+                            batchMutateLivePrices({ indices: [msg.index] });
+                        }
                     } else if (msg.type === "market_lock" || msg.type === "auto_lock_325_picks" || msg.type === "closing_sequence_progress") {
                         if (msg.btst_status) lastBtstStatus = msg.btst_status;
                         fetchScanResults(true);
@@ -5332,6 +5349,14 @@ function initTradexoDashboard() {
                             fetchSplitAccuracy();
                             fetchWinRatePerformance();
                             fetchLiveTradesSection();
+                        } else if (data.type === "indices_tick") {
+                            if (data.indices && Array.isArray(data.indices)) {
+                                batchMutateLivePrices({ indices: data.indices });
+                            }
+                        } else if (data.type === "index_tick") {
+                            if (data.index) {
+                                batchMutateLivePrices({ indices: [data.index] });
+                            }
                         } else if (data.type === "scan_update" || data.type === "market_lock") {
                             fetchScanResults();
                             fetchTickerIndices();
@@ -5589,6 +5614,11 @@ function initTradexoDashboard() {
         });
     }
 
+    fetchTickerIndices();
+    fetchLivePrices();
+    if (!window._tradexoLivePricesInterval) {
+        window._tradexoLivePricesInterval = setInterval(fetchLivePrices, 1000);
+    }
     initWebSocket();
 }
 

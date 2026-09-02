@@ -59,7 +59,7 @@ from news_provider import (
     should_refresh_universe_news, refresh_universe_news_cache, get_cached_stock_news,
     get_all_cached_news, get_universe_news_meta
 )
-from index_scoring import evaluate_index_signal, fetch_global_cues, classify_global_cues, INDEX_TICKERS, fetch_gift_nifty_live
+from index_scoring import evaluate_index_signal, fetch_global_cues, classify_global_cues, INDEX_TICKERS, fetch_gift_nifty_live, fetch_major_indices_live
 from options_chain_provider import fetch_index_option_chain, get_nearest_expiry_chain, OPTION_CHAIN_INDICES
 from index_depth_analysis import build_index_btst_verdicts
 import strategy_manager as sm
@@ -1552,40 +1552,50 @@ def run_scheduler_tick() -> Dict[str, Any]:
 # -------------------------------------------------------------
 def gift_nifty_live_ticker_worker():
     """
-    Dedicated 1-second real-time ticker worker for GIFT Nifty (Sessions 1 & 2).
-    Session 1: 06:15 AM - 03:40 PM IST | Session 2: 03:58 PM - 04:00 AM IST.
+    Dedicated 1-second real-time ticker worker for all 4 major benchmark indices:
+    NIFTY 50, BANK NIFTY, SENSEX, and GIFT Nifty.
     Writes directly to fast_cache and broadcasts WebSocket events every 1 second.
     """
-    logger.info("Starting Dedicated 1-Second GIFT Nifty Live Ticker Worker Thread...")
+    logger.info("Starting Dedicated 1-Second Major Indices Live Ticker Worker Thread...")
     while not shutdown_event.is_set():
         try:
             ist_now = get_ist_now()
-            from index_scoring import is_gift_nifty_trading_active, fetch_gift_nifty_live
+            from index_scoring import is_gift_nifty_trading_active, fetch_major_indices_live
             is_gift_active, gift_session, gift_meta = is_gift_nifty_trading_active(ist_now)
 
-            if is_gift_active:
-                gift_live = fetch_gift_nifty_live()
-                if gift_live:
-                    fast_cache.set("index:GIFTNIFTY:quote", gift_live)
+            live_indices = fetch_major_indices_live()
+            if live_indices:
+                idx_dict = {}
+                live_map = cache_store.get("live_prices_map") or {}
 
-                    current_indices = cache_store.get("index_data") or []
-                    idx_dict = {idx.get("index_name"): idx for idx in current_indices if isinstance(idx, dict)}
-                    idx_dict["GIFTNIFTY"] = gift_live
-                    cache_store["index_data"] = list(idx_dict.values())
+                for idx in live_indices:
+                    name = idx.get("index_name")
+                    if name:
+                        fast_cache.set(f"index:{name}:quote", idx)
+                        idx_dict[name] = idx
+                        live_map[name] = {
+                            "symbol": name,
+                            "ltp": idx.get("ltp"),
+                            "prev_close": idx.get("prev_close"),
+                            "change_pts": idx.get("change_pts"),
+                            "pct_change": idx.get("pct_change"),
+                            "session_info": gift_meta if name == "GIFTNIFTY" else {"status": "Active"}
+                        }
 
-                    live_map = cache_store.get("live_prices_map") or {}
-                    live_map["GIFTNIFTY"] = {
-                        "symbol": "GIFTNIFTY",
-                        "ltp": gift_live.get("ltp"),
-                        "prev_close": gift_live.get("prev_close"),
-                        "change_pts": gift_live.get("change_pts"),
-                        "pct_change": gift_live.get("pct_change"),
-                        "session_info": gift_meta
-                    }
-                    cache_store["live_prices_map"] = live_map
+                cache_store["index_data"] = list(idx_dict.values())
+                cache_store["live_prices_map"] = live_map
+
+                # Broadcast batch index ticks and individual ticks over WebSocket
+                ws_broadcast.broadcast_sync({
+                    "type": "indices_tick",
+                    "indices": live_indices,
+                    "session": gift_session
+                })
+                gift_q = next((i for i in live_indices if i.get("index_name") == "GIFTNIFTY"), None)
+                if gift_q:
                     ws_broadcast.broadcast_sync({
                         "type": "index_tick",
-                        "index": gift_live,
+                        "index": gift_q,
                         "session": gift_session
                     })
 
@@ -2732,36 +2742,25 @@ def get_index_signals():
         else:
             index_data = []
 
-    # Guarantee all 4 primary indices are present in index_data when running locally / non-VERCEL
-    if not index_data and not os.environ.get("VERCEL"):
-        index_data = [
-            {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24231.85, "change_pts": 0.0, "pct_change": 0.0, "signal": "NEUTRAL", "confidence_score": 75},
-            {"index_name": "BANKNIFTY", "display_name": "BANK NIFTY", "ltp": 57495.90, "change_pts": 0.0, "pct_change": 0.0, "signal": "NEUTRAL", "confidence_score": 78},
-            {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 77537.72, "change_pts": 0.0, "pct_change": 0.0, "signal": "NEUTRAL", "confidence_score": 74},
-            {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24251.00, "change_pts": -46.50, "pct_change": -0.19, "signal": "NEUTRAL", "confidence_score": 80},
-        ]
-    elif isinstance(index_data, list) and index_data:
-        if not any(idx.get("index_name") == "GIFTNIFTY" for idx in index_data):
-            gift_live = fetch_gift_nifty_live()
-            if gift_live:
-                index_data.append(gift_live)
-
-    # Synchronize index_data with latest fast_cache live quotes if available
-    fast_indices = fast_cache.get_index_quotes_snapshot()
-    if fast_indices and index_data:
-        fast_map = {idx.get("index_name"): idx for idx in fast_indices if isinstance(idx, dict)}
-        for idx in index_data:
-            name = idx.get("index_name")
-            if name in fast_map:
-                f_idx = fast_map[name]
-                if f_idx.get("ltp") is not None:
-                    idx["ltp"] = f_idx["ltp"]
-                if f_idx.get("change_pts") is not None:
-                    idx["change_pts"] = f_idx["change_pts"]
-                if f_idx.get("pct_change") is not None:
-                    idx["pct_change"] = f_idx["pct_change"]
-                if f_idx.get("prev_close") is not None:
-                    idx["prev_close"] = f_idx["prev_close"]
+    # Guarantee all 4 primary indices are present in index_data with live quotes when running locally / non-VERCEL
+    if not os.environ.get("VERCEL"):
+        live_indices_snapshot = fetch_major_indices_live()
+        if live_indices_snapshot:
+            live_dict = {idx.get("index_name"): idx for idx in live_indices_snapshot if isinstance(idx, dict)}
+            if not index_data:
+                index_data = list(live_dict.values())
+            else:
+                for idx in index_data:
+                    name = idx.get("index_name")
+                    if name in live_dict:
+                        l_idx = live_dict[name]
+                        for field in ["ltp", "change_pts", "pct_change", "prev_close"]:
+                            if l_idx.get(field) is not None:
+                                idx[field] = l_idx[field]
+                existing_names = {idx.get("index_name") for idx in index_data}
+                for name, l_idx in live_dict.items():
+                    if name not in existing_names:
+                        index_data.append(l_idx)
 
     # Determine BTST display status based on current IST time
     ist_now = get_ist_now()
@@ -2813,10 +2812,10 @@ def get_live_prices():
     and pct_change for all indices and stocks in <5ms without blocking HTTP worker threads."""
     now_ts = time.time()
 
-    # 1. Index prices: check fast_cache first, then cache_store, then fallback
+    # 1. Index prices: check fast_cache first, then live fetch
     index_prices = []
     fast_indices = fast_cache.get_index_quotes_snapshot()
-    if fast_indices:
+    if fast_indices and len(fast_indices) >= 4:
         for idx in fast_indices:
             if isinstance(idx, dict):
                 index_prices.append({
@@ -2828,16 +2827,8 @@ def get_live_prices():
                     "prev_close": idx.get("prev_close"),
                 })
     else:
-        index_data = cache_store.get("index_data") or []
-        if not index_data:
-            index_data = [
-                {"index_name": "NIFTY50", "display_name": "NIFTY 50", "ltp": 24500.00, "change_pts": 125.40, "pct_change": 0.52, "prev_close": 24374.60},
-                {"index_name": "BANKNIFTY", "display_name": "BANKNIFTY", "ltp": 57500.00, "change_pts": 340.10, "pct_change": 0.60, "prev_close": 57159.90},
-                {"index_name": "SENSEX", "display_name": "SENSEX", "ltp": 80200.00, "change_pts": 410.20, "pct_change": 0.52, "prev_close": 79789.80},
-                {"index_name": "GIFTNIFTY", "display_name": "GIFT NIFTY", "ltp": 24560.00, "change_pts": 145.00, "pct_change": 0.60, "prev_close": 24415.00},
-            ]
-
-        for idx in index_data:
+        live_list = fetch_major_indices_live()
+        for idx in live_list:
             if isinstance(idx, dict):
                 index_prices.append({
                     "index_name": idx.get("index_name", ""),
@@ -2847,25 +2838,6 @@ def get_live_prices():
                     "pct_change": idx.get("pct_change"),
                     "prev_close": idx.get("prev_close"),
                 })
-
-    # Guarantee GIFTNIFTY is in index_prices from fast_cache
-    if not any(p.get("index_name") == "GIFTNIFTY" for p in index_prices):
-        gift_q = fast_cache.get("index:GIFTNIFTY:quote")
-        if not gift_q:
-            try:
-                from index_scoring import fetch_gift_nifty_live
-                gift_q = fetch_gift_nifty_live()
-            except Exception:
-                pass
-        if gift_q and isinstance(gift_q, dict):
-            index_prices.append({
-                "index_name": "GIFTNIFTY",
-                "display_name": "GIFT NIFTY",
-                "ltp": gift_q.get("ltp"),
-                "change_pts": gift_q.get("change_pts"),
-                "pct_change": gift_q.get("pct_change"),
-                "prev_close": gift_q.get("prev_close"),
-            })
 
     # 2. Stock prices: check fast_cache, cache_store, and persisted scan
     stock_prices_dict = {}
