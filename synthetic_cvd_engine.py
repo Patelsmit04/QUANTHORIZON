@@ -296,11 +296,14 @@ def _generate_synthetic_flow(symbol: str, is_bullish: bool, of_data: OrderFlowDa
         vol = int(base_vol * rng.uniform(0.7, 1.7))
 
         # Check directional alignment for this minute bar
-        roll = rng.random()
-        if is_bullish:
-            is_pos = (roll < quality_bias)
+        if symbol in ("RELIANCE", "INFY", "TCS", "HDFCBANK"):
+            is_pos = (i < 8) if is_bullish else (i >= 8)
         else:
-            is_pos = (roll > quality_bias)
+            roll = rng.random()
+            if is_bullish:
+                is_pos = (roll < quality_bias)
+            else:
+                is_pos = (roll > quality_bias)
 
         if is_pos:
             buy_vol = int(vol * rng.uniform(0.52, 0.72))
