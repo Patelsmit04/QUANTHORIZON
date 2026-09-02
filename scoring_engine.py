@@ -291,6 +291,59 @@ def evaluate_5_pillar_matrix(
     else:
         range_position_pct = 50.0
 
+    # ATR(14) calculation across session history for Range Exhaustion Check
+    if len(unique_dates) >= 14:
+        df_daily = df_stock.groupby(date_strs.values).agg({
+            'High': 'max', 'Low': 'min', 'Close': 'last', 'Open': 'first'
+        })
+        d_highs = df_daily['High']
+        d_lows = df_daily['Low']
+        d_closes = df_daily['Close']
+        d_prev_c = d_closes.shift(1).fillna(df_daily['Open'])
+        d_tr = pd.concat([d_highs - d_lows, (d_highs - d_prev_c).abs(), (d_lows - d_prev_c).abs()], axis=1).max(axis=1)
+        atr_14 = float(d_tr.rolling(14, min_periods=1).mean().iloc[-1])
+        is_day_range_exhausted = (day_range > 1.5 * atr_14) and (atr_14 > 0.05)
+    else:
+        atr_14 = float(day_range) if day_range > 0 else 1.0
+        is_day_range_exhausted = False
+
+    # 20-period EMA of Close for Trend Overextension Check
+    ema_20 = float(df_stock['Close'].ewm(span=20, adjust=False).mean().iloc[-1]) if len(df_stock) >= 5 else ltp
+    ema_20_extension_pct = round(((ltp - ema_20) / ema_20) * 100, 2) if ema_20 > 0 else 0.0
+
+    # Exhaustion & Mean Reversion Veto conditions (Phase 1)
+    # 1. Quiet pump: gain > 4.5% with weak volume surge (< 1.5x)
+    is_quiet_pump = (stock_pct_change > 4.5) and (vol_spike_ratio < 1.5)
+    # 2. Overextended beyond 20-period EMA with elevated RSI
+    is_ema_overextended = (ema_20_extension_pct > 5.0) and (rsi > 72.0)
+
+    # NIFTY 50 Intraday VWAP Alignment (Phase 2)
+    nifty_below_vwap = False
+    nifty_ltp_val = None
+    nifty_vwap_val = None
+    if df_nifty is not None and not df_nifty.empty:
+        nifty_ltp_val = float(df_nifty.iloc[-1]['Close'])
+        if 'Volume' in df_nifty.columns and df_nifty['Volume'].sum() > 0:
+            n_cum_vol = df_nifty['Volume'].cumsum()
+            n_cum_vp = (df_nifty['Close'] * df_nifty['Volume']).cumsum()
+            nifty_vwap_val = float(np.where(n_cum_vol > 0, n_cum_vp / n_cum_vol, df_nifty['Close'])[-1])
+        else:
+            nifty_vwap_val = float(df_nifty['Close'].mean())
+        nifty_below_vwap = nifty_ltp_val < nifty_vwap_val
+    elif macro_status is not None:
+        nifty_below_vwap = bool(macro_status.get("nifty_below_vwap", False))
+
+    # India VIX < 11.5 Low Volatility Regime Filter (Phase 2)
+    vix_low_vol_regime = False
+    vix_val = None
+    if macro_status is not None:
+        vix_val = macro_status.get("vix_value") or macro_status.get("india_vix")
+        if vix_val is not None:
+            try:
+                vix_low_vol_regime = float(vix_val) < 11.5
+            except (ValueError, TypeError):
+                vix_low_vol_regime = False
+
     expiry_discounted = is_monthly_expiry_window(eval_date, expiry_weekday=1)
 
     # Tentative directional bias from VWAP + RSI, computed up front so direction-sensitive
@@ -529,19 +582,19 @@ def evaluate_5_pillar_matrix(
             option_type = "PUT (PE)"
             conviction_level = "HIGH_CONVICTION" if total_confirmed_weight >= high_conviction_bar else "MODERATE"
 
-    # Decoupled Confidence Score Calculation — combines pillar weight ratio, volume surge,
-    # intraday Marubozu close, and relative strength trend alignment.
+    # Decoupled Confidence Score Calculation (Phase 3 Recalibration)
+    # Combines pillar weight ratio, volume surge, intraday Marubozu close, and relative strength trend alignment.
     weight_ratio = total_confirmed_weight / required_pillars if required_pillars > 0 else 0.0
     capped_vol_spike = min(vol_spike_ratio, 3.0)
     rs_slope_bonus = 5 if (p3_confirmed and rs_slope_positive) else 0
-    base_score = int(50 + (weight_ratio * 22) + (capped_vol_spike * 2.6) + rs_slope_bonus)
+    base_score = int(50 + (weight_ratio * 25) + (capped_vol_spike * 3.0) + rs_slope_bonus)
     if p5_confirmed:
         base_score += 5
     confidence_score = min(99, max(40, base_score))
 
-    # Priority Level Determination (P1_HIGH requires Weight >= required_pillars AND Confidence >= 85%)
+    # Priority Level Determination (P1_HIGH requires Weight >= required_pillars AND Confidence >= 88%)
     if signal in ["BTST (BUY)", "STBT (SELL)"]:
-        if total_confirmed_weight >= required_pillars and confidence_score >= 85:
+        if total_confirmed_weight >= required_pillars and confidence_score >= 88:
             priority_level = "P1_HIGH"
         elif confidence_score >= 70 or total_confirmed_weight >= (required_pillars - 0.5):
             priority_level = "P2_MEDIUM"
@@ -570,14 +623,16 @@ def evaluate_5_pillar_matrix(
             conviction_level = "MODERATE"
 
     # =========================================================================
-    # GLOBAL MACRO RISK GATE: caps conviction when S&P 500 futures, India VIX, or GIFT Nifty risk triggers
+    # GLOBAL MACRO RISK GATE & INDIA VIX REGIME FILTER (Phase 2)
+    # Caps conviction when S&P 500 futures, India VIX, or GIFT Nifty risk triggers
+    # IF India VIX < 11.5, disables breakout strategies (Low Volatility Regime)
     # =========================================================================
     macro_gate_applied = None
     if macro_status is not None:
         vix_ok = macro_status.get("vix_ok", True)
         sp500_green = macro_status.get("sp500_green", True)
         gift_nifty_ok = macro_status.get("gift_nifty_ok", True)
-        if (not vix_ok or not sp500_green or not gift_nifty_ok) and priority_level == "P1_HIGH":
+        if (not vix_ok or not sp500_green or not gift_nifty_ok or vix_low_vol_regime) and priority_level == "P1_HIGH":
             reasons = []
             if not vix_ok:
                 reasons.append("India VIX spiking > 5%")
@@ -585,11 +640,55 @@ def evaluate_5_pillar_matrix(
                 reasons.append("S&P 500 futures red")
             if not gift_nifty_ok:
                 reasons.append("GIFT Nifty pullback < -0.3%")
+            if vix_low_vol_regime:
+                reasons.append(f"India VIX {vix_val} < 11.5 (Low Volatility Regime — Breakouts disabled)")
             macro_gate_applied = f"Capped P1_HIGH -> P2_MEDIUM (Global Macro Risk: {', '.join(reasons)})"
             priority_level = "P2_MEDIUM"
             conviction_level = "MODERATE"
 
-    # ORDER FLOW VETO LAYER (3:15-3:25 PM Closing Aggression)
+    # =========================================================================
+    # INDEX GUARD: NIFTY 50 Intraday VWAP Alignment Gate (Phase 2)
+    # Individual stocks cannot fight broader market distribution on closing gap-ups
+    # =========================================================================
+    nifty_vwap_gate_applied = None
+    if bullish_bias and nifty_below_vwap:
+        nifty_vwap_gate_applied = "VETOED: NIFTY 50 trading below Intraday VWAP at 3:15 PM closing window"
+        if signal == "BTST (BUY)":
+            signal = "NEUTRAL"
+            priority_level = "P3_LOW"
+            conviction_level = "WATCHLIST"
+            confidence_score = min(confidence_score, 48)
+
+    # =========================================================================
+    # EXHAUSTION & MEAN REVERSION VETO (Phase 1)
+    # Prevents buying stocks that have exhausted daily energy at 3:25 PM
+    # 1. Quiet Pump: Intraday Gain > 4.5% with Volume Surge < 1.5x
+    # 2. ATR Range Exhaustion: Day Range > 1.5x 14-day ATR
+    # 3. 20-EMA Overextension > 5.0% with RSI > 72
+    # =========================================================================
+    exhaustion_veto_applied = None
+    is_exhaustion_vetoed = False
+    if bullish_bias and (is_quiet_pump or is_day_range_exhausted or is_ema_overextended):
+        ex_reasons = []
+        if is_quiet_pump:
+            ex_reasons.append(f"Quiet Pump (Gain +{stock_pct_change}% with Vol Surge {vol_spike_ratio}x < 1.5x)")
+        if is_day_range_exhausted:
+            ex_reasons.append(f"ATR Range Exhaustion (Day Range {day_range:.2f} > 1.5x ATR14 {atr_14:.2f})")
+        if is_ema_overextended:
+            ex_reasons.append(f"20-EMA Overextension (+{ema_20_extension_pct:.1f}%)")
+        
+        is_exhaustion_vetoed = True
+        exhaustion_veto_applied = f"VETOED_EXHAUSTION: {'; '.join(ex_reasons)}"
+        if signal == "BTST (BUY)":
+            signal = "NEUTRAL"
+            priority_level = "P3_LOW"
+            conviction_level = "WATCHLIST"
+            confidence_score = min(confidence_score, 45)
+
+    # =========================================================================
+    # ORDER FLOW VETO LAYER (Phase 3: 3:15-3:25 PM Closing Aggression & Selling Pressure)
+    # If synthetic CVD or live tick delta shows net selling, deduct >= 20 pts and strip P1
+    # =========================================================================
     from synthetic_cvd_engine import get_order_flow_data
     from order_flow_analyzer import check_closing_aggression
     
@@ -597,9 +696,12 @@ def evaluate_5_pillar_matrix(
     day_cvd_trend = "BULLISH" if ltp >= vwap else "BEARISH"
     order_flow_veto = check_closing_aggression(clean_sym, order_flow_data, signal_type=signal, day_cvd_trend=day_cvd_trend)
     
-    if order_flow_veto.get("verdict") == "vetoed" and priority_level in ["P1_HIGH", "P2_MEDIUM"]:
-        priority_level = "P3_LOW"
-        conviction_level = "MODERATE"
+    if order_flow_veto.get("verdict") == "vetoed":
+        # Deduct minimum 20 points and strip P1 status immediately
+        confidence_score = max(30, confidence_score - 20)
+        if priority_level in ["P1_HIGH", "P2_MEDIUM"]:
+            priority_level = "P3_LOW"
+            conviction_level = "MODERATE"
 
     # Estimated Gap % Calculation — clamped strictly between 0.5% and 3.5%
     raw_gap = 0.5 + (capped_vol_spike * 0.4) + (abs(rsi - 50) * 0.03)
@@ -608,7 +710,11 @@ def evaluate_5_pillar_matrix(
 
     # Explicit Priority Reason Metadata for UI & Debugging
     if priority_level == "P1_HIGH":
-        priority_reason = f"Priority 1 High Conviction (Weight {total_confirmed_weight:.1f} >= {required_pillars:.1f} & Conf {confidence_score}% >= 85%)"
+        priority_reason = f"Priority 1 High Conviction (Weight {total_confirmed_weight:.1f} >= {required_pillars:.1f} & Conf {confidence_score}% >= 88%)"
+    elif exhaustion_veto_applied:
+        priority_reason = exhaustion_veto_applied
+    elif nifty_vwap_gate_applied:
+        priority_reason = nifty_vwap_gate_applied
     elif fundamental_gate_applied:
         priority_reason = fundamental_gate_applied
     elif macro_gate_applied:
@@ -672,6 +778,28 @@ def evaluate_5_pillar_matrix(
             "red_flags": fundamental_data.get("quality", {}).get("red_flags", []) if fundamental_data else [],
             "yellow_flags": fundamental_data.get("quality", {}).get("yellow_flags", []) if fundamental_data else [],
             "data_status": "STALE_CACHE" if (fundamental_data and fundamental_data.get("stale")) else ("AVAILABLE" if fundamental_data else "DATA_UNAVAILABLE")
+        },
+        "exhaustion_veto": {
+            "is_vetoed": is_exhaustion_vetoed,
+            "reason": exhaustion_veto_applied,
+            "atr_14": round(atr_14, 2),
+            "day_range": round(day_range, 2),
+            "ema_20": round(ema_20, 2),
+            "ema_20_extension_pct": ema_20_extension_pct,
+            "is_quiet_pump": is_quiet_pump,
+            "is_day_range_exhausted": is_day_range_exhausted,
+            "is_ema_overextended": is_ema_overextended
+        },
+        "nifty_vwap_gate": {
+            "nifty_below_vwap": nifty_below_vwap,
+            "nifty_ltp": nifty_ltp_val,
+            "nifty_vwap": nifty_vwap_val,
+            "gate_applied": nifty_vwap_gate_applied
+        },
+        "vix_regime_gate": {
+            "vix_value": vix_val,
+            "is_low_vol_regime": vix_low_vol_regime,
+            "gate_applied": macro_gate_applied if vix_low_vol_regime else None
         },
         "order_flow_veto": order_flow_veto,
         "order_flow_data": order_flow_data.to_dict() if order_flow_data else None,
