@@ -5402,10 +5402,10 @@ body.intro-active {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 24px;
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    padding: 18px 22px;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--glass-border, #e2e8f0);
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
     border-radius: var(--radius-lg, 16px);
     margin-bottom: 24px;
     gap: 20px;
@@ -5413,9 +5413,9 @@ body.intro-active {
 }
 
 .health-hero-control-banner.is-paused {
-    border-color: rgba(239, 68, 68, 0.5);
-    background: linear-gradient(135deg, rgba(69, 10, 10, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
-    box-shadow: 0 4px 24px rgba(239, 68, 68, 0.15);
+    border-color: #fecdd3;
+    background: #fff1f2;
+    box-shadow: 0 4px 20px rgba(225, 29, 72, 0.08);
 }
 
 .health-control-left {
@@ -5429,26 +5429,26 @@ body.intro-active {
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
+    background: #ecfdf5;
+    color: #047857;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.3rem;
     flex-shrink: 0;
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    border: 1px solid #a7f3d0;
 }
 
 .health-hero-control-banner.is-paused .health-control-shield-icon {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-    border-color: rgba(239, 68, 68, 0.4);
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3;
 }
 
 .health-control-copy {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .health-control-headline {
@@ -5461,35 +5461,35 @@ body.intro-active {
 .health-control-headline strong {
     font-size: 0.95rem;
     font-weight: 800;
-    color: #fff;
+    color: var(--ink-primary, #0f172a);
     letter-spacing: 0.01em;
 }
 
 .health-live-status-pill {
-    font-size: 0.65rem;
+    font-size: 0.68rem;
     font-weight: 900;
     letter-spacing: 0.06em;
-    padding: 3px 8px;
-    border-radius: 20px;
+    padding: 3px 10px;
+    border-radius: 9999px;
     text-transform: uppercase;
 }
 
 .health-live-status-pill.status-nominal {
-    background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
-    border: 1px solid rgba(16, 185, 129, 0.4);
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
 }
 
 .health-live-status-pill.status-paused {
-    background: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.4);
+    background: #fff1f2;
+    color: #be123c;
+    border: 1px solid #fecdd3;
     animation: marketPulse 1.5s infinite;
 }
 
 .health-control-subtext {
-    font-size: 0.76rem;
-    color: #94a3b8;
+    font-size: 0.78rem;
+    color: var(--ink-secondary, #475569);
     line-height: 1.45;
     margin: 0;
 }
@@ -5499,18 +5499,19 @@ body.intro-active {
     font-weight: 800;
     padding: 10px 20px;
     letter-spacing: 0.04em;
-    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 2px 10px rgba(225, 29, 72, 0.2);
     white-space: nowrap;
 }
 
 .health-kill-btn.btn-resume {
-    background: #10b981;
-    border-color: #10b981;
-    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+    background: #047857;
+    border-color: #047857;
+    box-shadow: 0 4px 14px rgba(4, 120, 87, 0.25);
+    color: #ffffff;
 }
 
 .health-kill-btn.btn-resume:hover {
-    background: #059669;
+    background: #065f46;
 }
 
 /* 2. Top Diagnostic 4-Card Overview Grid */
@@ -5522,63 +5523,70 @@ body.intro-active {
 }
 
 .health-overview-card {
-    background: var(--glass-bg-strong, rgba(15, 23, 42, 0.75));
-    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.08));
-    border-radius: var(--radius-md, 12px);
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--glass-border, #e2e8f0);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+    border-radius: var(--radius-md, 14px);
     padding: 18px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    gap: 12px;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .health-overview-card:hover {
-    border-color: rgba(212, 175, 55, 0.3);
+    border-color: rgba(217, 119, 6, 0.35);
     transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
 }
 
 .health-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+    width: 100%;
+    margin-bottom: 6px;
 }
 
 .health-card-title {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 800;
-    letter-spacing: 0.06em;
-    color: var(--ink-secondary, #cbd5e1);
+    letter-spacing: 0.05em;
+    color: var(--ink-primary, #0f172a);
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
 }
 
 .health-card-badge {
-    font-size: 0.62rem;
+    font-size: 0.65rem;
     font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
-.health-card-badge.nominal { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.health-card-badge.info { background: rgba(6, 182, 212, 0.15); color: #06b6d4; }
-.health-card-badge.success { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.health-card-badge.warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.health-card-badge.danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.health-card-badge.nominal { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.health-card-badge.info { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
+.health-card-badge.success { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+.health-card-badge.warning { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.health-card-badge.danger { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
 
 .health-score-gauge-wrap {
     display: flex;
     align-items: center;
     gap: 16px;
+    width: 100%;
 }
 
 .health-svg-gauge-container {
     position: relative;
-    width: 76px;
-    height: 76px;
+    width: 78px;
+    height: 78px;
+    min-width: 78px;
+    min-height: 78px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -5589,27 +5597,19 @@ body.intro-active {
     width: 100%;
     height: 100%;
     transform: rotate(-90deg);
+    display: block;
 }
 
 .gauge-bg-circle {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.08);
+    stroke: #e2e8f0;
 }
 
 .gauge-progress-circle {
     fill: none;
-    stroke: #10b981;
+    stroke: #059669;
     stroke-linecap: round;
     transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease;
-    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.4));
-}
-
-.health-svg-gauge-container.attention .gauge-progress-circle {
-    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.4));
-}
-
-.health-svg-gauge-container.critical .gauge-progress-circle {
-    filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.4));
 }
 
 .health-gauge-inner-text {
@@ -5620,86 +5620,69 @@ body.intro-active {
     align-items: center;
     justify-content: center;
     text-align: center;
-}
-
-.health-gauge-ring {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.02) 75%);
-    border: 3px solid #10b981;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.health-gauge-ring.attention {
-    border-color: #f59e0b;
-    background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.02) 75%);
-}
-
-.health-gauge-ring.critical {
-    border-color: #ef4444;
-    background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.02) 75%);
+    pointer-events: none;
 }
 
 .health-gauge-val {
-    font-size: 1.35rem;
+    font-size: 1.3rem;
     font-weight: 900;
-    color: #fff;
+    color: var(--ink-primary, #0f172a);
     line-height: 1;
     font-family: var(--font-mono, monospace);
+    font-variant-numeric: tabular-nums;
 }
 
 .health-gauge-denom {
-    font-size: 0.55rem;
+    font-size: 0.58rem;
     font-weight: 700;
-    color: #94a3b8;
+    color: var(--ink-muted, #64748b);
     margin-top: 2px;
 }
 
 .health-gauge-meta {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
+    flex: 1;
+    min-width: 0;
 }
 
 .health-gauge-meta strong {
-    font-size: 0.86rem;
+    font-size: 0.88rem;
     font-weight: 800;
-    color: #10b981;
+    color: #047857;
 }
 
 .health-gauge-meta span {
-    font-size: 0.72rem;
-    color: #94a3b8;
-    line-height: 1.35;
+    font-size: 0.74rem;
+    color: var(--ink-secondary, #475569);
+    line-height: 1.4;
 }
 
 .health-timestamp-tag {
-    font-size: 0.65rem;
-    color: #64748b;
+    font-size: 0.68rem;
+    color: var(--ink-muted, #64748b);
     margin-top: 4px;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
+    font-family: var(--font-mono, monospace);
 }
 
 .health-metric-content {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    width: 100%;
 }
 
 .health-key-value-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.76rem;
-    padding: 3px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    font-size: 0.78rem;
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .health-key-value-row:last-child {
@@ -5707,12 +5690,13 @@ body.intro-active {
 }
 
 .health-key-value-row span {
-    color: var(--ink-muted, #94a3b8);
+    color: var(--ink-muted, #64748b);
 }
 
 .health-key-value-row strong {
     font-weight: 700;
-    color: var(--ink-primary, #f1f5f9);
+    color: var(--ink-primary, #0f172a);
+    font-variant-numeric: tabular-nums;
 }
 
 /* 3. 4-Pillar Milestone Trackers */
@@ -5724,13 +5708,14 @@ body.intro-active {
 }
 
 .milestone-full-card {
-    background: var(--glass-bg-soft, rgba(15, 23, 42, 0.5));
-    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.06));
-    border-radius: var(--radius-md, 12px);
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--glass-border, #e2e8f0);
+    border-radius: var(--radius-md, 14px);
     padding: 16px 18px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .milestone-full-header {
@@ -5740,14 +5725,15 @@ body.intro-active {
 }
 
 .milestone-num {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
-    background: rgba(212, 175, 55, 0.15);
-    color: var(--gold, #d4af37);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    font-size: 0.8rem;
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fde68a;
+    font-size: 0.85rem;
     font-weight: 900;
+    font-family: var(--font-mono, monospace);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -5758,183 +5744,172 @@ body.intro-active {
     flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 2px;
 }
 
 .milestone-title-wrap strong {
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     font-weight: 800;
-    color: #fff;
+    color: var(--ink-primary, #0f172a);
 }
 
 .milestone-title-wrap span {
-    font-size: 0.68rem;
-    color: #94a3b8;
+    font-size: 0.72rem;
+    color: var(--ink-muted, #64748b);
+    line-height: 1.35;
 }
 
 .milestone-status-chip {
-    font-size: 0.62rem;
+    font-size: 0.65rem;
     font-weight: 900;
     padding: 3px 8px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #94a3b8;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
     text-transform: uppercase;
 }
 
 .milestone-status-chip.nominal {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
 }
 
 .milestone-status-chip.warning {
-    background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: #fffbeb;
+    color: #d97706;
+    border-color: #fde68a;
 }
 
 .milestone-status-chip.danger {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3;
 }
 
 .milestone-detail-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.72rem;
-    color: #94a3b8;
+    gap: 10px;
+    font-size: 0.76rem;
+    color: var(--ink-secondary, #475569);
     padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    border-top: 1px solid #f1f5f9;
 }
 
-/* 4. Live Anomaly & Diagnostic Stream */
 .health-log-filter-group {
     display: flex;
+    align-items: center;
     gap: 6px;
 }
 
 .health-filter-btn {
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    padding: 4px 10px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    border: 1px solid var(--glass-border, #e2e8f0);
+    background: var(--card-bg, #ffffff);
+    color: var(--ink-secondary, #475569);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .health-filter-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background: #f1f5f9;
+    color: var(--ink-primary, #0f172a);
 }
 
 .health-filter-btn.active {
-    background: var(--gold-bg, rgba(212, 175, 55, 0.15));
-    border-color: rgba(212, 175, 55, 0.4);
-    color: var(--gold, #d4af37);
+    background: #d97706;
+    color: #ffffff;
+    border-color: #d97706;
 }
 
 .health-log-table-card {
-    background: #090d16;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 0;
-    overflow: hidden;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--glass-border, #e2e8f0);
+    border-radius: var(--radius-md, 14px);
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .health-log-list {
-    max-height: 240px;
-    overflow-y: auto;
-    font-family: var(--font-mono, "Courier New", monospace);
-    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .health-log-entry {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    padding: 10px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    transition: background 0.15s ease;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    transition: all 0.15s ease;
 }
 
 .health-log-entry:hover {
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.health-log-entry:last-child {
-    border-bottom: none;
+    background: #ffffff;
+    border-color: #cbd5e1;
 }
 
 .log-entry-time {
-    color: #64748b;
-    flex-shrink: 0;
-    font-size: 0.7rem;
+    color: var(--ink-muted, #64748b);
+    font-family: var(--font-mono, monospace);
+    font-size: 0.72rem;
+    white-space: nowrap;
 }
 
 .log-entry-tag {
-    font-size: 0.62rem;
+    font-size: 0.65rem;
     font-weight: 800;
-    padding: 2px 6px;
+    padding: 2px 7px;
     border-radius: 4px;
-    flex-shrink: 0;
     text-transform: uppercase;
 }
 
-.log-entry-tag.error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-.log-entry-tag.warn { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-.log-entry-tag.info { background: rgba(6, 182, 212, 0.2); color: #38bdf8; }
+.log-entry-tag.error { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+.log-entry-tag.warn { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.log-entry-tag.info { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
 
 .log-entry-msg {
-    color: #e2e8f0;
-    line-height: 1.4;
+    color: var(--ink-primary, #0f172a);
+    line-height: 1.45;
     word-break: break-word;
 }
 
 .health-empty-log {
     padding: 24px;
     text-align: center;
-    color: #10b981;
+    color: #047857;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     font-weight: 700;
-}
-
-@media (max-width: 768px) {
-    .health-hero-control-banner {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .health-control-action {
-        width: 100%;
-    }
-    .health-kill-btn {
-        width: 100%;
-        text-align: center;
-    }
+    font-size: 0.84rem;
 }
 
 /* ==========================================================================
    ACTIVE HEALTH ISSUES & DIAGNOSTIC FINDINGS PANEL
    ========================================================================== */
 .health-active-issues-card {
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(245, 158, 11, 0.35);
+    background: var(--card-bg, #ffffff);
+    border: 1px solid #fde68a;
     border-radius: var(--radius-lg, 14px);
     padding: 20px 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(245, 158, 11, 0.15);
-    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 16px rgba(217, 119, 6, 0.08);
 }
 
 .health-active-issues-card.critical {
-    border-color: rgba(239, 68, 68, 0.4);
-    box-shadow: 0 8px 32px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(239, 68, 68, 0.2);
+    border-color: #fecdd3;
+    box-shadow: 0 4px 16px rgba(225, 29, 72, 0.08);
 }
 
 .health-active-issues-header {
@@ -5945,7 +5920,7 @@ body.intro-active {
     gap: 12px;
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .health-active-issues-header-left {
@@ -5958,9 +5933,9 @@ body.intro-active {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: rgba(245, 158, 11, 0.15);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    color: #f59e0b;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #d97706;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -5969,32 +5944,32 @@ body.intro-active {
 }
 
 .health-active-issues-card.critical .health-active-issues-icon {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.3);
-    color: #ef4444;
+    background: #fff1f2;
+    border-color: #fecdd3;
+    color: #be123c;
 }
 
 .health-active-issues-title {
     font-size: 0.95rem;
     font-weight: 800;
-    color: #f59e0b;
+    color: #b45309;
     margin: 0;
 }
 
 .health-active-issues-card.critical .health-active-issues-title {
-    color: #ef4444;
+    color: #be123c;
 }
 
 .health-active-issues-subtitle {
-    font-size: 0.72rem;
-    color: var(--ink-muted, #94a3b8);
+    font-size: 0.74rem;
+    color: var(--ink-muted, #64748b);
     display: block;
     margin-top: 2px;
 }
 
 .health-issue-item {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 10px;
     padding: 14px 18px;
     margin-bottom: 10px;
@@ -6006,8 +5981,8 @@ body.intro-active {
 }
 
 .health-issue-item:hover {
-    border-color: rgba(245, 158, 11, 0.3);
-    background: rgba(0, 0, 0, 0.45);
+    border-color: #cbd5e1;
+    background: #ffffff;
 }
 
 .health-issue-item-header {
@@ -6021,39 +5996,40 @@ body.intro-active {
 .health-issue-item-title {
     font-size: 0.85rem;
     font-weight: 800;
-    color: #f8fafc;
+    color: var(--ink-primary, #0f172a);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .health-issue-item-body {
-    font-size: 0.76rem;
-    color: #cbd5e1;
+    font-size: 0.78rem;
+    color: var(--ink-secondary, #475569);
     line-height: 1.45;
     margin-bottom: 10px;
 }
 
 .health-issue-item-meta-box {
-    background: rgba(15, 23, 42, 0.6);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 10px 14px;
-    font-size: 0.72rem;
-    color: #94a3b8;
+    font-size: 0.74rem;
+    color: var(--ink-secondary, #475569);
     line-height: 1.45;
     display: flex;
     flex-direction: column;
     gap: 6px;
     margin-bottom: 12px;
-    border-left: 3px solid #f59e0b;
+    border-left: 3px solid #d97706;
 }
 
 .health-issue-item-meta-box.critical {
-    border-left-color: #ef4444;
+    border-left-color: #be123c;
 }
 
 .health-issue-meta-row strong {
-    color: #e2e8f0;
+    color: var(--ink-primary, #0f172a);
     margin-right: 4px;
 }
 
@@ -6065,13 +6041,13 @@ body.intro-active {
 }
 
 .health-issue-btn {
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 700;
     padding: 6px 14px;
     border-radius: 6px;
-    border: 1px solid rgba(245, 158, 11, 0.4);
-    background: rgba(245, 158, 11, 0.12);
-    color: #f59e0b;
+    border: 1px solid #fde68a;
+    background: #fffbeb;
+    color: #b45309;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -6080,20 +6056,20 @@ body.intro-active {
 }
 
 .health-issue-btn:hover {
-    background: rgba(245, 158, 11, 0.25);
-    border-color: #f59e0b;
-    color: #fff;
+    background: #d97706;
+    border-color: #d97706;
+    color: #ffffff;
     transform: translateY(-1px);
 }
 
 .health-issue-pill {
-    font-size: 0.62rem;
+    font-size: 0.65rem;
     font-weight: 700;
     padding: 2px 8px;
     border-radius: 4px;
-    background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -6103,11 +6079,11 @@ body.intro-active {
    TRADEXO AI SENTINEL & AUTONOMOUS AUTO-HEALER STYLING
    ========================================================================== */
 .ai-sentinel-master-card {
-    background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(15, 23, 42, 0.98));
-    border: 1px solid rgba(99, 102, 241, 0.35);
+    background: var(--card-bg, #ffffff);
+    border: 1px solid rgba(99, 102, 241, 0.3);
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(99, 102, 241, 0.12);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
     position: relative;
     overflow: hidden;
 }
@@ -6145,33 +6121,32 @@ body.intro-active {
 }
 
 .ai-sentinel-icon-glow {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(16, 185, 129, 0.2));
-    border: 1px solid rgba(99, 102, 241, 0.45);
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    color: #818cf8;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    font-size: 22px;
+    color: #4f46e5;
     flex-shrink: 0;
 }
 
 .ai-sentinel-heading {
-    font-size: 1.15rem;
+    font-size: 1.1rem;
     font-weight: 800;
-    letter-spacing: 0.5px;
-    color: #fff;
+    letter-spacing: 0.4px;
+    color: var(--ink-primary, #0f172a);
     margin: 0;
 }
 
 .ai-sentinel-subheading {
     font-size: 0.8rem;
-    color: var(--ink-secondary, #94a3b8);
+    color: var(--ink-secondary, #64748b);
     margin: 4px 0 0 0;
-    line-height: 1.4;
+    line-height: 1.45;
     max-width: 680px;
 }
 
@@ -6188,17 +6163,17 @@ body.intro-active {
 }
 
 .ai-sentinel-badge.nominal {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-    border: 1px solid rgba(16, 185, 129, 0.35);
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
 }
 
 .ai-sentinel-badge .pulse-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 8px #10b981;
+    background: #047857;
+    box-shadow: 0 0 8px #047857;
     animation: sentinelPulse 1.8s infinite;
 }
 
@@ -6208,10 +6183,10 @@ body.intro-active {
 }
 
 .sentinel-heal-btn {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-    border-color: #818cf8;
+    background: linear-gradient(135deg, #4f46e5, #4338ca);
+    border: none;
     color: #fff;
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
     font-weight: 800;
     font-size: 0.78rem;
     letter-spacing: 0.4px;
@@ -6219,13 +6194,15 @@ body.intro-active {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    border-radius: 9999px;
+    cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .sentinel-heal-btn:hover {
-    background: linear-gradient(135deg, #4f46e5, #4338ca);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 22px rgba(99, 102, 241, 0.6);
+    background: linear-gradient(135deg, #4338ca, #3730a3);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4);
 }
 
 /* 4 Category Grid */
@@ -6237,16 +6214,17 @@ body.intro-active {
 }
 
 .sentinel-cat-card {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 14px 16px;
     transition: all 0.2s ease;
 }
 
 .sentinel-cat-card:hover {
-    border-color: rgba(99, 102, 241, 0.3);
-    background: rgba(15, 23, 42, 0.85);
+    border-color: #cbd5e1;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
 .sentinel-cat-header {
@@ -6257,9 +6235,9 @@ body.intro-active {
 }
 
 .sentinel-cat-title {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    color: var(--ink-primary, #f1f5f9);
+    color: var(--ink-primary, #0f172a);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -6268,12 +6246,13 @@ body.intro-active {
 .sentinel-cat-score {
     font-size: 0.95rem;
     font-weight: 800;
+    font-family: var(--font-mono, monospace);
 }
 
 .sentinel-cat-bar-wrap {
     width: 100%;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.08);
+    height: 6px;
+    background: #e2e8f0;
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -6281,29 +6260,29 @@ body.intro-active {
 
 .sentinel-cat-bar {
     height: 100%;
-    background: linear-gradient(90deg, #10b981, #34d399);
+    background: linear-gradient(90deg, #059669, #10b981);
     border-radius: 4px;
     transition: width 0.4s ease;
 }
 
 .sentinel-cat-bar.attention {
-    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    background: linear-gradient(90deg, #d97706, #f59e0b);
 }
 
 .sentinel-cat-bar.critical {
-    background: linear-gradient(90deg, #ef4444, #f87171);
+    background: linear-gradient(90deg, #be123c, #ef4444);
 }
 
 .sentinel-cat-desc {
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     color: var(--ink-muted, #64748b);
     font-weight: 600;
 }
 
 /* Stream activity */
 .sentinel-healing-stream-wrap {
-    background: rgba(11, 15, 25, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 14px 18px;
 }
@@ -6318,9 +6297,9 @@ body.intro-active {
 }
 
 .sentinel-stream-title {
-    font-size: 0.76rem;
+    font-size: 0.78rem;
     font-weight: 800;
-    color: var(--ink-primary, #f8fafc);
+    color: var(--ink-primary, #0f172a);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -6328,10 +6307,11 @@ body.intro-active {
 }
 
 .sentinel-stream-counter {
-    font-size: 0.7rem;
-    color: var(--ink-secondary, #94a3b8);
+    font-size: 0.72rem;
+    color: var(--ink-secondary, #475569);
     font-weight: 700;
-    background: rgba(255, 255, 255, 0.05);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     padding: 2px 8px;
     border-radius: 6px;
 }
@@ -6343,8 +6323,8 @@ body.intro-active {
 }
 
 .sentinel-stream-empty {
-    font-size: 0.76rem;
-    color: var(--ink-secondary, #94a3b8);
+    font-size: 0.78rem;
+    color: var(--ink-secondary, #475569);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -6356,21 +6336,22 @@ body.intro-active {
     align-items: flex-start;
     gap: 10px;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 0.76rem;
+    font-size: 0.78rem;
 }
 
 .sentinel-stream-entry-time {
     color: var(--ink-muted, #64748b);
     font-weight: 700;
+    font-family: var(--font-mono, monospace);
     white-space: nowrap;
 }
 
 .sentinel-stream-entry-body {
     flex: 1;
-    color: var(--ink-primary, #f1f5f9);
+    color: var(--ink-primary, #0f172a);
 }
 
 .sentinel-stream-entry-chip {
@@ -6378,9 +6359,9 @@ body.intro-active {
     border-radius: 4px;
     font-size: 0.64rem;
     font-weight: 800;
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
     margin-right: 6px;
 }
 
@@ -6388,11 +6369,11 @@ body.intro-active {
    10-PHASE DIAGNOSTIC WATERFALL ENGINE STYLING
    ========================================================================== */
 .sentinel-waterfall-master-card {
-    background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(15, 23, 42, 0.98));
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    background: var(--card-bg, #ffffff);
+    border: 1px solid rgba(217, 119, 6, 0.3);
     border-radius: var(--radius-lg, 16px);
     padding: 24px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 25px rgba(212, 175, 55, 0.08);
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
     position: relative;
     overflow: hidden;
 }
@@ -6404,7 +6385,7 @@ body.intro-active {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #d4af37, #10b981, #06b6d4, #d4af37);
+    background: linear-gradient(90deg, #d97706, #059669, #0284c7, #d97706);
     background-size: 200% 100%;
     animation: sentinelGradientFlow 8s linear infinite;
 }
@@ -6422,7 +6403,7 @@ body.intro-active {
     font-size: 1.15rem;
     font-weight: 800;
     letter-spacing: 0.5px;
-    color: var(--ink-primary, #fff);
+    color: var(--ink-primary, #0f172a);
     margin: 0;
     display: flex;
     align-items: center;
@@ -6431,7 +6412,7 @@ body.intro-active {
 
 .sentinel-waterfall-subheading {
     font-size: 0.8rem;
-    color: var(--ink-secondary, #94a3b8);
+    color: var(--ink-secondary, #64748b);
     margin: 4px 0 0 0;
     line-height: 1.45;
     max-width: 780px;
@@ -6444,8 +6425,8 @@ body.intro-active {
 }
 
 .waterfall-phase-row {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: var(--radius-md, 12px);
     padding: 14px 18px;
     display: flex;
@@ -6455,23 +6436,24 @@ body.intro-active {
 }
 
 .waterfall-phase-row:hover {
-    background: rgba(15, 23, 42, 0.85);
-    border-color: rgba(212, 175, 55, 0.35);
+    background: #ffffff;
+    border-color: rgba(217, 119, 6, 0.35);
     transform: translateX(2px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
 .waterfall-phase-row.optimal {
-    border-left: 3px solid #10b981;
+    border-left: 3px solid #059669;
 }
 
 .waterfall-phase-row.degraded {
-    border-left: 3px solid #f59e0b;
-    background: rgba(245, 158, 11, 0.04);
+    border-left: 3px solid #d97706;
+    background: #fffbeb;
 }
 
 .waterfall-phase-row.fail {
-    border-left: 3px solid #ef4444;
-    background: rgba(239, 68, 68, 0.06);
+    border-left: 3px solid #be123c;
+    background: #fff1f2;
 }
 
 .waterfall-phase-num-wrap {
@@ -6487,9 +6469,9 @@ body.intro-active {
     font-size: 0.78rem;
     font-weight: 900;
     font-family: var(--font-mono, monospace);
-    color: var(--gold, #d4af37);
-    background: rgba(212, 175, 55, 0.12);
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d97706;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
     width: 32px;
     height: 32px;
     border-radius: 8px;
@@ -6505,18 +6487,18 @@ body.intro-active {
 }
 
 .waterfall-status-dot.optimal {
-    background: #10b981;
-    box-shadow: 0 0 6px #10b981;
+    background: #059669;
+    box-shadow: 0 0 6px #059669;
 }
 
 .waterfall-status-dot.degraded {
-    background: #f59e0b;
-    box-shadow: 0 0 6px #f59e0b;
+    background: #d97706;
+    box-shadow: 0 0 6px #d97706;
 }
 
 .waterfall-status-dot.fail {
-    background: #ef4444;
-    box-shadow: 0 0 6px #ef4444;
+    background: #be123c;
+    box-shadow: 0 0 6px #be123c;
 }
 
 .waterfall-phase-main {
@@ -6538,7 +6520,7 @@ body.intro-active {
 .waterfall-phase-name {
     font-size: 0.88rem;
     font-weight: 800;
-    color: var(--ink-primary, #f8fafc);
+    color: var(--ink-primary, #0f172a);
 }
 
 .waterfall-phase-chips {
@@ -6551,8 +6533,9 @@ body.intro-active {
 .waterfall-target-chip {
     font-size: 0.68rem;
     font-weight: 700;
-    color: var(--ink-secondary, #94a3b8);
-    background: rgba(255, 255, 255, 0.05);
+    color: var(--ink-secondary, #64748b);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     padding: 2px 8px;
     border-radius: 4px;
     display: inline-flex;
@@ -6564,7 +6547,8 @@ body.intro-active {
     font-size: 0.7rem;
     font-weight: 800;
     font-family: var(--font-mono, monospace);
-    background: rgba(0, 0, 0, 0.3);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     padding: 2px 8px;
     border-radius: 4px;
     display: inline-flex;
@@ -6583,7 +6567,7 @@ body.intro-active {
 
 .waterfall-phase-details {
     font-size: 0.76rem;
-    color: var(--ink-secondary, #cbd5e1);
+    color: var(--ink-secondary, #475569);
     line-height: 1.45;
     margin: 0;
     word-break: break-word;
@@ -6595,8 +6579,8 @@ body.intro-active {
     justify-content: space-between;
     gap: 10px;
     padding: 8px 12px;
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.25);
+    background: #fffbeb;
+    border: 1px solid #fde68a;
     border-radius: 8px;
     margin-top: 4px;
     flex-wrap: wrap;
@@ -6605,7 +6589,7 @@ body.intro-active {
 .waterfall-heal-badge {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #f59e0b;
+    color: #d97706;
     display: inline-flex;
     align-items: center;
     gap: 6px;
