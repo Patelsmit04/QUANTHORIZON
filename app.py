@@ -15,7 +15,10 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 
+import sys
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 from env_utils import load_env_with_fallback, DATA_DIR, shutdown_event
 load_env_with_fallback(BASE_DIR)
 
