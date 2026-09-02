@@ -1606,23 +1606,23 @@
     }
 
     .modal-content,
-    .modal-dialog {
-        width: 100% !important;
-        max-width: 100% !important;
-        border-radius: 20px 20px 0 0 !important;
-        max-height: 88dvh !important;
-        overflow-y: auto !important;
-        padding: 20px 16px !important;
-        padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
-        margin: 0 !important;
-        animation: slideUpBottom 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
-}
 
-@keyframes slideUpBottom {
-    from {
-        transform: translateY(100%);
+    .stock-header-left .stock-subtext {
+        font-size: 10.5px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 140px !important;
     }
+
+    .stock-header-right {
+        gap: 8px !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
     .stock-price-block {
         display: flex !important;
         flex-direction: column !important;
@@ -1993,8 +1993,8 @@
     }
 
     .health-svg-gauge {
-        width: 100% !important;
-        height: 100% !important;
+        width: 76px !important;
+        height: 76px !important;
         transform: rotate(-90deg) !important;
         display: block !important;
     }
