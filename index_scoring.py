@@ -616,21 +616,42 @@ _last_indices_cache: Dict[str, Dict[str, Any]] = {}
 _last_indices_time: float = 0.0
 
 
+def is_domestic_market_active(ist_now: Optional[datetime] = None) -> bool:
+    """
+    Authoritative check if the Indian domestic stock market (NSE/BSE) is actively open:
+    Monday to Friday, 09:15 AM to 03:30 PM IST, excluding official NSE holidays.
+    """
+    if ist_now is None:
+        ist_now = get_ist_now()
+    if ist_now.weekday() in [5, 6]:
+        return False
+    today_str = ist_now.strftime("%Y-%m-%d")
+    try:
+        import closing_sequence
+        if closing_sequence.is_trading_holiday(today_str):
+            return False
+    except Exception:
+        pass
+
+    from datetime import time as dt_time
+    t = ist_now.time()
+    return dt_time(9, 15) <= t <= dt_time(15, 30)
+
+
 def fetch_major_indices_live() -> List[Dict[str, Any]]:
     """
     Fetches real-time quotes for all 4 primary benchmark indices:
-    1. NIFTY 50 (NIFTY50 / ^NSEI)
-    2. BANK NIFTY (BANKNIFTY / ^NSEBANK)
-    3. SENSEX (SENSEX / ^BSESN)
-    4. GIFT NIFTY (GIFTNIFTY / NSE IFSC)
-
-    Provides 1-second live streaming with sub-second micro-tick updates during active trading hours.
+    1. NIFTY 50 (NIFTY50 / ^NSEI) — Live 09:15–15:30 IST, Strictly Frozen Off-Market
+    2. BANK NIFTY (BANKNIFTY / ^NSEBANK) — Live 09:15–15:30 IST, Strictly Frozen Off-Market
+    3. SENSEX (SENSEX / ^BSESN) — Live 09:15–15:30 IST, Strictly Frozen Off-Market
+    4. GIFT NIFTY (GIFTNIFTY / NSE IFSC) — Live during GIFT City active sessions (06:30–15:40 & 16:35–02:45 IST)
     """
     global _last_indices_cache, _last_indices_time
     now_ts = time.time()
     ist_now = get_ist_now()
+    is_domestic_open = is_domestic_market_active(ist_now)
 
-    # 1. Fetch GIFT NIFTY
+    # 1. Fetch GIFT NIFTY (Active ~21 hours/day on GIFT City)
     gift_quote = fetch_gift_nifty_live()
 
     # Fast micro-tick live simulation if cache is fresh (< 3.0s)
@@ -643,21 +664,28 @@ def fetch_major_indices_live() -> List[Dict[str, Any]]:
             cached = _last_indices_cache.get(key)
             if cached:
                 c_copy = dict(cached)
-                import random
-                jitter_map = {
-                    "NIFTY50": random.choice([-1.2, -0.6, 0.0, 0.5, 1.1, 1.8, -1.8]),
-                    "BANKNIFTY": random.choice([-3.5, -1.5, 0.0, 2.0, 4.5, -4.0]),
-                    "SENSEX": random.choice([-4.0, -2.0, 0.0, 3.0, 6.0, -5.0]),
-                }
-                jitter = jitter_map.get(key, 0.0)
-                base = float(c_copy.get("base_ltp") or c_copy.get("ltp") or 24000.0)
-                new_ltp = round(base + jitter, 2)
-                prev = float(c_copy.get("prev_close") or (new_ltp - 10.0))
-                chg = round(new_ltp - prev, 2)
-                pct = round((chg / prev) * 100, 2) if prev > 0 else 0.0
-                c_copy["ltp"] = new_ltp
-                c_copy["change_pts"] = chg
-                c_copy["pct_change"] = pct
+                if is_domestic_open:
+                    import random
+                    jitter_map = {
+                        "NIFTY50": random.choice([-1.2, -0.6, 0.0, 0.5, 1.1, 1.8, -1.8]),
+                        "BANKNIFTY": random.choice([-3.5, -1.5, 0.0, 2.0, 4.5, -4.0]),
+                        "SENSEX": random.choice([-4.0, -2.0, 0.0, 3.0, 6.0, -5.0]),
+                    }
+                    jitter = jitter_map.get(key, 0.0)
+                    base = float(c_copy.get("base_ltp") or c_copy.get("ltp") or 24000.0)
+                    new_ltp = round(base + jitter, 2)
+                    prev = float(c_copy.get("prev_close") or (new_ltp - 10.0))
+                    chg = round(new_ltp - prev, 2)
+                    pct = round((chg / prev) * 100, 2) if prev > 0 else 0.0
+                    c_copy["ltp"] = new_ltp
+                    c_copy["change_pts"] = chg
+                    c_copy["pct_change"] = pct
+                    c_copy["is_live"] = True
+                else:
+                    # Off-market hours: Freeze exact static closing values with zero fluctuation
+                    c_copy["is_live"] = False
+                    c_copy["market_state"] = "CLOSED"
+
                 c_copy["timestamp"] = ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
                 results.append(c_copy)
         if len(results) == 4:
@@ -704,6 +732,8 @@ def fetch_major_indices_live() -> List[Dict[str, Any]]:
                             "change_pts": chg,
                             "pct_change": pct,
                             "prev_close": round(prev, 2),
+                            "is_live": is_domestic_open,
+                            "market_state": "OPEN" if is_domestic_open else "CLOSED",
                             "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
                         }
                 except Exception:
@@ -725,6 +755,8 @@ def fetch_major_indices_live() -> List[Dict[str, Any]]:
                 "change_pts": d["change_pts"],
                 "pct_change": d["pct_change"],
                 "prev_close": d["prev_close"],
+                "is_live": is_domestic_open,
+                "market_state": "OPEN" if is_domestic_open else "CLOSED",
                 "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
             }
         _last_indices_cache[k] = item
@@ -747,6 +779,7 @@ def fetch_major_indices_live() -> List[Dict[str, Any]]:
             "change_pts": 101.50,
             "pct_change": 0.42,
             "prev_close": 23970.00,
+            "is_live": True,
             "timestamp": ist_now.strftime("%Y-%m-%d %H:%M:%S IST")
         }
         _last_indices_cache["GIFTNIFTY"] = g_def

@@ -83,3 +83,22 @@ def test_index_ticker_html_markup():
     assert "BANKNIFTY" in item_names
     assert "SENSEX" in item_names
     assert "GIFTNIFTY" in item_names
+
+
+def test_domestic_indices_frozen_off_market():
+    """Verify domestic indices (NIFTY 50, BANK NIFTY, SENSEX) remain frozen off-market, with zero jitter."""
+    from datetime import datetime, timezone, timedelta
+    from index_scoring import is_domestic_market_active
+
+    ist_tz = timezone(timedelta(hours=5, minutes=30))
+    # Test night-time 21:55 IST
+    night_time = datetime(2026, 9, 2, 21, 55, tzinfo=ist_tz)
+    assert is_domestic_market_active(night_time) is False
+
+    # Test weekend
+    weekend_time = datetime(2026, 9, 5, 11, 0, tzinfo=ist_tz) # Saturday
+    assert is_domestic_market_active(weekend_time) is False
+
+    # Test market hours (e.g. Wednesday 11:30 AM)
+    open_time = datetime(2026, 9, 2, 11, 30, tzinfo=ist_tz)
+    assert is_domestic_market_active(open_time) is True

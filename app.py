@@ -1563,8 +1563,9 @@ def gift_nifty_live_ticker_worker():
     while not shutdown_event.is_set():
         try:
             ist_now = get_ist_now()
-            from index_scoring import is_gift_nifty_trading_active, fetch_major_indices_live
+            from index_scoring import is_gift_nifty_trading_active, is_domestic_market_active, fetch_major_indices_live
             is_gift_active, gift_session, gift_meta = is_gift_nifty_trading_active(ist_now)
+            is_domestic_active = is_domestic_market_active(ist_now)
 
             live_indices = fetch_major_indices_live()
             if live_indices:
@@ -1582,7 +1583,7 @@ def gift_nifty_live_ticker_worker():
                             "prev_close": idx.get("prev_close"),
                             "change_pts": idx.get("change_pts"),
                             "pct_change": idx.get("pct_change"),
-                            "session_info": gift_meta if name == "GIFTNIFTY" else {"status": "Active"}
+                            "session_info": gift_meta if name == "GIFTNIFTY" else ({"status": "Active"} if is_domestic_active else {"status": "Closed", "market": "NSE/BSE (Closed)"})
                         }
 
                 cache_store["index_data"] = list(idx_dict.values())
