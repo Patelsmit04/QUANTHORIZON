@@ -7579,10 +7579,10 @@ function render10PhaseWaterfallUI(data) {
 
     const badge = document.getElementById("waterfallOverallBadge");
     if (badge) {
-        const passed = data.passed_phases_count || 10;
-        const total = data.total_phases_count || 10;
+        const passed = data.passed_phases_count ?? 10;
+        const total = data.total_phases_count ?? 10;
         const isOptimal = (data.overall_status || 'OPTIMAL') === 'OPTIMAL';
-        badge.className = isOptimal ? "badge badge-bullish" : "badge badge-bearish";
+        badge.className = isOptimal ? "badge badge-bullish" : ((data.overall_status === 'DEGRADED') ? "badge badge-amber" : "badge badge-bearish");
         badge.textContent = `${passed}/${total} PHASES ${data.overall_status || 'OPTIMAL'}`;
     }
 
@@ -7591,24 +7591,43 @@ function render10PhaseWaterfallUI(data) {
 
     const phases = data.phases || [];
     if (phases.length === 0) {
-        list.innerHTML = '<div style="text-align:center;padding:20px;color:#64748b;">No diagnostic telemetry available.</div>';
+        list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--ink-muted);font-weight:600;"><i class="fa-solid fa-arrows-rotate"></i> Click "RUN DIAGNOSTICS" to execute live 10-phase waterfall telemetry.</div>';
         return;
     }
 
     list.innerHTML = phases.map(p => {
-        const isPass = p.status === "OPTIMAL" || p.status === "PASS";
-        const badgeCls = isPass ? "badge-bullish" : (p.status === "DEGRADED" ? "badge-warning" : "badge-bearish");
+        const isOptimal = p.status === "OPTIMAL" || p.status === "PASS";
+        const isDegraded = p.status === "DEGRADED";
+        const statusClass = isOptimal ? "optimal" : (isDegraded ? "degraded" : "fail");
+        const badgeCls = isOptimal ? "badge-bullish" : (isDegraded ? "badge-amber" : "badge-bearish");
+        const lat = p.latency_ms !== undefined ? `${p.latency_ms}ms` : "--";
         const latCls = (p.latency_ms || 0) < 50 ? "text-bullish" : ((p.latency_ms || 0) < 200 ? "text-amber" : "text-bearish");
-        
+        const phaseNum = p.phase || 1;
+
         return `
-            <div class="waterfall-phase-row">
-                <div class="waterfall-phase-num">${String(p.phase).padStart(2, '0')}</div>
-                <div class="waterfall-phase-name" title="${escapeAttr(p.name)}">${escapeHtml(p.name)}</div>
-                <div class="waterfall-phase-target"><i class="fa-solid fa-bullseye" style="font-size:9px;margin-right:3px;"></i>${escapeHtml(p.target)}</div>
-                <div class="waterfall-phase-latency ${latCls}">${p.latency_ms}ms</div>
-                <div class="waterfall-phase-details" title="${escapeAttr(p.details)}">${escapeHtml(p.details)}</div>
-                <div class="waterfall-phase-status">
-                    <span class="badge ${badgeCls}" style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:12px;">${escapeHtml(p.status)}</span>
+            <div class="waterfall-phase-row ${statusClass}">
+                <div class="waterfall-phase-num-wrap">
+                    <span class="waterfall-phase-num">${String(phaseNum).padStart(2, '0')}</span>
+                    <span class="waterfall-status-dot ${statusClass}"></span>
+                </div>
+                <div class="waterfall-phase-main">
+                    <div class="waterfall-phase-header-line">
+                        <strong class="waterfall-phase-name">${escapeHtml(p.name || `Phase ${phaseNum}`)}</strong>
+                        <div class="waterfall-phase-chips">
+                            <span class="waterfall-target-chip"><i class="fa-solid fa-bullseye"></i> ${escapeHtml(p.target || '< 300ms')}</span>
+                            <span class="waterfall-latency-chip ${latCls}"><i class="fa-regular fa-clock"></i> ${lat}</span>
+                            <span class="badge ${badgeCls} waterfall-status-badge">${escapeHtml(p.status || 'OPTIMAL')}</span>
+                        </div>
+                    </div>
+                    <div class="waterfall-phase-details">${escapeHtml(p.details || 'Phase executed within nominal telemetry bounds.')}</div>
+                    ${p.can_heal && p.healing_action ? `
+                        <div class="waterfall-heal-hook">
+                            <span class="waterfall-heal-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Heal Hook: ${escapeHtml(p.healing_action)}</span>
+                            <button class="btn btn-xs btn-pill btn-secondary" onclick="document.getElementById('btnTriggerAiSelfHeal')?.click();">
+                                <i class="fa-solid fa-wrench"></i> AUTO-HEAL NOW
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -7800,14 +7819,32 @@ function renderSystemHealthUI(payload) {
     // 2. Card 1: Health Score Gauge
     const scoreVal = document.getElementById("pageHealthScoreVal");
     const gaugeRing = document.getElementById("pageHealthGaugeRing");
+    const gaugeCircle = document.getElementById("pageHealthGaugeCircle");
     const pageHealthBadge = document.getElementById("pageHealthStatusBadge");
     const summaryTitle = document.getElementById("pageHealthSummaryTitle");
     const summaryDesc = document.getElementById("pageHealthSummaryDesc");
     const lastChecked = document.getElementById("pageHealthLastChecked");
 
-    if (scoreVal) scoreVal.textContent = isPaused ? "PAUSE" : health.score;
+    const rawScore = isPaused ? 0 : Math.max(0, Math.min(100, health.score ?? 100));
+    if (scoreVal) scoreVal.textContent = isPaused ? "PAUSE" : rawScore;
+    if (gaugeCircle) {
+        // Circumference = 2 * PI * 40 ≈ 251.32
+        const circumference = 251.32;
+        const progress = isPaused ? 0.5 : (rawScore / 100);
+        const offset = circumference - (circumference * progress);
+        gaugeCircle.style.strokeDashoffset = offset;
+        if (isPaused) {
+            gaugeCircle.style.stroke = "#f59e0b";
+        } else if (rawScore >= 90) {
+            gaugeCircle.style.stroke = "#10b981";
+        } else if (rawScore >= 70) {
+            gaugeCircle.style.stroke = "#f59e0b";
+        } else {
+            gaugeCircle.style.stroke = "#ef4444";
+        }
+    }
     if (gaugeRing) {
-        gaugeRing.className = "health-gauge-ring";
+        gaugeRing.className = "health-svg-gauge-container";
         if (isPaused || health.status === "ATTENTION_REQUIRED") gaugeRing.classList.add("attention");
         else if (health.status === "CRITICAL") gaugeRing.classList.add("critical");
     }

@@ -45,8 +45,8 @@
     </script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=43.0.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=43.0.0">
+    <link rel="stylesheet" href="/static/styles.css?v=44.0.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=44.0.0">
 
 </head>
 <body>
@@ -1149,9 +1149,15 @@
                             <span class="health-card-badge nominal" id="pageHealthStatusBadge">NOMINAL</span>
                         </div>
                         <div class="health-score-gauge-wrap">
-                            <div class="health-gauge-ring" id="pageHealthGaugeRing">
-                                <span class="health-gauge-val" id="pageHealthScoreVal">100</span>
-                                <span class="health-gauge-denom">/ 100</span>
+                            <div class="health-svg-gauge-container" id="pageHealthGaugeRing">
+                                <svg class="health-svg-gauge" viewBox="0 0 100 100">
+                                    <circle class="gauge-bg-circle" cx="50" cy="50" r="40" stroke-width="8"></circle>
+                                    <circle class="gauge-progress-circle" id="pageHealthGaugeCircle" cx="50" cy="50" r="40" stroke-width="8" stroke-dasharray="251.3" stroke-dashoffset="0"></circle>
+                                </svg>
+                                <div class="health-gauge-inner-text">
+                                    <span class="health-gauge-val" id="pageHealthScoreVal">100</span>
+                                    <span class="health-gauge-denom">/ 100</span>
+                                </div>
                             </div>
                             <div class="health-gauge-meta">
                                 <strong id="pageHealthSummaryTitle">ALL SYSTEMS NOMINAL</strong>
@@ -2350,7 +2356,7 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=43.0.0"></script>
+    <script src="/static/app.js?v=44.0.0"></script>
 
 </body>
 </html>
