@@ -68,6 +68,20 @@ def has_api_key() -> bool:
     return bool(api_key)
 
 
+def get_session_status() -> Dict[str, Any]:
+    """Return current session status for diagnostics & health monitors."""
+    api_key, client_id, _, _ = get_credentials()
+    configured = is_configured()
+    return {
+        "configured": configured,
+        "session_active": bool(_logged_in and _smart_api is not None),
+        "mode": "SMART_API" if configured else "DEMO_SIMULATED",
+        "client_id": client_id if client_id else "N/A",
+        "has_feed_token": bool(_feed_token),
+        "login_time": _login_time
+    }
+
+
 def angel_login() -> Optional[Any]:
     """
     Full automated SmartAPI login with pyotp TOTP generation.

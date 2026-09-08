@@ -496,5 +496,95 @@
       "Pillar 5: Marubozu Close": 0.95,
       "Pillar 6: Institutional Flow": 1.1
     }
+  },
+  {
+    "date": "2026-09-02",
+    "action": "APPLIED",
+    "sample_size": 84,
+    "changes": {
+      "Pillar 1: Futures OI": {
+        "from": 1.1,
+        "to": 1.12,
+        "recommended": 1.12
+      },
+      "Pillar 2: Vol Persistence": {
+        "from": 0.97,
+        "to": 0.96,
+        "recommended": 0.96
+      },
+      "Pillar 3: Relative Strength": {
+        "from": 0.94,
+        "to": 0.93,
+        "recommended": 0.93
+      },
+      "Pillar 4: Volume Spike": {
+        "from": 0.95,
+        "to": 0.94,
+        "recommended": 0.94
+      },
+      "Pillar 5: Marubozu Close": {
+        "from": 0.95,
+        "to": 0.94,
+        "recommended": 0.94
+      },
+      "Pillar 6: Institutional Flow": {
+        "from": 1.1,
+        "to": 1.12,
+        "recommended": 1.12
+      }
+    },
+    "weights": {
+      "Pillar 1: Futures OI": 1.12,
+      "Pillar 2: Vol Persistence": 0.96,
+      "Pillar 3: Relative Strength": 0.93,
+      "Pillar 4: Volume Spike": 0.94,
+      "Pillar 5: Marubozu Close": 0.94,
+      "Pillar 6: Institutional Flow": 1.12
+    }
+  },
+  {
+    "date": "2026-09-08",
+    "action": "APPLIED",
+    "sample_size": 141,
+    "changes": {
+      "Pillar 1: Futures OI": {
+        "from": 1.12,
+        "to": 0.952,
+        "recommended": 0.94
+      },
+      "Pillar 2: Vol Persistence": {
+        "from": 0.96,
+        "to": 1.04,
+        "recommended": 1.04
+      },
+      "Pillar 3: Relative Strength": {
+        "from": 0.93,
+        "to": 1.03,
+        "recommended": 1.03
+      },
+      "Pillar 4: Volume Spike": {
+        "from": 0.94,
+        "to": 1.03,
+        "recommended": 1.03
+      },
+      "Pillar 5: Marubozu Close": {
+        "from": 0.94,
+        "to": 1.03,
+        "recommended": 1.03
+      },
+      "Pillar 6: Institutional Flow": {
+        "from": 1.12,
+        "to": 0.952,
+        "recommended": 0.94
+      }
+    },
+    "weights": {
+      "Pillar 1: Futures OI": 0.952,
+      "Pillar 2: Vol Persistence": 1.04,
+      "Pillar 3: Relative Strength": 1.03,
+      "Pillar 4: Volume Spike": 1.03,
+      "Pillar 5: Marubozu Close": 1.03,
+      "Pillar 6: Institutional Flow": 0.952
+    }
   }
 ]

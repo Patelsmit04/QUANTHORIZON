@@ -84,23 +84,23 @@ def test_paper_trading_institutional_workflow(client):
     assert pdata2["open_positions"][0]["symbol"] == "RELIANCE"
     assert pdata2["open_positions"][0]["target_price_1"] == 2570.0
 
-    # 6. Close Position with Profit & Verify Realistic Charges Deducted
+    # 6. Close Position with Profit & Verify Realistic Institutional Charges Deducted
     # Gross P&L: (2550 - 2500) * 100 = +5000.0
-    # Exit Brokerage: ₹20 + Exit STT (2550 * 100 * 0.001 = 255.0) = ₹275.0
-    # Net Realized P&L = 5000.0 - 275.0 = +4725.0
+    # Deducts unified FrictionModel fees (Entry + Exit Brokerage, STT, GST, SEBI, Stamp Duty, Slippage, Spread)
+    # Net Realized P&L = ₹3,884.23
     close_res = client.post(f"/api/paper_trading/close/{pos_id}", json={"exit_price": 2550.0})
     assert close_res.status_code == 200
     cls_data = close_res.json()
     assert cls_data["ok"] is True
     assert cls_data["gross_pnl"] == 5000.0
-    assert cls_data["realized_pnl"] == 4725.0
+    assert cls_data["realized_pnl"] == 3884.23
 
     # 7. Verify Portfolio Updated
     port_res3 = client.get("/api/paper_trading/portfolio")
     pdata3 = port_res3.json()
     assert len(pdata3["open_positions"]) == 0
     assert len(pdata3["closed_trades"]) == 1
-    assert pdata3["account"]["realized_pnl"] == 4725.0
+    assert pdata3["account"]["realized_pnl"] == 3884.23
     assert pdata3["account"]["winning_trades"] == 1
 
 

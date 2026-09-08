@@ -899,7 +899,16 @@ class AISentinelEngine:
         can_heal = False
         try:
             import angel_one_provider
-            session_status = angel_one_provider.get_session_status()
+            if not hasattr(angel_one_provider, "get_session_status"):
+                import importlib
+                angel_one_provider = importlib.reload(angel_one_provider)
+            if hasattr(angel_one_provider, "get_session_status"):
+                session_status = angel_one_provider.get_session_status()
+            else:
+                session_status = {
+                    "session_active": bool(getattr(angel_one_provider, "_logged_in", False)),
+                    "mode": "SMART_API" if getattr(angel_one_provider, "is_configured", lambda: False)() else "DEMO_SIMULATED"
+                }
             is_active = session_status.get("session_active", False)
             mode = session_status.get("mode", "SMART_API")
             if is_active or mode == "DEMO_SIMULATED":

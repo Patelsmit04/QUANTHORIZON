@@ -212,5 +212,1694 @@
     "errors_count": 0,
     "errors": [],
     "market_transitions": []
+  },
+  "2026-09-02": {
+    "date": "2026-09-02",
+    "generated_at": "2026-09-08 20:17:48 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-02 21:59:54 IST",
+          "evaluated_count": 0,
+          "wins": 0,
+          "losses": 0,
+          "win_rate_pct": 32.4,
+          "status": "SUCCESS",
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_backfill"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-09-02 21:59:55 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 21:59:55 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 21:59:56 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 21:59:56 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 21:59:59 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:00:06 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:00:06 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:00:12 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:00:12 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:00:15 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:00:15 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:00:17 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:00:18 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:00:19 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:00:19 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:00:38 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:00:38 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:01:10 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:01:11 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:01:42 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:01:42 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:02:14 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:02:15 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:02:50 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:02:53 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:03:27 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:03:28 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:03:59 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:03:59 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:04:32 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:04:33 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:05:05 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:05:05 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:05:37 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:05:38 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:05:58 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:05:59 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:06:03 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:06:03 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:06:04 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:06:04 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:06:10 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:06:10 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:06:42 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:06:43 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:07:14 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:07:14 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:07:46 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:07:46 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:08:18 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:08:18 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:08:51 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:08:51 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:09:22 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:09:22 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:09:54 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:09:54 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:10:25 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:10:26 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:10:58 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:10:59 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:11:30 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:11:30 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:12:02 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:12:02 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:12:33 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:12:34 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:13:07 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:13:07 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:13:38 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:13:38 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:14:10 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:14:10 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:14:41 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:14:41 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:15:14 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:15:14 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:15:45 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:15:45 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:16:18 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:16:18 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:16:49 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:16:50 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:17:22 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:17:22 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:17:53 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:17:53 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:18:25 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:18:25 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:18:56 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:18:56 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:19:29 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:19:29 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:19:59 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:20:00 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:20:31 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:20:32 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:21:03 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:21:03 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:21:35 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:21:35 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:22:06 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:22:07 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:22:39 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:22:39 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:22:59 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:23:00 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:23:35 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:23:35 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:24:07 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:24:08 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:24:39 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:24:39 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:25:11 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:25:11 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:25:42 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:25:42 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:26:15 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:26:15 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:26:46 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:26:46 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:27:19 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:27:19 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:27:50 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:27:51 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:28:22 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:28:22 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:28:53 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:28:54 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:29:26 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:29:26 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-02 22:29:59 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-02 22:29:59 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HINDALCO",
+            "NTPC",
+            "TATASTEEL",
+            "TITAN",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
   }
 }

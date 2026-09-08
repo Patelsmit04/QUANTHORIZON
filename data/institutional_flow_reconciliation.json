@@ -241,5 +241,80 @@
     "symbols_only_in_archive": [],
     "value_mismatches": [],
     "status": "ARCHIVE_UNAVAILABLE"
+  },
+  {
+    "date": "2026-08-21",
+    "run_at": "2026-08-21T19:48:09.338306+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 19,
+    "archive_symbol_count": 13,
+    "symbols_only_in_live": [
+      "AMRUTANJAN",
+      "BALRAMCHIN",
+      "CREDENT",
+      "DWARKESH",
+      "INDOBORAX",
+      "KFINTECH",
+      "KIRIINDUS",
+      "MARSONS",
+      "MOREPENLAB",
+      "SBC",
+      "SHANTIGOLD",
+      "SHIPROCKET",
+      "SIRCA",
+      "SOLARA",
+      "TFCILTD"
+    ],
+    "symbols_only_in_archive": [
+      "AMAGI",
+      "KRONOX",
+      "KWIL",
+      "MOTISONS",
+      "PRSMJOHNSN",
+      "QUADFUTURE",
+      "RHETAN",
+      "SHANTIGEAR",
+      "TBZ"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "BLEL",
+        "live_net_value_cr": 9.82,
+        "archive_net_value_cr": -0.89
+      },
+      {
+        "symbol": "NXT-INFRA",
+        "live_net_value_cr": 0.0,
+        "archive_net_value_cr": -27.25
+      },
+      {
+        "symbol": "RATNAVEER",
+        "live_net_value_cr": 5.59,
+        "archive_net_value_cr": 2.9
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
+  },
+  {
+    "date": "2026-09-02",
+    "run_at": "2026-09-02T21:09:22.535833+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 19,
+    "archive_symbol_count": 19,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "CLEAN"
+  },
+  {
+    "date": "2026-09-08",
+    "run_at": "2026-09-08T20:49:33.274553+05:30",
+    "live_snapshot_checkpoint_used": null,
+    "live_symbol_count": 0,
+    "archive_symbol_count": null,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "ARCHIVE_UNAVAILABLE"
   }
 ]

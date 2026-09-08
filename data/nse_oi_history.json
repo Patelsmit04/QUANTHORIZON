@@ -1,12 +1,6 @@
 {
   "360ONE": [
     {
-      "date": "2026-08-06",
-      "total_oi": 959901,
-      "total_oi_change": -134298,
-      "oi_pct_change": -12.27
-    },
-    {
       "date": "2026-08-07",
       "total_oi": 1707560,
       "total_oi_change": 667735,
@@ -89,15 +83,15 @@
       "total_oi": 485140,
       "total_oi_change": -398155,
       "oi_pct_change": -45.08
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 666823,
+      "total_oi_change": -211314,
+      "oi_pct_change": -24.06
     }
   ],
   "AARTIIND": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2569945,
-      "total_oi_change": 1049818,
-      "oi_pct_change": 69.06
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1422279,
@@ -181,15 +175,15 @@
       "total_oi": 995748,
       "total_oi_change": -795610,
       "oi_pct_change": -44.41
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 917705,
+      "total_oi_change": -48183,
+      "oi_pct_change": -4.99
     }
   ],
   "ABB": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 159592,
-      "total_oi_change": -308034,
-      "oi_pct_change": -65.87
-    },
     {
       "date": "2026-08-07",
       "total_oi": 179322,
@@ -273,15 +267,15 @@
       "total_oi": 85392,
       "total_oi_change": -79741,
       "oi_pct_change": -48.29
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 163580,
+      "total_oi_change": -9794,
+      "oi_pct_change": -5.65
     }
   ],
   "ABCAPITAL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2147659,
-      "total_oi_change": -2634821,
-      "oi_pct_change": -55.09
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4840967,
@@ -365,15 +359,15 @@
       "total_oi": 3668437,
       "total_oi_change": 374229,
       "oi_pct_change": 11.36
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4883439,
+      "total_oi_change": 1602871,
+      "oi_pct_change": 48.86
     }
   ],
   "ABFRL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 12219124,
-      "total_oi_change": 6024304,
-      "oi_pct_change": 97.25
-    },
     {
       "date": "2026-08-07",
       "total_oi": 6582044,
@@ -457,15 +451,15 @@
       "total_oi": 3032302,
       "total_oi_change": -5223760,
       "oi_pct_change": -63.27
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4428051,
+      "total_oi_change": 933687,
+      "oi_pct_change": 26.72
     }
   ],
   "ACC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 161060,
-      "total_oi_change": -108593,
-      "oi_pct_change": -40.27
-    },
     {
       "date": "2026-08-07",
       "total_oi": 160343,
@@ -549,15 +543,15 @@
       "total_oi": 119003,
       "total_oi_change": -7091,
       "oi_pct_change": -5.62
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 146429,
+      "total_oi_change": 26932,
+      "oi_pct_change": 22.54
     }
   ],
   "ADANIENSOL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 938596,
-      "total_oi_change": -1037847,
-      "oi_pct_change": -52.51
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1391604,
@@ -641,15 +635,15 @@
       "total_oi": 2335751,
       "total_oi_change": -311017,
       "oi_pct_change": -11.75
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4214587,
+      "total_oi_change": -2324608,
+      "oi_pct_change": -35.55
     }
   ],
   "ADANIENT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 843121,
-      "total_oi_change": -247118,
-      "oi_pct_change": -22.67
-    },
     {
       "date": "2026-08-07",
       "total_oi": 788881,
@@ -733,15 +727,15 @@
       "total_oi": 803177,
       "total_oi_change": -243709,
       "oi_pct_change": -23.28
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1642492,
+      "total_oi_change": -999301,
+      "oi_pct_change": -37.83
     }
   ],
   "ADANIGREEN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 814990,
-      "total_oi_change": -2821171,
-      "oi_pct_change": -77.59
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1273380,
@@ -825,15 +819,15 @@
       "total_oi": 1151739,
       "total_oi_change": -265136,
       "oi_pct_change": -18.71
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2634560,
+      "total_oi_change": 885005,
+      "oi_pct_change": 50.58
     }
   ],
   "ADANIPORTS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1254956,
-      "total_oi_change": -1605660,
-      "oi_pct_change": -56.13
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2387389,
@@ -917,15 +911,15 @@
       "total_oi": 1113535,
       "total_oi_change": -692952,
       "oi_pct_change": -38.36
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2338937,
+      "total_oi_change": -360690,
+      "oi_pct_change": -13.36
     }
   ],
   "ADANIPOWER": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 15357824,
-      "total_oi_change": -11820605,
-      "oi_pct_change": -43.49
-    },
     {
       "date": "2026-08-07",
       "total_oi": 14372119,
@@ -1009,15 +1003,15 @@
       "total_oi": 10503673,
       "total_oi_change": -3909694,
       "oi_pct_change": -27.13
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 18174608,
+      "total_oi_change": -7315567,
+      "oi_pct_change": -28.7
     }
   ],
   "ALKEM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 109477,
-      "total_oi_change": 9342,
-      "oi_pct_change": 9.33
-    },
     {
       "date": "2026-08-07",
       "total_oi": 76165,
@@ -1101,15 +1095,15 @@
       "total_oi": 76854,
       "total_oi_change": -86358,
       "oi_pct_change": -52.91
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 218220,
+      "total_oi_change": 106224,
+      "oi_pct_change": 94.85
     }
   ],
   "AMBER": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 102768,
-      "total_oi_change": -102627,
-      "oi_pct_change": -49.97
-    },
     {
       "date": "2026-08-07",
       "total_oi": 210061,
@@ -1193,15 +1187,15 @@
       "total_oi": 170487,
       "total_oi_change": -277410,
       "oi_pct_change": -61.94
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 174407,
+      "total_oi_change": -81678,
+      "oi_pct_change": -31.9
     }
   ],
   "AMBUJACEM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3853693,
-      "total_oi_change": 823260,
-      "oi_pct_change": 27.17
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2026621,
@@ -1285,15 +1279,15 @@
       "total_oi": 5526988,
       "total_oi_change": 2895833,
       "oi_pct_change": 110.06
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1330391,
+      "total_oi_change": -1107940,
+      "oi_pct_change": -45.44
     }
   ],
   "ANGELONE": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2142791,
-      "total_oi_change": -3478284,
-      "oi_pct_change": -61.88
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4094497,
@@ -1377,15 +1371,15 @@
       "total_oi": 3614925,
       "total_oi_change": -654391,
       "oi_pct_change": -15.33
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4437022,
+      "total_oi_change": -1546521,
+      "oi_pct_change": -25.85
     }
   ],
   "APLAPOLLO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 824303,
-      "total_oi_change": -13275,
-      "oi_pct_change": -1.58
-    },
     {
       "date": "2026-08-07",
       "total_oi": 404634,
@@ -1469,15 +1463,15 @@
       "total_oi": 237101,
       "total_oi_change": -308796,
       "oi_pct_change": -56.57
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 786402,
+      "total_oi_change": 161107,
+      "oi_pct_change": 25.77
     }
   ],
   "APOLLOHOSP": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 399856,
-      "total_oi_change": 186257,
-      "oi_pct_change": 87.2
-    },
     {
       "date": "2026-08-07",
       "total_oi": 273543,
@@ -1561,15 +1555,15 @@
       "total_oi": 184342,
       "total_oi_change": -376562,
       "oi_pct_change": -67.13
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 169190,
+      "total_oi_change": -91052,
+      "oi_pct_change": -34.99
     }
   ],
   "APOLLOTYRE": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 907493,
-      "total_oi_change": 180961,
-      "oi_pct_change": 24.91
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1967067,
@@ -1653,15 +1647,15 @@
       "total_oi": 1728307,
       "total_oi_change": 976181,
       "oi_pct_change": 129.79
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 333100,
+      "total_oi_change": -3484396,
+      "oi_pct_change": -91.27
     }
   ],
   "ASHOKLEY": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 15063477,
-      "total_oi_change": -6379763,
-      "oi_pct_change": -29.75
-    },
     {
       "date": "2026-08-07",
       "total_oi": 11282040,
@@ -1745,15 +1739,15 @@
       "total_oi": 5801819,
       "total_oi_change": -13009429,
       "oi_pct_change": -69.16
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 16412854,
+      "total_oi_change": 5020940,
+      "oi_pct_change": 44.07
     }
   ],
   "ASIANPAINT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 797083,
-      "total_oi_change": -488802,
-      "oi_pct_change": -38.01
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1067986,
@@ -1837,15 +1831,15 @@
       "total_oi": 330334,
       "total_oi_change": -413766,
       "oi_pct_change": -55.61
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 497889,
+      "total_oi_change": -118005,
+      "oi_pct_change": -19.16
     }
   ],
   "ASTRAL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 196726,
-      "total_oi_change": -287502,
-      "oi_pct_change": -59.37
-    },
     {
       "date": "2026-08-07",
       "total_oi": 118762,
@@ -1929,15 +1923,15 @@
       "total_oi": 451537,
       "total_oi_change": -1086358,
       "oi_pct_change": -70.64
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1046620,
+      "total_oi_change": -520072,
+      "oi_pct_change": -33.2
     }
   ],
   "ATGL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 373836,
-      "total_oi_change": -435006,
-      "oi_pct_change": -53.78
-    },
     {
       "date": "2026-08-07",
       "total_oi": 427282,
@@ -2021,15 +2015,15 @@
       "total_oi": 774129,
       "total_oi_change": -588866,
       "oi_pct_change": -43.2
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 776942,
+      "total_oi_change": -640050,
+      "oi_pct_change": -45.17
     }
   ],
   "AUBANK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4756035,
-      "total_oi_change": 2872683,
-      "oi_pct_change": 152.53
-    },
     {
       "date": "2026-08-07",
       "total_oi": 752130,
@@ -2113,15 +2107,15 @@
       "total_oi": 2113659,
       "total_oi_change": 738355,
       "oi_pct_change": 53.69
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 864436,
+      "total_oi_change": -1041928,
+      "oi_pct_change": -54.66
     }
   ],
   "AUROPHARMA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1299019,
-      "total_oi_change": 343163,
-      "oi_pct_change": 35.9
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2001257,
@@ -2205,15 +2199,15 @@
       "total_oi": 750168,
       "total_oi_change": -179962,
       "oi_pct_change": -19.35
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 816419,
+      "total_oi_change": -61063,
+      "oi_pct_change": -6.96
     }
   ],
   "AXISBANK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4845792,
-      "total_oi_change": -2111295,
-      "oi_pct_change": -30.35
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3628823,
@@ -2297,15 +2291,15 @@
       "total_oi": 3690270,
       "total_oi_change": -1265106,
       "oi_pct_change": -25.53
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 6437250,
+      "total_oi_change": 2084203,
+      "oi_pct_change": 47.88
     }
   ],
   "BAJAJ-AUTO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 250127,
-      "total_oi_change": -53150,
-      "oi_pct_change": -17.53
-    },
     {
       "date": "2026-08-07",
       "total_oi": 208968,
@@ -2389,15 +2383,15 @@
       "total_oi": 221616,
       "total_oi_change": 12971,
       "oi_pct_change": 6.22
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 333619,
+      "total_oi_change": 85789,
+      "oi_pct_change": 34.62
     }
   ],
   "BAJAJFINSV": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1819169,
-      "total_oi_change": 66167,
-      "oi_pct_change": 3.77
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2416624,
@@ -2481,15 +2475,15 @@
       "total_oi": 830062,
       "total_oi_change": -131418,
       "oi_pct_change": -13.67
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 730988,
+      "total_oi_change": 119757,
+      "oi_pct_change": 19.59
     }
   ],
   "BAJAJHLDNG": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 49087,
-      "total_oi_change": -7396,
-      "oi_pct_change": -13.1
-    },
     {
       "date": "2026-08-07",
       "total_oi": 25976,
@@ -2573,15 +2567,15 @@
       "total_oi": 24339,
       "total_oi_change": -14710,
       "oi_pct_change": -37.67
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 32382,
+      "total_oi_change": -10448,
+      "oi_pct_change": -24.39
     }
   ],
   "BAJFINANCE": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 6472397,
-      "total_oi_change": -5952321,
-      "oi_pct_change": -47.91
-    },
     {
       "date": "2026-08-07",
       "total_oi": 15614001,
@@ -2665,15 +2659,15 @@
       "total_oi": 3042594,
       "total_oi_change": -2798942,
       "oi_pct_change": -47.91
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 6234288,
+      "total_oi_change": 1774290,
+      "oi_pct_change": 39.78
     }
   ],
   "BANDHANBNK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 28299072,
-      "total_oi_change": 12774042,
-      "oi_pct_change": 82.28
-    },
     {
       "date": "2026-08-07",
       "total_oi": 10729624,
@@ -2757,15 +2751,15 @@
       "total_oi": 6671543,
       "total_oi_change": 1137086,
       "oi_pct_change": 20.55
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 6396488,
+      "total_oi_change": 175949,
+      "oi_pct_change": 2.83
     }
   ],
   "BANKBARODA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 9633422,
-      "total_oi_change": 947435,
-      "oi_pct_change": 10.91
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7479873,
@@ -2849,15 +2843,15 @@
       "total_oi": 7918075,
       "total_oi_change": 911414,
       "oi_pct_change": 13.01
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 9638977,
+      "total_oi_change": 1423574,
+      "oi_pct_change": 17.33
     }
   ],
   "BANKINDIA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 6155628,
-      "total_oi_change": -2674494,
-      "oi_pct_change": -30.29
-    },
     {
       "date": "2026-08-07",
       "total_oi": 8569425,
@@ -2941,15 +2935,15 @@
       "total_oi": 5334194,
       "total_oi_change": -265634,
       "oi_pct_change": -4.74
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 5132803,
+      "total_oi_change": -1014294,
+      "oi_pct_change": -16.5
     }
   ],
   "BDL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2795990,
-      "total_oi_change": 2199481,
-      "oi_pct_change": 368.73
-    },
     {
       "date": "2026-08-07",
       "total_oi": 872088,
@@ -3033,15 +3027,15 @@
       "total_oi": 2191062,
       "total_oi_change": -376936,
       "oi_pct_change": -14.68
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 578257,
+      "total_oi_change": -899281,
+      "oi_pct_change": -60.86
     }
   ],
   "BEL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 17574744,
-      "total_oi_change": 1447916,
-      "oi_pct_change": 8.98
-    },
     {
       "date": "2026-08-07",
       "total_oi": 10798068,
@@ -3125,15 +3119,15 @@
       "total_oi": 13688811,
       "total_oi_change": 4294097,
       "oi_pct_change": 45.71
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 11919117,
+      "total_oi_change": 2592997,
+      "oi_pct_change": 27.8
     }
   ],
   "BHARATFORG": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 897784,
-      "total_oi_change": 214518,
-      "oi_pct_change": 31.4
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1152060,
@@ -3217,15 +3211,15 @@
       "total_oi": 877899,
       "total_oi_change": -891323,
       "oi_pct_change": -50.38
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1341071,
+      "total_oi_change": 525846,
+      "oi_pct_change": 64.5
     }
   ],
   "BHARTIARTL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 5391645,
-      "total_oi_change": -954583,
-      "oi_pct_change": -15.04
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3019876,
@@ -3309,15 +3303,15 @@
       "total_oi": 3016258,
       "total_oi_change": -4239050,
       "oi_pct_change": -58.43
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4125938,
+      "total_oi_change": -2473605,
+      "oi_pct_change": -37.48
     }
   ],
   "BHEL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 5362227,
-      "total_oi_change": -1792308,
-      "oi_pct_change": -25.05
-    },
     {
       "date": "2026-08-07",
       "total_oi": 9754089,
@@ -3401,15 +3395,15 @@
       "total_oi": 3639529,
       "total_oi_change": -5708913,
       "oi_pct_change": -61.07
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 5742323,
+      "total_oi_change": -1131174,
+      "oi_pct_change": -16.46
     }
   ],
   "BIOCON": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 10929015,
-      "total_oi_change": 7631345,
-      "oi_pct_change": 231.42
-    },
     {
       "date": "2026-08-07",
       "total_oi": 5265823,
@@ -3493,15 +3487,15 @@
       "total_oi": 2225359,
       "total_oi_change": -922163,
       "oi_pct_change": -29.3
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1433504,
+      "total_oi_change": -841686,
+      "oi_pct_change": -36.99
     }
   ],
   "BLUESTARCO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2327347,
-      "total_oi_change": 2024829,
-      "oi_pct_change": 669.33
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2392270,
@@ -3585,15 +3579,15 @@
       "total_oi": 199161,
       "total_oi_change": -529079,
       "oi_pct_change": -72.65
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 657972,
+      "total_oi_change": 358092,
+      "oi_pct_change": 119.41
     }
   ],
   "BOSCHLTD": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 30753,
-      "total_oi_change": -3986,
-      "oi_pct_change": -11.48
-    },
     {
       "date": "2026-08-07",
       "total_oi": 28216,
@@ -3677,15 +3671,15 @@
       "total_oi": 30216,
       "total_oi_change": -32004,
       "oi_pct_change": -51.44
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 50832,
+      "total_oi_change": 12346,
+      "oi_pct_change": 32.08
     }
   ],
   "BPCL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3694266,
-      "total_oi_change": -2269126,
-      "oi_pct_change": -38.05
-    },
     {
       "date": "2026-08-07",
       "total_oi": 5431740,
@@ -3769,15 +3763,15 @@
       "total_oi": 4998491,
       "total_oi_change": -65777,
       "oi_pct_change": -1.3
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 8277464,
+      "total_oi_change": 3023380,
+      "oi_pct_change": 57.54
     }
   ],
   "BRITANNIA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 342179,
-      "total_oi_change": 42420,
-      "oi_pct_change": 14.15
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1342849,
@@ -3861,15 +3855,15 @@
       "total_oi": 704494,
       "total_oi_change": 339990,
       "oi_pct_change": 93.28
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 325672,
+      "total_oi_change": 32142,
+      "oi_pct_change": 10.95
     }
   ],
   "BSE": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3925729,
-      "total_oi_change": 1128697,
-      "oi_pct_change": 40.35
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3722055,
@@ -3953,15 +3947,15 @@
       "total_oi": 6640651,
       "total_oi_change": 1687685,
       "oi_pct_change": 34.07
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 6510791,
+      "total_oi_change": 2044602,
+      "oi_pct_change": 45.78
     }
   ],
   "CAMS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 808249,
-      "total_oi_change": -628137,
-      "oi_pct_change": -43.73
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1011683,
@@ -4045,15 +4039,15 @@
       "total_oi": 1631822,
       "total_oi_change": 489413,
       "oi_pct_change": 42.84
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1271642,
+      "total_oi_change": -241442,
+      "oi_pct_change": -15.96
     }
   ],
   "CANBK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 23441604,
-      "total_oi_change": 73379,
-      "oi_pct_change": 0.31
-    },
     {
       "date": "2026-08-07",
       "total_oi": 22576580,
@@ -4137,15 +4131,15 @@
       "total_oi": 8125972,
       "total_oi_change": -5793715,
       "oi_pct_change": -41.62
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 13231733,
+      "total_oi_change": 1331887,
+      "oi_pct_change": 11.19
     }
   ],
   "CDSL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 817532,
-      "total_oi_change": -410315,
-      "oi_pct_change": -33.42
-    },
     {
       "date": "2026-08-07",
       "total_oi": 571095,
@@ -4229,15 +4223,15 @@
       "total_oi": 3743675,
       "total_oi_change": 2957718,
       "oi_pct_change": 376.32
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 858052,
+      "total_oi_change": -840818,
+      "oi_pct_change": -49.49
     }
   ],
   "CGPOWER": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1509786,
-      "total_oi_change": -4228478,
-      "oi_pct_change": -73.69
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1523373,
@@ -4321,15 +4315,15 @@
       "total_oi": 1311542,
       "total_oi_change": -523024,
       "oi_pct_change": -28.51
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2061765,
+      "total_oi_change": -482564,
+      "oi_pct_change": -18.97
     }
   ],
   "CHOLAFIN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2644332,
-      "total_oi_change": 637507,
-      "oi_pct_change": 31.77
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1617860,
@@ -4413,15 +4407,15 @@
       "total_oi": 902331,
       "total_oi_change": -17197,
       "oi_pct_change": -1.87
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 853169,
+      "total_oi_change": -107590,
+      "oi_pct_change": -11.2
     }
   ],
   "CIPLA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1462279,
-      "total_oi_change": -230850,
-      "oi_pct_change": -13.63
-    },
     {
       "date": "2026-08-07",
       "total_oi": 765193,
@@ -4505,15 +4499,15 @@
       "total_oi": 728275,
       "total_oi_change": 94167,
       "oi_pct_change": 14.85
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 578260,
+      "total_oi_change": -141167,
+      "oi_pct_change": -19.62
     }
   ],
   "COALINDIA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4753639,
-      "total_oi_change": -3733120,
-      "oi_pct_change": -43.99
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3493763,
@@ -4597,15 +4591,15 @@
       "total_oi": 10327739,
       "total_oi_change": 4592604,
       "oi_pct_change": 80.08
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 34130970,
+      "total_oi_change": 24141982,
+      "oi_pct_change": 241.69
     }
   ],
   "COCHINSHIP": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3352181,
-      "total_oi_change": 2544238,
-      "oi_pct_change": 314.9
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2274374,
@@ -4689,15 +4683,15 @@
       "total_oi": 817183,
       "total_oi_change": -246814,
       "oi_pct_change": -23.2
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 327832,
+      "total_oi_change": -484631,
+      "oi_pct_change": -59.65
     }
   ],
   "COFORGE": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1606627,
-      "total_oi_change": -3094742,
-      "oi_pct_change": -65.83
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2666057,
@@ -4781,15 +4775,15 @@
       "total_oi": 1990336,
       "total_oi_change": -135329,
       "oi_pct_change": -6.37
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1665060,
+      "total_oi_change": -784866,
+      "oi_pct_change": -32.04
     }
   ],
   "CONCOR": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 788586,
-      "total_oi_change": -2379143,
-      "oi_pct_change": -75.11
-    },
     {
       "date": "2026-08-07",
       "total_oi": 892002,
@@ -4873,15 +4867,15 @@
       "total_oi": 506883,
       "total_oi_change": -1164437,
       "oi_pct_change": -69.67
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2202359,
+      "total_oi_change": 828079,
+      "oi_pct_change": 60.26
     }
   ],
   "CROMPTON": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2143916,
-      "total_oi_change": -729278,
-      "oi_pct_change": -25.38
-    },
     {
       "date": "2026-08-07",
       "total_oi": 22616837,
@@ -4965,15 +4959,15 @@
       "total_oi": 13394000,
       "total_oi_change": 9230813,
       "oi_pct_change": 221.72
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 3476670,
+      "total_oi_change": -2246083,
+      "oi_pct_change": -39.25
     }
   ],
   "CUB": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3131786,
-      "total_oi_change": -2380455,
-      "oi_pct_change": -43.18
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3440800,
@@ -5057,15 +5051,15 @@
       "total_oi": 727772,
       "total_oi_change": -2067459,
       "oi_pct_change": -73.96
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2227407,
+      "total_oi_change": -436510,
+      "oi_pct_change": -16.39
     }
   ],
   "CYIENT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 327050,
-      "total_oi_change": -434758,
-      "oi_pct_change": -57.07
-    },
     {
       "date": "2026-08-07",
       "total_oi": 355030,
@@ -5149,15 +5143,15 @@
       "total_oi": 594920,
       "total_oi_change": -42380,
       "oi_pct_change": -6.65
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 820374,
+      "total_oi_change": -2191333,
+      "oi_pct_change": -72.76
     }
   ],
   "DALBHARAT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 124954,
-      "total_oi_change": -144646,
-      "oi_pct_change": -53.65
-    },
     {
       "date": "2026-08-07",
       "total_oi": 103018,
@@ -5241,15 +5235,15 @@
       "total_oi": 339192,
       "total_oi_change": 154701,
       "oi_pct_change": 83.85
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 58918,
+      "total_oi_change": -432798,
+      "oi_pct_change": -88.02
     }
   ],
   "DEEPAKNTR": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 429324,
-      "total_oi_change": -63449,
-      "oi_pct_change": -12.88
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1628102,
@@ -5333,15 +5327,15 @@
       "total_oi": 294642,
       "total_oi_change": -203897,
       "oi_pct_change": -40.9
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 389513,
+      "total_oi_change": -8804,
+      "oi_pct_change": -2.21
     }
   ],
   "DELHIVERY": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1689564,
-      "total_oi_change": -1567586,
-      "oi_pct_change": -48.13
-    },
     {
       "date": "2026-08-07",
       "total_oi": 6405412,
@@ -5425,15 +5419,15 @@
       "total_oi": 1293159,
       "total_oi_change": -2902909,
       "oi_pct_change": -69.18
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1061104,
+      "total_oi_change": -650267,
+      "oi_pct_change": -38.0
     }
   ],
   "DIVISLAB": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 327434,
-      "total_oi_change": -394501,
-      "oi_pct_change": -54.64
-    },
     {
       "date": "2026-08-07",
       "total_oi": 256657,
@@ -5517,15 +5511,15 @@
       "total_oi": 180697,
       "total_oi_change": -171066,
       "oi_pct_change": -48.63
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 403619,
+      "total_oi_change": -51166,
+      "oi_pct_change": -11.25
     }
   ],
   "DIXON": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 207079,
-      "total_oi_change": -176439,
-      "oi_pct_change": -46.01
-    },
     {
       "date": "2026-08-07",
       "total_oi": 192713,
@@ -5609,15 +5603,15 @@
       "total_oi": 582929,
       "total_oi_change": 257367,
       "oi_pct_change": 79.05
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 216702,
+      "total_oi_change": -213579,
+      "oi_pct_change": -49.64
     }
   ],
   "DLF": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4883685,
-      "total_oi_change": 1432405,
-      "oi_pct_change": 41.5
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2466390,
@@ -5701,15 +5695,15 @@
       "total_oi": 2480650,
       "total_oi_change": -472717,
       "oi_pct_change": -16.01
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 3578778,
+      "total_oi_change": 925819,
+      "oi_pct_change": 34.9
     }
   ],
   "DRREDDY": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1329196,
-      "total_oi_change": -1128031,
-      "oi_pct_change": -45.91
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1072438,
@@ -5793,15 +5787,15 @@
       "total_oi": 1246756,
       "total_oi_change": -578627,
       "oi_pct_change": -31.7
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 486542,
+      "total_oi_change": -865964,
+      "oi_pct_change": -64.03
     }
   ],
   "EICHERMOT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 377530,
-      "total_oi_change": -265628,
-      "oi_pct_change": -41.3
-    },
     {
       "date": "2026-08-07",
       "total_oi": 339416,
@@ -5885,15 +5879,15 @@
       "total_oi": 316029,
       "total_oi_change": -33329,
       "oi_pct_change": -9.54
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1117588,
+      "total_oi_change": 733233,
+      "oi_pct_change": 190.77
     }
   ],
   "ESCORTS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 61901,
-      "total_oi_change": -124679,
-      "oi_pct_change": -66.82
-    },
     {
       "date": "2026-08-07",
       "total_oi": 65250,
@@ -5977,15 +5971,15 @@
       "total_oi": 47487,
       "total_oi_change": -19591,
       "oi_pct_change": -29.21
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 103177,
+      "total_oi_change": 35261,
+      "oi_pct_change": 51.92
     }
   ],
   "ETERNAL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 29960978,
-      "total_oi_change": -9483959,
-      "oi_pct_change": -24.04
-    },
     {
       "date": "2026-08-07",
       "total_oi": 12763812,
@@ -6069,15 +6063,15 @@
       "total_oi": 31651425,
       "total_oi_change": 8805929,
       "oi_pct_change": 38.55
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 20138975,
+      "total_oi_change": -34514199,
+      "oi_pct_change": -63.15
     }
   ],
   "EXIDEIND": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4895622,
-      "total_oi_change": -3855317,
-      "oi_pct_change": -44.06
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7853639,
@@ -6161,15 +6155,15 @@
       "total_oi": 2410717,
       "total_oi_change": -808056,
       "oi_pct_change": -25.1
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2878998,
+      "total_oi_change": 539531,
+      "oi_pct_change": 23.06
     }
   ],
   "FEDERALBNK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3780768,
-      "total_oi_change": -1357819,
-      "oi_pct_change": -26.42
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4924276,
@@ -6253,15 +6247,15 @@
       "total_oi": 4398375,
       "total_oi_change": 989384,
       "oi_pct_change": 29.02
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 6273256,
+      "total_oi_change": 644160,
+      "oi_pct_change": 11.44
     }
   ],
   "FORCEMOT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 73575,
-      "total_oi_change": -44784,
-      "oi_pct_change": -37.84
-    },
     {
       "date": "2026-08-07",
       "total_oi": 46841,
@@ -6345,15 +6339,15 @@
       "total_oi": 40914,
       "total_oi_change": -38979,
       "oi_pct_change": -48.79
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 103485,
+      "total_oi_change": 39577,
+      "oi_pct_change": 61.93
     }
   ],
   "GMRAIRPORT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 5850034,
-      "total_oi_change": -4581387,
-      "oi_pct_change": -43.92
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7114277,
@@ -6437,15 +6431,15 @@
       "total_oi": 7419821,
       "total_oi_change": -2567055,
       "oi_pct_change": -25.7
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 6108730,
+      "total_oi_change": -10835392,
+      "oi_pct_change": -63.95
     }
   ],
   "GNFC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2522027,
-      "total_oi_change": 2169838,
-      "oi_pct_change": 616.1
-    },
     {
       "date": "2026-08-07",
       "total_oi": 261632,
@@ -6529,15 +6523,15 @@
       "total_oi": 469967,
       "total_oi_change": -225559,
       "oi_pct_change": -32.43
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 610680,
+      "total_oi_change": 167823,
+      "oi_pct_change": 37.9
     }
   ],
   "GODFRYPHLP": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 278917,
-      "total_oi_change": -818322,
-      "oi_pct_change": -74.58
-    },
     {
       "date": "2026-08-07",
       "total_oi": 232091,
@@ -6621,15 +6615,15 @@
       "total_oi": 184685,
       "total_oi_change": -35859,
       "oi_pct_change": -16.26
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 226079,
+      "total_oi_change": 4655,
+      "oi_pct_change": 2.1
     }
   ],
   "GOKULAGRO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 175123,
-      "total_oi_change": -613940,
-      "oi_pct_change": -77.81
-    },
     {
       "date": "2026-08-07",
       "total_oi": 343324,
@@ -6713,15 +6707,15 @@
       "total_oi": 731235,
       "total_oi_change": -28453,
       "oi_pct_change": -3.75
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 487548,
+      "total_oi_change": -723986,
+      "oi_pct_change": -59.76
     }
   ],
   "GRANULES": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 447705,
-      "total_oi_change": -337216,
-      "oi_pct_change": -42.96
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1146571,
@@ -6805,15 +6799,15 @@
       "total_oi": 406173,
       "total_oi_change": -109411,
       "oi_pct_change": -21.22
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 787511,
+      "total_oi_change": 265346,
+      "oi_pct_change": 50.82
     }
   ],
   "GRASIM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 365593,
-      "total_oi_change": -43974,
-      "oi_pct_change": -10.74
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1071215,
@@ -6897,6 +6891,12 @@
       "total_oi": 1465361,
       "total_oi_change": 144778,
       "oi_pct_change": 10.96
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1085964,
+      "total_oi_change": -49339,
+      "oi_pct_change": -4.35
     }
   ],
   "GUJGASLTD": [
@@ -6908,12 +6908,6 @@
     }
   ],
   "HAL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4796689,
-      "total_oi_change": 4181325,
-      "oi_pct_change": 679.49
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1083102,
@@ -6997,15 +6991,15 @@
       "total_oi": 733538,
       "total_oi_change": -518227,
       "oi_pct_change": -41.4
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 525620,
+      "total_oi_change": -52186,
+      "oi_pct_change": -9.03
     }
   ],
   "HAVELLS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1078858,
-      "total_oi_change": -25640,
-      "oi_pct_change": -2.32
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1506943,
@@ -7089,15 +7083,15 @@
       "total_oi": 498229,
       "total_oi_change": -208809,
       "oi_pct_change": -29.53
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 752254,
+      "total_oi_change": 25990,
+      "oi_pct_change": 3.58
     }
   ],
   "HCLTECH": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3821560,
-      "total_oi_change": 490656,
-      "oi_pct_change": 14.73
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1725616,
@@ -7181,15 +7175,15 @@
       "total_oi": 1484443,
       "total_oi_change": -49435,
       "oi_pct_change": -3.22
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2739386,
+      "total_oi_change": 691025,
+      "oi_pct_change": 33.74
     }
   ],
   "HDFCAMC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 400755,
-      "total_oi_change": -237956,
-      "oi_pct_change": -37.26
-    },
     {
       "date": "2026-08-07",
       "total_oi": 310098,
@@ -7273,15 +7267,15 @@
       "total_oi": 708050,
       "total_oi_change": -102870,
       "oi_pct_change": -12.69
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 962353,
+      "total_oi_change": 8905,
+      "oi_pct_change": 0.93
     }
   ],
   "HDFCBANK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 44772122,
-      "total_oi_change": 13952076,
-      "oi_pct_change": 45.27
-    },
     {
       "date": "2026-08-07",
       "total_oi": 19382042,
@@ -7365,15 +7359,15 @@
       "total_oi": 26029811,
       "total_oi_change": 4692722,
       "oi_pct_change": 21.99
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 36950338,
+      "total_oi_change": 6886695,
+      "oi_pct_change": 22.91
     }
   ],
   "HDFCLIFE": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2727203,
-      "total_oi_change": -1646928,
-      "oi_pct_change": -37.65
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1413369,
@@ -7457,15 +7451,15 @@
       "total_oi": 3328959,
       "total_oi_change": 1051657,
       "oi_pct_change": 46.18
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1116864,
+      "total_oi_change": -1625373,
+      "oi_pct_change": -59.27
     }
   ],
   "HEROMOTOCO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 533656,
-      "total_oi_change": -349073,
-      "oi_pct_change": -39.54
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1914675,
@@ -7549,15 +7543,15 @@
       "total_oi": 463679,
       "total_oi_change": -261319,
       "oi_pct_change": -36.04
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1746768,
+      "total_oi_change": 1253348,
+      "oi_pct_change": 254.01
     }
   ],
   "HINDALCO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 6345953,
-      "total_oi_change": 1724393,
-      "oi_pct_change": 37.31
-    },
     {
       "date": "2026-08-07",
       "total_oi": 9284747,
@@ -7641,15 +7635,15 @@
       "total_oi": 2644211,
       "total_oi_change": -2395908,
       "oi_pct_change": -47.54
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1902917,
+      "total_oi_change": -1374683,
+      "oi_pct_change": -41.94
     }
   ],
   "HINDUNILVR": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1160270,
-      "total_oi_change": -1457238,
-      "oi_pct_change": -55.67
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1054665,
@@ -7733,15 +7727,15 @@
       "total_oi": 857550,
       "total_oi_change": -299363,
       "oi_pct_change": -25.88
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1497019,
+      "total_oi_change": 394056,
+      "oi_pct_change": 35.73
     }
   ],
   "HINDZINC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 6577691,
-      "total_oi_change": 1970174,
-      "oi_pct_change": 42.76
-    },
     {
       "date": "2026-08-07",
       "total_oi": 6362181,
@@ -7825,15 +7819,15 @@
       "total_oi": 14189716,
       "total_oi_change": 9217579,
       "oi_pct_change": 185.38
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 3987561,
+      "total_oi_change": -5201794,
+      "oi_pct_change": -56.61
     }
   ],
   "HONAUT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2587,
-      "total_oi_change": -7840,
-      "oi_pct_change": -75.19
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2131,
@@ -7917,15 +7911,15 @@
       "total_oi": 2374,
       "total_oi_change": -550,
       "oi_pct_change": -18.82
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2073,
+      "total_oi_change": -1043,
+      "oi_pct_change": -33.48
     }
   ],
   "HUDCO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2002727,
-      "total_oi_change": -380344,
-      "oi_pct_change": -15.96
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1224833,
@@ -8009,15 +8003,15 @@
       "total_oi": 876000,
       "total_oi_change": -1022297,
       "oi_pct_change": -53.85
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1558842,
+      "total_oi_change": -81271,
+      "oi_pct_change": -4.96
     }
   ],
   "HYUNDAI": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 694415,
-      "total_oi_change": -498271,
-      "oi_pct_change": -41.78
-    },
     {
       "date": "2026-08-07",
       "total_oi": 279115,
@@ -8101,15 +8095,15 @@
       "total_oi": 820353,
       "total_oi_change": 237632,
       "oi_pct_change": 40.78
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1012608,
+      "total_oi_change": 256006,
+      "oi_pct_change": 33.84
     }
   ],
   "ICICIBANK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 14954726,
-      "total_oi_change": 3153372,
-      "oi_pct_change": 26.72
-    },
     {
       "date": "2026-08-07",
       "total_oi": 14395789,
@@ -8193,15 +8187,15 @@
       "total_oi": 4565280,
       "total_oi_change": -5035219,
       "oi_pct_change": -52.45
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 8515824,
+      "total_oi_change": -172848,
+      "oi_pct_change": -1.99
     }
   ],
   "ICICIGI": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1843593,
-      "total_oi_change": 808546,
-      "oi_pct_change": 78.12
-    },
     {
       "date": "2026-08-07",
       "total_oi": 395441,
@@ -8285,15 +8279,15 @@
       "total_oi": 916594,
       "total_oi_change": 402445,
       "oi_pct_change": 78.27
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 605897,
+      "total_oi_change": -639433,
+      "oi_pct_change": -51.35
     }
   ],
   "ICICIPRULI": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3072294,
-      "total_oi_change": 1450893,
-      "oi_pct_change": 89.48
-    },
     {
       "date": "2026-08-07",
       "total_oi": 974283,
@@ -8377,15 +8371,15 @@
       "total_oi": 1609364,
       "total_oi_change": 509218,
       "oi_pct_change": 46.29
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1099572,
+      "total_oi_change": -267500,
+      "oi_pct_change": -19.57
     }
   ],
   "IDBI": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2634487,
-      "total_oi_change": -3532840,
-      "oi_pct_change": -57.28
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2347275,
@@ -8469,15 +8463,15 @@
       "total_oi": 3261960,
       "total_oi_change": 567234,
       "oi_pct_change": 21.05
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 10822943,
+      "total_oi_change": -9548177,
+      "oi_pct_change": -46.87
     }
   ],
   "IDEA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 204537429,
-      "total_oi_change": -86826375,
-      "oi_pct_change": -29.8
-    },
     {
       "date": "2026-08-07",
       "total_oi": 205855564,
@@ -8561,15 +8555,15 @@
       "total_oi": 190569146,
       "total_oi_change": -315851914,
       "oi_pct_change": -62.37
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 527024719,
+      "total_oi_change": 74207549,
+      "oi_pct_change": 16.39
     }
   ],
   "IDFCFIRSTB": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 10687868,
-      "total_oi_change": -24294383,
-      "oi_pct_change": -69.45
-    },
     {
       "date": "2026-08-07",
       "total_oi": 9539702,
@@ -8653,15 +8647,15 @@
       "total_oi": 12594633,
       "total_oi_change": 2116567,
       "oi_pct_change": 20.2
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 15107630,
+      "total_oi_change": 2421659,
+      "oi_pct_change": 19.09
     }
   ],
   "IEX": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2460962,
-      "total_oi_change": -6447361,
-      "oi_pct_change": -72.37
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2475559,
@@ -8745,15 +8739,15 @@
       "total_oi": 1544675,
       "total_oi_change": -525926,
       "oi_pct_change": -25.4
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 3975640,
+      "total_oi_change": 1433159,
+      "oi_pct_change": 56.37
     }
   ],
   "IGL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 788950,
-      "total_oi_change": -351048,
-      "oi_pct_change": -30.79
-    },
     {
       "date": "2026-08-07",
       "total_oi": 758514,
@@ -8837,15 +8831,15 @@
       "total_oi": 2842551,
       "total_oi_change": 253571,
       "oi_pct_change": 9.79
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1206517,
+      "total_oi_change": -2122934,
+      "oi_pct_change": -63.76
     }
   ],
   "INDHOTEL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1965855,
-      "total_oi_change": -15179,
-      "oi_pct_change": -0.77
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1606078,
@@ -8929,15 +8923,15 @@
       "total_oi": 741676,
       "total_oi_change": -559581,
       "oi_pct_change": -43.0
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1623631,
+      "total_oi_change": -24736,
+      "oi_pct_change": -1.5
     }
   ],
   "INDIACEM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 127290,
-      "total_oi_change": -55419,
-      "oi_pct_change": -30.33
-    },
     {
       "date": "2026-08-07",
       "total_oi": 181089,
@@ -9021,15 +9015,15 @@
       "total_oi": 42297,
       "total_oi_change": -102916,
       "oi_pct_change": -70.87
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 73072,
+      "total_oi_change": -56222,
+      "oi_pct_change": -43.48
     }
   ],
   "INDIGO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 486230,
-      "total_oi_change": -571590,
-      "oi_pct_change": -54.03
-    },
     {
       "date": "2026-08-07",
       "total_oi": 432283,
@@ -9113,15 +9107,15 @@
       "total_oi": 1115342,
       "total_oi_change": 758814,
       "oi_pct_change": 212.83
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1437991,
+      "total_oi_change": 904149,
+      "oi_pct_change": 169.37
     }
   ],
   "INDUSINDBK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 769423,
-      "total_oi_change": -1379710,
-      "oi_pct_change": -64.2
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1727371,
@@ -9205,15 +9199,15 @@
       "total_oi": 1043385,
       "total_oi_change": 70076,
       "oi_pct_change": 7.2
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2673391,
+      "total_oi_change": 1549136,
+      "oi_pct_change": 137.79
     }
   ],
   "INDUSTOWER": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 5731783,
-      "total_oi_change": 1524602,
-      "oi_pct_change": 36.24
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3442481,
@@ -9297,15 +9291,15 @@
       "total_oi": 4157306,
       "total_oi_change": -1544311,
       "oi_pct_change": -27.09
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2707843,
+      "total_oi_change": -1960203,
+      "oi_pct_change": -41.99
     }
   ],
   "INFY": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 8521064,
-      "total_oi_change": -10086575,
-      "oi_pct_change": -54.21
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7581410,
@@ -9389,15 +9383,15 @@
       "total_oi": 6094967,
       "total_oi_change": -1741426,
       "oi_pct_change": -22.22
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 8564358,
+      "total_oi_change": 68941,
+      "oi_pct_change": 0.81
     }
   ],
   "IOC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 9474034,
-      "total_oi_change": 80196,
-      "oi_pct_change": 0.85
-    },
     {
       "date": "2026-08-07",
       "total_oi": 5173696,
@@ -9481,15 +9475,15 @@
       "total_oi": 6642882,
       "total_oi_change": -1399934,
       "oi_pct_change": -17.41
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 8229119,
+      "total_oi_change": 277676,
+      "oi_pct_change": 3.49
     }
   ],
   "IRB": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4352770,
-      "total_oi_change": -10673932,
-      "oi_pct_change": -71.03
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7172175,
@@ -9573,15 +9567,15 @@
       "total_oi": 4422521,
       "total_oi_change": -2025979,
       "oi_pct_change": -31.42
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 28951268,
+      "total_oi_change": 16598915,
+      "oi_pct_change": 134.38
     }
   ],
   "IRCTC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1584430,
-      "total_oi_change": 634931,
-      "oi_pct_change": 66.87
-    },
     {
       "date": "2026-08-07",
       "total_oi": 994282,
@@ -9665,15 +9659,15 @@
       "total_oi": 1105998,
       "total_oi_change": 221696,
       "oi_pct_change": 25.07
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1151968,
+      "total_oi_change": 405645,
+      "oi_pct_change": 54.35
     }
   ],
   "IRFC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 7130936,
-      "total_oi_change": -1665109,
-      "oi_pct_change": -18.93
-    },
     {
       "date": "2026-08-07",
       "total_oi": 5732015,
@@ -9757,15 +9751,15 @@
       "total_oi": 4768042,
       "total_oi_change": -1422616,
       "oi_pct_change": -22.98
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 7977861,
+      "total_oi_change": 134261,
+      "oi_pct_change": 1.71
     }
   ],
   "ITC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 12447629,
-      "total_oi_change": -7977940,
-      "oi_pct_change": -39.06
-    },
     {
       "date": "2026-08-07",
       "total_oi": 6128841,
@@ -9849,15 +9843,15 @@
       "total_oi": 8312928,
       "total_oi_change": -4615709,
       "oi_pct_change": -35.7
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 14643482,
+      "total_oi_change": -1246881,
+      "oi_pct_change": -7.85
     }
   ],
   "JINDALSTEL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1715023,
-      "total_oi_change": 605651,
-      "oi_pct_change": 54.59
-    },
     {
       "date": "2026-08-07",
       "total_oi": 392474,
@@ -9941,15 +9935,15 @@
       "total_oi": 999052,
       "total_oi_change": 337519,
       "oi_pct_change": 51.02
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 706262,
+      "total_oi_change": -203190,
+      "oi_pct_change": -22.34
     }
   ],
   "JIOFIN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 15775224,
-      "total_oi_change": -6857155,
-      "oi_pct_change": -30.3
-    },
     {
       "date": "2026-08-07",
       "total_oi": 10858220,
@@ -10033,15 +10027,15 @@
       "total_oi": 5583469,
       "total_oi_change": -8865530,
       "oi_pct_change": -61.36
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 15926208,
+      "total_oi_change": 6468521,
+      "oi_pct_change": 68.39
     }
   ],
   "JKCEMENT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 22983,
-      "total_oi_change": -29210,
-      "oi_pct_change": -55.97
-    },
     {
       "date": "2026-08-07",
       "total_oi": 23148,
@@ -10125,15 +10119,15 @@
       "total_oi": 13416,
       "total_oi_change": -11345,
       "oi_pct_change": -45.82
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 63500,
+      "total_oi_change": 40440,
+      "oi_pct_change": 175.38
     }
   ],
   "JSWENERGY": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 989604,
-      "total_oi_change": -685633,
-      "oi_pct_change": -40.93
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1552610,
@@ -10217,15 +10211,15 @@
       "total_oi": 973494,
       "total_oi_change": -540435,
       "oi_pct_change": -35.7
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 3635853,
+      "total_oi_change": 1539936,
+      "oi_pct_change": 73.47
     }
   ],
   "JSWSTEEL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2307926,
-      "total_oi_change": 654760,
-      "oi_pct_change": 39.61
-    },
     {
       "date": "2026-08-07",
       "total_oi": 720726,
@@ -10309,15 +10303,15 @@
       "total_oi": 2013069,
       "total_oi_change": 629378,
       "oi_pct_change": 45.49
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1562597,
+      "total_oi_change": -475849,
+      "oi_pct_change": -23.34
     }
   ],
   "JUBLFOOD": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3933013,
-      "total_oi_change": 662484,
-      "oi_pct_change": 20.26
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4147385,
@@ -10401,15 +10395,15 @@
       "total_oi": 937437,
       "total_oi_change": -3236892,
       "oi_pct_change": -77.54
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 976244,
+      "total_oi_change": -371091,
+      "oi_pct_change": -27.54
     }
   ],
   "KALYANKJIL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 24595955,
-      "total_oi_change": -615072,
-      "oi_pct_change": -2.44
-    },
     {
       "date": "2026-08-07",
       "total_oi": 33255299,
@@ -10493,15 +10487,15 @@
       "total_oi": 6936147,
       "total_oi_change": -4888388,
       "oi_pct_change": -41.34
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 21212135,
+      "total_oi_change": 13100648,
+      "oi_pct_change": 161.51
     }
   ],
   "KAYNES": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 942467,
-      "total_oi_change": -812300,
-      "oi_pct_change": -46.29
-    },
     {
       "date": "2026-08-07",
       "total_oi": 806763,
@@ -10585,15 +10579,15 @@
       "total_oi": 990990,
       "total_oi_change": -395179,
       "oi_pct_change": -28.51
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 834972,
+      "total_oi_change": -522413,
+      "oi_pct_change": -38.49
     }
   ],
   "KEI": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 374795,
-      "total_oi_change": -305316,
-      "oi_pct_change": -44.89
-    },
     {
       "date": "2026-08-07",
       "total_oi": 273169,
@@ -10677,15 +10671,15 @@
       "total_oi": 289585,
       "total_oi_change": -51298,
       "oi_pct_change": -15.05
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 666412,
+      "total_oi_change": 338457,
+      "oi_pct_change": 103.2
     }
   ],
   "KOTAKBANK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 10378024,
-      "total_oi_change": -1383811,
-      "oi_pct_change": -11.77
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7315232,
@@ -10769,15 +10763,15 @@
       "total_oi": 15670257,
       "total_oi_change": 7716979,
       "oi_pct_change": 97.03
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 10022695,
+      "total_oi_change": -5519246,
+      "oi_pct_change": -35.51
     }
   ],
   "KPITTECH": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3620699,
-      "total_oi_change": -4807086,
-      "oi_pct_change": -57.04
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2544167,
@@ -10861,15 +10855,15 @@
       "total_oi": 904430,
       "total_oi_change": -395852,
       "oi_pct_change": -30.44
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 715333,
+      "total_oi_change": -951572,
+      "oi_pct_change": -57.09
     }
   ],
   "LALPATHLAB": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 427191,
-      "total_oi_change": -335277,
-      "oi_pct_change": -43.97
-    },
     {
       "date": "2026-08-07",
       "total_oi": 158460,
@@ -10953,15 +10947,15 @@
       "total_oi": 99702,
       "total_oi_change": -124861,
       "oi_pct_change": -55.6
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 178401,
+      "total_oi_change": -6133,
+      "oi_pct_change": -3.32
     }
   ],
   "LICHSGFIN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2575192,
-      "total_oi_change": 1151271,
-      "oi_pct_change": 80.85
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1604722,
@@ -11045,15 +11039,15 @@
       "total_oi": 3123216,
       "total_oi_change": 1433496,
       "oi_pct_change": 84.84
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2788144,
+      "total_oi_change": -1040426,
+      "oi_pct_change": -27.18
     }
   ],
   "LIQUIDBEES": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3520701,
-      "total_oi_change": 320598,
-      "oi_pct_change": 10.02
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3015559,
@@ -11137,15 +11131,15 @@
       "total_oi": 3042098,
       "total_oi_change": 272288,
       "oi_pct_change": 9.83
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2397673,
+      "total_oi_change": -952394,
+      "oi_pct_change": -28.43
     }
   ],
   "LT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1401341,
-      "total_oi_change": -505469,
-      "oi_pct_change": -26.51
-    },
     {
       "date": "2026-08-07",
       "total_oi": 901290,
@@ -11229,15 +11223,15 @@
       "total_oi": 1258912,
       "total_oi_change": -92553,
       "oi_pct_change": -6.85
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1307081,
+      "total_oi_change": 94149,
+      "oi_pct_change": 7.76
     }
   ],
   "LTF": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1807929,
-      "total_oi_change": -3946880,
-      "oi_pct_change": -68.58
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4814207,
@@ -11321,15 +11315,15 @@
       "total_oi": 3402087,
       "total_oi_change": -1604969,
       "oi_pct_change": -32.05
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 6165981,
+      "total_oi_change": 995268,
+      "oi_pct_change": 19.25
     }
   ],
   "LTTS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 79100,
-      "total_oi_change": -38355,
-      "oi_pct_change": -32.66
-    },
     {
       "date": "2026-08-07",
       "total_oi": 79998,
@@ -11413,15 +11407,15 @@
       "total_oi": 54789,
       "total_oi_change": -46241,
       "oi_pct_change": -45.77
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 41078,
+      "total_oi_change": -89017,
+      "oi_pct_change": -68.42
     }
   ],
   "M&M": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1656879,
-      "total_oi_change": -1401360,
-      "oi_pct_change": -45.82
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3299237,
@@ -11505,15 +11499,15 @@
       "total_oi": 1730623,
       "total_oi_change": -186181,
       "oi_pct_change": -9.71
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2883166,
+      "total_oi_change": 1218909,
+      "oi_pct_change": 73.24
     }
   ],
   "M&MFIN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1785952,
-      "total_oi_change": -3175786,
-      "oi_pct_change": -64.01
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4874880,
@@ -11597,15 +11591,15 @@
       "total_oi": 1314155,
       "total_oi_change": -1322027,
       "oi_pct_change": -50.15
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1218704,
+      "total_oi_change": -439189,
+      "oi_pct_change": -26.49
     }
   ],
   "MANAPPURAM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3913831,
-      "total_oi_change": -3303238,
-      "oi_pct_change": -45.77
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2588647,
@@ -11689,15 +11683,15 @@
       "total_oi": 9887894,
       "total_oi_change": 2735655,
       "oi_pct_change": 38.25
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 5411370,
+      "total_oi_change": -673417,
+      "oi_pct_change": -11.07
     }
   ],
   "MANKIND": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 241909,
-      "total_oi_change": -290965,
-      "oi_pct_change": -54.6
-    },
     {
       "date": "2026-08-07",
       "total_oi": 167663,
@@ -11781,15 +11775,15 @@
       "total_oi": 343261,
       "total_oi_change": -39901,
       "oi_pct_change": -10.41
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 334009,
+      "total_oi_change": 7205,
+      "oi_pct_change": 2.2
     }
   ],
   "MARICO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1939903,
-      "total_oi_change": -409188,
-      "oi_pct_change": -17.42
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1151946,
@@ -11873,15 +11867,15 @@
       "total_oi": 815655,
       "total_oi_change": -335496,
       "oi_pct_change": -29.14
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1477115,
+      "total_oi_change": -333059,
+      "oi_pct_change": -18.4
     }
   ],
   "MARUTI": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 333510,
-      "total_oi_change": -160125,
-      "oi_pct_change": -32.44
-    },
     {
       "date": "2026-08-07",
       "total_oi": 324104,
@@ -11965,15 +11959,15 @@
       "total_oi": 224951,
       "total_oi_change": -30667,
       "oi_pct_change": -12.0
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 614156,
+      "total_oi_change": 287848,
+      "oi_pct_change": 88.21
     }
   ],
   "MAZDOCK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4183448,
-      "total_oi_change": 3551120,
-      "oi_pct_change": 561.6
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1078657,
@@ -12057,15 +12051,15 @@
       "total_oi": 486643,
       "total_oi_change": -382182,
       "oi_pct_change": -43.99
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 410616,
+      "total_oi_change": -306099,
+      "oi_pct_change": -42.71
     }
   ],
   "MCX": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2085783,
-      "total_oi_change": 350090,
-      "oi_pct_change": 20.17
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1444759,
@@ -12149,15 +12143,15 @@
       "total_oi": 3473999,
       "total_oi_change": 247324,
       "oi_pct_change": 7.66
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2448588,
+      "total_oi_change": -166056,
+      "oi_pct_change": -6.35
     }
   ],
   "METROPOLIS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 218066,
-      "total_oi_change": -89659,
-      "oi_pct_change": -29.14
-    },
     {
       "date": "2026-08-07",
       "total_oi": 132288,
@@ -12241,15 +12235,15 @@
       "total_oi": 474638,
       "total_oi_change": 36451,
       "oi_pct_change": 8.32
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 135132,
+      "total_oi_change": -224370,
+      "oi_pct_change": -62.41
     }
   ],
   "MFSL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1101308,
-      "total_oi_change": 381873,
-      "oi_pct_change": 53.08
-    },
     {
       "date": "2026-08-07",
       "total_oi": 359409,
@@ -12333,15 +12327,15 @@
       "total_oi": 458883,
       "total_oi_change": -509842,
       "oi_pct_change": -52.63
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 547908,
+      "total_oi_change": 108904,
+      "oi_pct_change": 24.81
     }
   ],
   "MGL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 187854,
-      "total_oi_change": -286106,
-      "oi_pct_change": -60.37
-    },
     {
       "date": "2026-08-07",
       "total_oi": 531620,
@@ -12425,15 +12419,15 @@
       "total_oi": 153293,
       "total_oi_change": -224468,
       "oi_pct_change": -59.42
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 176423,
+      "total_oi_change": -169674,
+      "oi_pct_change": -49.03
     }
   ],
   "MOTHERSON": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 39983472,
-      "total_oi_change": 23411912,
-      "oi_pct_change": 141.28
-    },
     {
       "date": "2026-08-07",
       "total_oi": 115582755,
@@ -12517,15 +12511,15 @@
       "total_oi": 7600823,
       "total_oi_change": -17177139,
       "oi_pct_change": -69.32
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 18944363,
+      "total_oi_change": 7641419,
+      "oi_pct_change": 67.61
     }
   ],
   "MOTILALOFS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 516195,
-      "total_oi_change": -1703755,
-      "oi_pct_change": -76.75
-    },
     {
       "date": "2026-08-07",
       "total_oi": 891154,
@@ -12609,15 +12603,15 @@
       "total_oi": 1852541,
       "total_oi_change": 424905,
       "oi_pct_change": 29.76
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1044243,
+      "total_oi_change": -185401,
+      "oi_pct_change": -15.08
     }
   ],
   "MPHASIS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 179783,
-      "total_oi_change": -691293,
-      "oi_pct_change": -79.36
-    },
     {
       "date": "2026-08-07",
       "total_oi": 608641,
@@ -12701,15 +12695,15 @@
       "total_oi": 241512,
       "total_oi_change": -212202,
       "oi_pct_change": -46.77
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 900566,
+      "total_oi_change": 487702,
+      "oi_pct_change": 118.13
     }
   ],
   "MRF": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3690,
-      "total_oi_change": -291,
-      "oi_pct_change": -7.32
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2090,
@@ -12793,15 +12787,15 @@
       "total_oi": 2811,
       "total_oi_change": -1495,
       "oi_pct_change": -34.72
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4254,
+      "total_oi_change": 55,
+      "oi_pct_change": 1.32
     }
   ],
   "MUTHOOTFIN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1271961,
-      "total_oi_change": -379294,
-      "oi_pct_change": -22.97
-    },
     {
       "date": "2026-08-07",
       "total_oi": 813420,
@@ -12885,15 +12879,15 @@
       "total_oi": 1362004,
       "total_oi_change": 431287,
       "oi_pct_change": 46.34
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 950173,
+      "total_oi_change": -242772,
+      "oi_pct_change": -20.35
     }
   ],
   "NACLIND": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 450992,
-      "total_oi_change": -467082,
-      "oi_pct_change": -50.88
-    },
     {
       "date": "2026-08-07",
       "total_oi": 308579,
@@ -12977,15 +12971,15 @@
       "total_oi": 357595,
       "total_oi_change": -181855,
       "oi_pct_change": -33.71
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 236134,
+      "total_oi_change": -151325,
+      "oi_pct_change": -39.06
     }
   ],
   "NAM-INDIA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 512681,
-      "total_oi_change": -733452,
-      "oi_pct_change": -58.86
-    },
     {
       "date": "2026-08-07",
       "total_oi": 688856,
@@ -13069,15 +13063,15 @@
       "total_oi": 1545229,
       "total_oi_change": 528147,
       "oi_pct_change": 51.93
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1599776,
+      "total_oi_change": -176239,
+      "oi_pct_change": -9.92
     }
   ],
   "NATIONALUM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 6636333,
-      "total_oi_change": -484950,
-      "oi_pct_change": -6.81
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4423953,
@@ -13161,15 +13155,15 @@
       "total_oi": 6393431,
       "total_oi_change": -3485749,
       "oi_pct_change": -35.28
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4447742,
+      "total_oi_change": -831990,
+      "oi_pct_change": -15.76
     }
   ],
   "NBCC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 6704370,
-      "total_oi_change": 1185389,
-      "oi_pct_change": 21.48
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4742088,
@@ -13253,15 +13247,15 @@
       "total_oi": 5375979,
       "total_oi_change": -992061,
       "oi_pct_change": -15.58
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4241099,
+      "total_oi_change": -733900,
+      "oi_pct_change": -14.75
     }
   ],
   "NESTLEIND": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1666312,
-      "total_oi_change": -1362901,
-      "oi_pct_change": -44.99
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1520661,
@@ -13345,15 +13339,15 @@
       "total_oi": 2679922,
       "total_oi_change": 919963,
       "oi_pct_change": 52.27
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 875020,
+      "total_oi_change": -736198,
+      "oi_pct_change": -45.69
     }
   ],
   "NMDC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 26097300,
-      "total_oi_change": 9808536,
-      "oi_pct_change": 60.22
-    },
     {
       "date": "2026-08-07",
       "total_oi": 9354641,
@@ -13437,15 +13431,15 @@
       "total_oi": 18876961,
       "total_oi_change": 20600,
       "oi_pct_change": 0.11
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 16726795,
+      "total_oi_change": -1840678,
+      "oi_pct_change": -9.91
     }
   ],
   "NTPC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 10079779,
-      "total_oi_change": 472346,
-      "oi_pct_change": 4.92
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7012048,
@@ -13529,15 +13523,15 @@
       "total_oi": 6534716,
       "total_oi_change": -1733190,
       "oi_pct_change": -20.96
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 11993091,
+      "total_oi_change": 3911978,
+      "oi_pct_change": 48.41
     }
   ],
   "NYKAA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 6083027,
-      "total_oi_change": -1807866,
-      "oi_pct_change": -22.91
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4598346,
@@ -13621,15 +13615,15 @@
       "total_oi": 6455820,
       "total_oi_change": 1454423,
       "oi_pct_change": 29.08
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 3267663,
+      "total_oi_change": -1862940,
+      "oi_pct_change": -36.31
     }
   ],
   "OBEROIRLTY": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 579391,
-      "total_oi_change": 324659,
-      "oi_pct_change": 127.45
-    },
     {
       "date": "2026-08-07",
       "total_oi": 171271,
@@ -13713,15 +13707,15 @@
       "total_oi": 323704,
       "total_oi_change": -306788,
       "oi_pct_change": -48.66
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 378206,
+      "total_oi_change": 6906,
+      "oi_pct_change": 1.86
     }
   ],
   "OIL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1670224,
-      "total_oi_change": -1118494,
-      "oi_pct_change": -40.11
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4232298,
@@ -13805,15 +13799,15 @@
       "total_oi": 1163337,
       "total_oi_change": -2956838,
       "oi_pct_change": -71.76
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4334724,
+      "total_oi_change": 2606469,
+      "oi_pct_change": 150.82
     }
   ],
   "ONGC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 13959109,
-      "total_oi_change": 2078061,
-      "oi_pct_change": 17.49
-    },
     {
       "date": "2026-08-07",
       "total_oi": 10078070,
@@ -13897,15 +13891,15 @@
       "total_oi": 13313403,
       "total_oi_change": -312839,
       "oi_pct_change": -2.3
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 13073915,
+      "total_oi_change": 1986926,
+      "oi_pct_change": 17.92
     }
   ],
   "PAGEIND": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 15718,
-      "total_oi_change": -4258,
-      "oi_pct_change": -21.32
-    },
     {
       "date": "2026-08-07",
       "total_oi": 10770,
@@ -13989,15 +13983,15 @@
       "total_oi": 18862,
       "total_oi_change": -30964,
       "oi_pct_change": -62.14
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 19411,
+      "total_oi_change": -4696,
+      "oi_pct_change": -19.48
     }
   ],
   "PAYTM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3673541,
-      "total_oi_change": -1346511,
-      "oi_pct_change": -26.82
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3055929,
@@ -14081,15 +14075,15 @@
       "total_oi": 5129938,
       "total_oi_change": -2174956,
       "oi_pct_change": -29.77
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 3008191,
+      "total_oi_change": -1405796,
+      "oi_pct_change": -31.85
     }
   ],
   "PERSISTENT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 239382,
-      "total_oi_change": -585019,
-      "oi_pct_change": -70.96
-    },
     {
       "date": "2026-08-07",
       "total_oi": 507690,
@@ -14173,15 +14167,15 @@
       "total_oi": 355144,
       "total_oi_change": -86444,
       "oi_pct_change": -19.58
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 610391,
+      "total_oi_change": 80518,
+      "oi_pct_change": 15.2
     }
   ],
   "PETRONET": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1356475,
-      "total_oi_change": -276662,
-      "oi_pct_change": -16.94
-    },
     {
       "date": "2026-08-07",
       "total_oi": 833605,
@@ -14265,15 +14259,15 @@
       "total_oi": 1700150,
       "total_oi_change": -687181,
       "oi_pct_change": -28.78
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1476710,
+      "total_oi_change": -753355,
+      "oi_pct_change": -33.78
     }
   ],
   "PFC": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3704243,
-      "total_oi_change": -2561463,
-      "oi_pct_change": -40.88
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4422078,
@@ -14357,15 +14351,15 @@
       "total_oi": 9594279,
       "total_oi_change": -941685,
       "oi_pct_change": -8.94
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 11746142,
+      "total_oi_change": 2835890,
+      "oi_pct_change": 31.83
     }
   ],
   "PFIZER": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 16772,
-      "total_oi_change": -21085,
-      "oi_pct_change": -55.7
-    },
     {
       "date": "2026-08-07",
       "total_oi": 5857,
@@ -14449,15 +14443,15 @@
       "total_oi": 63975,
       "total_oi_change": -21359,
       "oi_pct_change": -25.03
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 9434,
+      "total_oi_change": -56916,
+      "oi_pct_change": -85.78
     }
   ],
   "PIDILITIND": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1808445,
-      "total_oi_change": 376117,
-      "oi_pct_change": 26.26
-    },
     {
       "date": "2026-08-07",
       "total_oi": 917427,
@@ -14541,15 +14535,15 @@
       "total_oi": 732973,
       "total_oi_change": -136272,
       "oi_pct_change": -15.68
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 635780,
+      "total_oi_change": -163465,
+      "oi_pct_change": -20.45
     }
   ],
   "PIIND": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 93539,
-      "total_oi_change": -98040,
-      "oi_pct_change": -51.17
-    },
     {
       "date": "2026-08-07",
       "total_oi": 85234,
@@ -14633,15 +14627,15 @@
       "total_oi": 111661,
       "total_oi_change": -326685,
       "oi_pct_change": -74.53
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 128403,
+      "total_oi_change": -54060,
+      "oi_pct_change": -29.63
     }
   ],
   "PIRAMALFIN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 121223,
-      "total_oi_change": -123369,
-      "oi_pct_change": -50.44
-    },
     {
       "date": "2026-08-07",
       "total_oi": 168834,
@@ -14725,15 +14719,15 @@
       "total_oi": 411545,
       "total_oi_change": 271828,
       "oi_pct_change": 194.56
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 588816,
+      "total_oi_change": 56733,
+      "oi_pct_change": 10.66
     }
   ],
   "POLYCAB": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 221520,
-      "total_oi_change": -57357,
-      "oi_pct_change": -20.57
-    },
     {
       "date": "2026-08-07",
       "total_oi": 197996,
@@ -14817,15 +14811,15 @@
       "total_oi": 317848,
       "total_oi_change": 71699,
       "oi_pct_change": 29.13
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 434543,
+      "total_oi_change": 94930,
+      "oi_pct_change": 27.95
     }
   ],
   "POWERGRID": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 18258733,
-      "total_oi_change": 9540932,
-      "oi_pct_change": 109.44
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7795199,
@@ -14909,15 +14903,15 @@
       "total_oi": 18031357,
       "total_oi_change": 10333466,
       "oi_pct_change": 134.24
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 9068868,
+      "total_oi_change": 528628,
+      "oi_pct_change": 6.19
     }
   ],
   "PREMIER": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1128,
-      "total_oi_change": -6271,
-      "oi_pct_change": -84.76
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3685,
@@ -15001,15 +14995,15 @@
       "total_oi": 4231,
       "total_oi_change": -4112,
       "oi_pct_change": -49.29
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 5669,
+      "total_oi_change": 28,
+      "oi_pct_change": 0.51
     }
   ],
   "PVRINOX": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 157049,
-      "total_oi_change": -721627,
-      "oi_pct_change": -82.13
-    },
     {
       "date": "2026-08-07",
       "total_oi": 137511,
@@ -15093,15 +15087,15 @@
       "total_oi": 342888,
       "total_oi_change": 67918,
       "oi_pct_change": 24.7
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 311807,
+      "total_oi_change": -289375,
+      "oi_pct_change": -48.13
     }
   ],
   "RAIN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 6138266,
-      "total_oi_change": 1504075,
-      "oi_pct_change": 32.46
-    },
     {
       "date": "2026-08-07",
       "total_oi": 25397402,
@@ -15185,15 +15179,15 @@
       "total_oi": 3396240,
       "total_oi_change": -3741848,
       "oi_pct_change": -52.42
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2767223,
+      "total_oi_change": -1053703,
+      "oi_pct_change": -27.58
     }
   ],
   "RAMCOCEM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 80023,
-      "total_oi_change": -52244,
-      "oi_pct_change": -39.5
-    },
     {
       "date": "2026-08-07",
       "total_oi": 221192,
@@ -15277,15 +15271,15 @@
       "total_oi": 239794,
       "total_oi_change": -154572,
       "oi_pct_change": -39.2
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 100528,
+      "total_oi_change": -213321,
+      "oi_pct_change": -67.97
     }
   ],
   "RBLBANK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2903774,
-      "total_oi_change": -2501350,
-      "oi_pct_change": -46.28
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1693465,
@@ -15369,15 +15363,15 @@
       "total_oi": 1987210,
       "total_oi_change": 242886,
       "oi_pct_change": 13.92
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4297189,
+      "total_oi_change": 2446194,
+      "oi_pct_change": 132.16
     }
   ],
   "RECLTD": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3944657,
-      "total_oi_change": -605311,
-      "oi_pct_change": -13.3
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4061190,
@@ -15461,15 +15455,15 @@
       "total_oi": 4327678,
       "total_oi_change": -3398837,
       "oi_pct_change": -43.99
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4975534,
+      "total_oi_change": -552107,
+      "oi_pct_change": -9.99
     }
   ],
   "RELIANCE": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 20342297,
-      "total_oi_change": 9122980,
-      "oi_pct_change": 81.31
-    },
     {
       "date": "2026-08-07",
       "total_oi": 9885638,
@@ -15553,15 +15547,15 @@
       "total_oi": 5434871,
       "total_oi_change": -3809285,
       "oi_pct_change": -41.21
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 13497841,
+      "total_oi_change": 3078056,
+      "oi_pct_change": 29.54
     }
   ],
   "SBICARD": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 530440,
-      "total_oi_change": -531090,
-      "oi_pct_change": -50.03
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1453309,
@@ -15645,15 +15639,15 @@
       "total_oi": 2055590,
       "total_oi_change": -82907,
       "oi_pct_change": -3.88
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1969265,
+      "total_oi_change": -2869319,
+      "oi_pct_change": -59.3
     }
   ],
   "SBILIFE": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 474116,
-      "total_oi_change": -578295,
-      "oi_pct_change": -54.95
-    },
     {
       "date": "2026-08-07",
       "total_oi": 390231,
@@ -15737,15 +15731,15 @@
       "total_oi": 655563,
       "total_oi_change": -152989,
       "oi_pct_change": -18.92
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 671784,
+      "total_oi_change": -246208,
+      "oi_pct_change": -26.82
     }
   ],
   "SBIN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 13822265,
-      "total_oi_change": 4922840,
-      "oi_pct_change": 55.32
-    },
     {
       "date": "2026-08-07",
       "total_oi": 29410622,
@@ -15829,15 +15823,15 @@
       "total_oi": 6534213,
       "total_oi_change": -4928458,
       "oi_pct_change": -43.0
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 13843678,
+      "total_oi_change": 7162911,
+      "oi_pct_change": 107.22
     }
   ],
   "SHREECEM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 24420,
-      "total_oi_change": -3291,
-      "oi_pct_change": -11.88
-    },
     {
       "date": "2026-08-07",
       "total_oi": 10742,
@@ -15921,15 +15915,15 @@
       "total_oi": 15450,
       "total_oi_change": -7867,
       "oi_pct_change": -33.74
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 17542,
+      "total_oi_change": -14035,
+      "oi_pct_change": -44.45
     }
   ],
   "SIEMENS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 213389,
-      "total_oi_change": -209898,
-      "oi_pct_change": -49.59
-    },
     {
       "date": "2026-08-07",
       "total_oi": 221514,
@@ -16013,15 +16007,15 @@
       "total_oi": 373459,
       "total_oi_change": 7985,
       "oi_pct_change": 2.19
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 263290,
+      "total_oi_change": -166688,
+      "oi_pct_change": -38.77
     }
   ],
   "SOLARINDS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 63360,
-      "total_oi_change": -9711,
-      "oi_pct_change": -13.29
-    },
     {
       "date": "2026-08-07",
       "total_oi": 49218,
@@ -16105,15 +16099,15 @@
       "total_oi": 89559,
       "total_oi_change": -118504,
       "oi_pct_change": -56.96
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 139030,
+      "total_oi_change": 26959,
+      "oi_pct_change": 24.06
     }
   ],
   "SRF": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 550578,
-      "total_oi_change": -113082,
-      "oi_pct_change": -17.04
-    },
     {
       "date": "2026-08-07",
       "total_oi": 262181,
@@ -16197,15 +16191,15 @@
       "total_oi": 174387,
       "total_oi_change": -99311,
       "oi_pct_change": -36.28
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 129379,
+      "total_oi_change": -95822,
+      "oi_pct_change": -42.55
     }
   ],
   "SULA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 589248,
-      "total_oi_change": -389576,
-      "oi_pct_change": -39.8
-    },
     {
       "date": "2026-08-07",
       "total_oi": 787216,
@@ -16289,15 +16283,15 @@
       "total_oi": 251774,
       "total_oi_change": -137040,
       "oi_pct_change": -35.25
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 207531,
+      "total_oi_change": -27872,
+      "oi_pct_change": -11.84
     }
   ],
   "SUNDARMFIN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 44340,
-      "total_oi_change": -40232,
-      "oi_pct_change": -47.57
-    },
     {
       "date": "2026-08-07",
       "total_oi": 22448,
@@ -16381,15 +16375,15 @@
       "total_oi": 28816,
       "total_oi_change": -9271,
       "oi_pct_change": -24.34
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 35627,
+      "total_oi_change": -13891,
+      "oi_pct_change": -28.05
     }
   ],
   "SUNPHARMA": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1864891,
-      "total_oi_change": -1242029,
-      "oi_pct_change": -39.98
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2425268,
@@ -16473,15 +16467,15 @@
       "total_oi": 1491953,
       "total_oi_change": -116500,
       "oi_pct_change": -7.24
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1245419,
+      "total_oi_change": -394280,
+      "oi_pct_change": -24.05
     }
   ],
   "SUNTV": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 254130,
-      "total_oi_change": -71682,
-      "oi_pct_change": -22.0
-    },
     {
       "date": "2026-08-07",
       "total_oi": 137019,
@@ -16565,15 +16559,15 @@
       "total_oi": 298974,
       "total_oi_change": -314959,
       "oi_pct_change": -51.3
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 270939,
+      "total_oi_change": -116087,
+      "oi_pct_change": -29.99
     }
   ],
   "SWIGGY": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 51405488,
-      "total_oi_change": 20659546,
-      "oi_pct_change": 67.19
-    },
     {
       "date": "2026-08-07",
       "total_oi": 26303196,
@@ -16657,15 +16651,15 @@
       "total_oi": 12194587,
       "total_oi_change": 135517,
       "oi_pct_change": 1.12
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 16995573,
+      "total_oi_change": 4588531,
+      "oi_pct_change": 36.98
     }
   ],
   "SYNGENE": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 806023,
-      "total_oi_change": -1709672,
-      "oi_pct_change": -67.96
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2260564,
@@ -16749,15 +16743,15 @@
       "total_oi": 953583,
       "total_oi_change": 19435,
       "oi_pct_change": 2.08
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 593732,
+      "total_oi_change": -40116,
+      "oi_pct_change": -6.33
     }
   ],
   "TATACHEM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 602174,
-      "total_oi_change": 209167,
-      "oi_pct_change": 53.22
-    },
     {
       "date": "2026-08-07",
       "total_oi": 3567616,
@@ -16841,15 +16835,15 @@
       "total_oi": 512406,
       "total_oi_change": -395821,
       "oi_pct_change": -43.58
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 529669,
+      "total_oi_change": -22768,
+      "oi_pct_change": -4.12
     }
   ],
   "TATACOMM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 204750,
-      "total_oi_change": -103068,
-      "oi_pct_change": -33.48
-    },
     {
       "date": "2026-08-07",
       "total_oi": 156599,
@@ -16933,15 +16927,15 @@
       "total_oi": 152406,
       "total_oi_change": -82614,
       "oi_pct_change": -35.15
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 505913,
+      "total_oi_change": 246166,
+      "oi_pct_change": 94.77
     }
   ],
   "TATACONSUM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1350606,
-      "total_oi_change": -293317,
-      "oi_pct_change": -17.84
-    },
     {
       "date": "2026-08-07",
       "total_oi": 879013,
@@ -17025,15 +17019,15 @@
       "total_oi": 1126589,
       "total_oi_change": -229085,
       "oi_pct_change": -16.9
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1052859,
+      "total_oi_change": -105523,
+      "oi_pct_change": -9.11
     }
   ],
   "TATAELXSI": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 166412,
-      "total_oi_change": -326134,
-      "oi_pct_change": -66.21
-    },
     {
       "date": "2026-08-07",
       "total_oi": 449437,
@@ -17117,15 +17111,15 @@
       "total_oi": 148013,
       "total_oi_change": -53144,
       "oi_pct_change": -26.42
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 181417,
+      "total_oi_change": 3830,
+      "oi_pct_change": 2.16
     }
   ],
   "TATAPOWER": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2531350,
-      "total_oi_change": -574385,
-      "oi_pct_change": -18.49
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2614409,
@@ -17209,15 +17203,15 @@
       "total_oi": 4141292,
       "total_oi_change": 108507,
       "oi_pct_change": 2.69
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 12229632,
+      "total_oi_change": 6184595,
+      "oi_pct_change": 102.31
     }
   ],
   "TATASTEEL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 18802510,
-      "total_oi_change": -2506798,
-      "oi_pct_change": -11.76
-    },
     {
       "date": "2026-08-07",
       "total_oi": 9924021,
@@ -17301,6 +17295,12 @@
       "total_oi": 26299054,
       "total_oi_change": 5923533,
       "oi_pct_change": 29.07
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 19496175,
+      "total_oi_change": -12696626,
+      "oi_pct_change": -39.44
     }
   ],
   "TATATECH": [
@@ -17387,15 +17387,15 @@
       "total_oi": 611985,
       "total_oi_change": -2413712,
       "oi_pct_change": -79.77
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 947143,
+      "total_oi_change": -245191,
+      "oi_pct_change": -20.56
     }
   ],
   "TCS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2729141,
-      "total_oi_change": -1593835,
-      "oi_pct_change": -36.87
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4547979,
@@ -17479,15 +17479,15 @@
       "total_oi": 2066749,
       "total_oi_change": -854714,
       "oi_pct_change": -29.26
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 2533005,
+      "total_oi_change": 25440,
+      "oi_pct_change": 1.01
     }
   ],
   "TECHM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3585913,
-      "total_oi_change": 763398,
-      "oi_pct_change": 27.05
-    },
     {
       "date": "2026-08-07",
       "total_oi": 6089110,
@@ -17571,15 +17571,15 @@
       "total_oi": 1324911,
       "total_oi_change": -1506786,
       "oi_pct_change": -53.21
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1508528,
+      "total_oi_change": -567090,
+      "oi_pct_change": -27.32
     }
   ],
   "TITAN": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1283840,
-      "total_oi_change": 522981,
-      "oi_pct_change": 68.74
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1166858,
@@ -17663,15 +17663,15 @@
       "total_oi": 352381,
       "total_oi_change": -714636,
       "oi_pct_change": -66.98
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 812660,
+      "total_oi_change": 301809,
+      "oi_pct_change": 59.08
     }
   ],
   "TMPV": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 5218339,
-      "total_oi_change": -2236923,
-      "oi_pct_change": -30.0
-    },
     {
       "date": "2026-08-07",
       "total_oi": 4274035,
@@ -17755,15 +17755,15 @@
       "total_oi": 10824328,
       "total_oi_change": -331412,
       "oi_pct_change": -2.97
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 6667459,
+      "total_oi_change": -1842424,
+      "oi_pct_change": -21.65
     }
   ],
   "TORNTPHARM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 701944,
-      "total_oi_change": 51156,
-      "oi_pct_change": 7.86
-    },
     {
       "date": "2026-08-07",
       "total_oi": 394462,
@@ -17847,15 +17847,15 @@
       "total_oi": 226264,
       "total_oi_change": -128746,
       "oi_pct_change": -36.27
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 295518,
+      "total_oi_change": 7118,
+      "oi_pct_change": 2.47
     }
   ],
   "TORNTPOWER": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 404065,
-      "total_oi_change": 28641,
-      "oi_pct_change": 7.63
-    },
     {
       "date": "2026-08-07",
       "total_oi": 379616,
@@ -17939,15 +17939,15 @@
       "total_oi": 168844,
       "total_oi_change": -65556,
       "oi_pct_change": -27.97
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1313132,
+      "total_oi_change": 1028330,
+      "oi_pct_change": 361.07
     }
   ],
   "TRENT": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4403351,
-      "total_oi_change": 3574606,
-      "oi_pct_change": 431.33
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2469173,
@@ -18031,15 +18031,15 @@
       "total_oi": 522242,
       "total_oi_change": -416600,
       "oi_pct_change": -44.37
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 873641,
+      "total_oi_change": 311295,
+      "oi_pct_change": 55.36
     }
   ],
   "TVSMOTOR": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 1143968,
-      "total_oi_change": -639419,
-      "oi_pct_change": -35.85
-    },
     {
       "date": "2026-08-07",
       "total_oi": 840158,
@@ -18123,15 +18123,15 @@
       "total_oi": 912628,
       "total_oi_change": 264282,
       "oi_pct_change": 40.76
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1596164,
+      "total_oi_change": 550831,
+      "oi_pct_change": 52.69
     }
   ],
   "UBL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 90278,
-      "total_oi_change": -73845,
-      "oi_pct_change": -44.99
-    },
     {
       "date": "2026-08-07",
       "total_oi": 99991,
@@ -18215,15 +18215,15 @@
       "total_oi": 68125,
       "total_oi_change": -370,
       "oi_pct_change": -0.54
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 60937,
+      "total_oi_change": -34627,
+      "oi_pct_change": -36.23
     }
   ],
   "ULTRACEMCO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 208304,
-      "total_oi_change": -68400,
-      "oi_pct_change": -24.72
-    },
     {
       "date": "2026-08-07",
       "total_oi": 171352,
@@ -18307,15 +18307,15 @@
       "total_oi": 133753,
       "total_oi_change": -86088,
       "oi_pct_change": -39.16
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 228820,
+      "total_oi_change": -14347,
+      "oi_pct_change": -5.9
     }
   ],
   "UNIONBANK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 19962851,
-      "total_oi_change": 10011224,
-      "oi_pct_change": 100.6
-    },
     {
       "date": "2026-08-07",
       "total_oi": 22186841,
@@ -18399,15 +18399,15 @@
       "total_oi": 6917352,
       "total_oi_change": -6192150,
       "oi_pct_change": -47.23
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 9420048,
+      "total_oi_change": 1309524,
+      "oi_pct_change": 16.15
     }
   ],
   "UPL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 2528114,
-      "total_oi_change": 387396,
-      "oi_pct_change": 18.1
-    },
     {
       "date": "2026-08-07",
       "total_oi": 882844,
@@ -18491,15 +18491,15 @@
       "total_oi": 885783,
       "total_oi_change": -742826,
       "oi_pct_change": -45.61
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 4050279,
+      "total_oi_change": 1756507,
+      "oi_pct_change": 76.58
     }
   ],
   "VBL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4923022,
-      "total_oi_change": -4941556,
-      "oi_pct_change": -50.09
-    },
     {
       "date": "2026-08-07",
       "total_oi": 2472286,
@@ -18583,15 +18583,15 @@
       "total_oi": 2399879,
       "total_oi_change": -347577,
       "oi_pct_change": -12.65
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 7804640,
+      "total_oi_change": -603969,
+      "oi_pct_change": -7.18
     }
   ],
   "VEDL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 18499108,
-      "total_oi_change": 8787322,
-      "oi_pct_change": 90.48
-    },
     {
       "date": "2026-08-07",
       "total_oi": 10287563,
@@ -18675,15 +18675,15 @@
       "total_oi": 23088301,
       "total_oi_change": 11635467,
       "oi_pct_change": 101.59
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 7580567,
+      "total_oi_change": -7252663,
+      "oi_pct_change": -48.89
     }
   ],
   "VGUARD": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 3151241,
-      "total_oi_change": -1384096,
-      "oi_pct_change": -30.52
-    },
     {
       "date": "2026-08-07",
       "total_oi": 1204577,
@@ -18767,15 +18767,15 @@
       "total_oi": 363474,
       "total_oi_change": -1056035,
       "oi_pct_change": -74.39
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 517815,
+      "total_oi_change": -67788,
+      "oi_pct_change": -11.58
     }
   ],
   "VMM": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 4458233,
-      "total_oi_change": -8046122,
-      "oi_pct_change": -64.35
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7431528,
@@ -18859,15 +18859,15 @@
       "total_oi": 17742471,
       "total_oi_change": 9860647,
       "oi_pct_change": 125.11
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 13754007,
+      "total_oi_change": -12616616,
+      "oi_pct_change": -47.84
     }
   ],
   "VOLTAS": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 598220,
-      "total_oi_change": 148910,
-      "oi_pct_change": 33.14
-    },
     {
       "date": "2026-08-07",
       "total_oi": 811972,
@@ -18951,15 +18951,15 @@
       "total_oi": 557685,
       "total_oi_change": -774518,
       "oi_pct_change": -58.14
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 1981487,
+      "total_oi_change": 1177365,
+      "oi_pct_change": 146.42
     }
   ],
   "WAAREEENER": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 363839,
-      "total_oi_change": -829076,
-      "oi_pct_change": -69.5
-    },
     {
       "date": "2026-08-07",
       "total_oi": 777123,
@@ -19043,15 +19043,15 @@
       "total_oi": 449753,
       "total_oi_change": 19696,
       "oi_pct_change": 4.58
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 741486,
+      "total_oi_change": 266823,
+      "oi_pct_change": 56.21
     }
   ],
   "WIPRO": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 6629768,
-      "total_oi_change": -13091782,
-      "oi_pct_change": -66.38
-    },
     {
       "date": "2026-08-07",
       "total_oi": 7823102,
@@ -19135,15 +19135,15 @@
       "total_oi": 4637869,
       "total_oi_change": -2022884,
       "oi_pct_change": -30.37
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 12056634,
+      "total_oi_change": 3458946,
+      "oi_pct_change": 40.23
     }
   ],
   "YESBANK": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 37986003,
-      "total_oi_change": -13844461,
-      "oi_pct_change": -26.71
-    },
     {
       "date": "2026-08-07",
       "total_oi": 25521116,
@@ -19227,15 +19227,15 @@
       "total_oi": 33859169,
       "total_oi_change": -9294133,
       "oi_pct_change": -21.54
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 44781892,
+      "total_oi_change": -9909373,
+      "oi_pct_change": -18.12
     }
   ],
   "ZEEL": [
-    {
-      "date": "2026-08-06",
-      "total_oi": 30094304,
-      "total_oi_change": -1887594,
-      "oi_pct_change": -5.9
-    },
     {
       "date": "2026-08-07",
       "total_oi": 21179751,
@@ -19319,6 +19319,12 @@
       "total_oi": 23307195,
       "total_oi_change": -15428725,
       "oi_pct_change": -39.83
+    },
+    {
+      "date": "2026-09-02",
+      "total_oi": 18542223,
+      "total_oi_change": -15525614,
+      "oi_pct_change": -45.57
     }
   ]
 }

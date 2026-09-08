@@ -8,6 +8,7 @@ Welcome to the definitive, in-depth architectural and page blueprint documentati
 
 | Blueprint Document | Scope & Workspaces Covered | Key Subsystems & Features |
 | :--- | :--- | :--- |
+| [**🌟 MASTER SYSTEM BLUEPRINT & FORMULARY**](MASTER_SYSTEM_BLUEPRINT.md) | **Complete System Architecture & Math Formulary** | **Paper Trading Math, 5-Pillar Equations, Overnight Gap Forecaster, Black-Scholes Greeks, All 14 Pages & Modals** |
 | [**01. Scanner & Signals Engine**](01_SCANNER_DASHBOARD.md) | Primary Dashboard, F&O Universe Table, Marquee | 230+ F&O Stocks, 12-Column Grid, 4-Button Action Bar, Gap Probability Distribution, Real-time WebSockets |
 | [**02. Index Intelligence & Macro Gate**](02_INDEX_INTELLIGENCE.md) | Nifty 50, Bank Nifty, FinNifty, Sensex, GIFT NIFTY | Multi-Index Telemetry, PCR & Max Pain, Macro Pullback Gate, Sector Weight Overrides |
 | [**03. Live 1-Second Option Chain**](03_LIVE_1SEC_OPTION_CHAIN.md) | Derivatives Matrix Modal, Strike Polling | 1-Second Live Polling Loop, In-Memory Zero-Latency Cache, Official Lot Sizes, Click-to-Trade Integration |

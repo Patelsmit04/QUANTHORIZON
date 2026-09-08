@@ -1,0 +1,15 @@
+# Vercel deployment ignore file
+.git
+.github
+.pytest_cache
+.venv
+venv
+tests/
+scratch/
+docs/
+.aider*
+.vscode/
+.idea/
+*.pyc
+__pycache__/
+*.log

@@ -1,26 +1,14 @@
 {
-  "today_date": "2026-08-21",
+  "today_date": "2026-09-08",
   "cold_starts": [],
   "market_transitions": [],
   "evaluations": [
     {
-      "timestamp": "2026-08-21 18:40:06 IST",
+      "timestamp": "2026-09-08 21:50:39 IST",
       "evaluated_count": 0,
       "wins": 0,
       "losses": 0,
-      "win_rate_pct": 32.1,
-      "status": "SUCCESS",
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_backfill"
-      }
-    },
-    {
-      "timestamp": "2026-08-21 18:40:08 IST",
-      "evaluated_count": 0,
-      "wins": 0,
-      "losses": 0,
-      "win_rate_pct": 32.1,
+      "win_rate_pct": 36.1,
       "status": "SUCCESS",
       "details": {
         "healed_by": "AISentinel",
@@ -30,24 +18,19 @@
   ],
   "locks": [
     {
-      "timestamp": "2026-08-21 18:40:07 IST",
+      "timestamp": "2026-09-08 21:50:39 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-21 18:40:07 IST",
+      "timestamp": "2026-09-08 21:50:39 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "ASIANPAINT",
-        "BAJAJFINSV",
         "ICICIBANK",
-        "RELIANCE",
-        "TCS",
-        "TITAN",
-        "MARUTI"
+        "ULTRACEMCO"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -55,24 +38,19 @@
       }
     },
     {
-      "timestamp": "2026-08-21 18:40:09 IST",
+      "timestamp": "2026-09-08 21:50:41 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-21 18:40:10 IST",
+      "timestamp": "2026-09-08 21:50:42 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "ASIANPAINT",
-        "BAJAJFINSV",
         "ICICIBANK",
-        "RELIANCE",
-        "TCS",
-        "TITAN",
-        "MARUTI"
+        "ULTRACEMCO"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -80,24 +58,26 @@
       }
     },
     {
-      "timestamp": "2026-08-21 18:40:11 IST",
+      "timestamp": "2026-09-08 21:50:46 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-21 18:40:11 IST",
+      "timestamp": "2026-09-08 21:51:07 IST",
+      "lock_type": "BTST_330_LOCK",
+      "locked_count": 0,
+      "symbols": [],
+      "details": {}
+    },
+    {
+      "timestamp": "2026-09-08 21:51:07 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "ASIANPAINT",
-        "BAJAJFINSV",
         "ICICIBANK",
-        "RELIANCE",
-        "TCS",
-        "TITAN",
-        "MARUTI"
+        "ULTRACEMCO"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -105,31 +85,19 @@
       }
     },
     {
-      "timestamp": "2026-08-21 18:40:14 IST",
+      "timestamp": "2026-09-08 21:51:19 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-21 18:40:28 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-21 18:40:29 IST",
+      "timestamp": "2026-09-08 21:51:20 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "ASIANPAINT",
-        "BAJAJFINSV",
         "ICICIBANK",
-        "RELIANCE",
-        "TCS",
-        "TITAN",
-        "MARUTI"
+        "ULTRACEMCO"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -137,24 +105,19 @@
       }
     },
     {
-      "timestamp": "2026-08-21 18:40:32 IST",
+      "timestamp": "2026-09-08 21:51:28 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-21 18:40:32 IST",
+      "timestamp": "2026-09-08 21:51:28 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "ASIANPAINT",
-        "BAJAJFINSV",
         "ICICIBANK",
-        "RELIANCE",
-        "TCS",
-        "TITAN",
-        "MARUTI"
+        "ULTRACEMCO"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -162,74 +125,19 @@
       }
     },
     {
-      "timestamp": "2026-08-21 18:40:35 IST",
+      "timestamp": "2026-09-08 21:51:32 IST",
       "lock_type": "BTST_330_LOCK",
       "locked_count": 0,
       "symbols": [],
       "details": {}
     },
     {
-      "timestamp": "2026-08-21 18:40:35 IST",
+      "timestamp": "2026-09-08 21:51:32 IST",
       "lock_type": "AI_SENTINEL_330_RECONCILIATION",
       "locked_count": 0,
       "symbols": [
-        "ASIANPAINT",
-        "BAJAJFINSV",
         "ICICIBANK",
-        "RELIANCE",
-        "TCS",
-        "TITAN",
-        "MARUTI"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-21 18:40:36 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-21 18:40:37 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "ASIANPAINT",
-        "BAJAJFINSV",
-        "ICICIBANK",
-        "RELIANCE",
-        "TCS",
-        "TITAN",
-        "MARUTI"
-      ],
-      "details": {
-        "healed_by": "AISentinel",
-        "trigger": "auto_reconciliation"
-      }
-    },
-    {
-      "timestamp": "2026-08-21 18:40:40 IST",
-      "lock_type": "BTST_330_LOCK",
-      "locked_count": 0,
-      "symbols": [],
-      "details": {}
-    },
-    {
-      "timestamp": "2026-08-21 18:40:41 IST",
-      "lock_type": "AI_SENTINEL_330_RECONCILIATION",
-      "locked_count": 0,
-      "symbols": [
-        "ASIANPAINT",
-        "BAJAJFINSV",
-        "ICICIBANK",
-        "RELIANCE",
-        "TCS",
-        "TITAN",
-        "MARUTI"
+        "ULTRACEMCO"
       ],
       "details": {
         "healed_by": "AISentinel",
@@ -239,5 +147,5 @@
   ],
   "errors": [],
   "warnings": [],
-  "last_health_check": "2026-08-21 18:40:41 IST"
+  "last_health_check": "2026-09-08 21:51:32 IST"
 }
