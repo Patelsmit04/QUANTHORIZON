@@ -1726,6 +1726,21 @@ input:checked + .slider:before { transform: translateX(16px); }
    MODALS
    ========================================== */
 
+.modal-overlay.hidden,
+#orderTicketModal.hidden,
+#optionChainModal.hidden,
+#stockModal.hidden,
+#strategyFormModal.hidden,
+#clarificationModal.hidden,
+#winRateModal.hidden,
+#editPositionModal.hidden,
+#optionsDemoTradeModal.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
 .modal-overlay {
     position: fixed; inset: 0;
     background: rgba(20, 22, 30, 0.35);

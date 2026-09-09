@@ -7248,22 +7248,51 @@ function recalculateOrderTicketSummary() {
     if (marginEl) marginEl.textContent = `₹${totalMargin.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
 }
 
+window.closeOrderTicketModal = function() {
+    const modal = document.getElementById("orderTicketModal");
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+        modal.style.setProperty("display", "none", "important");
+    }
+};
+
+window.closeOptionChainModal = function() {
+    const modal = document.getElementById("optionChainModal");
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+        modal.style.setProperty("display", "none", "important");
+    }
+};
+
 // Global Order Ticket Event Listeners
 function initOrderTicketEventListeners() {
     const closeBtn = document.getElementById("closeOrderTicketBtn");
     const modal = document.getElementById("orderTicketModal");
-    if (closeBtn && modal) {
-        closeBtn.addEventListener("click", () => {
-            modal.classList.add("hidden");
-            modal.style.display = "none";
-        });
+    if (closeBtn) {
+        closeBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.closeOrderTicketModal();
+        };
+    }
+    if (modal) {
         modal.addEventListener("click", (e) => {
             if (e.target === modal) {
-                modal.classList.add("hidden");
-                modal.style.display = "none";
+                window.closeOrderTicketModal();
             }
         });
     }
+
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            window.closeOrderTicketModal();
+            window.closeOptionChainModal();
+            const ep = document.getElementById("editPositionModal");
+            if (ep) { ep.classList.add("hidden"); ep.style.display = "none"; }
+        }
+    });
 
     const mktBtn = document.getElementById("orderTypeMarketBtn");
     const lmtBtn = document.getElementById("orderTypeLimitBtn");

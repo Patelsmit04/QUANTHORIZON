@@ -45,8 +45,8 @@
     </script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=47.0.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=47.0.0">
+    <link rel="stylesheet" href="/static/styles.css?v=48.0.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=48.0.0">
 
 </head>
 <body>
@@ -2172,14 +2172,14 @@
     </div>
 
     <!-- ============================== INSTITUTIONAL ORDER TICKET MODAL ============================== -->
-    <div id="orderTicketModal" class="modal-overlay hidden" style="z-index: 1000000;">
+    <div id="orderTicketModal" class="modal-overlay hidden" style="z-index: 1000000;" onclick="if(event.target===this)closeOrderTicketModal()">
         <div class="modal-card" style="max-width: 480px; width: 95%; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;">
             <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 16px 20px;">
                 <div class="modal-title-group" style="display:flex;align-items:center;gap:10px;">
                     <span id="orderTicketActionBadge" class="badge badge-bullish" style="font-size:12px;font-weight:800;padding:4px 10px;">BUY (CE)</span>
                     <h2 id="orderTicketSymbol" style="font-size:20px;font-weight:900;letter-spacing:0.5px;color:#0f172a;margin:0;">RELIANCE</h2>
                 </div>
-                <button id="closeOrderTicketBtn" class="modal-close-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; cursor: pointer;">&times;</button>
+                <button id="closeOrderTicketBtn" class="modal-close-btn" onclick="closeOrderTicketModal()" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; cursor: pointer;">&times;</button>
             </div>
             <div class="modal-body" style="padding: 20px;">
                 <!-- Live Price Bar -->
@@ -2277,13 +2277,13 @@
     </div>
 
     <!-- ============================== POSITION SL / TP EDIT MODAL ============================== -->
-    <div id="editPositionModal" class="modal-overlay hidden" style="z-index: 1000000;">
+    <div id="editPositionModal" class="modal-overlay hidden" style="z-index: 1000000;" onclick="if(event.target===this){this.classList.add('hidden');this.style.display='none';}">
         <div class="modal-card" style="max-width: 420px; width: 95%; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;">
             <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 16px 20px;">
                 <div class="modal-title-group" style="display:flex;align-items:center;gap:10px;">
                     <h3 id="editPosTitle" style="font-size:16px;font-weight:900;color:#0f172a;margin:0;">MODIFY TARGET &amp; SL</h3>
                 </div>
-                <button id="closeEditPosBtn" class="modal-close-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; cursor: pointer;">&times;</button>
+                <button id="closeEditPosBtn" class="modal-close-btn" onclick="document.getElementById('editPositionModal').classList.add('hidden');document.getElementById('editPositionModal').style.display='none';" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; cursor: pointer;">&times;</button>
             </div>
             <div class="modal-body" style="padding: 20px;">
                 <input type="hidden" id="editPosIdInput" />
@@ -2332,7 +2332,7 @@
                     <span id="ocLiveStatusBadge" class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
                         <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block;"></span> 1-SEC LIVE
                     </span>
-                    <button id="closeOptionChainBtn" class="modal-close-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; cursor: pointer;">&times;</button>
+                    <button id="closeOptionChainBtn" class="modal-close-btn" onclick="closeOptionChainModal()" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; cursor: pointer;">&times;</button>
                 </div>
             </div>
 
@@ -2497,7 +2497,7 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=47.0.0"></script>
+    <script src="/static/app.js?v=48.0.0"></script>
 
 </body>
 </html>

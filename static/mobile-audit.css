@@ -2390,9 +2390,12 @@
 }
 
 /* --- Institutional Order Ticket Modal Mobile Responsiveness --- */
-#orderTicketModal {
+#orderTicketModal:not(.hidden) {
     padding: 8px !important;
     box-sizing: border-box !important;
+}
+#orderTicketModal.hidden {
+    display: none !important;
 }
 
 #orderTicketModal .modal-card {
@@ -2464,9 +2467,12 @@
 }
 
 /* --- Live Options Chain Modal Mobile Responsiveness --- */
-#optionChainModal {
+#optionChainModal:not(.hidden) {
     padding: 8px !important;
     box-sizing: border-box !important;
+}
+#optionChainModal.hidden {
+    display: none !important;
 }
 
 #optionChainModal .modal-card,
@@ -2657,12 +2663,15 @@
 }
 
 /* Order Ticket Modal: Centered card with full vertical clearance */
-#orderTicketModal {
+#orderTicketModal:not(.hidden) {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     padding: 16px 8px !important;
     box-sizing: border-box !important;
+}
+#orderTicketModal.hidden {
+    display: none !important;
 }
 
 #orderTicketModal .modal-card {
