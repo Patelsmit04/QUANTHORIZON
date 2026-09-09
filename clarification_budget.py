@@ -16,14 +16,14 @@ from datetime import date
 from typing import Dict, Any
 
 from json_utils import atomic_write_json, read_json, json_file_lock
-from env_utils import DATA_DIR
+from env_utils import DATA_DIR, safe_int_env
 from pg_utils import USE_POSTGRES, pg_read_json, pg_write_json, pg_key_lock
 
 logger = logging.getLogger("ClarificationBudget")
 
 BUDGET_FILE = os.path.join(DATA_DIR, "clarification_budget.json")
 
-MAX_CLARIFICATIONS_PER_DAY = int(os.environ.get("MAX_CLARIFICATIONS_PER_DAY", "20"))
+MAX_CLARIFICATIONS_PER_DAY = safe_int_env("MAX_CLARIFICATIONS_PER_DAY", 20)
 
 
 class ClarificationBudgetExceededError(Exception):

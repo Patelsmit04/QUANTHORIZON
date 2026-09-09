@@ -23,7 +23,7 @@ import random
 from datetime import datetime
 from typing import Dict, Any, Optional, List
 
-from env_utils import IST
+from env_utils import IST, safe_float_env
 
 logger = logging.getLogger("NSEScraperWorkers")
 
@@ -237,7 +237,7 @@ def _fetch_block_deals() -> Optional[List[Dict]]:
         return None
 
     parsed = []
-    min_value_cr = float(os.environ.get("INSTITUTIONAL_FLOW_MIN_VALUE_CR", "25"))
+    min_value_cr = safe_float_env("INSTITUTIONAL_FLOW_MIN_VALUE_CR", 25.0)
 
     for deal in deals:
         try:

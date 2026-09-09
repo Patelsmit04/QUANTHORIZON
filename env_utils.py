@@ -17,6 +17,26 @@ def load_env_with_fallback(base_dir: str) -> None:
         load_dotenv(env_file, override=True)
 
 
+def safe_int_env(name: str, default: int) -> int:
+    val = os.environ.get(name)
+    if val is None or not str(val).strip():
+        return default
+    try:
+        return int(str(val).strip())
+    except (ValueError, TypeError):
+        return default
+
+
+def safe_float_env(name: str, default: float) -> float:
+    val = os.environ.get(name)
+    if val is None or not str(val).strip():
+        return default
+    try:
+        return float(str(val).strip())
+    except (ValueError, TypeError):
+        return default
+
+
 def _get_data_dir() -> str:
     """
     On Vercel, the repository root is read-only and only /tmp is writable.

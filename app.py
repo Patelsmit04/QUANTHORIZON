@@ -19,10 +19,10 @@ import sys
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
-from env_utils import load_env_with_fallback, DATA_DIR, shutdown_event
+from env_utils import load_env_with_fallback, DATA_DIR, shutdown_event, safe_int_env, safe_float_env
 load_env_with_fallback(BASE_DIR)
 
-APP_PORT = int(os.environ.get("PORT", 8000))
+APP_PORT = safe_int_env("PORT", 8000)
 
 from net_utils import call_with_retry
 from candle_utils import fetch_post_lock_candles
@@ -324,8 +324,8 @@ INDEX_INTELLIGENCE_FILE = os.path.join(DATA_DIR, "index_btst_verdicts.json")
 # Post-close Index BTST Intelligence run time — deliberately separate from the 3:30 PM stock
 # lock, since overnight-relevant reads (option chain positioning) settle right after close, not
 # during intraday scanning. Configurable via env vars per the original spec's "config flag".
-INDEX_INTELLIGENCE_RUN_HOUR = int(os.environ.get("INDEX_INTELLIGENCE_RUN_HOUR", "15"))
-INDEX_INTELLIGENCE_RUN_MINUTE = int(os.environ.get("INDEX_INTELLIGENCE_RUN_MINUTE", "45"))
+INDEX_INTELLIGENCE_RUN_HOUR = safe_int_env("INDEX_INTELLIGENCE_RUN_HOUR", 15)
+INDEX_INTELLIGENCE_RUN_MINUTE = safe_int_env("INDEX_INTELLIGENCE_RUN_MINUTE", 45)
 
 # In-Memory Cache Store for Instant Responses
 cache_store: Dict[str, Any] = {

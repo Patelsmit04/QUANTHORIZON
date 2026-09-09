@@ -37,7 +37,7 @@ import urllib.error
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Any, Optional, Tuple
 
-from env_utils import DATA_DIR, get_ist_now
+from env_utils import DATA_DIR, get_ist_now, safe_int_env
 from json_utils import atomic_write_json, read_json
 
 logger = logging.getLogger("AISentinel")
@@ -48,7 +48,7 @@ SYSTEM_CONTROL_FILE = os.path.join(DATA_DIR, "system_control.json")
 _sentinel_lock = threading.RLock()
 
 # Port for self-probes — read from the same env var the server uses.
-_SELF_PROBE_PORT = int(os.environ.get("PORT", 8000))
+_SELF_PROBE_PORT = safe_int_env("PORT", 8000)
 _SELF_PROBE_BASE = f"http://127.0.0.1:{_SELF_PROBE_PORT}"
 _SELF_PROBE_TIMEOUT = 1.0  # seconds (local loopback connects in <5ms)
 _cached_test_client = None
