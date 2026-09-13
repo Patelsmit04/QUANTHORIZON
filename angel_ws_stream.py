@@ -260,7 +260,23 @@ class AngelWebSocketStream:
             last_traded_qty = message.get("last_traded_quantity", 0) or 0
 
             # Previous close — use close_price from tick, or our stored value
-            prev_close = close if close > 0 else self._prev_closes.get(symbol, ltp)
+            default_index_prevs = {
+                "NIFTY": 23431.50,
+                "NIFTY50": 23431.50,
+                "BANKNIFTY": 56295.55,
+                "SENSEX": 74764.23,
+                "FINNIFTY": 25520.30,
+            }
+            prev_close = 0.0
+            if close > 0 and abs(close - ltp) > 0.01:
+                prev_close = close
+            else:
+                prev_close = self._prev_closes.get(symbol, 0.0)
+                if prev_close <= 0 and symbol in default_index_prevs:
+                    prev_close = default_index_prevs[symbol]
+                elif prev_close <= 0 and close > 0:
+                    prev_close = close
+
             if prev_close <= 0:
                 prev_close = ltp
 

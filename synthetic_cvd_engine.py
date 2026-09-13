@@ -42,6 +42,7 @@ class OrderFlowData:
             "ask_pct": 50.0
         }
         self.minute_bars: List[Dict[str, Any]] = []
+        self.cvd_series: List[Dict[str, Any]] = []
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -52,6 +53,7 @@ class OrderFlowData:
             "total_ticks": self.total_ticks,
             "depth_imbalance": self.depth_imbalance,
             "minute_bars": self.minute_bars,
+            "cvd_series": self.cvd_series,
             "inferred_delta_notice": (
                 "Delta is TICK-RULE classified from Angel One Level 2 feed "
                 "(LTP vs Bid/Ask), not exchange-tagged."
@@ -261,6 +263,9 @@ def get_order_flow_data(
             except Exception:
                 pass
 
+            # Populate CVD series
+            of_data.cvd_series = _get_cvd_bars(clean_sym)
+
             return of_data
 
     # ─── Fallback: Synthetic simulator (no live data) ────────
@@ -336,5 +341,201 @@ def _generate_synthetic_flow(symbol: str, is_bullish: bool, of_data: OrderFlowDa
         "bid_pct": bid_pct,
         "ask_pct": round(100.0 - bid_pct, 1),
     }
+    # Populate 1-minute CVD series leading up to 3:30 PM
+    of_data.cvd_series = _build_synthetic_cvd_series(symbol, is_bullish, window="closing")
 
     return of_data
+
+
+def _build_synthetic_cvd_series(symbol: str, is_bullish: bool, window: str = "closing") -> List[Dict[str, Any]]:
+    """
+    Builds deterministic 1-minute Cumulative Volume Delta (CVD) series leading up to 3:30 PM.
+    - 'closing': 15:00 to 15:30 (31 bars)
+    - 'power_hour': 14:30 to 15:30 (61 bars)
+    - 'session': 09:15 to 15:30 (full session)
+    """
+    import random
+    from datetime import date
+    clean_sym = symbol.replace(".NS", "").upper()
+    today_int = int(date.today().strftime("%Y%m%d"))
+    seed_val = sum(ord(c) * (idx + 1) for idx, c in enumerate(clean_sym)) + today_int + 777
+    rng = random.Random(seed_val)
+
+    # Base price estimation for Indian large-caps / F&O tickers
+    base_prices = {
+        "RELIANCE": 2980.0, "TCS": 4120.0, "HDFCBANK": 1640.0, "INFY": 1820.0,
+        "ICICIBANK": 1240.0, "SBIN": 820.0, "BHARTIARTL": 1490.0, "LT": 3650.0,
+        "ITC": 490.0, "TATAMOTORS": 980.0
+    }
+    cur_price = base_prices.get(clean_sym, 1250.0)
+
+    # Determine time intervals leading up to 3:30 PM (15:30)
+    time_slots: List[str] = []
+    if window == "power_hour":
+        # 14:30 to 15:30
+        for m in range(30, 60):
+            time_slots.append(f"14:{m:02d}")
+        for m in range(0, 31):
+            time_slots.append(f"15:{m:02d}")
+    elif window == "session":
+        # 09:15 to 15:30
+        for m in range(15, 60):
+            time_slots.append(f"09:{m:02d}")
+        for h in range(10, 15):
+            for m in range(0, 60):
+                time_slots.append(f"{h:02d}:{m:02d}")
+        for m in range(0, 31):
+            time_slots.append(f"15:{m:02d}")
+    else:
+        # Default 'closing': 15:00 to 15:30
+        for m in range(0, 31):
+            time_slots.append(f"15:{m:02d}")
+
+    base_vol = 14000 if clean_sym in ("RELIANCE", "INFY", "TCS", "HDFCBANK") else 5500
+    quality_bias = 0.85 if clean_sym in ("RELIANCE", "INFY", "TCS", "HDFCBANK") else rng.uniform(0.62, 0.86)
+
+    series: List[Dict[str, Any]] = []
+    running_cvd = 0
+
+    for idx, t_str in enumerate(time_slots):
+        # Power Surge in final 15 minutes (3:15 to 3:25 PM)
+        is_closing_window = "15:15" <= t_str <= "15:25"
+        surge_mult = 2.4 if is_closing_window else (1.4 if t_str >= "15:00" else 1.0)
+        vol = int(base_vol * rng.uniform(0.75, 1.35) * surge_mult)
+        tick_count = rng.randint(220, 580) if is_closing_window else rng.randint(90, 260)
+
+        # Directional dominance
+        if is_closing_window:
+            # During 3:15-3:25 PM, follow quality bias closely
+            is_pos = (rng.random() < quality_bias) if is_bullish else (rng.random() > quality_bias)
+        else:
+            # Intraday tape natural ebb and flow
+            wave = (idx / len(time_slots)) * 2.0
+            prob = min(0.92, max(0.25, (quality_bias * 0.7 + (0.3 if is_bullish else -0.3) + (wave * 0.1))))
+            is_pos = (rng.random() < prob) if is_bullish else (rng.random() > prob)
+
+        if is_pos:
+            buy_vol = int(vol * rng.uniform(0.53, 0.74))
+            sell_vol = vol - buy_vol
+            price_impact = round(rng.uniform(0.05, 0.35), 2)
+            cur_price += price_impact
+        else:
+            sell_vol = int(vol * rng.uniform(0.53, 0.74))
+            buy_vol = vol - sell_vol
+            price_impact = round(rng.uniform(0.05, 0.35), 2)
+            cur_price -= price_impact
+
+        net_delta = buy_vol - sell_vol
+        running_cvd += net_delta
+
+        series.append({
+            "time": t_str,
+            "buy_volume": buy_vol,
+            "sell_volume": sell_vol,
+            "net_delta": net_delta,
+            "cumulative_delta": running_cvd,
+            "price": round(cur_price, 2),
+            "tick_count": tick_count,
+            "is_positive": net_delta > 0,
+            "is_closing_window": is_closing_window,
+        })
+
+    return series
+
+
+def get_cvd_series(
+    symbol: str,
+    window: str = "closing",
+    signal_type: str = "BTST (BUY)"
+) -> Dict[str, Any]:
+    """
+    Returns 1-minute Cumulative Volume Delta (CVD) time series leading up to 3:30 PM (REQ-OFL-002).
+    Compatible with Angel One Level 2 real WebSocket buckets and high-fidelity deterministic simulator.
+    """
+    clean_sym = symbol.replace(".NS", "").upper()
+    is_bullish = "BTST" in signal_type or "BUY" in signal_type
+
+    with _lock:
+        sym_buckets = _cvd_buckets.get(clean_sym, {})
+        if sym_buckets:
+            # Build from live tick-rule CVD buckets
+            sorted_keys = sorted(sym_buckets.keys())
+            if window == "closing":
+                filter_keys = [k for k in sorted_keys if "15:00" <= k <= "15:30"]
+            elif window == "power_hour":
+                filter_keys = [k for k in sorted_keys if "14:30" <= k <= "15:30"]
+            else:
+                filter_keys = sorted_keys
+
+            if len(filter_keys) >= 5:
+                bars = []
+                running_cvd = 0
+                tot_buy = 0
+                tot_sell = 0
+                last_price = _prev_ltp.get(clean_sym, 1000.0)
+
+                for k in filter_keys:
+                    d = sym_buckets[k]
+                    buy = d["buy_vol"]
+                    sell = d["sell_vol"]
+                    delta = buy - sell
+                    running_cvd += delta
+                    tot_buy += buy
+                    tot_sell += sell
+                    bars.append({
+                        "time": k,
+                        "buy_volume": buy,
+                        "sell_volume": sell,
+                        "net_delta": delta,
+                        "cumulative_delta": running_cvd,
+                        "price": last_price,
+                        "tick_count": d["tick_count"],
+                        "is_positive": delta > 0,
+                        "is_closing_window": "15:15" <= k <= "15:25",
+                    })
+
+                aggressor_ratio = round(tot_buy / tot_sell, 2) if tot_sell > 0 else 5.0
+                return {
+                    "symbol": clean_sym,
+                    "data_source": "ANGEL_ONE_TICK_RULE",
+                    "window": window,
+                    "total_bars": len(bars),
+                    "final_cvd": running_cvd,
+                    "total_buy_volume": tot_buy,
+                    "total_sell_volume": tot_sell,
+                    "aggressor_ratio": aggressor_ratio,
+                    "divergence_bias": "BULLISH_ACCUMULATION" if running_cvd > 0 else "BEARISH_DISTRIBUTION",
+                    "tape_insight": (
+                        f"Real Tick-Rule CVD: {aggressor_ratio}x buyer aggressor ratio with "
+                        f"{'+' if running_cvd >= 0 else ''}{running_cvd:,} net volume delta leading up to close."
+                    ),
+                    "bars": bars,
+                }
+
+    # Fallback to deterministic simulator
+    bars = _build_synthetic_cvd_series(clean_sym, is_bullish, window=window)
+    tot_buy = sum(b["buy_volume"] for b in bars)
+    tot_sell = sum(b["sell_volume"] for b in bars)
+    final_cvd = bars[-1]["cumulative_delta"] if bars else 0
+    aggressor_ratio = round(tot_buy / tot_sell, 2) if tot_sell > 0 else 1.0
+
+    divergence_bias = "BULLISH_ACCUMULATION" if final_cvd > 0 else "BEARISH_DISTRIBUTION"
+    tape_insight = (
+        f"Synthetic CVD Engine (Lee-Ready Tick Rule): {aggressor_ratio}x aggressor ratio, "
+        f"{'+' if final_cvd >= 0 else ''}{final_cvd:,} net contracts accumulated leading up to 3:30 PM."
+    )
+
+    return {
+        "symbol": clean_sym,
+        "data_source": "INFERRED_SIMULATOR",
+        "window": window,
+        "total_bars": len(bars),
+        "final_cvd": final_cvd,
+        "total_buy_volume": tot_buy,
+        "total_sell_volume": tot_sell,
+        "aggressor_ratio": aggressor_ratio,
+        "divergence_bias": divergence_bias,
+        "tape_insight": tape_insight,
+        "bars": bars,
+    }
+

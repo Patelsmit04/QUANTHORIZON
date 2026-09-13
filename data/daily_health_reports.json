@@ -1901,5 +1901,351 @@
     "errors_count": 0,
     "errors": [],
     "market_transitions": []
+  },
+  "2026-09-08": {
+    "date": "2026-09-08",
+    "generated_at": "2026-09-09 07:47:59 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-08 21:50:39 IST",
+          "evaluated_count": 0,
+          "wins": 0,
+          "losses": 0,
+          "win_rate_pct": 36.1,
+          "status": "SUCCESS",
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_backfill"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-09-08 21:50:39 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-08 21:50:39 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "ICICIBANK",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-08 21:50:41 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-08 21:50:42 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "ICICIBANK",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-08 21:50:46 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-08 21:51:07 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-08 21:51:07 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "ICICIBANK",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-08 21:51:19 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-08 21:51:20 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "ICICIBANK",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-08 21:51:28 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-08 21:51:28 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "ICICIBANK",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        },
+        {
+          "timestamp": "2026-09-08 21:51:32 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-08 21:51:32 IST",
+          "lock_type": "AI_SENTINEL_330_RECONCILIATION",
+          "locked_count": 0,
+          "symbols": [
+            "ICICIBANK",
+            "ULTRACEMCO"
+          ],
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_reconciliation"
+          }
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-09": {
+    "date": "2026-09-09",
+    "generated_at": "2026-09-10 20:49:13 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [],
+      "locks": [],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-10": {
+    "date": "2026-09-10",
+    "generated_at": "2026-09-11 09:15:08 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-10 20:52:03 IST",
+          "evaluated_count": 6,
+          "wins": 17,
+          "losses": 25,
+          "win_rate_pct": 40.5,
+          "status": "SUCCESS",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-10 20:52:05 IST",
+          "evaluated_count": 6,
+          "wins": 0,
+          "losses": 0,
+          "win_rate_pct": 40.5,
+          "status": "SUCCESS",
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_backfill"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-09-10 20:49:21 IST",
+          "lock_type": "AUTO_RECONCILE_LOCK",
+          "locked_count": 210,
+          "symbols": [
+            "ICICIBANK",
+            "ULTRACEMCO",
+            "ADANIENSOL"
+          ],
+          "details": {
+            "healed_by": "AutoReconcile"
+          }
+        },
+        {
+          "timestamp": "2026-09-10 20:50:37 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 9,
+          "symbols": [
+            "BAJAJFINSV",
+            "GRASIM",
+            "HDFCBANK",
+            "POWERGRID",
+            "TITAN",
+            "ULTRACEMCO",
+            "ASIANPAINT",
+            "ITC",
+            "KOTAKBANK"
+          ],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-10 20:50:39 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-10 20:50:52 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-11": {
+    "date": "2026-09-11",
+    "generated_at": "2026-09-12 22:25:45 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-11 09:15:08 IST",
+          "evaluated_count": 3,
+          "wins": 19,
+          "losses": 26,
+          "win_rate_pct": 42.2,
+          "status": "SUCCESS",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-11 09:29:31 IST",
+          "evaluated_count": 2,
+          "wins": 20,
+          "losses": 27,
+          "win_rate_pct": 42.6,
+          "status": "SUCCESS",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-11 11:17:53 IST",
+          "evaluated_count": 4,
+          "wins": 22,
+          "losses": 29,
+          "win_rate_pct": 43.1,
+          "status": "SUCCESS",
+          "details": {}
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-09-11 16:43:21 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 15,
+          "symbols": [
+            "PIIND",
+            "DRREDDY",
+            "ICICIBANK",
+            "BIOCON",
+            "MANKIND",
+            "PERSISTENT",
+            "BAJAJ-AUTO",
+            "BOSCHLTD",
+            "JUBLFOOD",
+            "AUROPHARMA",
+            "CONCOR",
+            "MRF",
+            "HINDZINC",
+            "MOTHERSON",
+            "HCLTECH"
+          ],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-11 16:46:17 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-11 17:01:19 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
   }
 }

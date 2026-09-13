@@ -316,5 +316,95 @@
     "symbols_only_in_archive": [],
     "value_mismatches": [],
     "status": "ARCHIVE_UNAVAILABLE"
+  },
+  {
+    "date": "2026-09-10",
+    "run_at": "2026-09-10T20:57:12.177486+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 22,
+    "archive_symbol_count": 22,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [],
+    "value_mismatches": [],
+    "status": "CLEAN"
+  },
+  {
+    "date": "2026-09-11",
+    "run_at": "2026-09-11T19:30:11.849034+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 22,
+    "archive_symbol_count": 29,
+    "symbols_only_in_live": [
+      "ESDS",
+      "GENESYS",
+      "KROSS",
+      "MANINDS",
+      "MARSONS",
+      "MVKAGRO",
+      "POKARNA",
+      "RIR",
+      "SHIVAUM",
+      "SMCGLOBAL",
+      "SWANCORP",
+      "TCC",
+      "WHEELS",
+      "XTRANET"
+    ],
+    "symbols_only_in_archive": [
+      "AEROPLANE",
+      "AHCL",
+      "ASIANTILES",
+      "AWFIS",
+      "BLACKBUCK",
+      "BODALCHEM",
+      "ELECTHERM",
+      "FILATEX",
+      "GCSL",
+      "GRANULES",
+      "JAMNAAUTO",
+      "MOBIKWIK",
+      "MOLBIO",
+      "NRBBEARING",
+      "PINELABS",
+      "QUADFUTURE",
+      "RAYMOND",
+      "SHANKESH",
+      "SMSPHARMA",
+      "SUNSHINE",
+      "WESTLIFE"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "ANTELOPUS",
+        "live_net_value_cr": -0.3,
+        "archive_net_value_cr": 1.56
+      },
+      {
+        "symbol": "LOTUSDEV",
+        "live_net_value_cr": -5.29,
+        "archive_net_value_cr": 0.0
+      },
+      {
+        "symbol": "MVELECTRO",
+        "live_net_value_cr": 4.04,
+        "archive_net_value_cr": 1.31
+      },
+      {
+        "symbol": "PCJEWELLER",
+        "live_net_value_cr": -26.67,
+        "archive_net_value_cr": 1.24
+      },
+      {
+        "symbol": "RATNAVEER",
+        "live_net_value_cr": 11.9,
+        "archive_net_value_cr": 10.08
+      },
+      {
+        "symbol": "TECHNOCRAF",
+        "live_net_value_cr": -1.12,
+        "archive_net_value_cr": 10.05
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
   }
 ]

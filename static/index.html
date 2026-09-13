@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" class="light-mode">
+<html lang="en" data-theme="dark" class="dark-mode">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -13,15 +13,23 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="TRADEXO">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#f8fafc">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0b0f19">
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Fira Code (Tradexo Master Design System) + Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
-    <!-- FontAwesome Icons -->
+    <!-- Lucide Icons (Institutional Vector Icons) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if (!window.lucide) {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"><\/script>');
+        }
+    </script>
+
+    <!-- FontAwesome Icons Fallback -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- TradingView Lightweight Charts (M6) with CDN Fallback -->
@@ -32,14 +40,19 @@
         }
     </script>
 
-    <!-- Fixed Clean Slate White Theme Initialization -->
+    <!-- Institutional Theme Initialization (Defaults to Champagne Gold Dark Mode) -->
     <script>
         (function() {
             try {
-                document.documentElement.setAttribute("data-theme", "light");
-                document.documentElement.classList.add("light-mode");
-                localStorage.setItem("tradexo_theme", "light");
-                localStorage.setItem("qh-theme", "light");
+                const storedTheme = localStorage.getItem("tradexo_theme") || localStorage.getItem("qh-theme") || "dark";
+                document.documentElement.setAttribute("data-theme", storedTheme);
+                if (storedTheme === "light") {
+                    document.documentElement.classList.add("light-mode");
+                    document.documentElement.classList.remove("dark-mode");
+                } else {
+                    document.documentElement.classList.add("dark-mode");
+                    document.documentElement.classList.remove("light-mode");
+                }
             } catch(e) {}
         })();
     </script>
@@ -199,6 +212,20 @@
 
                 <!-- Right Header Chrome Buttons -->
                 <div class="header-actions">
+                    <button id="topbarScanBtn" class="btn btn-primary btn-sm topbar-action-btn" title="Force Scan 230+ Stocks Now">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span class="btn-text">FORCE SCAN</span>
+                    </button>
+
+                    <button id="topbarExportCsvBtn" class="btn btn-secondary btn-sm topbar-action-btn" title="Export Active Watchlist to CSV">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span class="btn-text">EXPORT CSV</span>
+                    </button>
+
+                    <button id="themeToggleBtn" class="btn btn-secondary btn-icon" title="Toggle Theme (Champagne Dark / Clean Slate)" aria-label="Toggle Theme">
+                        <i class="fa-solid fa-moon text-gold" id="themeToggleIcon"></i>
+                    </button>
+
                     <button id="winRateBtn" class="btn btn-secondary winrate-topbar-btn" title="View BTST Win Rate Analytics">
                         <i class="fa-solid fa-chart-pie text-sub"></i>
                         <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
@@ -213,19 +240,17 @@
                 </div>
             </header>
 
-            <!-- Live Index Ticker Tape (Nifty 50 / Bank Nifty / Sensex / Gift Nifty) — global,
+            <!-- Live Index Ticker Tape (Nifty 50 / Bank Nifty / FinNifty / Sensex / Gift Nifty) — global,
                  shown below the topbar on every section (see app.js fetchTickerIndices()). -->
-            <!-- Live Index Ticker Tape (Nifty 50 / Bank Nifty / Sensex / Gift Nifty) — continuous loop -->
-            <div class="index-ticker-bar" id="indexTickerBar">
+            <!-- Live Index Ticker Tape (Nifty 50 / Bank Nifty / FinNifty / Sensex / Gift Nifty) — continuous 60fps loop -->
+            <div class="index-ticker-bar" id="marqueeTrack">
                 <div class="index-ticker-track" id="indexTickerTrack">
-                    <span class="index-ticker-item" data-index-name="NIFTY50" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view NIFTY 50 chart"><strong>NIFTY 50</strong> <span>24,231.85</span> <span class="text-bullish">+0.00 (+0.00%)</span></span>
-                    <span class="index-ticker-item" data-index-name="BANKNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view BANK NIFTY chart"><strong>BANK NIFTY</strong> <span>57,495.90</span> <span class="text-bullish">+0.00 (+0.00%)</span></span>
-                    <span class="index-ticker-item" data-index-name="SENSEX" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view SENSEX chart"><strong>SENSEX</strong> <span>77,537.72</span> <span class="text-bullish">+0.00 (+0.00%)</span></span>
-                    <span class="index-ticker-item" data-index-name="GIFTNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view GIFT NIFTY chart"><strong>GIFT NIFTY</strong> <span>24,251.00</span> <span class="text-bearish">-46.50 (-0.19%)</span></span>
-                    <span class="index-ticker-item" data-index-name="NIFTY50" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view NIFTY 50 chart"><strong>NIFTY 50</strong> <span>24,231.85</span> <span class="text-bullish">+0.00 (+0.00%)</span></span>
-                    <span class="index-ticker-item" data-index-name="BANKNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view BANK NIFTY chart"><strong>BANK NIFTY</strong> <span>57,495.90</span> <span class="text-bullish">+0.00 (+0.00%)</span></span>
-                    <span class="index-ticker-item" data-index-name="SENSEX" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view SENSEX chart"><strong>SENSEX</strong> <span>77,537.72</span> <span class="text-bullish">+0.00 (+0.00%)</span></span>
-                    <span class="index-ticker-item" data-index-name="GIFTNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view GIFT NIFTY chart"><strong>GIFT NIFTY</strong> <span>24,251.00</span> <span class="text-bearish">-46.50 (-0.19%)</span></span>
+                    <span class="index-ticker-item" data-index-name="NIFTY50" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view NIFTY 50 chart"><strong>NIFTY 50</strong> <span>23,398.10</span> <span class="text-bearish">-79.70 (-0.34%)</span></span>
+                    <span class="index-ticker-item" data-index-name="BANKNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view BANK NIFTY chart"><strong>BANK NIFTY</strong> <span>56,606.55</span> <span class="text-bullish">+134.60 (+0.24%)</span></span>
+                    <span class="index-ticker-item" data-index-name="FINNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view FINNIFTY chart"><strong>FINNIFTY</strong> <span>24,850.20</span> <span class="text-bullish">+42.10 (+0.17%)</span></span>
+                    <span class="index-ticker-item" data-index-name="SENSEX" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view SENSEX chart"><strong>SENSEX</strong> <span>74,781.76</span> <span class="text-bearish">-120.84 (-0.16%)</span></span>
+                    <span class="index-ticker-item" data-index-name="GIFTNIFTY" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;" title="Click to view GIFT NIFTY chart"><strong>GIFT NIFTY</strong> <span>23,416.60</span> <span class="text-bearish">-79.20 (-0.34%)</span></span>
+                    <span id="p1TickerContainer" style="display:inline-flex;align-items:center;gap:8px;"></span>
                 </div>
             </div>
 
@@ -282,8 +307,31 @@
                 <!-- Metrics Overview Section -->
                 <section class="metrics-grid">
 
+                    <!-- Card 1: Total Scanned -->
+                    <div class="metric-card" id="metricCardTotalScanned">
+                        <div class="metric-header">
+                            <span class="metric-title">TOTAL SCANNED</span>
+                            <div class="card-icon-bubble text-gold"><i class="fa-solid fa-list-check"></i></div>
+                        </div>
+                        <div class="metric-body">
+                            <span id="totalScanned" class="metric-value">0</span>
+                            <span class="metric-subtext">230+ F&amp;O Equities</span>
+                        </div>
+                    </div>
 
-                    <!-- Card 4: BTST Calls -->
+                    <!-- Card 2: P1 High Conviction -->
+                    <div class="metric-card card-p1" id="metricCardPriority1">
+                        <div class="metric-header">
+                            <span class="metric-title">P1 HIGH CONVICTION</span>
+                            <div class="card-icon-bubble text-gold"><i class="fa-solid fa-bolt"></i></div>
+                        </div>
+                        <div class="metric-body">
+                            <span id="priority1Count" class="metric-value text-gold">0</span>
+                            <span class="metric-subtext">Priority 1 Setups</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: BTST Calls -->
                     <div class="metric-card card-bullish" id="metricCardBtst">
                         <div class="metric-header">
                             <span class="metric-title">BTST CALLS (CE)</span>
@@ -295,7 +343,7 @@
                         </div>
                     </div>
 
-                    <!-- Card 5: STBT Puts -->
+                    <!-- Card 4: STBT Puts -->
                     <div class="metric-card card-bearish" id="metricCardStbt">
                         <div class="metric-header">
                             <span class="metric-title">STBT PUTS (PE)</span>
@@ -319,7 +367,7 @@
 
                 <div class="section-heading-row">
                     <h2 class="section-page-title"><i class="fa-solid fa-crosshairs text-gold"></i> SIGNALS ENGINE
-                        <span class="section-page-subtitle">Live-Ranked BTST/STBT Setups &amp; 210 F&amp;O Live Stock Feed</span>
+                        <span class="section-page-subtitle">Live-Ranked BTST/STBT Setups &amp; 230+ F&amp;O Live Stock Feed</span>
                     </h2>
                 </div>
 
@@ -353,22 +401,46 @@
 
                 <!-- Controls & Search Toolbar -->
                 <section class="toolbar-container">
-                    <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="searchInput" placeholder="Search Ticker (e.g. RELIANCE)...">
+                    <!-- REQ-SCAN-003: Multi-filter toolbar (ALL, P1 HIGH CONVICTION, P2 MEDIUM, BTST, STBT, TOP 5 ONLY) -->
+                    <div class="filter-group filter-tabs" id="scannerFilterTabs">
+                        <button type="button" class="filter-chip active" data-filter="ALL" id="filterAllBtn">
+                            <i class="fa-solid fa-layer-group"></i> ALL
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="P1" id="filterP1Btn">
+                            <i class="fa-solid fa-bolt text-gold"></i> P1 HIGH CONVICTION
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="P2" id="filterP2Btn">
+                            <i class="fa-solid fa-shield-halved"></i> P2 MEDIUM
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="BTST" id="filterBtstBtn">
+                            <i class="fa-solid fa-arrow-trend-up text-bullish"></i> BTST (BUY)
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="STBT" id="filterStbtBtn">
+                            <i class="fa-solid fa-arrow-trend-down text-bearish"></i> STBT (SELL)
+                        </button>
+                        <button type="button" class="filter-chip" data-filter="TOP5" id="filterTop5Btn">
+                            <i class="fa-solid fa-crown text-gold"></i> TOP 5 ONLY
+                        </button>
                     </div>
 
-                    <div class="sort-box">
-                        <i class="fa-solid fa-sort"></i>
-                        <select id="sortSelect" aria-label="Sort stocks">
-                            <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
-                            <option value="GAINERS_DESC">Sort: Top Gainers (+% Change)</option>
-                            <option value="LOSERS_ASC">Sort: Top Losers (-% Change)</option>
-                            <option value="SCORE_DESC">Sort: Highest Confidence %</option>
-                            <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
-                            <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
-                            <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
-                        </select>
+                    <div class="toolbar-controls-row">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="searchInput" placeholder="Search Ticker (e.g. RELIANCE)...">
+                        </div>
+
+                        <div class="sort-box">
+                            <i class="fa-solid fa-sort"></i>
+                            <select id="sortSelect" aria-label="Sort stocks">
+                                <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
+                                <option value="GAINERS_DESC">Sort: Top Gainers (+% Change)</option>
+                                <option value="LOSERS_ASC">Sort: Top Losers (-% Change)</option>
+                                <option value="SCORE_DESC">Sort: Highest Confidence %</option>
+                                <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
+                                <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
+                                <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
+                            </select>
+                        </div>
                     </div>
                 </section>
 
@@ -471,6 +543,14 @@
                             <i class="fa-solid fa-receipt"></i> TRADE LOG
                         </button>
                     </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <button type="button" class="btn btn-outline text-gold" onclick="openOptionChainModal('NIFTY')" title="Launch 1-Second NIFTY Option Chain" style="font-size:11.5px;padding:6px 12px;font-weight:700;">
+                            <i class="fa-solid fa-layer-group"></i> NIFTY OPTION CHAIN
+                        </button>
+                        <button type="button" class="btn btn-outline text-gold" onclick="openOptionChainModal('BANKNIFTY')" title="Launch 1-Second BANKNIFTY Option Chain" style="font-size:11.5px;padding:6px 12px;font-weight:700;">
+                            <i class="fa-solid fa-layer-group"></i> BANKNIFTY
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Active Trade Cards Container -->
@@ -507,14 +587,20 @@
                     <h2 class="section-page-title"><i class="fa-solid fa-wallet text-gold"></i> PAPER TRADING PORTFOLIO
                         <span class="section-page-subtitle">Virtual Account Balance, Live Mark-to-Market P&amp;L, Positions &amp; Closed Trades</span>
                     </h2>
-                    <div class="dashboard-heading-actions">
+                    <div class="dashboard-heading-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <button id="btnPaperEquityTrade" class="btn btn-pill btn-secondary" onclick="openOrderTicketModal({ symbol: 'RELIANCE', entry_price: 2980, is_equity: true })" title="Open Equity Order Ticket">
+                            <i class="fa-solid fa-arrow-trend-up text-cyan"></i><span>EQUITY TICKET</span>
+                        </button>
+                        <button id="btnPaperNewTrade" class="btn btn-pill btn-gold" title="Open Virtual Options Demo Trade Modal">
+                            <i class="fa-solid fa-plus"></i><span>NEW OPTION TRADE</span>
+                        </button>
                         <button id="resetPaperAccountBtn" class="btn btn-pill btn-secondary" title="Reset virtual account balance to ₹10,00,000">
                             <i class="fa-solid fa-rotate-left"></i><span>RESET ₹10L CAPITAL</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- 6x Portfolio Overview Stat Cards Grid -->
+                <!-- 8x Portfolio Overview Stat Cards Grid (REQ-PTR-001) -->
                 <div class="stats-overview-grid" style="margin-top:14px;margin-bottom:16px;">
                     <div class="stat-card" style="border-top:3px solid var(--gold, #d4af37);">
                         <div class="stat-card-title"><i class="fa-solid fa-chart-pie text-gold"></i> TOTAL EQUITY</div>
@@ -522,9 +608,14 @@
                         <div class="stat-card-footer">Starting Capital: ₹10,00,000</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #3b82f6;">
-                        <div class="stat-card-title"><i class="fa-solid fa-vault text-cyan"></i> CASH BALANCE</div>
+                        <div class="stat-card-title"><i class="fa-solid fa-vault text-cyan"></i> AVAILABLE CASH</div>
                         <div class="stat-card-value text-cyan" id="paperCashBalance">₹10,00,000.00</div>
                         <div class="stat-card-footer">Available for new trades</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #6366f1;">
+                        <div class="stat-card-title"><i class="fa-solid fa-coins text-gold"></i> INVESTED MARGIN</div>
+                        <div class="stat-card-value text-gold" id="paperInvestedMargin">₹0.00</div>
+                        <div class="stat-card-footer">Capital locked in open positions</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #10b981;">
                         <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-up text-bullish"></i> UNREALIZED MTM P&amp;L</div>
@@ -535,6 +626,11 @@
                         <div class="stat-card-title"><i class="fa-solid fa-sack-dollar text-gold"></i> REALIZED P&amp;L</div>
                         <div class="stat-card-value text-gold" id="paperRealizedPnl">₹0.00</div>
                         <div class="stat-card-footer">Booked profit / loss from closed trades</div>
+                    </div>
+                    <div class="stat-card" style="border-top:3px solid #ec4899;">
+                        <div class="stat-card-title"><i class="fa-solid fa-receipt text-cyan"></i> TOTAL BROKERAGE PAID</div>
+                        <div class="stat-card-value text-cyan" id="paperBrokeragePaid">₹0.00</div>
+                        <div class="stat-card-footer">Regulatory charges &amp; brokerage</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #06b6d4;">
                         <div class="stat-card-title"><i class="fa-solid fa-bullseye text-cyan"></i> WIN RATE</div>
@@ -559,11 +655,11 @@
                             <thead>
                                 <tr>
                                     <th>POSITION ID</th>
-                                    <th>SYMBOL</th>
-                                    <th>SIGNAL</th>
-                                    <th>QTY</th>
-                                    <th>ENTRY PRICE</th>
-                                    <th>LIVE LTP</th>
+                                    <th>CONTRACT / SYMBOL</th>
+                                    <th>SIGNAL / TYPE</th>
+                                    <th>LOTS &amp; QTY</th>
+                                    <th>ENTRY PREMIUM</th>
+                                    <th>LIVE PREMIUM</th>
                                     <th>TARGET 1 / 2</th>
                                     <th>STOP LOSS</th>
                                     <th>UNREALIZED P&amp;L</th>
@@ -587,19 +683,20 @@
                         <table class="data-table" id="paperClosedTable">
                             <thead>
                                 <tr>
-                                    <th>SYMBOL</th>
-                                    <th>SIGNAL</th>
-                                    <th>QTY</th>
-                                    <th>ENTRY PRICE</th>
-                                    <th>EXIT PRICE</th>
-                                    <th>REALIZED P&amp;L (₹)</th>
-                                    <th>RETURN (%)</th>
+                                    <th>CONTRACT / SYMBOL</th>
+                                    <th>SIGNAL / TYPE</th>
+                                    <th>LOTS &amp; QTY</th>
+                                    <th>ENTRY PREMIUM</th>
+                                    <th>EXIT PREMIUM</th>
+                                    <th>REALIZED P&amp;L</th>
+                                    <th>RETURN %</th>
+                                    <th>CHARGES PAID</th>
                                     <th>OPENED AT</th>
                                     <th>CLOSED AT</th>
                                 </tr>
                             </thead>
                             <tbody id="paperClosedBody">
-                                <tr><td colspan="9" style="text-align:center;padding:32px;color:var(--ink-muted);">No closed paper trades recorded yet.</td></tr>
+                                <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--ink-muted);">No closed paper trades recorded yet.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -687,11 +784,11 @@
             </div>
             <!-- ============================== END GLOBAL & MACRO NEWS SECTION ============================== -->
 
-            <!-- ============================== INSTITUTIONAL FLOW SECTION ============================== -->
+            <!-- ============================== INSTITUTIONAL FLOW SECTION (REQ-OFL-001) ============================== -->
             <div id="institutionalFlowSection" class="hidden">
                 <div class="section-heading-row">
                     <h2 class="section-page-title"><i class="fa-solid fa-building-columns text-gold"></i> INSTITUTIONAL FLOW
-                        <span class="section-page-subtitle">Today's NSE Bulk &amp; Block Deals, &ge; Regulatory Floor (&#8377;10Cr / 0.5% shares)</span>
+                        <span class="section-page-subtitle">Today's NSE Bulk &amp; Block Deals — Highlighting Transactions &ge; &#8377;25 Cr Floor (REQ-OFL-001)</span>
                     </h2>
                     <button id="btnRefreshInstitutionalFlow" class="btn btn-pill btn-secondary">
                         <i class="fa-solid fa-rotate-right"></i> REFRESH
@@ -708,17 +805,17 @@
                     <div class="stat-card" style="border-top:3px solid var(--gold);">
                         <div class="stat-card-title"><i class="fa-solid fa-building-columns text-gold"></i> TOTAL DEALS</div>
                         <div class="stat-card-value" id="ifTotalDealsVal">0</div>
-                        <div class="stat-card-footer" id="ifTotalDealsSub">Log &ge; &#8377;10Cr Floor</div>
+                        <div class="stat-card-footer" id="ifTotalDealsSub">Floor &ge; &#8377;25Cr Blocks</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #10b981;">
-                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-up text-bullish"></i> BUY INFLOW</div>
+                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-up text-bullish"></i> BUY ACCUMULATION</div>
                         <div class="stat-card-value text-bullish" id="ifBuyInflowVal">&#8377;0.00cr</div>
-                        <div class="stat-card-footer" id="ifBuyInflowSub">0 Buy Orders</div>
+                        <div class="stat-card-footer" id="ifBuyInflowSub">0 Institutional Buys</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #ef4444;">
-                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-down text-bearish"></i> SELL OUTFLOW</div>
+                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-down text-bearish"></i> SELL DISTRIBUTION</div>
                         <div class="stat-card-value text-bearish" id="ifSellOutflowVal">&#8377;0.00cr</div>
-                        <div class="stat-card-footer" id="ifSellOutflowSub">0 Sell Orders</div>
+                        <div class="stat-card-footer" id="ifSellOutflowSub">0 Institutional Sells</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid var(--cat-blue);">
                         <div class="stat-card-title"><i class="fa-solid fa-scale-balanced text-cyan"></i> NET INSTITUTIONAL FLOW</div>
@@ -731,14 +828,15 @@
                 <div class="toolbar-container" style="margin-bottom:16px;">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="institutionalFlowSearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
+                        <input type="text" id="institutionalFlowSearchInput" placeholder="Filter by symbol or institution (e.g. RELIANCE, LIC, MORGAN)...">
                     </div>
                     <div class="filter-group" id="instFlowFilterGroup">
                         <button class="filter-chip active" data-flow-filter="ALL">ALL DEALS</button>
-                        <button class="filter-chip" data-flow-filter="BUY">BUY INFLOW</button>
-                        <button class="filter-chip" data-flow-filter="SELL">SELL OUTFLOW</button>
-                        <button class="filter-chip" data-flow-filter="BLOCK">BLOCK DEALS (&ge;&#8377;10Cr)</button>
-                        <button class="filter-chip" data-flow-filter="BULK">BULK DEALS (&ge;0.5%)</button>
+                        <button class="filter-chip" data-flow-filter="MEGA_BLOCK"><i class="fa-solid fa-crown text-gold"></i> &ge; &#8377;25 Cr BLOCKS</button>
+                        <button class="filter-chip" data-flow-filter="BUY">BUY ACCUMULATION</button>
+                        <button class="filter-chip" data-flow-filter="SELL">SELL DISTRIBUTION</button>
+                        <button class="filter-chip" data-flow-filter="BLOCK">BLOCK WINDOW</button>
+                        <button class="filter-chip" data-flow-filter="BULK">BULK DEALS</button>
                     </div>
                 </div>
 
@@ -749,11 +847,12 @@
                             <thead>
                                 <tr>
                                     <th>SYMBOL</th>
-                                    <th>SIDE</th>
+                                    <th>SIDE / BIAS</th>
                                     <th>DEAL TYPE</th>
                                     <th>CLIENT / INSTITUTION</th>
+                                    <th>QUANTITY &amp; PRICE</th>
                                     <th>VALUE (&#8377;CR)</th>
-                                    <th>DATE</th>
+                                    <th>TIME / DATE</th>
                                     <th>ACTION</th>
                                 </tr>
                             </thead>
@@ -771,7 +870,7 @@
                     </div>
                     <h3 style="font-family: var(--font-heading); font-size: 17px; font-weight: 800; color: var(--ink-primary); margin-bottom: 6px;">No Institutional Bulk or Block Deals Found Today</h3>
                     <p style="font-size: 12px; color: var(--ink-secondary); max-width: 460px; margin: 0 auto 16px auto; line-height: 1.6;">
-                        NSE Bulk &amp; Block deal snapshots are checked shortly after the <strong>2:20 PM afternoon block window</strong> and verified at market close (3:45 PM). Deals meeting the &#8377;10Cr / 0.5% share regulatory threshold populate automatically.
+                        NSE Bulk &amp; Block deal snapshots are monitored around the <strong>2:05–2:20 PM afternoon block window</strong> and verified at market close (3:45 PM). Institutional deals exceeding the <strong>&#8377;25 Cr threshold</strong> or 0.5% share count populate automatically.
                     </p>
                 </div>
             </div>
@@ -806,6 +905,81 @@
                         <div class="stat-card-title"><i class="fa-solid fa-ban text-bearish"></i> VETOED SETUPS</div>
                         <div class="stat-card-value text-bearish" id="ofPageVetoedCount">0</div>
                         <div class="stat-card-footer">Capped to P3 LOW Conviction</div>
+                    </div>
+                </div>
+
+                <!-- 1-Minute Synthetic Cumulative Volume Delta (CVD) Interactive Workbench (REQ-OFL-002) -->
+                <div class="cvd-workbench-card" id="cvdWorkbenchCard" style="background:var(--glass-bg);backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:20px;box-shadow:var(--glass-shadow);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+                        <div>
+                            <div style="font-size:13px;font-weight:800;color:var(--gold);letter-spacing:0.6px;text-transform:uppercase;display:flex;align-items:center;gap:8px;">
+                                <i class="fa-solid fa-chart-line text-gold"></i> 1-MINUTE SYNTHETIC CUMULATIVE VOLUME DELTA (CVD) ENGINE
+                                <span class="badge" style="font-size:9.5px;padding:2px 7px;background:rgba(16,185,129,0.15);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.3);font-weight:700;">REQ-OFL-002</span>
+                            </div>
+                            <div style="font-size:11px;color:var(--ink-secondary);margin-top:2px;">
+                                High-precision Lee-Ready tick-rule cumulative aggression &amp; delta trajectory leading up to 3:30 PM market close
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span style="font-size:11px;font-weight:700;color:var(--ink-muted);">STOCK:</span>
+                                <select id="cvdSymbolSelect" class="input-glass" style="padding:4px 10px;font-size:12px;font-weight:800;border-radius:6px;min-width:130px;color:var(--ink-primary);background:var(--glass-bg-soft);border:1px solid var(--gridline);">
+                                    <option value="RELIANCE">RELIANCE</option>
+                                    <option value="HDFCBANK">HDFCBANK</option>
+                                    <option value="TCS">TCS</option>
+                                    <option value="INFY">INFY</option>
+                                    <option value="ICICIBANK">ICICIBANK</option>
+                                    <option value="SBIN">SBIN</option>
+                                    <option value="BHARTIARTL">BHARTIARTL</option>
+                                </select>
+                            </div>
+                            <div class="filter-group" id="cvdTimeframeRail" style="display:flex;gap:4px;">
+                                <button class="filter-chip active" data-cvd-window="closing" style="font-size:10px;padding:4px 8px;">3:00–3:30 PM</button>
+                                <button class="filter-chip" data-cvd-window="power_hour" style="font-size:10px;padding:4px 8px;">2:30–3:30 PM</button>
+                                <button class="filter-chip" data-cvd-window="session" style="font-size:10px;padding:4px 8px;">FULL SESSION</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Live CVD Metric Ribbons -->
+                    <div class="cvd-metrics-ribbon" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:10px;margin-bottom:14px;background:var(--glass-bg-soft);padding:10px 14px;border-radius:8px;border:1px solid var(--gridline);">
+                        <div>
+                            <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Cumulative CVD</div>
+                            <div id="cvdCumulativeVal" style="font-size:16px;font-weight:800;color:var(--bullish-green);">+1.48M</div>
+                            <div style="font-size:9.5px;color:var(--ink-secondary);" id="cvdCumulativeSub">Net Buyer Delta</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Aggressor Ratio</div>
+                            <div id="cvdAggressorRatioVal" style="font-size:16px;font-weight:800;color:var(--gold);">2.15x</div>
+                            <div style="font-size:9.5px;color:var(--ink-secondary);" id="cvdAggressorRatioSub">Buyer Dominance</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Tape Divergence</div>
+                            <div id="cvdDivergenceVal" style="font-size:13px;font-weight:800;color:var(--bullish-green);margin-top:2px;">ACCUMULATION</div>
+                            <div style="font-size:9.5px;color:var(--ink-secondary);" id="cvdDivergenceSub">Absorption Mode</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">5L Depth Imbalance</div>
+                            <div id="cvdDepthRatioVal" style="font-size:16px;font-weight:800;color:var(--gold);">1.85x Buyers</div>
+                            <div style="font-size:9.5px;color:var(--bullish-green);" id="cvdDepthPctSub">64.9% Bids</div>
+                        </div>
+                        <div>
+                            <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Closing Veto Gate</div>
+                            <div id="cvdVetoGateBadge" style="margin-top:2px;"><span class="badge badge-gold" style="font-size:11px;font-weight:800;padding:3px 8px;">CONFIRMED</span></div>
+                            <div style="font-size:9.5px;color:var(--ink-secondary);">3:15–3:25 PM Window</div>
+                        </div>
+                    </div>
+
+                    <!-- Dual Pane Chart Container: Top = CVD Curve, Bottom = Volume Delta Bars -->
+                    <div id="cvdChartWrapper" style="position:relative;width:100%;height:220px;background:rgba(11,15,25,0.7);border-radius:8px;border:1px solid var(--gridline);overflow:hidden;">
+                        <svg id="cvdChartSvg" width="100%" height="100%" style="display:block;cursor:crosshair;"></svg>
+                        <div id="cvdChartTooltip" class="cvd-tooltip hidden" style="position:absolute;pointer-events:none;background:rgba(15,23,42,0.94);backdrop-filter:blur(8px);border:1px solid var(--glass-border-strong);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--ink-primary);box-shadow:0 8px 24px rgba(0,0,0,0.5);z-index:10;"></div>
+                    </div>
+
+                    <!-- Tape Intelligence Insight Callout -->
+                    <div id="cvdTapeInsight" style="margin-top:10px;font-size:11px;color:var(--ink-secondary);background:var(--glass-bg-soft);padding:8px 12px;border-radius:6px;border:1px solid var(--gridline);display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-lightbulb text-gold"></i>
+                        <span id="cvdTapeInsightText">Loading live tick-rule CVD analytics...</span>
                     </div>
                 </div>
 
@@ -965,13 +1139,28 @@
                         <span class="section-page-subtitle">Post-Close Verdict &amp; Live Index Signals</span>
                     </h2>
                 </div>
-                <div class="index-section-switcher" id="indexSectionSwitcher" style="margin-top:14px;">
-                    <button class="index-tab-btn active" data-index-view="intelligence">
-                        <i class="fa-solid fa-brain"></i> BTST Intelligence
-                    </button>
-                    <button class="index-tab-btn" data-index-view="signals">
-                        <i class="fa-solid fa-signal"></i> Live Index Signals
-                    </button>
+                <div class="index-section-switcher" id="indexSectionSwitcher" style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                    <div style="display:flex;gap:6px;">
+                        <button class="index-tab-btn active" data-index-view="intelligence">
+                            <i class="fa-solid fa-brain"></i> BTST Intelligence
+                        </button>
+                        <button class="index-tab-btn" data-index-view="signals">
+                            <i class="fa-solid fa-signal"></i> Live Index Signals
+                        </button>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button type="button" class="btn btn-outline text-gold" onclick="openOptionChainModal('NIFTY')" title="Launch Live NIFTY Option Chain" style="font-size:11px;padding:5px 10px;font-weight:700;">
+                            <i class="fa-solid fa-layer-group"></i> NIFTY OPTION CHAIN
+                        </button>
+                        <button type="button" class="btn btn-outline text-gold" onclick="openOptionChainModal('BANKNIFTY')" title="Launch Live BANKNIFTY Option Chain" style="font-size:11px;padding:5px 10px;font-weight:700;">
+                            <i class="fa-solid fa-layer-group"></i> BANKNIFTY
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REQ-IDX-003: Macro Pullback Gate Indicator Card -->
+                <div id="macroPullbackGateCard" class="macro-pullback-gate-card" style="margin-top:16px; margin-bottom:16px;">
+                    <!-- Dynamically populated by renderMacroPullbackGate() in app.js -->
                 </div>
 
                 <div id="indexIntelligenceView">
@@ -1009,6 +1198,38 @@
                     </button>
                 </section>
 
+                <!-- REQ-STR-002: Natural-Language Custom Strategy AI Builder -->
+                <div class="ai-strategy-builder-card" id="aiStrategyBuilderCard" style="margin-bottom:20px;">
+                    <div class="ai-builder-header">
+                        <div class="ai-builder-title-group">
+                            <h3 class="ai-builder-title"><i class="fa-solid fa-wand-magic-sparkles text-gold"></i> AI Natural-Language Strategy Builder</h3>
+                            <span class="ai-builder-subtitle">Describe your setup in plain English. The AI Clarifier converts your natural language rules into verified quantitative parameters &amp; execution rules.</span>
+                        </div>
+                        <span class="badge badge-gold" style="font-size:10px;"><i class="fa-solid fa-microchip"></i> AI CLARIFIER V2</span>
+                    </div>
+
+                    <div class="ai-builder-input-group">
+                        <textarea id="aiStrategyPromptInput" class="ai-strategy-textarea" placeholder="e.g., Buy Nifty when 5-min RSI drops below 30 and recovers above VWAP with high institutional volume, target 1.5% profit, stop loss 0.75%..."></textarea>
+                    </div>
+
+                    <div class="ai-builder-quick-prompts">
+                        <span class="ai-prompt-chip" data-prompt="VWAP Pullback with 2x Volume Surge on 5-minute candles: Buy when price pulls back to VWAP and bounces with strong bullish delta. Target 1.5% profit, stop loss 0.75%."><i class="fa-solid fa-bolt text-gold"></i> VWAP Pullback</span>
+                        <span class="ai-prompt-chip" data-prompt="Opening Range Breakout 15m (ORB 30): Enter when 9:15-9:45 AM high is broken with volume exceeding 20-day average. Target 1.8% profit, stop loss 0.8%."><i class="fa-solid fa-chart-line text-cyan"></i> ORB Breakout</span>
+                        <span class="ai-prompt-chip" data-prompt="Smart Money Concepts (SMC): 15-minute Order Block re-entry in discount zone after sell-side liquidity sweep. Target 3.0% profit, stop loss 1.0%."><i class="fa-solid fa-building-columns text-bullish"></i> SMC Order Block</span>
+                        <span class="ai-prompt-chip" data-prompt="Derivatives OI Surge: Buy Call when Call OI unwinds by 20% and Put OI surges by 30% with PCR > 1.30. Target 2.5% profit, stop loss 1.0%."><i class="fa-solid fa-layer-group text-amber"></i> OI Surge</span>
+                    </div>
+
+                    <div class="ai-builder-controls-row">
+                        <div style="flex:1;min-width:220px;">
+                            <input type="text" id="aiStrategyNameInput" class="form-input" placeholder="Strategy Name (optional, e.g. Institutional VWAP)">
+                        </div>
+                        <button type="button" id="btnAiClarifySubmit" class="btn btn-pill btn-primary">
+                            <i class="fa-solid fa-sparkles"></i> COMPOSE &amp; CLARIFY VIA AI
+                        </button>
+                    </div>
+                    <div id="aiStrategyStatus" class="form-hint" style="margin-top:8px;"></div>
+                </div>
+
                 <div class="paper-trade-notice">
                     <i class="fa-solid fa-circle-info"></i>
                     <span>All strategy execution is PAPER/SIMULATED only — no real broker order placement is executed (Market data &amp; tick-rule order flow are streamed read-only).</span>
@@ -1032,7 +1253,7 @@
                 </div>
 
                 <!-- History Toolbar Filters -->
-                <div class="toolbar-container" style="margin-bottom:16px;">
+                <div class="toolbar-container" style="margin-bottom:16px;flex-wrap:wrap;gap:10px;">
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass search-icon"></i>
                         <input type="text" id="historySearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
@@ -1041,7 +1262,13 @@
                         <select id="historyStrategyFilter" class="form-select">
                             <option value="ALL">All Strategies</option>
                             <option value="default-5-pillar">5-Pillar Matrix</option>
-                            <option value="smc-institutional-v1">Smart Money Concepts (SMC)</option>
+                            <option value="smc-institutional-v1">SMC Order Block Reversal</option>
+                            <option value="vwap-pullback-v1">VWAP Pullback</option>
+                            <option value="breakdown-spike-v1">Breakdown Spike</option>
+                            <option value="orb-v1">ORB 30</option>
+                            <option value="oi-surge-v1">OI Surge</option>
+                            <option value="death-cross-v1">Death Cross</option>
+                            <option value="volatility-straddle-v1">Volatility Straddle</option>
                         </select>
                     </div>
                     <div class="sort-box">
@@ -1051,10 +1278,18 @@
                             <option value="OPEN">Open / Pending</option>
                         </select>
                     </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <input type="date" id="historyDateFrom" class="form-input" style="font-size:11px;padding:6px 10px;height:38px;" title="Filter From Date">
+                        <span style="font-size:11px;color:var(--ink-muted);">to</span>
+                        <input type="date" id="historyDateTo" class="form-input" style="font-size:11px;padding:6px 10px;height:38px;" title="Filter To Date">
+                    </div>
                     <label class="checkbox-item" style="white-space:nowrap;" title="Only setups where Institutional Flow (Pillar 6) contributed to the score">
                         <input type="checkbox" id="historyInstitutionalFlowFilter">
                         <i class="fa-solid fa-building-columns"></i> Institutional Flow Only
                     </label>
+                    <button id="btnExportHistoryCsv" class="btn btn-pill btn-secondary" title="Export Filtered Signal Journal to CSV" style="margin-left:auto;">
+                        <i class="fa-solid fa-file-csv text-gold"></i> EXPORT CSV
+                    </button>
                 </div>
 
                 <!-- History Table -->
@@ -1093,6 +1328,46 @@
                 <section id="calibrationCardGrid" class="calibration-card-grid">
                     <!-- Dynamic calibration bar-cards injected by JS -->
                 </section>
+
+                <!-- REQ-ACC-002: Predicted vs Actual Gap Distribution Histogram -->
+                <div class="stock-card" id="gapDistributionHistogramCard" style="margin-top:24px;padding:20px;">
+                    <div style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-chart-simple text-gold"></i> PREDICTED VS. ACTUAL GAP DISTRIBUTION HISTOGRAM
+                    </div>
+                    <div class="legend-subtitle" style="margin-bottom:16px;">
+                        Empirical gap frequency comparison across buckets: &lt; -1.5%, -1.5% to -0.5%, -0.5% to 0.0%, 0.0% to +0.5%, +0.5% to +1.5%, &gt; +1.5%. Compares algorithm forecasted opening gap distribution against actual realized market gap-ups and gap-downs.
+                    </div>
+                    <div id="gapHistogramContainer" class="gap-histogram-grid">
+                        <!-- Dynamic Histogram Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- REQ-ACC-002: 30-Day Rolling Walk-Forward Pillar Weight Calibrations -->
+                <div class="stock-card" id="walkForwardPillarWeightsCard" style="margin-top:24px;padding:20px;">
+                    <div style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-scale-balanced text-cyan"></i> 30-DAY ROLLING WALK-FORWARD PILLAR WEIGHT CALIBRATION
+                    </div>
+                    <div class="legend-subtitle" style="margin-bottom:16px;">
+                        Dynamic walk-forward optimization recalibrating each pillar's contribution weight based on rolling out-of-sample predictive hit rate. Prevents overfitting by bounding daily adjustments to &plusmn;15%/day.
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table" id="walkForwardWeightsTable">
+                            <thead>
+                                <tr>
+                                    <th>PILLAR NAME</th>
+                                    <th>NOMINAL WEIGHT</th>
+                                    <th>STANDALONE HIT RATE</th>
+                                    <th>30D CALIBRATED MULTIPLIER</th>
+                                    <th>EFFECTIVE POINTS</th>
+                                    <th>CALIBRATION STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="walkForwardWeightsBody">
+                                <!-- Dynamic Rows Injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             <!-- ============================== END HISTORY & CALIBRATION SECTION ============================== -->
 
@@ -1190,16 +1465,45 @@
                             <span class="health-card-badge nominal" id="pageHealthStatusBadge">NOMINAL</span>
                         </div>
                         <div class="health-score-gauge-wrap">
-                            <div class="health-svg-gauge-container" id="pageHealthGaugeRing">
-                                <svg class="health-svg-gauge" width="92" height="92" viewBox="0 0 100 100">
+                            <div class="health-svg-gauge-container multi-ring-meter" id="pageHealthGaugeRing" title="Multi-Ring Composite Health Meter: Outer=Core Scheduling, Ring 2=Data Integrity, Ring 3=Frontend APIs, Inner=Notifications & DB">
+                                <svg class="health-svg-gauge" width="106" height="106" viewBox="0 0 120 120">
                                     <defs>
-                                        <linearGradient id="healthScoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <linearGradient id="ringCoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#06b6d4" />
+                                            <stop offset="100%" stop-color="#0ea5e9" />
+                                        </linearGradient>
+                                        <linearGradient id="ringDataGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#d97706" />
+                                            <stop offset="100%" stop-color="#f59e0b" />
+                                        </linearGradient>
+                                        <linearGradient id="ringApiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#6366f1" />
+                                            <stop offset="100%" stop-color="#818cf8" />
+                                        </linearGradient>
+                                        <linearGradient id="ringJournGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                                             <stop offset="0%" stop-color="#059669" />
                                             <stop offset="100%" stop-color="#10b981" />
                                         </linearGradient>
                                     </defs>
-                                    <circle class="gauge-bg-circle" cx="50" cy="50" r="40" stroke-width="8" fill="none"></circle>
-                                    <circle class="gauge-progress-circle" id="pageHealthGaugeCircle" cx="50" cy="50" r="40" stroke-width="8" fill="none" stroke="url(#healthScoreGradient)" stroke-dasharray="251.32" stroke-dashoffset="0"></circle>
+
+                                    <!-- Ring 1 Background & Arc: Core Scheduling (r=52, C=326.73) -->
+                                    <circle cx="60" cy="60" r="52" stroke-width="4.5" stroke="rgba(6,182,212,0.15)" fill="none" class="gauge-bg-circle"></circle>
+                                    <circle id="ringCoreScheduling" cx="60" cy="60" r="52" stroke-width="4.5" stroke="url(#ringCoreGrad)" fill="none" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="0" class="gauge-ring-arc" transform="rotate(-90 60 60)"></circle>
+
+                                    <!-- Ring 2 Background & Arc: Data Integrity (r=42, C=263.89) -->
+                                    <circle cx="60" cy="60" r="42" stroke-width="4.5" stroke="rgba(245,158,11,0.15)" fill="none" class="gauge-bg-circle"></circle>
+                                    <circle id="ringDataIntegrity" cx="60" cy="60" r="42" stroke-width="4.5" stroke="url(#ringDataGrad)" fill="none" stroke-linecap="round" stroke-dasharray="263.89" stroke-dashoffset="0" class="gauge-ring-arc" transform="rotate(-90 60 60)"></circle>
+
+                                    <!-- Ring 3 Background & Arc: Frontend APIs (r=32, C=201.06) -->
+                                    <circle cx="60" cy="60" r="32" stroke-width="4.5" stroke="rgba(99,102,241,0.15)" fill="none" class="gauge-bg-circle"></circle>
+                                    <circle id="ringFrontendApis" cx="60" cy="60" r="32" stroke-width="4.5" stroke="url(#ringApiGrad)" fill="none" stroke-linecap="round" stroke-dasharray="201.06" stroke-dashoffset="0" class="gauge-ring-arc" transform="rotate(-90 60 60)"></circle>
+
+                                    <!-- Ring 4 Background & Arc: Notifications & Journals (r=22, C=138.23) -->
+                                    <circle cx="60" cy="60" r="22" stroke-width="4.5" stroke="rgba(16,185,129,0.15)" fill="none" class="gauge-bg-circle"></circle>
+                                    <circle id="ringNotificationsJournals" cx="60" cy="60" r="22" stroke-width="4.5" stroke="url(#ringJournGrad)" fill="none" stroke-linecap="round" stroke-dasharray="138.23" stroke-dashoffset="0" class="gauge-ring-arc" transform="rotate(-90 60 60)"></circle>
+
+                                    <!-- Legacy compatibility node -->
+                                    <circle id="pageHealthGaugeCircle" cx="60" cy="60" r="52" stroke-width="0" fill="none" style="display:none;"></circle>
                                 </svg>
                                 <div class="health-gauge-inner-text">
                                     <span class="health-gauge-val" id="pageHealthScoreVal">100</span>
@@ -1346,10 +1650,11 @@
                             </div>
                         </div>
                         <div class="ai-sentinel-actions-wrap">
-                            <button id="btnTriggerAiSelfHeal" class="btn btn-pill btn-primary sentinel-heal-btn">
+                            <button id="btnTriggerAiSelfHeal" class="btn btn-pill btn-primary sentinel-heal-btn" data-action="self-heal" title="1-Click AI Sentinel Self-Healing: Clear database locks, restart WebSockets, and refresh memory caches">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                                 <span>TRIGGER AI SELF-HEAL NOW</span>
                             </button>
+                            <button id="triggerSelfHealBtn" class="btn btn-pill btn-primary sentinel-heal-btn" style="display:none;" aria-hidden="true" title="Self Heal Trigger Alias"></button>
                         </div>
                     </div>
 
@@ -1435,7 +1740,8 @@
                             <div class="waterfall-filter-pills" id="waterfallFilterPills">
                                 <button type="button" class="waterfall-filter-btn active" data-filter="ALL">ALL (10)</button>
                                 <button type="button" class="waterfall-filter-btn" data-filter="OPTIMAL">OPTIMAL</button>
-                                <button type="button" class="waterfall-filter-btn" data-filter="DEGRADED">ISSUES</button>
+                                <button type="button" class="waterfall-filter-btn" data-filter="WARN">WARN</button>
+                                <button type="button" class="waterfall-filter-btn" data-filter="DEGRADED">DEGRADED</button>
                             </div>
                             <button id="btnRun10PhaseDiag" class="btn btn-pill btn-secondary">
                                 <i class="fa-solid fa-arrows-rotate text-gold"></i> <span>RUN DIAGNOSTICS</span>
@@ -2044,9 +2350,9 @@
         </div>
     </div>
 
-    <!-- Stock Detail Drawer / Modal -->
-    <div id="stockModal" class="modal-overlay hidden">
-        <div class="modal-card">
+    <!-- Deep Technical Analysis Drawer (REQ-MOD-004) -->
+    <div id="modalAnalysisDrawer" class="modal-overlay modal-drawer-overlay hidden" data-alias="stockModal" role="dialog" aria-modal="true" aria-label="Technical Analysis Drawer">
+        <div id="stockModal" class="modal-card modal-drawer-card">
             <div class="modal-header">
                 <div class="modal-title-group">
                     <h2 id="modalSymbol">--</h2>
@@ -2099,8 +2405,14 @@
                         </div>
                     </div>
 
+                    <!-- 5-Pillar Confirmation Matrix (REQ-MOD-004) -->
+                    <h4 class="section-heading mt-4"><i class="fa-solid fa-layer-group text-gold"></i> 5-PILLAR CONFIRMATION MATRIX</h4>
+                    <div id="modalPillarsContainer" class="modal-pillars-grid">
+                        <!-- Dynamic 5 Pillars Injected by JS -->
+                    </div>
+
                     <!-- Breakdown Checklist -->
-                    <h4 class="section-heading"><i class="fa-solid fa-list-check"></i> QUANTITATIVE TIER 1 CONVICTION CHECKLIST</h4>
+                    <h4 class="section-heading mt-4"><i class="fa-solid fa-list-check"></i> QUANTITATIVE TIER 1 CONVICTION CHECKLIST</h4>
                     <div id="modalChecklist" class="checklist-grid">
                         <!-- Dynamic Checklist Injected by JS -->
                     </div>
@@ -2112,6 +2424,7 @@
                             <div style="display:flex;align-items:center;gap:8px;">
                                 <span id="modalOfVetoBadge" class="badge badge-gold" style="font-size:11px;font-weight:800;padding:4px 10px;">CONFIRMED</span>
                                 <span id="modalOfHealthBadge" style="font-size:11px;font-weight:700;color:var(--bullish-green);"><i class="fa-solid fa-circle" style="font-size:8px;"></i> Ticker Live</span>
+                                <span id="modalOfBarsAgreedBadge" class="badge" style="font-size:10px;font-weight:700;background:rgba(16,185,129,0.15);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.3);">8/10 Bars Agree</span>
                             </div>
                             <div style="font-size:10px;font-weight:700;color:var(--ink-secondary);" id="modalOfSource">
                                 Source: SmartAPI WebSocket (5-Level Depth)
@@ -2120,24 +2433,35 @@
                         <div style="font-size:12px;color:var(--ink-secondary);margin-bottom:12px;" id="modalOfReason">
                             Loading 3:15-3:25 PM order flow evaluation...
                         </div>
-                        <!-- 5-Level Depth Imbalance Bar -->
-                        <div style="margin-bottom:12px;">
-                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800;margin-bottom:4px;">
-                                <span style="color:var(--bullish-green);" id="modalOfBidPct">BIDS: 50.0%</span>
-                                <span style="color:var(--ink-muted);" id="modalOfDepthRatio">5L DEPTH RATIO: 1.0x</span>
-                                <span style="color:var(--bearish-red);" id="modalOfAskPct">ASKS: 50.0%</span>
+                        <!-- 5-Level Depth Imbalance Bar (REQ-OFL-003) -->
+                        <div style="margin-bottom:14px;">
+                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800;margin-bottom:4px;flex-wrap:wrap;gap:4px;">
+                                <span style="color:var(--bullish-green);" id="modalOfBidPct">BIDS: 50.0% <span id="modalOfBidQty" style="font-size:9px;color:var(--ink-muted);">(0 Qty)</span></span>
+                                <span style="color:var(--gold);" id="modalOfDepthRatio">5L DEPTH RATIO: 1.0x</span>
+                                <span style="color:var(--bearish-red);" id="modalOfAskPct">ASKS: 50.0% <span id="modalOfAskQty" style="font-size:9px;color:var(--ink-muted);">(0 Qty)</span></span>
                             </div>
-                            <div style="height:10px;background:rgba(239,68,68,0.3);border-radius:6px;overflow:hidden;display:flex;">
-                                <div id="modalOfBidBar" style="height:100%;width:50%;background:var(--bullish-green);transition:width 0.3s ease;"></div>
+                            <div style="height:10px;background:rgba(239,68,68,0.3);border-radius:6px;overflow:hidden;display:flex;position:relative;">
+                                <div id="modalOfBidBar" style="height:100%;width:50%;background:linear-gradient(90deg, #059669, #10b981);transition:width 0.3s ease;"></div>
                             </div>
                         </div>
-                        <!-- 10-Bar Inferred Delta Mini Chart -->
-                        <div>
-                            <div style="font-size:10px;font-weight:800;color:var(--ink-muted);margin-bottom:6px;">
-                                10-MINUTE INFERRED DELTA BARS (3:15-3:25 PM — TICK-RULE):
+                        <!-- 10-Bar Inferred Delta Mini Chart (REQ-OFL-004) -->
+                        <div style="margin-bottom:12px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                <span style="font-size:10px;font-weight:800;color:var(--ink-muted);">10-MINUTE INFERRED DELTA BARS (3:15–3:25 PM — TICK-RULE):</span>
+                                <span style="font-size:9.5px;font-weight:700;color:var(--gold);" id="modalOfDeltaBreadth">Avg 240 ticks/min</span>
                             </div>
-                            <div id="modalOfBarsContainer" style="display:flex;gap:6px;height:45px;align-items:flex-end;">
+                            <div id="modalOfBarsContainer" style="display:flex;gap:6px;height:48px;align-items:flex-end;">
                                 <!-- Mini delta bars injected by JS -->
+                            </div>
+                        </div>
+                        <!-- Mini 1-Minute CVD Progression Sparkline (REQ-OFL-002) -->
+                        <div style="background:rgba(11,15,25,0.6);border-radius:8px;padding:8px 10px;border:1px solid var(--gridline);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                                <span style="font-size:9.5px;font-weight:800;color:var(--ink-muted);"><i class="fa-solid fa-chart-line text-gold"></i> 1-MIN CUMULATIVE VOLUME DELTA (CVD) CURVE</span>
+                                <span style="font-size:9px;font-weight:700;color:var(--bullish-green);" id="modalOfCvdSum">+0.00K CVD</span>
+                            </div>
+                            <div id="modalOfCvdSparklineWrap" style="height:40px;width:100%;">
+                                <svg id="modalOfCvdSparkline" width="100%" height="40" style="display:block;overflow:visible;"></svg>
                             </div>
                         </div>
                     </div>
@@ -2266,6 +2590,9 @@
                         <span style="color:#0f172a;font-weight:800;">Total Margin Required:</span>
                         <strong style="color:#d97706;font-size:14px;font-family:var(--font-mono);" id="orderTotalMarginRequired">₹0.00</strong>
                     </div>
+                    <div id="orderMarginWarning" class="hidden" style="margin-top:10px;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:6px;font-size:11.5px;font-weight:700;display:flex;align-items:center;gap:6px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> ⚠️ INSUFFICIENT VIRTUAL CASH FOR THIS TRADE
+                    </div>
                 </div>
 
                 <!-- Submit Button -->
@@ -2276,10 +2603,10 @@
         </div>
     </div>
 
-    <!-- ============================== POSITION SL / TP EDIT MODAL ============================== -->
+    <!-- ============================== POSITION SL / TP EDIT MODAL (REQ-MOD-003) ============================== -->
     <div id="editPositionModal" class="modal-overlay hidden" style="z-index: 1000000;" onclick="if(event.target===this){this.classList.add('hidden');this.style.display='none';}">
-        <div class="modal-card" style="max-width: 420px; width: 95%; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;">
-            <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 16px 20px;">
+        <div class="modal-card" style="max-width: 440px; width: 95%; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;">
+            <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 16px 20px; display:flex; justify-content:space-between; align-items:center;">
                 <div class="modal-title-group" style="display:flex;align-items:center;gap:10px;">
                     <h3 id="editPosTitle" style="font-size:16px;font-weight:900;color:#0f172a;margin:0;">MODIFY TARGET &amp; SL</h3>
                 </div>
@@ -2287,7 +2614,15 @@
             </div>
             <div class="modal-body" style="padding: 20px;">
                 <input type="hidden" id="editPosIdInput" />
-                <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;margin-bottom:14px;">
+                <!-- Position Context Info Bar -->
+                <div id="editPosMetaBar" style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;margin-bottom:14px;font-size:11.5px;">
+                    <div><span style="color:#64748b;">Entry:</span> <strong id="editPosEntryDisplay" style="color:#0f172a;font-family:var(--font-mono);">₹--</strong></div>
+                    <div><span style="color:#64748b;">Live LTP:</span> <strong id="editPosCurrentDisplay" class="text-bullish" style="font-family:var(--font-mono);">₹--</strong></div>
+                    <div><span id="editPosSideBadge" class="badge badge-bullish" style="font-size:10px;">BUY</span></div>
+                </div>
+
+                <!-- Targets Grid -->
+                <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;margin-bottom:12px;">
                     <div>
                         <label style="font-size:11px;font-weight:800;color:#047857;display:block;margin-bottom:4px;">TARGET 1 (₹)</label>
                         <input type="number" id="editPosTp1Input" class="text-bullish" style="width:100%;padding:8px 12px;font-size:14px;font-weight:800;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:8px;" step="0.05" />
@@ -2297,51 +2632,74 @@
                         <input type="number" id="editPosTp2Input" class="text-bullish" style="width:100%;padding:8px 12px;font-size:14px;font-weight:800;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:8px;" step="0.05" />
                     </div>
                 </div>
-                <div style="margin-bottom:16px;">
+
+                <!-- Stop Loss Input -->
+                <div style="margin-bottom:12px;">
                     <label style="font-size:11px;font-weight:800;color:#be123c;display:block;margin-bottom:4px;">STOP LOSS (₹)</label>
                     <input type="number" id="editPosSlInput" class="text-bearish" style="width:100%;padding:8px 12px;font-size:14px;font-weight:800;background:#ffffff;border:1.5px solid #cbd5e1;border-radius:8px;" step="0.05" />
                 </div>
-                <button type="button" id="saveEditPosBtn" class="btn btn-gold btn-block" style="padding:12px;font-weight:900;border-radius:10px;width:100%;display:flex;align-items:center;justify-content:center;">
-                    UPDATE POSITION
+
+                <!-- Quick Presets Row (Blueprint 04) -->
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:10.5px;font-weight:800;color:#64748b;text-transform:uppercase;margin-bottom:6px;display:block;">QUICK PRESETS (CALCULATED ON ENTRY / LTP)</label>
+                    <div style="display:grid;grid-template-columns: repeat(3, 1fr); gap:6px;" id="editPosPresetsGroup">
+                        <button type="button" class="btn btn-xs btn-secondary" id="editPresetTp1Btn" style="font-weight:700;font-size:11px;border-radius:6px;padding:6px 4px;">TP1 (+30%)</button>
+                        <button type="button" class="btn btn-xs btn-secondary" id="editPresetTp2Btn" style="font-weight:700;font-size:11px;border-radius:6px;padding:6px 4px;">TP2 (+60%)</button>
+                        <button type="button" class="btn btn-xs btn-secondary" id="editPresetSlBtn" style="font-weight:700;font-size:11px;border-radius:6px;padding:6px 4px;">SL (-30%)</button>
+                    </div>
+                </div>
+
+                <!-- Live Validation Error Box (REQ-MOD-003) -->
+                <div id="editPosValidationWarning" class="hidden" style="margin-bottom:14px;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:6px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span id="editPosValidationMsg">Invalid Stop Loss</span>
+                </div>
+
+                <!-- Save Button -->
+                <button type="button" id="saveEditPosBtn" class="btn btn-gold btn-block" style="padding:12px;font-weight:900;border-radius:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <i class="fa-solid fa-check"></i> UPDATE POSITION
                 </button>
             </div>
         </div>
     </div>
 
     <!-- ============================== LIVE 1-SECOND OPTION CHAIN MODAL ============================== -->
-    <div id="optionChainModal" class="modal-overlay hidden" style="z-index: 1000000;">
-        <div class="modal-card option-chain-modal-card" style="max-width: 1080px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border-radius: 16px; overflow: hidden;">
+    <div id="optionChainModal" class="modal-overlay tradexo-modal-backdrop hidden" style="z-index: 1000000;">
+        <div class="modal-card option-chain-modal-card tradexo-options-card" style="max-width: 1080px; width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
             <!-- Modal Header -->
-            <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;">
+            <div class="modal-header tradexo-options-header">
                 <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="badge" style="background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;"><i class="fa-solid fa-link"></i> LIVE DERIVATIVES</span>
-                        <h2 id="ocModalSymbol" style="font-size: 20px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: 0.5px;"><span id="modalOptionChainSymbol">--</span></h2>
+                        <span class="badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3); font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;">
+                            <i data-lucide="layers" class="lucide-sm"></i> LIVE DERIVATIVES
+                        </span>
+                        <h2 id="ocModalSymbol" class="tradexo-options-title"><span id="modalOptionChainSymbol">--</span></h2>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: #475569;">
-                        <span>LTP: <strong id="ocModalLtp" style="color: #0f172a; font-family: var(--font-mono); font-variant-numeric: tabular-nums;">₹--</strong></span>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 12.5px; font-weight: 700; color: var(--tradexo-obsidian-muted);">
+                        <span>LTP: <strong id="ocModalLtp" class="tradexo-mono-tabular" style="color: var(--tradexo-obsidian-text);">₹--</strong></span>
                         <span>&bull;</span>
-                        <span>Lot Size: <strong id="ocModalLotSize" style="color: #d97706; font-family: var(--font-mono); font-variant-numeric: tabular-nums;">--</strong></span>
+                        <span>Lot: <strong id="ocModalLotSize" class="tradexo-mono-tabular" style="color: var(--tradexo-obsidian-warning);">--</strong></span>
                         <span>&bull;</span>
-                        <span>PCR: <strong id="ocModalPcr" style="color: #047857; font-family: var(--font-mono); font-variant-numeric: tabular-nums;">--</strong></span>
+                        <span>PCR: <strong id="ocModalPcr" class="tradexo-mono-tabular" style="color: var(--tradexo-obsidian-success);">--</strong></span>
                         <span>&bull;</span>
-                        <span>Max Pain: <strong id="ocModalMaxPain" style="color: #475569; font-family: var(--font-mono); font-variant-numeric: tabular-nums;">--</strong></span>
+                        <span>Max Pain: <strong id="ocModalMaxPain" class="tradexo-mono-tabular" style="color: var(--tradexo-obsidian-text);">--</strong></span>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <span id="ocLiveStatusBadge" class="badge" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
-                        <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block;"></span> 1-SEC LIVE
+                    <span id="ocLiveStatusBadge" class="badge" style="background: rgba(34, 197, 94, 0.12); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
+                        <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #22c55e;"></span> 1-SEC LIVE
                     </span>
-                    <button id="closeOptionChainBtn" class="modal-close-btn" onclick="closeOptionChainModal()" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; cursor: pointer;">&times;</button>
+                    <button id="closeOptionChainBtn" class="tradexo-close-btn" onclick="closeOptionChainModal()" aria-label="Close Option Chain Modal">
+                        <i data-lucide="x" class="lucide-sm"></i>
+                    </button>
                 </div>
             </div>
 
             <!-- Controls Toolbar (Expiry Filter + Range) -->
-            <div style="padding: 10px 20px; background: #ffffff; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+            <div class="oc-controls-bar" style="padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <label style="font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase;">Expiry:</label>
-                        <select id="ocExpirySelect" class="form-select" style="padding: 6px 10px; font-size: 12px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc; color: #0f172a;">
+                        <label style="font-size: 11px; font-weight: 800; color: var(--tradexo-obsidian-muted); text-transform: uppercase;">Expiry:</label>
+                        <select id="ocExpirySelect" class="tradexo-dark-select tradexo-mono-tabular" style="padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer;">
                             <!-- Injected by JS -->
                         </select>
                     </div>
@@ -2351,37 +2709,37 @@
                         <button type="button" class="oc-toggle-btn" data-oc-mode="puts">PUTS</button>
                     </div>
                 </div>
-                <div style="font-size: 11.5px; color: #64748b; display: flex; align-items: center; gap: 12px;">
-                    <span><i class="fa-solid fa-bolt text-gold"></i> Click any <strong>LTP / Strike</strong> to place Virtual Options Order</span>
-                    <span id="ocLastUpdatedTime" style="font-family: var(--font-mono); font-size: 10.5px;">Updated: --</span>
+                <div style="font-size: 11.5px; color: var(--tradexo-obsidian-muted); display: flex; align-items: center; gap: 12px;">
+                    <span style="display: flex; align-items: center; gap: 5px;"><i data-lucide="zap" class="lucide-sm" style="color: var(--tradexo-obsidian-warning);"></i> Click any <strong>LTP / Strike</strong> to place Virtual Options Order</span>
+                    <span id="ocLastUpdatedTime" class="tradexo-mono-tabular" style="font-size: 10.5px;">Updated: --</span>
                 </div>
             </div>
 
             <!-- Option Chain Matrix Table -->
             <div class="option-chain-table-wrap" style="flex: 1; overflow-y: auto; max-height: 60vh;">
                 <table class="data-table oc-matrix-table" style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px;">
-                    <thead style="position: sticky; top: 0; z-index: 10; background: #ffffff; color: #0f172a;">
+                    <thead style="position: sticky; top: 0; z-index: 10;">
                         <tr>
                             <!-- CALLS (CE) HEADER -->
-                            <th colspan="4" style="background: #ecfdf5; color: #047857; text-align: center; font-size: 11.5px; font-weight: 900; letter-spacing: 0.5px; padding: 8px 10px; border-right: 2px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;">
-                                <i class="fa-solid fa-arrow-trend-up"></i> CALLS (CE)
+                            <th colspan="4" style="background: rgba(34, 197, 94, 0.12); color: #22c55e; text-align: center; font-size: 11.5px; font-weight: 900; letter-spacing: 0.5px; padding: 8px 10px; border-right: 2px solid var(--tradexo-obsidian-border); border-bottom: 1px solid var(--tradexo-obsidian-border);">
+                                <span style="display: inline-flex; align-items: center; gap: 5px;"><i data-lucide="trending-up" class="lucide-sm"></i> CALLS (CE)</span>
                             </th>
                             <!-- STRIKE HEADER -->
-                            <th style="background: #f1f5f9; color: #0f172a; text-align: center; font-size: 11.5px; font-weight: 900; padding: 8px 14px; min-width: 100px; border-bottom: 1px solid #cbd5e1;">
+                            <th style="background: var(--tradexo-obsidian-elevated); color: var(--tradexo-obsidian-text); text-align: center; font-size: 11.5px; font-weight: 900; padding: 8px 14px; min-width: 100px; border-bottom: 1px solid var(--tradexo-obsidian-border);">
                                 STRIKE
                             </th>
                             <!-- PUTS (PE) HEADER -->
-                            <th colspan="4" style="background: #fff1f2; color: #be123c; text-align: center; font-size: 11.5px; font-weight: 900; letter-spacing: 0.5px; padding: 8px 10px; border-left: 2px solid #cbd5e1; border-bottom: 1px solid #cbd5e1;">
-                                PUTS (PE) <i class="fa-solid fa-arrow-trend-down"></i>
+                            <th colspan="4" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; text-align: center; font-size: 11.5px; font-weight: 900; letter-spacing: 0.5px; padding: 8px 10px; border-left: 2px solid var(--tradexo-obsidian-border); border-bottom: 1px solid var(--tradexo-obsidian-border);">
+                                <span style="display: inline-flex; align-items: center; gap: 5px;">PUTS (PE) <i data-lucide="trending-down" class="lucide-sm"></i></span>
                             </th>
                         </tr>
-                        <tr style="background: #f8fafc; color: #475569; font-size: 10.5px; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid #e2e8f0;">
+                        <tr style="background: var(--tradexo-obsidian-surface); color: var(--tradexo-obsidian-muted); font-size: 10.5px; text-transform: uppercase; font-weight: 800; border-bottom: 2px solid var(--tradexo-obsidian-border);">
                             <th style="padding: 8px 10px; text-align: right;">OI</th>
                             <th style="padding: 8px 10px; text-align: right;">CHNG IN OI</th>
                             <th style="padding: 8px 10px; text-align: right;">VOLUME</th>
-                            <th style="padding: 8px 12px; text-align: right; background: #d1fae5; color: #047857; border-right: 2px solid #cbd5e1;">LTP (₹)</th>
-                            <th style="padding: 8px 14px; text-align: center; background: #e2e8f0; color: #0f172a;">STRIKE</th>
-                            <th style="padding: 8px 12px; text-align: left; background: #ffe4e6; color: #be123c; border-left: 2px solid #cbd5e1;">LTP (₹)</th>
+                            <th style="padding: 8px 12px; text-align: right; background: rgba(34, 197, 94, 0.18); color: #22c55e; border-right: 2px solid var(--tradexo-obsidian-border);">LTP (₹)</th>
+                            <th style="padding: 8px 14px; text-align: center; background: var(--tradexo-obsidian-elevated); color: var(--tradexo-obsidian-text);">STRIKE</th>
+                            <th style="padding: 8px 12px; text-align: left; background: rgba(239, 68, 68, 0.18); color: #ef4444; border-left: 2px solid var(--tradexo-obsidian-border);">LTP (₹)</th>
                             <th style="padding: 8px 10px; text-align: left;">VOLUME</th>
                             <th style="padding: 8px 10px; text-align: left;">CHNG IN OI</th>
                             <th style="padding: 8px 10px; text-align: left;">OI</th>
@@ -2395,36 +2753,44 @@
         </div>
     </div>
 
-    <!-- ============================== ADVANCED OPTIONS DEMO TRADING MODAL ============================== -->
-    <div id="optionsDemoTradeModal" class="modal-overlay hidden" style="z-index: 1000005;">
-        <div class="modal-card" style="max-width: 520px; width: 95%; background: #ffffff; color: #0f172a; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden;">
+    <!-- ============================== ADVANCED OPTIONS DEMO TRADING MODAL (TRADEXO OBSIDIAN EXECUTION PANEL) ============================== -->
+    <div id="optionsDemoTradeModal" class="modal-overlay tradexo-modal-backdrop hidden" style="z-index: 1000005;">
+        <div class="modal-card tradexo-options-card" style="max-width: 520px; width: 95%;">
             <!-- Header -->
-            <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;">
+            <div class="modal-header tradexo-options-header">
                 <div>
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
-                        <span class="badge" style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-size: 10.5px; font-weight: 800; padding: 2px 6px; border-radius: 4px;">⚡ DEMO / PAPER TRADING ONLY</span>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
+                        <span class="badge" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 4px; display: inline-flex; align-items: center; gap: 5px;">
+                            <i data-lucide="shield-check" class="lucide-sm"></i> DEMO / PAPER EXECUTION
+                        </span>
                     </div>
-                    <h2 id="optTradeModalTitle" style="font-size: 18px; font-weight: 900; color: #0f172a; margin: 0; letter-spacing: 0.3px;">VIRTUAL OPTIONS EXECUTION - RELIANCE</h2>
+                    <h2 id="optTradeModalTitle" class="tradexo-options-title">VIRTUAL OPTIONS EXECUTION - RELIANCE</h2>
                 </div>
-                <button id="closeOptionsTradeModalBtn" class="modal-close-btn" style="background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569; cursor: pointer;">&times;</button>
+                <button id="closeOptionsTradeModalBtn" class="tradexo-close-btn" aria-label="Close options execution modal">
+                    <i data-lucide="x" class="lucide-sm"></i>
+                </button>
             </div>
 
             <div class="modal-body" style="padding: 20px;">
                 <!-- Live underlying quote pill -->
-                <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; margin-bottom: 16px;">
-                    <div style="font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase;">Underlying Price (LTP)</div>
-                    <strong id="optTradeUnderlyingLtp" style="font-size: 16px; font-weight: 900; color: #0f172a; font-family: var(--font-mono); font-variant-numeric: tabular-nums;">₹2,980.00</strong>
+                <div class="tradexo-quote-banner">
+                    <div class="tradexo-quote-label">
+                        <i data-lucide="activity" class="lucide-sm" style="color: var(--tradexo-obsidian-cyan);"></i> Underlying Price (LTP)
+                    </div>
+                    <strong id="optTradeUnderlyingLtp" class="tradexo-quote-val tradexo-mono-tabular">₹2,980.00</strong>
                 </div>
 
-                <!-- Input 1: Option Type CE vs PE -->
+                <!-- Input 1: Option Leg Type CE vs PE -->
                 <div style="margin-bottom: 16px;">
-                    <label style="font-size: 11.5px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 6px; display: block;">1. Option Leg Type</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" id="optTypeToggleGroup">
-                        <button type="button" id="optTypeCeBtn" class="btn active" style="min-height: 42px; font-weight: 800; border-radius: 8px; border: 1.5px solid #059669; background: #ecfdf5; color: #047857; cursor: pointer; transition: all 0.2s ease;">
-                            <i class="fa-solid fa-arrow-trend-up"></i> CALL (CE)
+                    <label style="font-size: 11px; font-weight: 800; color: var(--tradexo-obsidian-muted); text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="git-branch" class="lucide-sm"></i> 1. Option Leg Type
+                    </label>
+                    <div class="tradexo-leg-grid" id="optTypeToggleGroup">
+                        <button type="button" id="optTypeCeBtn" class="tradexo-leg-btn is-ce-active">
+                            <i data-lucide="trending-up" class="lucide-sm"></i> CALL (CE)
                         </button>
-                        <button type="button" id="optTypePeBtn" class="btn" style="min-height: 42px; font-weight: 800; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b; cursor: pointer; transition: all 0.2s ease;">
-                            <i class="fa-solid fa-arrow-trend-down"></i> PUT (PE)
+                        <button type="button" id="optTypePeBtn" class="tradexo-leg-btn">
+                            <i data-lucide="trending-down" class="lucide-sm"></i> PUT (PE)
                         </button>
                     </div>
                 </div>
@@ -2432,65 +2798,75 @@
                 <!-- Input 2: Strike Price Dropdown -->
                 <div style="margin-bottom: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
-                        <label style="font-size: 11.5px; font-weight: 800; color: #475569; text-transform: uppercase;">2. Strike Price</label>
-                        <span id="optTradeAtmBadge" style="font-size: 11px; font-weight: 700; color: #d97706;">ATM: 2980</span>
+                        <label style="font-size: 11px; font-weight: 800; color: var(--tradexo-obsidian-muted); text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="crosshair" class="lucide-sm"></i> 2. Strike Price
+                        </label>
+                        <span id="optTradeAtmBadge" class="tradexo-mono-tabular" style="font-size: 11px; font-weight: 800; color: var(--tradexo-obsidian-warning); background: rgba(245, 158, 11, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.25);">ATM: 2980</span>
                     </div>
-                    <select id="optTradeStrikeSelect" class="form-select" style="width: 100%; padding: 10px 14px; font-size: 14px; font-weight: 800; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #0f172a; cursor: pointer;">
+                    <select id="optTradeStrikeSelect" class="tradexo-dark-select tradexo-mono-tabular" style="width: 100%; padding: 10px 14px; font-size: 14px; font-weight: 800; cursor: pointer;">
                         <!-- Populated by JS -->
                     </select>
                 </div>
 
                 <!-- Live Premium Quote Card -->
-                <div style="background: linear-gradient(135deg, #fffbeb, #ffffff); border: 1.5px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div id="optTradePremiumCard" class="tradexo-premium-card">
                     <div>
-                        <div style="font-size: 10.5px; font-weight: 800; color: #b45309; text-transform: uppercase; letter-spacing: 0.5px;">Live Option Premium (LTP)</div>
-                        <div id="optTradeContractLabel" style="font-size: 12px; font-weight: 700; color: #475569; margin-top: 2px;">RELIANCE 2980 CE</div>
+                        <div class="tradexo-premium-tag">
+                            <i data-lucide="zap" class="lucide-sm"></i> Live Option Premium (LTP)
+                        </div>
+                        <div id="optTradeContractLabel" class="tradexo-mono-tabular" style="font-size: 12.5px; font-weight: 700; color: var(--tradexo-obsidian-muted); margin-top: 3px;">RELIANCE 2980 CE</div>
                     </div>
-                    <strong id="optTradePremiumLtp" style="font-size: 24px; font-weight: 900; color: #d97706; font-family: var(--font-mono); font-variant-numeric: tabular-nums;">₹42.50</strong>
+                    <strong id="optTradePremiumLtp" class="tradexo-premium-val tradexo-mono-tabular">₹42.50</strong>
                 </div>
 
                 <!-- Input 3: Lots & Quantity Multiplier -->
                 <div style="margin-bottom: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
-                        <label style="font-size: 11.5px; font-weight: 800; color: #475569; text-transform: uppercase;">3. Number of Lots</label>
-                        <span id="optTradeLotSizeDesc" style="font-size: 11.5px; font-weight: 700; color: #64748b;">Lot Size: 250 shares / lot</span>
+                        <label style="font-size: 11px; font-weight: 800; color: var(--tradexo-obsidian-muted); text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="layers" class="lucide-sm"></i> 3. Number of Lots
+                        </label>
+                        <span id="optTradeLotSizeDesc" class="tradexo-mono-tabular" style="font-size: 11.5px; font-weight: 700; color: var(--tradexo-obsidian-muted);">Lot Size: 250 shares / lot</span>
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <button type="button" id="optLotMinusBtn" class="btn" style="width: 44px; height: 44px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 18px; font-weight: 900; color: #0f172a; cursor: pointer;">-</button>
-                        <input type="number" id="optLotsInput" min="1" max="100" value="1" style="flex: 1; height: 44px; text-align: center; font-size: 18px; font-weight: 900; color: #0f172a; border: 1.5px solid #cbd5e1; border-radius: 8px; background: #ffffff;" />
-                        <button type="button" id="optLotPlusBtn" class="btn" style="width: 44px; height: 44px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 18px; font-weight: 900; color: #0f172a; cursor: pointer;">+</button>
+                        <button type="button" id="optLotMinusBtn" class="tradexo-stepper-btn" aria-label="Decrease lots">
+                            <i data-lucide="minus" class="lucide-sm"></i>
+                        </button>
+                        <input type="number" id="optLotsInput" min="1" max="100" value="1" class="tradexo-dark-input tradexo-mono-tabular" style="flex: 1; height: 44px; text-align: center; font-size: 18px; font-weight: 900;" />
+                        <button type="button" id="optLotPlusBtn" class="tradexo-stepper-btn" aria-label="Increase lots">
+                            <i data-lucide="plus" class="lucide-sm"></i>
+                        </button>
                     </div>
-                    <div style="font-size: 11px; font-weight: 700; color: #64748b; margin-top: 4px; text-align: right;">
-                        Total Quantity: <strong id="optTradeTotalQty" style="color: #0f172a; font-family: var(--font-mono);">250</strong> units
+                    <div style="font-size: 11px; font-weight: 700; color: var(--tradexo-obsidian-muted); margin-top: 5px; text-align: right;">
+                        Total Quantity: <strong id="optTradeTotalQty" class="tradexo-mono-tabular" style="color: var(--tradexo-obsidian-text); font-weight: 800;">250</strong> units
                     </div>
                 </div>
 
                 <!-- Margin & Cost Breakdown Box -->
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                        <span style="color: #64748b;">Virtual Account Cash:</span>
-                        <strong id="optVirtualCash" style="color: #0f172a; font-family: var(--font-mono);">₹10,00,000.00</strong>
+                <div class="tradexo-breakdown-card">
+                    <div class="tradexo-breakdown-row">
+                        <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="wallet" class="lucide-sm"></i> Virtual Account Cash:</span>
+                        <strong id="optVirtualCash" class="tradexo-mono-tabular">₹10,00,000.00</strong>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                        <span style="color: #64748b;">Premium Cost (Qty &times; LTP):</span>
-                        <strong id="optPremiumCost" style="color: #0f172a; font-family: var(--font-mono);">₹10,625.00</strong>
+                    <div class="tradexo-breakdown-row">
+                        <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="tag" class="lucide-sm"></i> Premium Cost (Qty &times; LTP):</span>
+                        <strong id="optPremiumCost" class="tradexo-mono-tabular">₹10,625.00</strong>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span style="color: #64748b;">Simulated Taxes &amp; Brokerage (₹20 + 0.1% STT):</span>
-                        <span id="optEstCharges" style="color: #d97706; font-family: var(--font-mono);">₹30.62</span>
+                    <div class="tradexo-breakdown-row">
+                        <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="receipt" class="lucide-sm"></i> Taxes & Brokerage (₹20 + 0.1% STT):</span>
+                        <span id="optEstCharges" class="tradexo-mono-tabular" style="color: var(--tradexo-obsidian-warning); font-weight: 700;">₹30.62</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px dashed #cbd5e1; font-weight: 800;">
-                        <span style="color: #0f172a;">Total Margin Required:</span>
-                        <strong id="optTotalMarginReq" style="color: #d97706; font-size: 14px; font-family: var(--font-mono);">₹10,655.62</strong>
+                    <div class="tradexo-breakdown-total">
+                        <span>Total Margin Required:</span>
+                        <strong id="optTotalMarginReq" class="tradexo-mono-tabular">₹10,655.62</strong>
                     </div>
-                    <div id="optMarginWarning" class="hidden" style="color: #be123c; font-size: 11px; font-weight: 800; margin-top: 6px; text-align: center;">
-                        <i class="fa-solid fa-triangle-exclamation"></i> INSUFFICIENT VIRTUAL CAPITAL FOR THIS TRADE
+                    <div id="optMarginWarning" class="tradexo-margin-warning hidden">
+                        <i data-lucide="shield-alert" class="lucide-sm"></i> INSUFFICIENT VIRTUAL CAPITAL FOR THIS TRADE
                     </div>
                 </div>
 
                 <!-- Execute Button -->
-                <button type="button" id="executeOptionsTradeBtn" class="btn" style="width: 100%; min-height: 48px; font-size: 14px; font-weight: 900; letter-spacing: 0.5px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; border: none; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);">
-                    <i class="fa-solid fa-bolt"></i> PLACE VIRTUAL OPTION TRADE
+                <button type="button" id="executeOptionsTradeBtn" class="tradexo-exec-btn is-ce">
+                    <i data-lucide="zap" class="lucide-md"></i> <span id="optExecBtnText">EXECUTE CALL (CE) TRADE</span>
                 </button>
             </div>
         </div>
@@ -2501,4 +2877,5 @@
 
 </body>
 </html>
+
 

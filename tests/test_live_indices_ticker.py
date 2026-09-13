@@ -102,3 +102,32 @@ def test_domestic_indices_frozen_off_market():
     # Test market hours (e.g. Wednesday 11:30 AM)
     open_time = datetime(2026, 9, 2, 11, 30, tzinfo=ist_tz)
     assert is_domestic_market_active(open_time) is True
+
+
+def test_index_quotes_accuracy_and_non_zero_change():
+    """Verify NIFTY 50, BANK NIFTY, and SENSEX quotes have accurate LTP and non-zero change points."""
+    res = client.get("/api/indices")
+    assert res.status_code == 200
+    data = res.json()
+    indices = {i["index_name"]: i for i in data.get("indices", [])}
+
+    # Verify all 3 key indices are present
+    for key in ["NIFTY50", "BANKNIFTY", "SENSEX"]:
+        assert key in indices, f"Missing {key} in /api/indices"
+        item = indices[key]
+        assert item["ltp"] > 0, f"{key} LTP should be > 0"
+        assert item["prev_close"] > 0, f"{key} prev_close should be > 0"
+        # prev_close must not equal ltp when previous day's close is different
+        assert abs(item["change_pts"]) > 0.0, f"{key} change points should not collapse to 0.00"
+        assert abs(item["pct_change"]) > 0.0, f"{key} pct change should not collapse to 0.00"
+
+    # Verify SENSEX is not stale 76570.35 fallback
+    sensex = indices["SENSEX"]
+    assert sensex["ltp"] < 76000.0, f"SENSEX should reflect current levels, not stale {sensex['ltp']}"
+
+    # Verify GIFT NIFTY is accurately correlated to NIFTY 50 (within 100 pts)
+    assert "GIFTNIFTY" in indices, "Missing GIFTNIFTY in /api/indices"
+    gift = indices["GIFTNIFTY"]
+    nifty = indices["NIFTY50"]
+    assert abs(gift["ltp"] - nifty["ltp"]) < 100.0, f"GIFT NIFTY ({gift['ltp']}) should track NIFTY 50 ({nifty['ltp']}) within ~100 pts, not disconnected 24000+!"
+

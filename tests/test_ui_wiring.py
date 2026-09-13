@@ -51,3 +51,35 @@ def test_api_strategies_endpoint_returns_presets():
     data = res.json()
     assert "strategies" in data
     assert len(data["strategies"]) >= 1
+
+def test_options_execution_panel_tradexo_design_system():
+    html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "index.html")
+    with open(html_path, "r", encoding="utf-8") as f:
+        soup = BeautifulSoup(f.read(), "html.parser")
+
+    opt_modal = soup.find("div", {"id": "optionsDemoTradeModal"})
+    assert opt_modal is not None, "Missing optionsDemoTradeModal element"
+    assert "tradexo-modal-backdrop" in opt_modal.get("class", [])
+
+    card = opt_modal.find("div", class_="tradexo-options-card")
+    assert card is not None, "Options execution modal must use tradexo-options-card class"
+
+    # Verify tabular numbers on price feed elements
+    und_ltp = soup.find("strong", {"id": "optTradeUnderlyingLtp"})
+    assert und_ltp is not None
+    assert "tradexo-mono-tabular" in und_ltp.get("class", [])
+
+    prem_ltp = soup.find("strong", {"id": "optTradePremiumLtp"})
+    assert prem_ltp is not None
+    assert "tradexo-mono-tabular" in prem_ltp.get("class", [])
+
+    # Verify Lucide icons presence in options modal
+    lucide_elements = opt_modal.find_all(attrs={"data-lucide": True})
+    assert len(lucide_elements) >= 5, "Options modal must utilize Lucide icons"
+
+    # Verify CSS contains obsidian background definition
+    css_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "styles.css")
+    with open(css_path, "r", encoding="utf-8") as f:
+        css_content = f.read()
+    assert "--tradexo-obsidian-bg: #09090b" in css_content
+

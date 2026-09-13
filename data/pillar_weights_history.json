@@ -586,5 +586,85 @@
       "Pillar 5: Marubozu Close": 1.03,
       "Pillar 6: Institutional Flow": 0.952
     }
+  },
+  {
+    "date": "2026-09-10",
+    "action": "APPLIED",
+    "sample_size": 171,
+    "changes": {
+      "Pillar 1: Futures OI": {
+        "from": 0.952,
+        "to": 0.97,
+        "recommended": 0.97
+      },
+      "Pillar 2: Vol Persistence": {
+        "from": 1.04,
+        "to": 1.03,
+        "recommended": 1.03
+      },
+      "Pillar 3: Relative Strength": {
+        "from": 1.03,
+        "to": 1.01,
+        "recommended": 1.01
+      },
+      "Pillar 4: Volume Spike": {
+        "from": 1.03,
+        "to": 1.01,
+        "recommended": 1.01
+      },
+      "Pillar 5: Marubozu Close": {
+        "from": 1.03,
+        "to": 1.01,
+        "recommended": 1.01
+      },
+      "Pillar 6: Institutional Flow": {
+        "from": 0.952,
+        "to": 0.97,
+        "recommended": 0.97
+      }
+    },
+    "weights": {
+      "Pillar 1: Futures OI": 0.97,
+      "Pillar 2: Vol Persistence": 1.03,
+      "Pillar 3: Relative Strength": 1.01,
+      "Pillar 4: Volume Spike": 1.01,
+      "Pillar 5: Marubozu Close": 1.01,
+      "Pillar 6: Institutional Flow": 0.97
+    }
+  },
+  {
+    "date": "2026-09-11",
+    "action": "APPLIED",
+    "sample_size": 201,
+    "changes": {
+      "Pillar 1: Futures OI": {
+        "from": 0.97,
+        "to": 0.96,
+        "recommended": 0.96
+      },
+      "Pillar 2: Vol Persistence": {
+        "from": 1.03,
+        "to": 1.02,
+        "recommended": 1.02
+      },
+      "Pillar 3: Relative Strength": {
+        "from": 1.01,
+        "to": 1.05,
+        "recommended": 1.05
+      },
+      "Pillar 6: Institutional Flow": {
+        "from": 0.97,
+        "to": 0.96,
+        "recommended": 0.96
+      }
+    },
+    "weights": {
+      "Pillar 1: Futures OI": 0.96,
+      "Pillar 2: Vol Persistence": 1.02,
+      "Pillar 3: Relative Strength": 1.05,
+      "Pillar 4: Volume Spike": 1.01,
+      "Pillar 5: Marubozu Close": 1.01,
+      "Pillar 6: Institutional Flow": 0.96
+    }
   }
 ]
