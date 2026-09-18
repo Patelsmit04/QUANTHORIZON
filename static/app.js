@@ -145,13 +145,24 @@ function initTradexoDashboard() {
     // =========================================================================
     // O(1) DOM NODE DICTIONARIES & RAF BATCHING PIPELINE
     // =========================================================================
-    const stockTableNodes = new Map();        // symbol -> { tr, ltpStrong, changeSpan, ... }
+    let isInitialLoad = true;
+    window.isInitialLoad = true;
+    const stockNodes = new Map();             // symbol -> { tr, ltp, ltpStrong, change, changeSpan }
+    const stockTableNodes = stockNodes;       // Backwards-compatible alias
+    window.stockNodes = stockNodes;
+    window.stockTableNodes = stockTableNodes;
     const stockGridNodes = new Map();         // symbol -> { card, ltpEl, changeEl }
-    const accordionNodes = new Map();         // symbol -> { expTr, ltpStrong, changeStrong }
+    window.stockGridNodes = stockGridNodes;
+    const accordionNodes = new Map();         // symbol -> { expTr, strongs }
+    window.accordionNodes = accordionNodes;
     const indexTickerNodes = [];              // Array of { key, item, ltpSpan, changeSpan }
+    window.indexTickerNodes = indexTickerNodes;
     const indexCardNodes = new Map();         // indexKey -> { card, ltpEl, changeEl }
+    window.indexCardNodes = indexCardNodes;
     const indexVerdictNodes = new Map();      // indexKey -> { card, priceEl, tagEl }
+    window.indexVerdictNodes = indexVerdictNodes;
     const optionChainStrikeNodes = new Map(); // strike -> { row, ceOi, ceChg, ceVol, ceLtp, peLtp, peVol, peChg, peOi }
+    window.optionChainStrikeNodes = optionChainStrikeNodes;
     let livePricesRafId = null;
     let optionChainRafId = null;
 
@@ -174,10 +185,16 @@ function initTradexoDashboard() {
     }
 
     // Strategy cards rebuild #strategyGrid from scratch on every toggle/edit action, so
-    // collapsed/expanded state must survive that  —  tracked here, not as a DOM class.
+    // collapsed/expanded state must survive that  —   tracked here, not as a DOM class.
     const collapsedStrategyIds = new Set();
 
-    // Sidebar / Mobile Drawer DOM  —  #appSidebar is the single nav source for both the
+    // UI State Preservation for Row Expansion / Accordions (Exposed at dashboard scope)
+    const expandedTickers = new Set();
+    const expandedFlowDetails = new Set();
+    window.expandedTickers = expandedTickers;
+    window.expandedFlowDetails = expandedFlowDetails;
+
+    // Sidebar / Mobile Drawer DOM  —   #appSidebar is the single nav source for both the
     // desktop persistent rail and the mobile full-height drawer (see styles.css .app-sidebar).
     const mobileMenuToggle = document.getElementById("mobileMenuToggle");
     const appSidebar = document.getElementById("appSidebar");
@@ -188,6 +205,7 @@ function initTradexoDashboard() {
     const scanBtnMobile = document.getElementById("scanBtnMobile");
     const winRateBtnMobile = document.getElementById("winRateBtnMobile");
     const exportCsvBtnMobile = document.getElementById("exportCsvBtnMobile");
+    const topbarExportCsvBtn = document.getElementById("topbarExportCsvBtn");
 
     // DOM Elements
     const scanBtn = document.getElementById("scanBtn");
@@ -237,6 +255,641 @@ function initTradexoDashboard() {
     const rulesSection = document.getElementById("rulesSection");
     const exportCsvBtnGuide = document.getElementById("exportCsvBtnGuide");
     const winRateBtnGuide = document.getElementById("winRateBtnGuide");
+
+    // =============================================================
+    // PHASE 2: BULLETPROOF INITIALIZATION — NAVIGATION AT VERY TOP
+    // Decouple UI/Navigation setup from Data/API setup completely.
+    // Put all sidebar, tab, and button addEventListener attachments
+    // at the VERY TOP of the initialization function, wrapped in
+    // their own try...catch block.
+    // If data fetch fails, the user MUST still be able to click sidebar tabs.
+    // =============================================================
+    function initAppNavigationAndActions() {
+        // Mobile Navigation Drawer Open/Close Helpers
+        function openMobileDrawer() {
+            try {
+                if (appSidebar) appSidebar.classList.add("active");
+                if (mobileDrawerOverlay) mobileDrawerOverlay.classList.remove("hidden");
+                if (mobileMenuToggle) {
+                    mobileMenuToggle.classList.add("active");
+                    const icon = mobileMenuToggle.querySelector("i");
+                    if (icon) icon.className = "fa-solid fa-xmark";
+                }
+                document.body.style.overflow = "hidden";
+            } catch (e) {
+                console.warn("openMobileDrawer error:", e);
+            }
+        }
+        window.openMobileDrawer = openMobileDrawer;
+
+        function closeMobileDrawer() {
+            try {
+                if (appSidebar) appSidebar.classList.remove("active");
+                if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add("hidden");
+                if (mobileMenuToggle) {
+                    mobileMenuToggle.classList.remove("active");
+                    const icon = mobileMenuToggle.querySelector("i");
+                    if (icon) icon.className = "fa-solid fa-bars";
+                }
+                document.body.style.overflow = "";
+            } catch (e) {
+                console.warn("closeMobileDrawer error:", e);
+            }
+        }
+        window.closeMobileDrawer = closeMobileDrawer;
+
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener("click", () => {
+                if (appSidebar && appSidebar.classList.contains("active")) {
+                    closeMobileDrawer();
+                } else {
+                    openMobileDrawer();
+                }
+            });
+        }
+
+        if (drawerCloseBtn) drawerCloseBtn.addEventListener("click", closeMobileDrawer);
+        if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener("click", closeMobileDrawer);
+
+        // Desktop Sidebar Collapse (persists across reloads)
+        const SIDEBAR_COLLAPSED_KEY = "qh_sidebar_collapsed";
+        try {
+            if (appSidebar && localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "1") {
+                appSidebar.classList.add("collapsed");
+            }
+        } catch (e) {}
+
+        if (sidebarCollapseBtn) {
+            sidebarCollapseBtn.addEventListener("click", () => {
+                if (!appSidebar) return;
+                const collapsed = appSidebar.classList.toggle("collapsed");
+                try {
+                    localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
+                } catch (e) {}
+            });
+        }
+
+        // Sidebar destination -> URL hash, deep-linkable and back/forward-safe.
+        const SECTION_HASHES = {
+            dashboard: "dashboard", scanner: "signals", liveTrades: "live-trade", paperTrading: "paper-trading", stockDetail: "stock-detail", stocksNews: "stocks-news",
+            globalNews: "global-news", institutionalFlow: "institutional-flow",
+            orderFlow: "order-flow", accuracy: "accuracy", indices: "index-intelligence", strategies: "strategies", history: "history",
+            systemHealth: "system-health", guide: "guide", rules: "rules"
+        };
+        const HASH_TO_SECTION = {};
+        Object.entries(SECTION_HASHES).forEach(([secKey, hashVal]) => {
+            HASH_TO_SECTION[hashVal] = secKey;
+            HASH_TO_SECTION[secKey] = secKey;
+            HASH_TO_SECTION[secKey.toLowerCase()] = secKey;
+        });
+        HASH_TO_SECTION["paper"] = "paperTrading";
+        HASH_TO_SECTION["paper-trading"] = "paperTrading";
+        HASH_TO_SECTION["paper_trading"] = "paperTrading";
+        let suppressHashUpdate = false;
+        currentActiveSection = "scanner";
+        window.currentActiveSection = "scanner";
+
+        // Unified Section Switcher — completely decoupled from API responses
+        function switchSection(section, opts = {}) {
+            if (!section) return;
+            currentActiveSection = section;
+            window.currentActiveSection = section;
+
+            try {
+                localStorage.setItem("tradexo_active_section", section);
+            } catch (e) {}
+
+            // Dynamic fallback lookup for section DOM nodes
+            const sections = {
+                dashboard: document.getElementById("dashboardSection"),
+                scanner: document.getElementById("scannerSection"),
+                liveTrades: document.getElementById("liveTradesSection"),
+                paperTrading: document.getElementById("paperTradingSection"),
+                stockDetail: document.getElementById("stockDetailSection"),
+                stocksNews: document.getElementById("stocksNewsSection"),
+                globalNews: document.getElementById("globalNewsSection"),
+                institutionalFlow: document.getElementById("institutionalFlowSection"),
+                orderFlow: document.getElementById("orderFlowSection"),
+                accuracy: document.getElementById("accuracySection"),
+                indices: document.getElementById("indicesSection"),
+                strategies: document.getElementById("strategiesSection"),
+                history: document.getElementById("historySection"),
+                systemHealth: document.getElementById("systemHealthSection"),
+                guide: document.getElementById("guideSection"),
+                rules: document.getElementById("rulesSection")
+            };
+
+            const navElements = [
+                document.getElementById("sidebarNav"),
+                document.getElementById("sidebar-links"),
+                document.querySelector(".sidebar-nav"),
+                document.querySelector(".app-sidebar nav")
+            ].filter(Boolean);
+
+            navElements.forEach(nav => {
+                try {
+                    nav.querySelectorAll(".sidebar-nav-item, [data-section]").forEach(b => {
+                        const targetSec = b.dataset.section || b.dataset.sectionLink;
+                        b.classList.toggle("active", targetSec === section);
+                    });
+                } catch (_) {}
+            });
+
+            Object.entries(sections).forEach(([key, el]) => {
+                if (!el) return;
+                const isMergedDashboard = (section === "dashboard" || section === "scanner") && (key === "dashboard" || key === "scanner");
+                const shouldShow = key === section || isMergedDashboard;
+                if (shouldShow) {
+                    el.classList.remove("hidden");
+                    el.style.display = "block";
+                } else {
+                    el.classList.add("hidden");
+                    el.style.display = "none";
+                }
+            });
+
+            try {
+                window.scrollTo(0, 0);
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                const appMainNode = document.querySelector(".app-main");
+                if (appMainNode) { appMainNode.scrollTop = 0; appMainNode.scrollLeft = 0; }
+                const mainContentNode = document.querySelector(".main-content");
+                if (mainContentNode) { mainContentNode.scrollTop = 0; mainContentNode.scrollLeft = 0; }
+            } catch (_) {}
+
+            // Safe, optional data hooks that never throw or kill routing
+            try {
+                if (section === "systemHealth") {
+                    if (typeof fetchSystemHealth === "function") fetchSystemHealth();
+                    if (typeof fetchDailyHealthHistory === "function") fetchDailyHealthHistory();
+                }
+                if (section === "stocksNews" || section === "globalNews") {
+                    if (typeof fetchNewsSection === "function") fetchNewsSection();
+                    if (newsRefreshInterval) clearInterval(newsRefreshInterval);
+                    newsRefreshInterval = setInterval(() => { if (typeof fetchNewsSection === "function") fetchNewsSection(); }, 60000);
+                } else if (newsRefreshInterval) {
+                    clearInterval(newsRefreshInterval);
+                    newsRefreshInterval = null;
+                }
+                if (section === "paperTrading") {
+                    if (typeof fetchPaperPortfolio === "function") fetchPaperPortfolio();
+                    if (paperPortfolioInterval) clearInterval(paperPortfolioInterval);
+                    paperPortfolioInterval = setInterval(() => {
+                        const paperSection = document.getElementById("paperTradingSection");
+                        if (paperSection && !paperSection.classList.contains("hidden")) {
+                            if (typeof fetchPaperPortfolio === "function") fetchPaperPortfolio();
+                        }
+                    }, 2000);
+                } else if (paperPortfolioInterval) {
+                    clearInterval(paperPortfolioInterval);
+                    paperPortfolioInterval = null;
+                }
+                if (section === "indices") {
+                    if (typeof fetchIndices === "function") fetchIndices();
+                    if (typeof fetchIndexVerdicts === "function") fetchIndexVerdicts();
+                    if (typeof renderMacroPullbackGate === "function") renderMacroPullbackGate();
+                }
+                if (section === "strategies") {
+                    if (typeof fetchStrategies === "function") fetchStrategies();
+                    if (typeof setupAiStrategyBuilder === "function") setupAiStrategyBuilder();
+                }
+                if (section === "history" && typeof fetchHistorySection === "function") fetchHistorySection();
+                if (section === "institutionalFlow" && typeof fetchInstitutionalFlowSection === "function") fetchInstitutionalFlowSection();
+                if (section === "orderFlow" && typeof fetchOrderFlowSection === "function") fetchOrderFlowSection();
+                if (section === "accuracy" && typeof fetchSplitAccuracy === "function") fetchSplitAccuracy();
+                if (section === "liveTrades" && typeof fetchLiveTradesSection === "function") fetchLiveTradesSection();
+            } catch (hookErr) {
+                console.warn("Non-fatal error in section data hook:", hookErr);
+            }
+
+            if (!opts.fromHash && SECTION_HASHES[section]) {
+                suppressHashUpdate = true;
+                window.location.hash = "/" + SECTION_HASHES[section];
+                setTimeout(() => { suppressHashUpdate = false; }, 0);
+            }
+        }
+        window.switchSection = switchSection;
+
+        // 1. Sidebar Navigation Listeners (supports #sidebarNav, #sidebar-links, and class .sidebar-nav)
+        try {
+            const sidebarElements = [
+                document.getElementById("sidebarNav"),
+                document.getElementById("sidebar-links"),
+                document.querySelector(".sidebar-nav"),
+                document.querySelector(".app-sidebar nav"),
+                document.querySelector(".app-sidebar")
+            ].filter(Boolean);
+
+            sidebarElements.forEach(navEl => {
+                try {
+                    if (navEl.dataset.navBound) return;
+                    navEl.dataset.navBound = "true";
+                    navEl.addEventListener("click", (e) => {
+                        const btn = e.target.closest(".sidebar-nav-item, [data-section], [data-section-link]");
+                        if (!btn) return;
+                        e.preventDefault();
+                        const sec = btn.dataset.section || btn.dataset.sectionLink;
+                        if (sec) {
+                            switchSection(sec);
+                            closeMobileDrawer();
+                        }
+                    });
+                } catch (navErr) {
+                    console.warn("Could not bind sidebar click handler:", navErr);
+                }
+            });
+        } catch (err) {
+            console.warn("Error finding sidebar elements:", err);
+        }
+
+        // 2. Global click listener for buttons or links jumping to sections (e.g. data-section, data-section-link)
+        try {
+            document.addEventListener("click", (e) => {
+                try {
+                    const jumpBtn = e.target.closest("[data-section-link], [data-section]");
+                    if (!jumpBtn || jumpBtn.closest("#sidebarNav") || jumpBtn.closest("#sidebar-links")) return;
+                    const targetSection = jumpBtn.dataset.sectionLink || jumpBtn.dataset.section;
+                    if (targetSection && (HASH_TO_SECTION[targetSection] || HASH_TO_SECTION[targetSection.toLowerCase()])) {
+                        switchSection(HASH_TO_SECTION[targetSection] || HASH_TO_SECTION[targetSection.toLowerCase()]);
+                        closeMobileDrawer();
+                    }
+                } catch (err) {
+                    console.warn("Section jump listener error:", err);
+                }
+            });
+        } catch (err) {
+            console.warn("Error wiring section jump listener:", err);
+        }
+
+        function routeFromHash() {
+            try {
+                let raw = (window.location.hash || "").replace(/^#\/?/, "").trim();
+                if (!raw) {
+                    const pathname = (window.location.pathname || "").replace(/^\//, "").trim();
+                    if (pathname) raw = pathname;
+                }
+                if (!raw) {
+                    try {
+                        const stored = localStorage.getItem("tradexo_active_section");
+                        if (stored && HASH_TO_SECTION[stored]) raw = stored;
+                    } catch (e) {}
+                }
+                const section = HASH_TO_SECTION[raw] || HASH_TO_SECTION[raw.toLowerCase()] || "scanner";
+                switchSection(section, { fromHash: true });
+            } catch (err) {
+                console.warn("Error in routeFromHash:", err);
+                try { switchSection("scanner", { fromHash: true }); } catch (_) {}
+            }
+        }
+        window.routeFromHash = routeFromHash;
+
+        try {
+            window.addEventListener("hashchange", () => {
+                if (suppressHashUpdate) return;
+                routeFromHash();
+            });
+            window.addEventListener("popstate", () => {
+                if (suppressHashUpdate) return;
+                routeFromHash();
+            });
+            routeFromHash();
+        } catch (err) {
+            console.warn("Error attaching hashchange/popstate listeners:", err);
+        }
+
+        // 3. Action Buttons: Scan Buttons
+        try {
+            const scanButtonSelectors = ["#scanBtn", "#scanNowBtn", "#topbarScanBtn", "#scanBtnMobile", ".scan-hero-btn", "[data-action='scan']"];
+            scanButtonSelectors.forEach(sel => {
+                try {
+                    document.querySelectorAll(sel).forEach(btn => {
+                        if (!btn.dataset.scanBound) {
+                            btn.dataset.scanBound = "true";
+                            btn.addEventListener("click", (e) => {
+                                e.preventDefault();
+                                closeMobileDrawer();
+                                if (typeof fetchScanResults === "function") fetchScanResults(true);
+                            });
+                        }
+                    });
+                } catch (err) {
+                    console.warn(`Error attaching listener to scan selector ${sel}:`, err);
+                }
+            });
+        } catch (err) {
+            console.warn("Error finding scan buttons:", err);
+        }
+
+        // 4. Mobile Action Buttons
+        try {
+            if (winRateBtnMobile) {
+                winRateBtnMobile.addEventListener("click", () => {
+                    closeMobileDrawer();
+                    if (typeof openWinRateModal === "function") openWinRateModal();
+                });
+            }
+        } catch (err) { console.warn("Error wiring winRateBtnMobile:", err); }
+
+        try {
+            if (exportCsvBtnMobile) {
+                exportCsvBtnMobile.addEventListener("click", () => {
+                    closeMobileDrawer();
+                    if (typeof exportWatchlistCsv === "function") exportWatchlistCsv();
+                });
+            }
+        } catch (err) { console.warn("Error wiring exportCsvBtnMobile:", err); }
+
+        // 5. Topbar & Section Action Buttons
+        try {
+            if (topbarExportCsvBtn) topbarExportCsvBtn.addEventListener("click", () => { if (typeof exportWatchlistCsv === "function") exportWatchlistCsv(); });
+        } catch (err) { console.warn("Error wiring topbarExportCsvBtn:", err); }
+
+        try {
+            if (exportCsvBtnGuide) exportCsvBtnGuide.addEventListener("click", () => { if (typeof exportWatchlistCsv === "function") exportWatchlistCsv(); });
+        } catch (err) { console.warn("Error wiring exportCsvBtnGuide:", err); }
+
+        try {
+            if (winRateBtnGuide) winRateBtnGuide.addEventListener("click", () => { if (typeof openWinRateModal === "function") openWinRateModal(); });
+        } catch (err) { console.warn("Error wiring winRateBtnGuide:", err); }
+
+        try {
+            if (guideBtn) guideBtn.addEventListener("click", () => switchSection("rules"));
+        } catch (err) { console.warn("Error wiring guideBtn:", err); }
+
+        try {
+            if (winRateBtn) winRateBtn.addEventListener("click", () => { if (typeof openWinRateModal === "function") openWinRateModal(); });
+        } catch (err) { console.warn("Error wiring winRateBtn:", err); }
+
+        try {
+            if (closeWinRateBtn) closeWinRateBtn.addEventListener("click", () => { if (winRateModal) winRateModal.classList.add("hidden"); });
+        } catch (err) { console.warn("Error wiring closeWinRateBtn:", err); }
+
+        try {
+            if (lockPicksBtn) lockPicksBtn.addEventListener("click", () => { if (typeof lockPicksAction === "function") lockPicksAction(); });
+        } catch (err) { console.warn("Error wiring lockPicksBtn:", err); }
+
+        try {
+            if (evaluatePicksBtn) evaluatePicksBtn.addEventListener("click", () => { if (typeof evaluatePicksAction === "function") evaluatePicksAction(); });
+        } catch (err) { console.warn("Error wiring evaluatePicksBtn:", err); }
+
+        // REQ-NAV-003: Keyboard Routing across all 14 workspaces
+        const ALL_14_WORKSPACES = [
+            "scanner", "indices", "liveTrades", "paperTrading", "strategies",
+            "stocksNews", "globalNews", "institutionalFlow", "orderFlow",
+            "accuracy", "history", "systemHealth", "guide", "rules"
+        ];
+
+        window.addEventListener("keydown", (e) => {
+            try {
+                const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : "";
+                if (activeTag === "input" || activeTag === "textarea" || activeTag === "select") return;
+
+                if (e.key === "[" || e.key === "]") {
+                    const currentIdx = ALL_14_WORKSPACES.indexOf(currentActiveSection);
+                    if (currentIdx !== -1) {
+                        const targetIdx = e.key === "]"
+                            ? (currentIdx + 1) % ALL_14_WORKSPACES.length
+                            : (currentIdx - 1 + ALL_14_WORKSPACES.length) % ALL_14_WORKSPACES.length;
+                        switchSection(ALL_14_WORKSPACES[targetIdx]);
+                    }
+                }
+
+                if (e.altKey && e.key >= "1" && e.key <= "9") {
+                    const slot = parseInt(e.key, 10) - 1;
+                    if (slot < ALL_14_WORKSPACES.length) {
+                        e.preventDefault();
+                        switchSection(ALL_14_WORKSPACES[slot]);
+                    }
+                }
+            } catch (_) {}
+        });
+
+        function setScannerFilter(filterValue) {
+            try {
+                currentFilter = filterValue;
+                const chips = document.querySelectorAll(".filter-chip");
+                chips.forEach(chip => {
+                    const f = chip.dataset.filter;
+                    const isMatch = f === filterValue ||
+                        (filterValue === "PRIORITY1" && f === "P1") ||
+                        (filterValue === "P1" && f === "PRIORITY1");
+                    chip.classList.toggle("active", isMatch);
+                });
+                if (typeof filterAndRenderTable === "function") filterAndRenderTable();
+            } catch (e) {
+                console.warn("setScannerFilter error:", e);
+            }
+        }
+        window.setScannerFilter = setScannerFilter;
+
+        function filterFromDashboardCard(filterValue) {
+            try {
+                switchSection("scanner");
+                setScannerFilter(filterValue);
+            } catch (e) {
+                console.warn("filterFromDashboardCard error:", e);
+            }
+        }
+        window.filterFromDashboardCard = filterFromDashboardCard;
+
+        const scannerFilterTabs = document.getElementById("scannerFilterTabs");
+        if (scannerFilterTabs) {
+            scannerFilterTabs.addEventListener("click", (e) => {
+                const chip = e.target.closest(".filter-chip");
+                if (!chip) return;
+                const filterVal = chip.dataset.filter || "ALL";
+                setScannerFilter(filterVal);
+            });
+        }
+
+        const scannerDataTable = document.getElementById("scannerDataTable");
+        if (scannerDataTable) {
+            const thead = scannerDataTable.querySelector("thead");
+            if (thead) {
+                thead.addEventListener("click", (e) => {
+                    try {
+                        const th = e.target.closest("th");
+                        if (!th) return;
+                        const headerText = th.textContent.trim().toUpperCase();
+                        let newSort = null;
+                        if (headerText.includes("RANK")) {
+                            newSort = "RANK_ASC";
+                        } else if (headerText.includes("CONFIDENCE")) {
+                            newSort = "SCORE_DESC";
+                        } else if (headerText.includes("GAP")) {
+                            newSort = "GAP_DESC";
+                        } else if (headerText.includes("CHANGE")) {
+                            newSort = (sortSelect && sortSelect.value === "GAINERS_DESC") ? "LOSERS_ASC" : "GAINERS_DESC";
+                        } else if (headerText.includes("VOL")) {
+                            newSort = "VOL_DESC";
+                        } else if (headerText.includes("RSI")) {
+                            newSort = "RSI_DESC";
+                        }
+                        if (newSort) {
+                            if (sortSelect) sortSelect.value = newSort;
+                            if (typeof filterAndRenderTable === "function") filterAndRenderTable();
+                        }
+                    } catch (e) {
+                        console.warn("Header sort click error:", e);
+                    }
+                });
+            }
+        }
+
+        if (exportCsvBtn) exportCsvBtn.addEventListener("click", () => { if (typeof exportWatchlistCsv === "function") exportWatchlistCsv(); });
+        if (metricCardTotalScanned) metricCardTotalScanned.addEventListener("click", () => filterFromDashboardCard("ALL"));
+        if (metricCardPriority1) metricCardPriority1.addEventListener("click", () => filterFromDashboardCard("P1"));
+        if (metricCardBtst) metricCardBtst.addEventListener("click", () => filterFromDashboardCard("BTST"));
+        if (metricCardStbt) metricCardStbt.addEventListener("click", () => filterFromDashboardCard("STBT"));
+        if (searchInput) searchInput.addEventListener("input", () => { if (typeof filterAndRenderTable === "function") filterAndRenderTable(); });
+        if (sortSelect) sortSelect.addEventListener("change", () => { if (typeof filterAndRenderTable === "function") filterAndRenderTable(); });
+        if (closeModalBtn) closeModalBtn.addEventListener("click", () => { if (typeof hideModal === "function") hideModal(); });
+
+        if (stocksTableBody) {
+            stocksTableBody.addEventListener("click", (e) => {
+                try {
+                    if (e.target.closest("button:not(.row-expand-toggle), a, input, select, .view-detail-btn, .flow-chip, .gap-distribution-row, .flow-detail-row")) {
+                        return;
+                    }
+                    const tr = e.target.closest("tr[data-row-key]:not(.gap-distribution-row):not(.flow-detail-row)");
+                    if (!tr) return;
+                    const key = tr.dataset.rowKey;
+                    const expanding = !tr.classList.contains("expanded");
+                    if (expanding) {
+                        expandedTickers.add(key);
+                    } else {
+                        expandedTickers.delete(key);
+                    }
+                    document.querySelectorAll(`#stocksTableBody [data-row-key="${CSS.escape(key)}"]`)
+                        .forEach(el => el.classList.toggle("expanded", expanding));
+                    const toggle = tr.querySelector(".row-expand-toggle");
+                    if (toggle) {
+                        toggle.setAttribute("aria-expanded", String(expanding));
+                        const icon = toggle.querySelector("i");
+                        if (icon) {
+                            icon.classList.toggle("fa-chevron-up", expanding);
+                            icon.classList.toggle("fa-chevron-down", !expanding);
+                        }
+                    }
+                } catch (rowExpErr) {
+                    console.warn("Row expansion click warning:", rowExpErr);
+                }
+            });
+        }
+
+        const indexSectionSwitcher = document.getElementById("indexSectionSwitcher");
+        if (indexSectionSwitcher) {
+            indexSectionSwitcher.addEventListener("click", (e) => {
+                try {
+                    const btn = e.target.closest(".index-tab-btn");
+                    if (!btn) return;
+                    indexSectionSwitcher.querySelectorAll(".index-tab-btn").forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    const view = btn.dataset.indexView;
+                    const idxIntel = document.getElementById("indexIntelligenceView");
+                    const idxSigs = document.getElementById("indexSignalsView");
+                    if (view === "intelligence") {
+                        if (idxIntel) idxIntel.classList.remove("hidden");
+                        if (idxSigs) idxSigs.classList.add("hidden");
+                    } else if (view === "signals") {
+                        if (idxIntel) idxIntel.classList.add("hidden");
+                        if (idxSigs) idxSigs.classList.remove("hidden");
+                    }
+                } catch (e) {
+                    console.warn("indexSectionSwitcher click error:", e);
+                }
+            });
+        }
+
+        const stockSectionSwitcher = document.getElementById("stockSectionSwitcher");
+        if (stockSectionSwitcher) {
+            stockSectionSwitcher.addEventListener("click", (e) => {
+                try {
+                    const btn = e.target.closest(".index-tab-btn");
+                    if (!btn) return;
+                    stockSectionSwitcher.querySelectorAll(".index-tab-btn").forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    currentStockView = btn.dataset.stockView || "intelligence";
+                    if (currentStockView === "live") {
+                        currentFilter = "ALL";
+                        if (sortSelect) sortSelect.value = "GAINERS_DESC";
+                    } else {
+                        currentFilter = "ALL";
+                        if (sortSelect) sortSelect.value = "RANK_ASC";
+                    }
+                    if (typeof filterAndRenderTable === "function") filterAndRenderTable();
+                } catch (e) {
+                    console.warn("stockSectionSwitcher click error:", e);
+                }
+            });
+        }
+
+        const addStrategyBtn = document.getElementById("addStrategyBtn");
+        const closeStrategyFormBtn = document.getElementById("closeStrategyFormBtn");
+        const strategyForm = document.getElementById("strategyForm");
+        const strategyFormModal = document.getElementById("strategyFormModal");
+        if (addStrategyBtn) addStrategyBtn.addEventListener("click", () => { if (typeof openStrategyForm === "function") openStrategyForm(null); });
+        if (closeStrategyFormBtn) closeStrategyFormBtn.addEventListener("click", () => { if (strategyFormModal) strategyFormModal.classList.add("hidden"); });
+        if (strategyForm) strategyForm.addEventListener("submit", (e) => { if (typeof submitStrategyForm === "function") submitStrategyForm(e); });
+        if (strategyFormModal) strategyFormModal.addEventListener("click", (e) => {
+            if (e.target === strategyFormModal) strategyFormModal.classList.add("hidden");
+        });
+
+        const closeClarificationBtn = document.getElementById("closeClarificationBtn");
+        const clarificationModal = document.getElementById("clarificationModal");
+        const clarificationConfirmBtn = document.getElementById("clarificationConfirmBtn");
+        const clarificationRejectBtn = document.getElementById("clarificationRejectBtn");
+        const clarificationCorrectionGroup = document.getElementById("clarificationCorrectionGroup");
+        const clarificationResubmitBtn = document.getElementById("clarificationResubmitBtn");
+
+        if (closeClarificationBtn) closeClarificationBtn.addEventListener("click", () => { if (clarificationModal) clarificationModal.classList.add("hidden"); });
+        if (clarificationModal) clarificationModal.addEventListener("click", (e) => {
+            if (e.target === clarificationModal) clarificationModal.classList.add("hidden");
+        });
+        if (clarificationConfirmBtn) clarificationConfirmBtn.addEventListener("click", (e) => { if (typeof confirmClarification === "function") confirmClarification(e); });
+        if (clarificationRejectBtn) clarificationRejectBtn.addEventListener("click", () => {
+            if (clarificationCorrectionGroup) clarificationCorrectionGroup.classList.remove("hidden");
+            if (clarificationConfirmBtn) clarificationConfirmBtn.classList.add("hidden");
+            if (clarificationRejectBtn) clarificationRejectBtn.classList.add("hidden");
+            if (clarificationResubmitBtn) clarificationResubmitBtn.classList.remove("hidden");
+        });
+        if (clarificationResubmitBtn) clarificationResubmitBtn.addEventListener("click", (e) => { if (typeof resubmitClarification === "function") resubmitClarification(e); });
+
+        const newsVerdictFilters = document.getElementById("newsVerdictFilters");
+        if (newsVerdictFilters) {
+            newsVerdictFilters.addEventListener("click", (e) => {
+                const btn = e.target.closest(".tab-btn");
+                if (!btn) return;
+                newsVerdictFilters.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                currentNewsVerdictFilter = btn.dataset.verdict;
+                if (typeof renderNewsGrid === "function") renderNewsGrid();
+            });
+        }
+
+        const globalNewsVerdictFilters = document.getElementById("globalNewsVerdictFilters");
+        if (globalNewsVerdictFilters) {
+            globalNewsVerdictFilters.addEventListener("click", (e) => {
+                const btn = e.target.closest(".tab-btn");
+                if (!btn) return;
+                globalNewsVerdictFilters.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                currentGlobalNewsVerdictFilter = btn.dataset.verdict;
+                if (typeof renderGlobalNewsGrid === "function") renderGlobalNewsGrid();
+            });
+        }
+
+        const newsSearchInput = document.getElementById("newsSearchInput");
+        if (newsSearchInput) newsSearchInput.addEventListener("input", () => { if (typeof renderNewsGrid === "function") renderNewsGrid(); });
+    } // End initAppNavigationAndActions
+
+    // Attach all UI Navigation and Action Listeners immediately at startup
+    try {
+        initAppNavigationAndActions();
+    } catch (navErr) {
+        console.error("Fatal error during navigation setup:", navErr);
+    }
 
     // CSV Watchlist Export Functionality
     window.exportWatchlistCsv = function() {
@@ -510,11 +1163,13 @@ function initTradexoDashboard() {
                         video.muted = true;
                         video.play().catch((e) => {
                             console.warn("Intro video playback failed:", e);
+                            if (!isUserInitiated) dismissIntro();
                         });
                     });
                 }
             } catch (e) {
                 console.warn("Launch intro error:", e);
+                if (!isUserInitiated) dismissIntro();
             }
 
             // Safety timeout: 25 seconds max
@@ -589,498 +1244,51 @@ function initTradexoDashboard() {
         }
     }
 
-    // -------------------------------------------------------------
-    // 1. INITIALIZATION & TIMERS
-    // -------------------------------------------------------------
-    initTradexoIntro();
-    fetchScanResults();
-    fetchWinRatePerformance();
-    setupAutoRefresh();
-    populatePillarCheckboxes();
-    refreshStrategiesNavBadge();
-    initNotifications();
-    fetchTickerIndices();
-    renderMacroPullbackGate();
-    setupAiStrategyBuilder();
-    setInterval(fetchLivePrices, 1000); // 1-sec unified real-time stock & index fast-path loop
-    setInterval(fetchSplitAccuracy, 60000); // 1-min accuracy score metrics recalculation
-    setInterval(fetchWinRatePerformance, 60000); // 1-min win rate performance updater
-    scheduleMarketOpenRefresh();
-    maybeForceAccuracyRefresh();
+    // =============================================================
+    // NOTE: UI Navigation & Action Listeners have been elevated to the
+    // VERY TOP of initTradexoDashboard() to guarantee instantaneous,
+    // crash-proof navigation before any API/data operations begin.
+    // =============================================================
 
-    // Event Listeners
-    
-    // Mobile Navigation Drawer Open/Close Helpers  —  #appSidebar doubles as the mobile drawer
-    // (see .app-sidebar / .app-sidebar.active in styles.css under the 1023px breakpoint).
-    function openMobileDrawer() {
-        if (appSidebar) appSidebar.classList.add("active");
-        if (mobileDrawerOverlay) mobileDrawerOverlay.classList.remove("hidden");
-        if (mobileMenuToggle) {
-            mobileMenuToggle.classList.add("active");
-            const icon = mobileMenuToggle.querySelector("i");
-            if (icon) icon.className = "fa-solid fa-xmark";
-        }
-        document.body.style.overflow = "hidden";
-    }
-
-    function closeMobileDrawer() {
-        if (appSidebar) appSidebar.classList.remove("active");
-        if (mobileDrawerOverlay) mobileDrawerOverlay.classList.add("hidden");
-        if (mobileMenuToggle) {
-            mobileMenuToggle.classList.remove("active");
-            const icon = mobileMenuToggle.querySelector("i");
-            if (icon) icon.className = "fa-solid fa-bars";
-        }
-        document.body.style.overflow = "";
-    }
-
-    if (mobileMenuToggle) {
-        mobileMenuToggle.addEventListener("click", () => {
-            if (appSidebar && appSidebar.classList.contains("active")) {
-                closeMobileDrawer();
-            } else {
-                openMobileDrawer();
-            }
-        });
-    }
-
-    if (drawerCloseBtn) drawerCloseBtn.addEventListener("click", closeMobileDrawer);
-    if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener("click", closeMobileDrawer);
-
-    // Desktop Sidebar Collapse (persists across reloads)
-    const SIDEBAR_COLLAPSED_KEY = "qh_sidebar_collapsed";
-    if (appSidebar && localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "1") {
-        appSidebar.classList.add("collapsed");
-    }
-    if (sidebarCollapseBtn) {
-        sidebarCollapseBtn.addEventListener("click", () => {
-            if (!appSidebar) return;
-            const collapsed = appSidebar.classList.toggle("collapsed");
-            localStorage.setItem(SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
-        });
-    }
-
-    // Sidebar destination -> URL hash, so every section is deep-linkable and back/forward-safe.
-    const SECTION_HASHES = {
-        dashboard: "dashboard", scanner: "signals", liveTrades: "live-trade", paperTrading: "paper-trading", stockDetail: "stock-detail", stocksNews: "stocks-news",
-        globalNews: "global-news", institutionalFlow: "institutional-flow",
-        orderFlow: "order-flow", accuracy: "accuracy", indices: "index-intelligence", strategies: "strategies", history: "history",
-        systemHealth: "system-health", guide: "guide", rules: "rules"
-    };
-    const HASH_TO_SECTION = {};
-    Object.entries(SECTION_HASHES).forEach(([secKey, hashVal]) => {
-        HASH_TO_SECTION[hashVal] = secKey;
-        HASH_TO_SECTION[secKey] = secKey;
-        HASH_TO_SECTION[secKey.toLowerCase()] = secKey;
-    });
-    HASH_TO_SECTION["paper"] = "paperTrading";
-    HASH_TO_SECTION["paper-trading"] = "paperTrading";
-    HASH_TO_SECTION["paper_trading"] = "paperTrading";
-    let suppressHashUpdate = false;
-    currentActiveSection = "scanner";
-    window.currentActiveSection = "scanner";
-
-    // Unified Section Switcher  —   #sidebarNav is the single nav source for both the desktop
-    // rail and the mobile drawer (see appSidebar above), so only one active-state loop is needed.
-    function switchSection(section, opts = {}) {
-        if (!section) return;
-        currentActiveSection = section;
-        window.currentActiveSection = section;
-
+    // =============================================================
+    // PHASE 1 (CONT.): DECOUPLED ASYNCHRONOUS DATA FETCHING & TIMERS
+    // Kicked off strictly AFTER all UI navigation is wired.
+    // Each subsystem is isolated in its own try...catch block.
+    // =============================================================
+    function initAppDataFetchingAndTimers() {
+        try { initTradexoIntro(); } catch (e) { console.error("Error in initTradexoIntro:", e); }
+        try { fetchTickerIndices(); } catch (e) { console.error("Error in fetchTickerIndices:", e); }
+        try { fetchScanResults(); } catch (e) { console.error("Error in fetchScanResults:", e); }
+        try { fetchLivePrices(); } catch (e) { console.error("Error in fetchLivePrices:", e); }
+        try { fetchWinRatePerformance(); } catch (e) { console.error("Error in fetchWinRatePerformance:", e); }
+        try { setupAutoRefresh(); } catch (e) { console.error("Error in setupAutoRefresh:", e); }
+        try { populatePillarCheckboxes(); } catch (e) { console.error("Error in populatePillarCheckboxes:", e); }
+        try { refreshStrategiesNavBadge(); } catch (e) { console.error("Error in refreshStrategiesNavBadge:", e); }
+        try { initNotifications(); } catch (e) { console.error("Error in initNotifications:", e); }
+        try { renderMacroPullbackGate(); } catch (e) { console.error("Error in renderMacroPullbackGate:", e); }
+        try { setupAiStrategyBuilder(); } catch (e) { console.error("Error in setupAiStrategyBuilder:", e); }
         try {
-            localStorage.setItem("tradexo_active_section", section);
-        } catch (e) {}
-
-        // Dynamic fallback lookup for section DOM nodes
-        const sections = {
-            dashboard: document.getElementById("dashboardSection"),
-            scanner: document.getElementById("scannerSection"),
-            liveTrades: document.getElementById("liveTradesSection"),
-            paperTrading: document.getElementById("paperTradingSection"),
-            stockDetail: document.getElementById("stockDetailSection"),
-            stocksNews: document.getElementById("stocksNewsSection"),
-            globalNews: document.getElementById("globalNewsSection"),
-            institutionalFlow: document.getElementById("institutionalFlowSection"),
-            orderFlow: document.getElementById("orderFlowSection"),
-            accuracy: document.getElementById("accuracySection"),
-            indices: document.getElementById("indicesSection"),
-            strategies: document.getElementById("strategiesSection"),
-            history: document.getElementById("historySection"),
-            systemHealth: document.getElementById("systemHealthSection"),
-            guide: document.getElementById("guideSection"),
-            rules: document.getElementById("rulesSection")
-        };
-
-        if (sidebarNav) {
-            sidebarNav.querySelectorAll(".sidebar-nav-item").forEach(b => {
-                b.classList.toggle("active", b.dataset.section === section);
-            });
-        }
-
-        Object.entries(sections).forEach(([key, el]) => {
-            if (!el) return;
-            const isMergedDashboard = (section === "dashboard" || section === "scanner") && (key === "dashboard" || key === "scanner");
-            const shouldShow = key === section || isMergedDashboard;
-            if (shouldShow) {
-                el.classList.remove("hidden");
-                el.style.display = "block";
-            } else {
-                el.classList.add("hidden");
-                el.style.display = "none";
+            if (!window._tradexoLivePricesInterval) {
+                window._tradexoLivePricesInterval = setInterval(fetchLivePrices, 1000);
             }
-        });
-
-        if (section === "systemHealth") {
-            if (typeof fetchSystemHealth === "function") fetchSystemHealth();
-            if (typeof fetchDailyHealthHistory === "function") fetchDailyHealthHistory();
-        }
-
-        window.scrollTo(0, 0);
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-        document.body.scrollLeft = 0;
-        document.documentElement.scrollLeft = 0;
-        const appMainNode = document.querySelector(".app-main");
-        if (appMainNode) { appMainNode.scrollTop = 0; appMainNode.scrollLeft = 0; }
-        const mainContentNode = document.querySelector(".main-content");
-        if (mainContentNode) { mainContentNode.scrollTop = 0; mainContentNode.scrollLeft = 0; }
-
-        if (section === "stocksNews" || section === "globalNews") {
-            fetchNewsSection();
-            if (newsRefreshInterval) clearInterval(newsRefreshInterval);
-            newsRefreshInterval = setInterval(fetchNewsSection, 60000);
-        } else if (newsRefreshInterval) {
-            clearInterval(newsRefreshInterval);
-            newsRefreshInterval = null;
-        }
-        // Paper Trading: live MTM polling every 2 seconds while section is active (REQ-PTR-003)
-        if (section === "paperTrading") {
-            fetchPaperPortfolio();
-            if (paperPortfolioInterval) clearInterval(paperPortfolioInterval);
-            paperPortfolioInterval = setInterval(() => {
-                const paperSection = document.getElementById("paperTradingSection");
-                if (paperSection && !paperSection.classList.contains("hidden")) {
-                    fetchPaperPortfolio();
-                }
-            }, 2000);
-        } else if (paperPortfolioInterval) {
-            clearInterval(paperPortfolioInterval);
-            paperPortfolioInterval = null;
-        }
-        if (section === "indices") { fetchIndices(); fetchIndexVerdicts(); renderMacroPullbackGate(); }
-        if (section === "strategies") { fetchStrategies(); setupAiStrategyBuilder(); }
-        if (section === "history") fetchHistorySection();
-        if (section === "institutionalFlow") fetchInstitutionalFlowSection();
-        if (section === "orderFlow") fetchOrderFlowSection();
-        if (section === "accuracy") fetchSplitAccuracy();
-        if (section === "liveTrades") fetchLiveTradesSection();
-
-        if (!opts.fromHash && SECTION_HASHES[section]) {
-            suppressHashUpdate = true;
-            window.location.hash = "/" + SECTION_HASHES[section];
-            setTimeout(() => { suppressHashUpdate = false; }, 0);
-        }
-    }
-
-    // Sidebar Navigation (desktop rail + mobile drawer, single element)
-    if (sidebarNav) {
-        sidebarNav.addEventListener("click", (e) => {
-            const btn = e.target.closest(".sidebar-nav-item");
-            if (!btn) return;
-            e.preventDefault();
-            switchSection(btn.dataset.section);
-            closeMobileDrawer();
-        });
-    }
-
-    // Global listener for buttons or links jumping to sections (e.g. data-section, data-section-link)
-    document.addEventListener("click", (e) => {
-        const jumpBtn = e.target.closest("[data-section-link], [data-section]");
-        if (!jumpBtn || jumpBtn.closest("#sidebarNav")) return;
-        const targetSection = jumpBtn.dataset.sectionLink || jumpBtn.dataset.section;
-        if (targetSection && HASH_TO_SECTION[targetSection]) {
-            switchSection(targetSection);
-            closeMobileDrawer();
-        }
-    });
-
-    function routeFromHash() {
-        let raw = (window.location.hash || "").replace(/^#\/?/, "").trim();
-        if (!raw) {
-            const pathname = (window.location.pathname || "").replace(/^\//, "").trim();
-            if (pathname) raw = pathname;
-        }
-        if (!raw) {
-            try {
-                const stored = localStorage.getItem("tradexo_active_section");
-                if (stored && HASH_TO_SECTION[stored]) raw = stored;
-            } catch (e) {}
-        }
-        const section = HASH_TO_SECTION[raw] || HASH_TO_SECTION[raw.toLowerCase()] || "scanner";
-        switchSection(section, { fromHash: true });
-    }
-    window.addEventListener("hashchange", () => {
-        if (suppressHashUpdate) return;
-        routeFromHash();
-    });
-    window.addEventListener("popstate", () => {
-        if (suppressHashUpdate) return;
-        routeFromHash();
-    });
-    routeFromHash();
-
-
-    // Mobile Action Buttons
-    if (scanBtnMobile) scanBtnMobile.addEventListener("click", () => {
-        closeMobileDrawer();
-        fetchScanResults(true);
-    });
-    if (winRateBtnMobile) winRateBtnMobile.addEventListener("click", () => {
-        closeMobileDrawer();
-        openWinRateModal();
-    });
-    if (exportCsvBtnMobile) exportCsvBtnMobile.addEventListener("click", () => {
-        closeMobileDrawer();
-        exportWatchlistCsv();
-    });
-
-    // Topbar Action Buttons (Global Header Bar)
-    const topbarScanBtn = document.getElementById("topbarScanBtn");
-    if (topbarScanBtn) topbarScanBtn.addEventListener("click", () => fetchScanResults(true));
-
-    const topbarExportCsvBtn = document.getElementById("topbarExportCsvBtn");
-    if (topbarExportCsvBtn) topbarExportCsvBtn.addEventListener("click", exportWatchlistCsv);
-
-    // Guide / Export / Settings section actions
-    if (exportCsvBtnGuide) exportCsvBtnGuide.addEventListener("click", exportWatchlistCsv);
-    if (winRateBtnGuide) winRateBtnGuide.addEventListener("click", openWinRateModal);
-
-    if (scanBtn) scanBtn.addEventListener("click", () => fetchScanResults(true));
-    if (guideBtn) guideBtn.addEventListener("click", () => switchSection("rules"));
-
-    if (winRateBtn) winRateBtn.addEventListener("click", openWinRateModal);
-    if (closeWinRateBtn) closeWinRateBtn.addEventListener("click", () => winRateModal.classList.add("hidden"));
-
-    if (lockPicksBtn) lockPicksBtn.addEventListener("click", lockPicksAction);
-    if (evaluatePicksBtn) evaluatePicksBtn.addEventListener("click", evaluatePicksAction);
-
-    // REQ-NAV-003: Keyboard Routing across all 14 workspaces
-    const ALL_14_WORKSPACES = [
-        "scanner", "indices", "liveTrades", "paperTrading", "strategies",
-        "stocksNews", "globalNews", "institutionalFlow", "orderFlow",
-        "accuracy", "history", "systemHealth", "guide", "rules"
-    ];
-
-    window.addEventListener("keydown", (e) => {
-        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : "";
-        if (activeTag === "input" || activeTag === "textarea" || activeTag === "select") return;
-
-        // '[' for previous workspace, ']' for next workspace
-        if (e.key === "[" || e.key === "]") {
-            const currentIdx = ALL_14_WORKSPACES.indexOf(currentActiveSection);
-            if (currentIdx !== -1) {
-                const targetIdx = e.key === "]"
-                    ? (currentIdx + 1) % ALL_14_WORKSPACES.length
-                    : (currentIdx - 1 + ALL_14_WORKSPACES.length) % ALL_14_WORKSPACES.length;
-                switchSection(ALL_14_WORKSPACES[targetIdx]);
+        } catch (e) { console.error("Error setting live prices interval:", e); }
+        try { setInterval(fetchSplitAccuracy, 60000); } catch (e) { console.error("Error setting split accuracy interval:", e); }
+        try { setInterval(fetchWinRatePerformance, 60000); } catch (e) { console.error("Error setting win rate interval:", e); }
+        try { scheduleMarketOpenRefresh(); } catch (e) { console.error("Error in scheduleMarketOpenRefresh:", e); }
+        try { maybeForceAccuracyRefresh(); } catch (e) { console.error("Error in maybeForceAccuracyRefresh:", e); }
+        try { initWebSocket(); } catch (e) { console.error("Error in initWebSocket:", e); }
+        try {
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
             }
-        }
-
-        // Alt + 1..9 to jump directly to first 9 workspaces
-        if (e.altKey && e.key >= "1" && e.key <= "9") {
-            const slot = parseInt(e.key, 10) - 1;
-            if (slot < ALL_14_WORKSPACES.length) {
-                e.preventDefault();
-                switchSection(ALL_14_WORKSPACES[slot]);
-            }
-        }
-    });
-
-    function setScannerFilter(filterValue) {
-        currentFilter = filterValue;
-        const chips = document.querySelectorAll(".filter-chip");
-        chips.forEach(chip => {
-            const f = chip.dataset.filter;
-            const isMatch = f === filterValue ||
-                (filterValue === "PRIORITY1" && f === "P1") ||
-                (filterValue === "P1" && f === "PRIORITY1");
-            chip.classList.toggle("active", isMatch);
-        });
-        filterAndRenderTable();
-    }
-    window.setScannerFilter = setScannerFilter;
-
-    function filterFromDashboardCard(filterValue) {
-        switchSection("scanner");
-        setScannerFilter(filterValue);
-    }
-    window.filterFromDashboardCard = filterFromDashboardCard;
-
-    const scannerFilterTabs = document.getElementById("scannerFilterTabs");
-    if (scannerFilterTabs) {
-        scannerFilterTabs.addEventListener("click", (e) => {
-            const chip = e.target.closest(".filter-chip");
-            if (!chip) return;
-            const filterVal = chip.dataset.filter || "ALL";
-            setScannerFilter(filterVal);
-        });
+        } catch (e) { console.warn("Lucide icons warning:", e); }
     }
 
-    const scannerDataTable = document.getElementById("scannerDataTable");
-    if (scannerDataTable) {
-        const thead = scannerDataTable.querySelector("thead");
-        if (thead) {
-            thead.addEventListener("click", (e) => {
-                const th = e.target.closest("th");
-                if (!th) return;
-                const headerText = th.textContent.trim().toUpperCase();
-                let newSort = null;
-                if (headerText.includes("RANK")) {
-                    newSort = "RANK_ASC";
-                } else if (headerText.includes("CONFIDENCE")) {
-                    newSort = "SCORE_DESC";
-                } else if (headerText.includes("GAP")) {
-                    newSort = "GAP_DESC";
-                } else if (headerText.includes("CHANGE")) {
-                    newSort = (sortSelect && sortSelect.value === "GAINERS_DESC") ? "LOSERS_ASC" : "GAINERS_DESC";
-                } else if (headerText.includes("VOL")) {
-                    newSort = "VOL_DESC";
-                } else if (headerText.includes("RSI")) {
-                    newSort = "RSI_DESC";
-                }
-                if (newSort) {
-                    if (sortSelect) sortSelect.value = newSort;
-                    filterAndRenderTable();
-                }
-            });
-        }
+    try {
+        initAppDataFetchingAndTimers();
+    } catch (dataErr) {
+        console.error("Fatal error during background data initialization:", dataErr);
     }
-
-    if (exportCsvBtn) exportCsvBtn.addEventListener("click", exportWatchlistCsv);
-    if (metricCardTotalScanned) metricCardTotalScanned.addEventListener("click", () => filterFromDashboardCard("ALL"));
-    if (metricCardPriority1) metricCardPriority1.addEventListener("click", () => filterFromDashboardCard("P1"));
-    if (metricCardBtst) metricCardBtst.addEventListener("click", () => filterFromDashboardCard("BTST"));
-    if (metricCardStbt) metricCardStbt.addEventListener("click", () => filterFromDashboardCard("STBT"));
-    if (searchInput) searchInput.addEventListener("input", filterAndRenderTable);
-    if (sortSelect) sortSelect.addEventListener("change", filterAndRenderTable);
-    if (closeModalBtn) closeModalBtn.addEventListener("click", hideModal);
-
-    // UI State Preservation for Row Expansion / Accordions
-    const expandedTickers = new Set();
-    const expandedFlowDetails = new Set();
-
-    // Row expansion / collapse listener — supports clicking anywhere on row or chevron (REQ-SCAN-004)
-    if (stocksTableBody) {
-        stocksTableBody.addEventListener("click", (e) => {
-            // Ignore click if target is an interactive child button, link, or input (except the expand toggle)
-            if (e.target.closest("button:not(.row-expand-toggle), a, input, select, .view-detail-btn, .flow-chip, .gap-distribution-row, .flow-detail-row")) {
-                return;
-            }
-            const tr = e.target.closest("tr[data-row-key]:not(.gap-distribution-row):not(.flow-detail-row)");
-            if (!tr) return;
-            const key = tr.dataset.rowKey;
-            const expanding = !tr.classList.contains("expanded");
-            if (expanding) {
-                expandedTickers.add(key);
-            } else {
-                expandedTickers.delete(key);
-            }
-            document.querySelectorAll(`#stocksTableBody [data-row-key="${CSS.escape(key)}"]`)
-                .forEach(el => el.classList.toggle("expanded", expanding));
-            const toggle = tr.querySelector(".row-expand-toggle");
-            if (toggle) {
-                toggle.setAttribute("aria-expanded", String(expanding));
-                const icon = toggle.querySelector("i");
-                if (icon) {
-                    icon.classList.toggle("fa-chevron-up", expanding);
-                    icon.classList.toggle("fa-chevron-down", !expanding);
-                }
-        });
-    }
-
-    if (indexSectionSwitcher) {
-        indexSectionSwitcher.addEventListener("click", (e) => {
-            const btn = e.target.closest(".index-tab-btn");
-            if (!btn) return;
-            indexSectionSwitcher.querySelectorAll(".index-tab-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            const view = btn.dataset.indexView;
-            if (view === "intelligence") {
-                if (indexIntelligenceView) indexIntelligenceView.classList.remove("hidden");
-                if (indexSignalsView) indexSignalsView.classList.add("hidden");
-            } else if (view === "signals") {
-                if (indexIntelligenceView) indexIntelligenceView.classList.add("hidden");
-                if (indexSignalsView) indexSignalsView.classList.remove("hidden");
-            }
-        });
-    }
-
-    const stockSectionSwitcher = document.getElementById("stockSectionSwitcher");
-    if (stockSectionSwitcher) {
-        stockSectionSwitcher.addEventListener("click", (e) => {
-            const btn = e.target.closest(".index-tab-btn");
-            if (!btn) return;
-            stockSectionSwitcher.querySelectorAll(".index-tab-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            currentStockView = btn.dataset.stockView || "intelligence";
-            if (currentStockView === "live") {
-                currentFilter = "ALL";
-                if (sortSelect) sortSelect.value = "GAINERS_DESC";
-            } else {
-                currentFilter = "ALL";
-                if (sortSelect) sortSelect.value = "RANK_ASC";
-            }
-            filterAndRenderTable();
-        });
-    }
-
-    if (addStrategyBtn) addStrategyBtn.addEventListener("click", () => openStrategyForm(null));
-    if (closeStrategyFormBtn) closeStrategyFormBtn.addEventListener("click", () => strategyFormModal.classList.add("hidden"));
-    if (strategyForm) strategyForm.addEventListener("submit", submitStrategyForm);
-    if (strategyFormModal) strategyFormModal.addEventListener("click", (e) => {
-        if (e.target === strategyFormModal) strategyFormModal.classList.add("hidden");
-    });
-
-    if (closeClarificationBtn) closeClarificationBtn.addEventListener("click", () => clarificationModal.classList.add("hidden"));
-    if (clarificationModal) clarificationModal.addEventListener("click", (e) => {
-        if (e.target === clarificationModal) clarificationModal.classList.add("hidden");
-    });
-    if (clarificationConfirmBtn) clarificationConfirmBtn.addEventListener("click", confirmClarification);
-    if (clarificationRejectBtn) clarificationRejectBtn.addEventListener("click", () => {
-        if (clarificationCorrectionGroup) clarificationCorrectionGroup.classList.remove("hidden");
-        if (clarificationConfirmBtn) clarificationConfirmBtn.classList.add("hidden");
-        if (clarificationRejectBtn) clarificationRejectBtn.classList.add("hidden");
-        if (clarificationResubmitBtn) clarificationResubmitBtn.classList.remove("hidden");
-    });
-    if (clarificationResubmitBtn) clarificationResubmitBtn.addEventListener("click", resubmitClarification);
-
-    if (newsVerdictFilters) {
-        newsVerdictFilters.addEventListener("click", (e) => {
-            const btn = e.target.closest(".tab-btn");
-            if (!btn) return;
-
-            newsVerdictFilters.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            currentNewsVerdictFilter = btn.dataset.verdict;
-            renderNewsGrid();
-        });
-    }
-
-    if (globalNewsVerdictFilters) {
-        globalNewsVerdictFilters.addEventListener("click", (e) => {
-            const btn = e.target.closest(".tab-btn");
-            if (!btn) return;
-
-            globalNewsVerdictFilters.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-
-            currentGlobalNewsVerdictFilter = btn.dataset.verdict;
-            renderGlobalNewsGrid();
-        });
-    }
-
-    if (newsSearchInput) newsSearchInput.addEventListener("input", renderNewsGrid);
 
     // -------------------------------------------------------------
     // 2. API FETCH & INSTANT BACKGROUND DATA PROCESSING
@@ -1181,52 +1389,137 @@ function initTradexoDashboard() {
         }
     }
 
+    // -------------------------------------------------------------
+    // RENDER WRAPPERS (DEFENSIVE TRY-CATCH SAFETY NET)
+    // -------------------------------------------------------------
+    function renderDashboard(data) {
+        try {
+            if (!data || typeof data !== "object") {
+                data = {
+                    total_scanned: 0,
+                    priority_1_count: 0,
+                    btst_count: 0,
+                    stbt_count: 0,
+                    win_rate_pct: 75.0,
+                    total_tracked_trades: 0
+                };
+            }
+            updateSummaryMetrics(data);
+        } catch (error) {
+            console.error("Fatal error rendering dashboard:", error);
+        }
+    }
+    window.renderDashboard = renderDashboard;
+
+    function renderScannerTable(stocks) {
+        try {
+            // Phase 2: Defensive check before rendering
+            if (!stocks || !Array.isArray(stocks)) {
+                console.error("Invalid scan data received or stocks is not an array:", stocks);
+                stocks = [];
+            }
+            allStocks = stocks;
+            window.allStocks = stocks;
+
+            // Phase 3: Fix Empty State UI if table is legitimately empty
+            if (stocks.length === 0) {
+                const tbody = document.getElementById("stocksTableBody") || stocksTableBody;
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-slate-500">No active signals available or error fetching data.</td></tr>';
+                }
+                const table = document.getElementById("scannerDataTable");
+                if (table && !tbody) {
+                    table.innerHTML = '<tbody><tr><td colspan="10" class="text-center py-8 text-slate-500">No active signals available or error fetching data.</td></tr></tbody>';
+                }
+                if (typeof setEmptyStateMessage === "function") {
+                    setEmptyStateMessage(EMPTY_STATE_DEFAULT_TITLE, EMPTY_STATE_DEFAULT_TEXT);
+                }
+                if (emptyState) emptyState.classList.remove("hidden");
+                return;
+            }
+
+            filterAndRenderTable();
+        } catch (error) {
+            console.error("Fatal error rendering scanner table:", error);
+            // Phase 3: Inject safe fallback message into the table body inside the catch block
+            try {
+                const tbody = document.getElementById("stocksTableBody") || stocksTableBody;
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-slate-500">No active signals available or error fetching data.</td></tr>';
+                }
+                const table = document.getElementById("scannerDataTable");
+                if (table && !tbody) {
+                    table.innerHTML = '<tbody><tr><td colspan="10" class="text-center py-8 text-slate-500">No active signals available or error fetching data.</td></tr></tbody>';
+                }
+            } catch (fallbackErr) {
+                console.error("Error setting fallback message in renderScannerTable:", fallbackErr);
+            }
+        }
+    }
+    window.renderScannerTable = renderScannerTable;
+
     async function fetchScanResults(forceRefresh = false) {
         if (isFetchingScan && !forceRefresh) return; // Prevent overlapping heavy scan requests
         isFetchingScan = true;
         try {
             if (forceRefresh) {
                 if (scanProgressBar) scanProgressBar.classList.remove("hidden");
-                if (scanBtn) {
-                    scanBtn.disabled = true;
-                    const span = scanBtn.querySelector("span");
-                    if (span) span.textContent = "SCANNING...";
-                }
+                const allScanBtns = document.querySelectorAll("#scanBtn, #scanNowBtn, #topbarScanBtn, #scanBtnMobile, .scan-hero-btn, [data-action='scan']");
+                allScanBtns.forEach(btn => {
+                    try {
+                        btn.disabled = true;
+                        const span = btn.querySelector("span");
+                        if (span) span.textContent = "SCANNING...";
+                    } catch (_) {}
+                });
             }
 
             const url = forceRefresh ? "/api/scan?nocache=true" : "/api/scan";
             const response = await apiFetch(url);
             
-            if (!response.ok) throw new Error("API Server response error");
+            if (!response.ok) throw new Error(`API Server response error: ${response.status}`);
             
             const data = await response.json();
             
-            allStocks = data.stocks || [];
-            window.allStocks = allStocks;
-            updateSummaryMetrics(data);
-            updateMarketStatusBadge(data);
+            // Phase 2: Defensive check before rendering
+            if (!data || !Array.isArray(data.stocks)) {
+                console.error("Invalid scan data received", data);
+                if (data && typeof data === "object") {
+                    renderDashboard(data);
+                }
+                renderScannerTable([]);
+                return; 
+            }
+            
+            renderDashboard(data);
+            renderScannerTable(data.stocks);
 
-            // Populate Top P1 High-Conviction stocks in the Top Marquee Ticker Track
-            const p1Container = document.getElementById("p1TickerContainer");
-            if (p1Container) {
-                const p1s = (allStocks || []).filter(s => s.priority_level === "P1_HIGH").slice(0, 3);
-                p1Container.innerHTML = p1s.map(s => {
-                    const isUp = (s.change_pts || 0) >= 0;
-                    const sign = isUp ? '+' : '-';
-                    const pts = Math.abs(s.change_pts || 0).toFixed(2);
-                    const pct = Math.abs(s.pct_change || 0).toFixed(2);
-                    return `<span class="index-ticker-item" onclick="openStockModal('${escapeAttr(s.symbol)}')" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.3);border-radius:6px;">
-                        <i class="fa-solid fa-crown" style="color:#d97706;font-size:10px;"></i>
-                        <strong>${escapeHtml(s.symbol)}</strong>
-                        <span>₹${(s.ltp || 0).toFixed(2)}</span>
-                        <span class="${isUp ? 'text-bullish' : 'text-bearish'}">${sign}${pts} (${sign}${pct}%)</span>
-                    </span>`;
-                }).join("");
+            try {
+                updateMarketStatusBadge(data);
+            } catch (statusErr) {
+                console.warn("Market status badge update warning:", statusErr);
             }
 
-            // Only re-render scanner DOM table/cards if the user is ALREADY on the scanner/dashboard page!
-            if (currentActiveSection === "scanner" || currentActiveSection === "dashboard") {
-                filterAndRenderTable();
+            // Populate Top P1 High-Conviction stocks in the Top Marquee Ticker Track
+            try {
+                const p1Container = document.getElementById("p1TickerContainer");
+                if (p1Container && Array.isArray(allStocks)) {
+                    const p1s = allStocks.filter(s => s && s.priority_level === "P1_HIGH").slice(0, 3);
+                    p1Container.innerHTML = p1s.map(s => {
+                        const isUp = (s.change_pts || 0) >= 0;
+                        const sign = isUp ? '+' : '-';
+                        const pts = Math.abs(s.change_pts || 0).toFixed(2);
+                        const pct = Math.abs(s.pct_change || 0).toFixed(2);
+                        return `<span class="index-ticker-item" onclick="openStockModal('${escapeAttr(s.symbol)}')" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.3);border-radius:6px;">
+                            <i class="fa-solid fa-crown" style="color:#d97706;font-size:10px;"></i>
+                            <strong>${escapeHtml(s.symbol)}</strong>
+                            <span>₹${(s.ltp || 0).toFixed(2)}</span>
+                            <span class="${isUp ? 'text-bullish' : 'text-bearish'}">${sign}${pts} (${sign}${pct}%)</span>
+                        </span>`;
+                    }).join("");
+                }
+            } catch (tickerErr) {
+                console.warn("P1 ticker container update warning:", tickerErr);
             }
             
             if (lastSyncTime) {
@@ -1234,8 +1527,9 @@ function initTradexoDashboard() {
             }
 
         } catch (error) {
-            console.error("Failed to fetch scan results:", error);
-            if (allStocks.length === 0 && emptyState) {
+            console.error("Fatal error fetching scan results:", error);
+            // Do not let this error kill the app
+            if ((!allStocks || allStocks.length === 0) && emptyState) {
                 const isTimeout = error && error.name === "AbortError";
                 setEmptyStateMessage(
                     isTimeout ? "Request Timed Out" : "Couldn't Load Scan Data",
@@ -1245,18 +1539,26 @@ function initTradexoDashboard() {
                 );
                 emptyState.classList.remove("hidden");
             }
+            // Phase 3: Safe fallback table rendering on error
+            renderScannerTable([]);
         } finally {
             isFetchingScan = false;
             if (forceRefresh) {
-                if (scanProgressBar) scanProgressBar.classList.add("hidden");
-                if (scanBtn) {
-                    scanBtn.disabled = false;
-                    const span = scanBtn.querySelector("span");
-                    if (span) span.textContent = "SCAN NOW";
-                }
+                try {
+                    if (scanProgressBar) scanProgressBar.classList.add("hidden");
+                    const allScanBtns = document.querySelectorAll("#scanBtn, #scanNowBtn, #topbarScanBtn, #scanBtnMobile, .scan-hero-btn, [data-action='scan']");
+                    allScanBtns.forEach(btn => {
+                        try {
+                            btn.disabled = false;
+                            const span = btn.querySelector("span");
+                            if (span) span.textContent = "SCAN NOW";
+                        } catch (_) {}
+                    });
+                } catch (_) {}
             }
         }
     }
+    window.fetchScanResults = fetchScanResults;
 
     function setupAutoRefresh() {
         // Strict Teardown of any existing intervals to prevent ghost polling loops
@@ -1447,81 +1749,116 @@ function initTradexoDashboard() {
 
     function ensureNodeDictionariesPopulated() {
         // 1. Index Ticker Nodes (Marquee Ticker Tape)
-        if ((indexTickerNodes.length === 0 || !indexTickerNodes[0]?.item?.isConnected) && indexTickerTrack) {
-            indexTickerNodes.length = 0;
-            indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
-                const rawName = item.dataset.indexName || item.querySelector('strong')?.textContent || '';
-                const idxKey = normalizeIndexKey(rawName);
-                const spans = item.querySelectorAll('span');
-                indexTickerNodes.push({
-                    key: idxKey,
-                    item: item,
-                    ltpSpan: spans[0] || null,
-                    changeSpan: spans[1] || spans[2] || null
-                });
-            });
-        }
-
-        // 2. Index Card Nodes (#indexGrid)
-        if ((indexCardNodes.size === 0 || !indexCardNodes.values().next().value?.card?.isConnected) && indexGrid) {
-            indexCardNodes.clear();
-            indexGrid.querySelectorAll('.index-card').forEach(card => {
-                const rawName = card.dataset.indexName || card.querySelector('.index-card-name')?.textContent || '';
-                const idxKey = normalizeIndexKey(rawName);
-                indexCardNodes.set(idxKey, {
-                    card: card,
-                    ltpEl: card.querySelector('.index-card-ltp'),
-                    changeEl: card.querySelector('.index-card-change')
-                });
-            });
-        }
-
-        // 3. Index Verdict Nodes (#indexVerdictGrid)
-        if ((indexVerdictNodes.size === 0 || !indexVerdictNodes.values().next().value?.card?.isConnected) && indexVerdictGrid) {
-            indexVerdictNodes.clear();
-            indexVerdictGrid.querySelectorAll('.index-verdict-card').forEach(card => {
-                const rawName = card.querySelector('.index-verdict-card-name')?.textContent || '';
-                const idxKey = normalizeIndexKey(rawName);
-                indexVerdictNodes.set(idxKey, {
-                    card: card,
-                    priceEl: card.querySelector('.index-verdict-card-price'),
-                    tagEl: card.querySelector('.index-verdict-card-price span')
-                });
-            });
-        }
-
-        // 4. Scanner Table Nodes (#stocksTableBody)
-        if (stockTableNodes.size === 0 && stocksTableBody) {
-            stocksTableBody.querySelectorAll('tr[data-row-key]:not(.gap-distribution-row)').forEach(tr => {
-                const key = tr.dataset.rowKey || '';
-                const sym = key.split('-')[0];
-                if (!sym) return;
-                stockTableNodes.set(sym, {
-                    tr: tr,
-                    ltpStrong: tr.querySelector('[data-label="LTP"] strong') || tr.querySelector('[data-label="LTP"]'),
-                    changeSpan: tr.querySelector('[data-label="CHANGE"] span') || tr.querySelector('[data-label="CHANGE"]')
-                });
-            });
-        }
-
-        // 5. Live Grid Nodes (#liveStocksGrid)
-        if (stockGridNodes.size === 0) {
-            const liveGrid = document.getElementById("liveStocksGrid");
-            if (liveGrid) {
-                liveGrid.querySelectorAll('.live-stock-card').forEach(card => {
-                    const sym = card.dataset.symbol;
-                    if (!sym) return;
-                    stockGridNodes.set(sym, {
-                        card: card,
-                        ltpEl: card.querySelector('.live-card-ltp'),
-                        changeEl: card.querySelector('.live-card-change')
+        try {
+            if ((indexTickerNodes.length === 0 || !indexTickerNodes[0]?.item?.isConnected) && indexTickerTrack) {
+                indexTickerNodes.length = 0;
+                indexTickerTrack.querySelectorAll('.index-ticker-item').forEach(item => {
+                    if (!item) return;
+                    const rawName = item.dataset.indexName || item.querySelector('strong')?.textContent || '';
+                    const idxKey = normalizeIndexKey(rawName);
+                    const spans = item.querySelectorAll('span');
+                    indexTickerNodes.push({
+                        key: idxKey,
+                        item: item,
+                        ltpSpan: spans[0] || null,
+                        changeSpan: spans[1] || spans[2] || null
                     });
                 });
             }
+        } catch (tickerErr) {
+            console.warn("ensureNodeDictionariesPopulated indexTickerNodes warning:", tickerErr);
+        }
+
+        // 2. Index Card Nodes (#indexGrid)
+        try {
+            const firstCard = indexCardNodes.values().next().value;
+            if ((indexCardNodes.size === 0 || !firstCard?.card?.isConnected) && indexGrid) {
+                indexCardNodes.clear();
+                indexGrid.querySelectorAll('.index-card').forEach(card => {
+                    if (!card) return;
+                    const rawName = card.dataset.indexName || card.querySelector('.index-card-name')?.textContent || '';
+                    const idxKey = normalizeIndexKey(rawName);
+                    indexCardNodes.set(idxKey, {
+                        card: card,
+                        ltpEl: card.querySelector('.index-card-ltp'),
+                        changeEl: card.querySelector('.index-card-change')
+                    });
+                });
+            }
+        } catch (cardErr) {
+            console.warn("ensureNodeDictionariesPopulated indexCardNodes warning:", cardErr);
+        }
+
+        // 3. Index Verdict Nodes (#indexVerdictGrid)
+        try {
+            const firstVerdict = indexVerdictNodes.values().next().value;
+            if ((indexVerdictNodes.size === 0 || !firstVerdict?.card?.isConnected) && indexVerdictGrid) {
+                indexVerdictNodes.clear();
+                indexVerdictGrid.querySelectorAll('.index-verdict-card').forEach(card => {
+                    if (!card) return;
+                    const rawName = card.querySelector('.index-verdict-card-name')?.textContent || '';
+                    const idxKey = normalizeIndexKey(rawName);
+                    indexVerdictNodes.set(idxKey, {
+                        card: card,
+                        priceEl: card.querySelector('.index-verdict-card-price'),
+                        tagEl: card.querySelector('.index-verdict-card-price span')
+                    });
+                });
+            }
+        } catch (verdictErr) {
+            console.warn("ensureNodeDictionariesPopulated indexVerdictNodes warning:", verdictErr);
+        }
+
+        // 4. Scanner Table Nodes (#stocksTableBody) -> stockNodes
+        try {
+            const firstStock = stockNodes.values().next().value;
+            if ((stockNodes.size === 0 || !firstStock?.tr?.isConnected) && stocksTableBody) {
+                stockNodes.clear();
+                stocksTableBody.querySelectorAll('tr[data-symbol], tr[data-row-key]:not(.gap-distribution-row)').forEach(tr => {
+                    if (!tr) return;
+                    const sym = tr.dataset.symbol || (tr.dataset.rowKey || '').split('-')[0];
+                    if (!sym) return;
+                    const ltpEl = tr.querySelector('.ltp-cell strong') || tr.querySelector('.ltp-cell') || tr.querySelector('[data-label="LTP"] strong') || tr.querySelector('[data-label="LTP"]');
+                    const changeEl = tr.querySelector('[data-label="CHANGE"] span') || tr.querySelector('[data-label="CHANGE"]');
+                    stockNodes.set(sym, {
+                        tr: tr,
+                        ltp: ltpEl,
+                        ltpStrong: ltpEl,
+                        change: changeEl,
+                        changeSpan: changeEl
+                    });
+                });
+            }
+        } catch (tableErr) {
+            console.warn("ensureNodeDictionariesPopulated stockNodes warning:", tableErr);
+        }
+
+        // 5. Live Grid Nodes (#liveStocksGrid)
+        try {
+            const firstGridNode = stockGridNodes.values().next().value;
+            if (stockGridNodes.size === 0 || !firstGridNode?.card?.isConnected) {
+                const liveGrid = document.getElementById("liveStocksGrid");
+                if (liveGrid) {
+                    stockGridNodes.clear();
+                    liveGrid.querySelectorAll('.live-stock-card').forEach(card => {
+                        if (!card) return;
+                        const sym = card.dataset.symbol;
+                        if (!sym) return;
+                        stockGridNodes.set(sym, {
+                            card: card,
+                            ltpEl: card.querySelector('.live-card-ltp'),
+                            changeEl: card.querySelector('.live-card-change')
+                        });
+                    });
+                }
+            }
+        } catch (gridErr) {
+            console.warn("ensureNodeDictionariesPopulated stockGridNodes warning:", gridErr);
         }
     }
 
     function batchMutateLivePrices(data) {
+        if (!data) return;
         if (livePricesRafId) cancelAnimationFrame(livePricesRafId);
 
         livePricesRafId = requestAnimationFrame(() => {
@@ -1533,12 +1870,14 @@ function initTradexoDashboard() {
             if (data.indices && Array.isArray(data.indices) && data.indices.length > 0) {
                 const indexMap = new Map();
                 data.indices.forEach(idx => {
+                    if (!idx) return;
                     if (idx.index_name) indexMap.set(normalizeIndexKey(idx.index_name), idx);
                     if (idx.display_name) indexMap.set(normalizeIndexKey(idx.display_name), idx);
                 });
 
-                // Top marquee ticker bar (O(1) iterations over cached nodes, zero querySelector)
+                // Top marquee ticker bar (O(1) iterations over cached nodes, defensive)
                 indexTickerNodes.forEach(node => {
+                    if (!node || !node.key) return;
                     const idx = indexMap.get(node.key);
                     if (!idx) return;
 
@@ -1567,8 +1906,9 @@ function initTradexoDashboard() {
                     }
                 });
 
-                // Index Intelligence Cards (O(1) lookups)
+                // Index Intelligence Cards (O(1) lookups, defensive)
                 indexCardNodes.forEach((node, idxKey) => {
+                    if (!node) return;
                     const idx = indexMap.get(idxKey);
                     if (!idx) return;
 
@@ -1591,10 +1931,11 @@ function initTradexoDashboard() {
                     }
                 });
 
-                // Index Verdict Cards (O(1) lookups)
+                // Index Verdict Cards (O(1) lookups, defensive)
                 indexVerdictNodes.forEach((node, idxKey) => {
+                    if (!node || !node.priceEl) return;
                     const idx = indexMap.get(idxKey);
-                    if (!idx || !node.priceEl) return;
+                    if (!idx) return;
                     const rawLtp = idx.ltp ?? idx.current_price ?? idx.price;
                     if (rawLtp != null) {
                         const tagHtml = node.tagEl ? node.tagEl.outerHTML : '';
@@ -1604,85 +1945,103 @@ function initTradexoDashboard() {
                 });
             }
 
-            // 2. Batch Stock Price Updates (O(1) lookups)
+            // 2. Batch Stock Price Updates (O(1) defensive lookups)
             if (data.stocks && Array.isArray(data.stocks) && data.stocks.length > 0) {
                 const stockMap = new Map();
-                data.stocks.forEach(s => stockMap.set(s.symbol, s));
+                data.stocks.forEach(s => {
+                    if (s && s.symbol) stockMap.set(s.symbol, s);
+                });
 
                 // Update in-memory allStocks
-                allStocks.forEach(s => {
-                    const live = stockMap.get(s.symbol);
-                    if (live) {
-                        if (live.ltp != null) s.ltp = live.ltp;
-                        if (live.prev_close != null) s.prev_close = live.prev_close;
-                        if (live.change_pts != null) s.change_pts = live.change_pts;
-                        if (live.pct_change != null) s.pct_change = live.pct_change;
-                    }
-                });
+                if (Array.isArray(allStocks)) {
+                    allStocks.forEach(s => {
+                        if (!s || !s.symbol) return;
+                        const live = stockMap.get(s.symbol);
+                        if (live) {
+                            if (live.ltp != null) s.ltp = live.ltp;
+                            if (live.prev_close != null) s.prev_close = live.prev_close;
+                            if (live.change_pts != null) s.change_pts = live.change_pts;
+                            if (live.pct_change != null) s.pct_change = live.pct_change;
+                        }
+                    });
+                }
 
-                // Scanner Table Rows (O(1) Map lookups, zero document.querySelector)
-                stockTableNodes.forEach((node, sym) => {
-                    const s = stockMap.get(sym);
-                    if (!s) return;
+                // Phase 2 & 3: Defensive Node Lookups for Scanner Table Rows (Stop Fatal JS Crashes)
+                data.stocks.forEach(stock => {
+                    if (!stock || !stock.symbol) return;
 
-                    if (node.ltpStrong && s.ltp != null) {
-                        const formattedLtp = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-                        if (node.ltpStrong.textContent !== formattedLtp) {
-                            node.ltpStrong.textContent = formattedLtp;
+                    // Direct DOM query check — Skip update if row doesn't exist yet!
+                    const row = document.querySelector(`tr[data-symbol="${stock.symbol}"]`);
+                    if (!row) return;
+
+                    if (stock.ltp != null) {
+                        const formattedLtp = `₹${Number(stock.ltp).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        const ltpNode = row.querySelector('.ltp-cell strong') || row.querySelector('.ltp-cell') || row.querySelector('[data-label="LTP"] strong') || row.querySelector('[data-label="LTP"]');
+                        if (ltpNode && ltpNode.textContent !== formattedLtp) {
+                            ltpNode.textContent = formattedLtp;
                         }
                     }
 
-                    if (node.changeSpan && s.change_pts != null && s.pct_change != null) {
-                        const isUp = s.change_pts >= 0;
+                    if (stock.change_pts != null && stock.pct_change != null) {
+                        const isUp = stock.change_pts >= 0;
                         const sign = isUp ? '+' : '';
-                        const newText = `${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
+                        const newText = `${sign}${stock.change_pts.toFixed(2)} (${sign}${stock.pct_change.toFixed(2)}%)`;
                         const targetClass = isUp ? 'text-bullish' : 'text-bearish';
-                        if (node.changeSpan.className !== targetClass) {
-                            node.changeSpan.className = targetClass;
-                        }
-                        if (node.changeSpan.textContent !== newText) {
-                            node.changeSpan.textContent = newText;
+                        const chgNode = row.querySelector('[data-label="CHANGE"] span') || row.querySelector('[data-label="CHANGE"]');
+                        if (chgNode) {
+                            if (chgNode.className !== targetClass) {
+                                chgNode.className = targetClass;
+                            }
+                            if (chgNode.textContent !== newText) {
+                                chgNode.textContent = newText;
+                            }
                         }
                     }
                 });
 
-                // Live Stock Grid Cards (O(1) Map lookups, zero document.querySelector)
-                stockGridNodes.forEach((node, sym) => {
+                // Live Stock Grid Cards (O(1) Map lookups, defensive)
+                data.stocks.forEach(stock => {
+                    if (!stock || !stock.symbol) return;
+                    if (stockGridNodes.has(stock.symbol)) {
+                        const node = stockGridNodes.get(stock.symbol);
+                        if (!node) return;
+
+                        const isUp = (stock.change_pts || 0) >= 0;
+                        const sign = isUp ? '+' : '';
+                        if (node.card) {
+                            const targetCardClass = `live-stock-card ${isUp ? 'live-card-up' : 'live-card-down'}`;
+                            if (node.card.className !== targetCardClass) {
+                                node.card.className = targetCardClass;
+                            }
+                        }
+
+                        if (node.ltpEl && stock.ltp != null) {
+                            const formattedLtp = `₹${stock.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+                            if (node.ltpEl.textContent !== formattedLtp) {
+                                node.ltpEl.textContent = formattedLtp;
+                            }
+                        }
+
+                        if (node.changeEl && stock.change_pts != null && stock.pct_change != null) {
+                            const arrowIcon = isUp ? 'fa-caret-up' : 'fa-caret-down';
+                            const newHtml = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${stock.change_pts.toFixed(2)} (${sign}${stock.pct_change.toFixed(2)}%)`;
+                            if (node.changeEl.innerHTML !== newHtml) {
+                                node.changeEl.innerHTML = newHtml;
+                            }
+                        }
+                    }
+                });
+
+                // Accordion Open Detail Rows (O(1) Map lookups, defensive)
+                accordionNodes.forEach((node, sym) => {
+                    if (!sym || !node || !node.strongs || node.strongs.length < 2) return;
                     const s = stockMap.get(sym);
                     if (!s) return;
-
-                    const isUp = (s.change_pts || 0) >= 0;
-                    const sign = isUp ? '+' : '';
-                    const targetCardClass = `live-stock-card ${isUp ? 'live-card-up' : 'live-card-down'}`;
-                    if (node.card.className !== targetCardClass) {
-                        node.card.className = targetCardClass;
-                    }
-
-                    if (node.ltpEl && s.ltp != null) {
-                        const formattedLtp = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
-                        if (node.ltpEl.textContent !== formattedLtp) {
-                            node.ltpEl.textContent = formattedLtp;
-                        }
-                    }
-
-                    if (node.changeEl && s.change_pts != null && s.pct_change != null) {
-                        const arrowIcon = isUp ? 'fa-caret-up' : 'fa-caret-down';
-                        const newHtml = `<i class="fa-solid ${arrowIcon}"></i> ${sign}${s.change_pts.toFixed(2)} (${sign}${s.pct_change.toFixed(2)}%)`;
-                        if (node.changeEl.innerHTML !== newHtml) {
-                            node.changeEl.innerHTML = newHtml;
-                        }
-                    }
-                });
-
-                // Accordion Open Detail Rows (O(1) Map lookups)
-                accordionNodes.forEach((node, sym) => {
-                    const s = stockMap.get(sym);
-                    if (!s || !node.strongs || node.strongs.length < 2) return;
-                    if (s.ltp != null) {
+                    if (s.ltp != null && node.strongs[0]) {
                         const formatted = `₹${s.ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
                         if (node.strongs[0].textContent !== formatted) node.strongs[0].textContent = formatted;
                     }
-                    if (s.change_pts != null && s.pct_change != null) {
+                    if (s.change_pts != null && s.pct_change != null && node.strongs[1]) {
                         const isUp = s.change_pts >= 0;
                         const sign = isUp ? '+' : '';
                         const targetClass = isUp ? 'text-bullish' : 'text-bearish';
@@ -1737,29 +2096,38 @@ function initTradexoDashboard() {
             // Update BTST status
             if (data.btst_status) lastBtstStatus = data.btst_status;
 
-            if (allStocks.length === 0 && data.stocks && Array.isArray(data.stocks) && data.stocks.length > 0) {
-                // Cold-start fallback: populate allStocks from live prices endpoint
-                allStocks = data.stocks.map((s, idx) => ({
-                    symbol: s.symbol,
-                    raw_ticker: `${s.symbol}.NS`,
-                    rank_position: idx + 1,
-                    priority_level: "P3_LOW",
-                    signal: "WATCHLIST",
-                    confidence_score: 50,
-                    predicted_gap_pct: 0.0,
-                    ltp: s.ltp || 0.0,
-                    prev_close: s.prev_close || 0.0,
-                    change_pts: s.change_pts || 0.0,
-                    pct_change: s.pct_change || 0.0,
-                    volume_spike: 1.0,
-                    rsi: 50.0,
-                    confirmed_pillars_weight: 0.0,
-                    required_pillars: 3,
-                }));
-                filterAndRenderTable();
+            // Phase 1: Initial Build vs Update Logic
+            // If this is the initial load or table rows have not been rendered yet, construct full DOM elements
+            const tableIsEmpty = !stocksTableBody || stocksTableBody.children.length === 0;
+            const needsInitialBuild = isInitialLoad || stockNodes.size === 0 || tableIsEmpty;
+
+            if (needsInitialBuild) {
+                if (allStocks.length === 0 && data.stocks && Array.isArray(data.stocks) && data.stocks.length > 0) {
+                    allStocks = data.stocks.map((s, idx) => ({
+                        symbol: s.symbol,
+                        raw_ticker: `${s.symbol}.NS`,
+                        rank_position: idx + 1,
+                        priority_level: "P3_LOW",
+                        signal: "WATCHLIST",
+                        confidence_score: 50,
+                        predicted_gap_pct: 0.0,
+                        ltp: s.ltp || 0.0,
+                        prev_close: s.prev_close || 0.0,
+                        change_pts: s.change_pts || 0.0,
+                        pct_change: s.pct_change || 0.0,
+                        volume_spike: 1.0,
+                        rsi: 50.0,
+                        confirmed_pillars_weight: 0.0,
+                        required_pillars: 3,
+                    }));
+                }
+                if (allStocks.length > 0) {
+                    filterAndRenderTable();
+                    isInitialLoad = false;
+                }
             }
 
-            // Always run high-performance batch mutation for indices and cached table nodes
+            // On subsequent loads (ticks), bypass the build step and strictly use in-place text mutations
             batchMutateLivePrices(data);
         } catch (e) {
             triggerHeartbeatError();
@@ -1772,16 +2140,21 @@ function initTradexoDashboard() {
     // 3. METRICS & SUMMARY CARDS UPDATE (NULL-SAFE)
     // -------------------------------------------------------------
     function updateSummaryMetrics(data) {
-        if (totalScanned) totalScanned.textContent = data.total_scanned || 0;
-        if (priority1Count) priority1Count.textContent = data.priority_1_count || 0;
-        if (signalsNavBadge) signalsNavBadge.textContent = data.priority_1_count || 0;
-        if (btstCount) btstCount.textContent = data.btst_count || 0;
-        if (stbtCount) stbtCount.textContent = data.stbt_count || 0;
+        try {
+            if (!data || typeof data !== "object") data = {};
+            if (totalScanned) totalScanned.textContent = (data.total_scanned !== undefined && data.total_scanned !== null) ? data.total_scanned : 0;
+            if (priority1Count) priority1Count.textContent = (data.priority_1_count !== undefined && data.priority_1_count !== null) ? data.priority_1_count : 0;
+            if (signalsNavBadge) signalsNavBadge.textContent = (data.priority_1_count !== undefined && data.priority_1_count !== null) ? data.priority_1_count : 0;
+            if (btstCount) btstCount.textContent = (data.btst_count !== undefined && data.btst_count !== null) ? data.btst_count : 0;
+            if (stbtCount) stbtCount.textContent = (data.stbt_count !== undefined && data.stbt_count !== null) ? data.stbt_count : 0;
 
-        const winRate = (data.win_rate_pct !== undefined && data.win_rate_pct !== null && data.win_rate_pct !== 0) ? data.win_rate_pct : 75.0;
-        if (headerWinRateText) headerWinRateText.textContent = `${winRate}%`;
-        if (cardWinRatePct) cardWinRatePct.textContent = `${winRate}%`;
-        if (cardTrackedTradesCount) cardTrackedTradesCount.textContent = data.total_tracked_trades || 0;
+            const winRate = (data.win_rate_pct !== undefined && data.win_rate_pct !== null && data.win_rate_pct !== 0) ? data.win_rate_pct : 75.0;
+            if (headerWinRateText) headerWinRateText.textContent = `${winRate}%`;
+            if (cardWinRatePct) cardWinRatePct.textContent = `${winRate}%`;
+            if (cardTrackedTradesCount) cardTrackedTradesCount.textContent = (data.total_tracked_trades !== undefined && data.total_tracked_trades !== null) ? data.total_tracked_trades : 0;
+        } catch (metricsErr) {
+            console.error("Error in updateSummaryMetrics:", metricsErr);
+        }
     }
 
     // -------------------------------------------------------------
@@ -2010,14 +2383,16 @@ function initTradexoDashboard() {
     }
 
     function filterAndRenderTable() {
-        if (!stocksTableBody) return;
+        try {
+            if (!stocksTableBody) return;
 
-        const searchTerm = searchInput ? searchInput.value.trim().toUpperCase() : "";
-        const sortKey = sortSelect ? sortSelect.value : "RANK_ASC";
-        const btstTableWrapper = document.getElementById("btstTableWrapper");
-        const liveStocksGrid = document.getElementById("liveStocksGrid");
+            const searchTerm = searchInput ? searchInput.value.trim().toUpperCase() : "";
+            const sortKey = sortSelect ? sortSelect.value : "RANK_ASC";
+            const btstTableWrapper = document.getElementById("btstTableWrapper");
+            const liveStocksGrid = document.getElementById("liveStocksGrid");
 
-        let filtered = (allStocks || []).filter((stock, idx) => {
+            const stocksList = (allStocks && Array.isArray(allStocks)) ? allStocks : [];
+            let filtered = stocksList.filter((stock, idx) => {
             if (searchTerm) {
                 const sSym = (stock.symbol || "").toUpperCase();
                 const sTick = (stock.raw_ticker || "").toUpperCase();
@@ -2077,45 +2452,50 @@ function initTradexoDashboard() {
             stockGridNodes.clear();
             liveStocksGrid.innerHTML = "";
             filtered.forEach(stock => {
-                const changePts = stock.change_pts || 0;
-                const pctChange = stock.pct_change || 0;
-                const ltp = stock.ltp || 0;
-                const isUp = changePts >= 0;
-                const sign = isUp ? "+" : "";
-                const colorClass = isUp ? "live-card-up" : "live-card-down";
-                const arrowIcon = isUp ? "fa-caret-up" : "fa-caret-down";
-                const sigText = stock.signal || (isUp ? "TOP GAINER" : "TOP LOSER");
+                try {
+                    if (!stock || typeof stock !== "object") return;
+                    const changePts = stock.change_pts || 0;
+                    const pctChange = stock.pct_change || 0;
+                    const ltp = stock.ltp || 0;
+                    const isUp = changePts >= 0;
+                    const sign = isUp ? "+" : "";
+                    const colorClass = isUp ? "live-card-up" : "live-card-down";
+                    const arrowIcon = isUp ? "fa-caret-up" : "fa-caret-down";
+                    const sigText = stock.signal || (isUp ? "TOP GAINER" : "TOP LOSER");
 
-                const card = document.createElement("div");
-                card.className = `live-stock-card ${colorClass}`;
-                card.dataset.symbol = stock.symbol || "";
-                card.innerHTML = `
-                    <div class="symbol-with-logo">
-                        ${getStockLogoHTML(stock.symbol)}
-                        <div>
-                            <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
-                            <div style="font-size: 10px; font-weight: 700; color: ${isUp ? '#10b981' : '#ef4444'}; margin-top: 2px;">
-                                <i class="fa-solid ${isUp ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${escapeHtml(sigText)}
+                    const card = document.createElement("div");
+                    card.className = `live-stock-card ${colorClass}`;
+                    card.dataset.symbol = stock.symbol || "";
+                    card.innerHTML = `
+                        <div class="symbol-with-logo">
+                            ${getStockLogoHTML(stock.symbol)}
+                            <div>
+                                <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
+                                <div style="font-size: 10px; font-weight: 700; color: ${isUp ? '#10b981' : '#ef4444'}; margin-top: 2px;">
+                                    <i class="fa-solid ${isUp ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${escapeHtml(sigText)}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div style="text-align:right;">
-                        <div class="live-card-ltp">₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
-                        <div class="live-card-change">
-                            <i class="fa-solid ${arrowIcon}"></i>
-                            ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
+                        <div style="text-align:right;">
+                            <div class="live-card-ltp">₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+                            <div class="live-card-change">
+                                <i class="fa-solid ${arrowIcon}"></i>
+                                ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
+                            </div>
                         </div>
-                    </div>
-                `;
-                card.addEventListener("click", () => openStockModal(stock.symbol));
-                liveStocksGrid.appendChild(card);
+                    `;
+                    card.addEventListener("click", () => openStockModal(stock.symbol));
+                    liveStocksGrid.appendChild(card);
 
-                // Register into O(1) Node Dictionary
-                stockGridNodes.set(stock.symbol, {
-                    card: card,
-                    ltpEl: card.querySelector(".live-card-ltp"),
-                    changeEl: card.querySelector(".live-card-change")
-                });
+                    // Register into O(1) Node Dictionary
+                    stockGridNodes.set(stock.symbol, {
+                        card: card,
+                        ltpEl: card.querySelector(".live-card-ltp"),
+                        changeEl: card.querySelector(".live-card-change")
+                    });
+                } catch (liveCardErr) {
+                    console.warn("Error rendering live stock card:", stock && stock.symbol, liveCardErr);
+                }
             });
             return;
         }
@@ -2128,7 +2508,7 @@ function initTradexoDashboard() {
         stocksTableBody.innerHTML = "";
         
         if (filtered.length === 0) {
-            stocksTableBody.innerHTML = "";
+            stocksTableBody.innerHTML = '<tr><td colspan="13" class="text-center py-8 text-slate-500" style="text-align:center;padding:32px;color:#64748b;">No active signals available or error fetching data.</td></tr>';
             setEmptyStateMessage(EMPTY_STATE_DEFAULT_TITLE, EMPTY_STATE_DEFAULT_TEXT);
             if (emptyState) emptyState.classList.remove("hidden");
             return;
@@ -2137,62 +2517,75 @@ function initTradexoDashboard() {
         }
 
         filtered.forEach((stock) => {
-            const estGap = stock.predicted_gap_pct !== undefined ? stock.predicted_gap_pct : 0.0;
-            const ltpVal = stock.ltp ? stock.ltp.toLocaleString('en-IN') : '0.00';
-            const sigText = stock.signal || 'NEUTRAL';
-            const pillarWeight = stock.confirmed_pillars_weight !== undefined ? stock.confirmed_pillars_weight : 0.0;
-            const reqPillars = stock.required_pillars || 3;
-            const rowKey = `${stock.symbol}-${stock.rank_position || 0}`;
-            const isRowExpanded = expandedTickers.has(rowKey);
+            try {
+                if (!stock || typeof stock !== "object") return;
+                const estGap = stock.predicted_gap_pct !== undefined ? stock.predicted_gap_pct : 0.0;
+                const ltpVal = stock.ltp ? stock.ltp.toLocaleString('en-IN') : '0.00';
+                const sigText = stock.signal || 'NEUTRAL';
+                const pillarWeight = stock.confirmed_pillars_weight !== undefined ? stock.confirmed_pillars_weight : 0.0;
+                const reqPillars = stock.required_pillars || 3;
+                const rowKey = `${stock.symbol}-${stock.rank_position || 0}`;
+                const isRowExpanded = (typeof expandedTickers !== "undefined" ? expandedTickers : (window.expandedTickers || new Set())).has(rowKey);
 
-            const flowDetailId = `flow-detail-${stock.symbol}-${stock.rank_position || 0}`;
-            const flowChipHtml = buildInstitutionalFlowChipHTML(stock.institutional_flow, flowDetailId);
-            const flowDetailRowHtml = buildInstitutionalFlowDetailRowHTML(stock, flowDetailId);
+                const flowDetailId = `flow-detail-${stock.symbol}-${stock.rank_position || 0}`;
+                const flowChipHtml = buildInstitutionalFlowChipHTML(stock.institutional_flow, flowDetailId);
+                const flowDetailRowHtml = buildInstitutionalFlowDetailRowHTML(stock, flowDetailId);
 
-            let tr = stocksTableBody.querySelector(`tr[data-row-key="${CSS.escape(rowKey)}"]`);
-            if (tr) {
-                // Selective In-Place DOM Update for Existing Row  —  PRESERVES OPEN ACCORDION & LOGO IMAGE
-                if (isRowExpanded) tr.classList.add("expanded");
-                const ltpTd = tr.querySelector('[data-label="LTP"]');
-                if (ltpTd) ltpTd.innerHTML = `<strong>₹${ltpVal}</strong>`;
-                const changeTd = tr.querySelector('[data-label="CHANGE"]');
-                if (changeTd) {
-                    const isPos = (stock.change_pts || 0) >= 0;
-                    changeTd.innerHTML = `
-                        <span class="${isPos ? 'text-bullish' : 'text-bearish'}" style="font-weight:700;font-size:12px;">
-                            ${isPos ? '+' : ''}${(stock.change_pts || 0).toFixed(2)} (${(stock.pct_change || 0) >= 0 ? '+' : ''}${(stock.pct_change || 0).toFixed(2)}%)
-                        </span>
-                    `;
+                let tr = stocksTableBody.querySelector(`tr[data-row-key="${CSS.escape(rowKey)}"]`) || stocksTableBody.querySelector(`tr[data-symbol="${CSS.escape(stock.symbol)}"]`);
+                if (tr) {
+                    // Selective In-Place DOM Update for Existing Row  —   PRESERVES OPEN ACCORDION & LOGO IMAGE
+                    if (isRowExpanded) tr.classList.add("expanded");
+                    const ltpTd = tr.querySelector('.ltp-cell') || tr.querySelector('[data-label="LTP"]');
+                    if (ltpTd) ltpTd.innerHTML = `<strong>₹${ltpVal}</strong>`;
+                    const changeTd = tr.querySelector('[data-label="CHANGE"]');
+                    if (changeTd) {
+                        const isPos = (stock.change_pts || 0) >= 0;
+                        changeTd.innerHTML = `
+                            <span class="${isPos ? 'text-bullish' : 'text-bearish'}" style="font-weight:700;font-size:12px;">
+                                ${isPos ? '+' : ''}${(stock.change_pts || 0).toFixed(2)} (${(stock.pct_change || 0) >= 0 ? '+' : ''}${(stock.pct_change || 0).toFixed(2)}%)
+                            </span>
+                        `;
+                    }
+                    const estGapTd = tr.querySelector('[data-label="EST. GAP"]');
+                    if (estGapTd) {
+                        estGapTd.innerHTML = `
+                            <span class="est-gap-pill ${estGap >= 0 ? 'est-gap-up' : 'est-gap-down'}">
+                                ${estGap >= 0 ? '+' : ''}${estGap}% EST
+                            </span>
+                        `;
+                    }
+                    const rsiTd = tr.querySelector('[data-label="RSI"]');
+                    if (rsiTd) {
+                        rsiTd.innerHTML = `<span class="rsi-badge ${getRsiColorClass(stock.rsi || 50)}">${stock.rsi || 50}</span>`;
+                    }
+                    const ltpStrong = tr.querySelector('.ltp-cell strong') || tr.querySelector('.ltp-cell') || tr.querySelector('[data-label="LTP"] strong') || tr.querySelector('[data-label="LTP"]');
+                    const changeSpan = tr.querySelector('[data-label="CHANGE"] span') || tr.querySelector('[data-label="CHANGE"]');
+                    stockNodes.set(stock.symbol, {
+                        tr: tr,
+                        ltp: ltpStrong,
+                        ltpStrong: ltpStrong,
+                        change: changeSpan,
+                        changeSpan: changeSpan
+                    });
+                    return;
                 }
-                const estGapTd = tr.querySelector('[data-label="EST. GAP"]');
-                if (estGapTd) {
-                    estGapTd.innerHTML = `
-                        <span class="est-gap-pill ${estGap >= 0 ? 'est-gap-up' : 'est-gap-down'}">
-                            ${estGap >= 0 ? '+' : ''}${estGap}% EST
-                        </span>
-                    `;
-                }
-                const rsiTd = tr.querySelector('[data-label="RSI"]');
-                if (rsiTd) {
-                    rsiTd.innerHTML = `<span class="rsi-badge ${getRsiColorClass(stock.rsi || 50)}">${stock.rsi || 50}</span>`;
-                }
-                return;
-            }
 
-            tr = document.createElement("tr");
-            tr.dataset.rowKey = rowKey;
-            
-            if (stock.rank_position <= 2) {
-                tr.classList.add("top-choice-row");
-            }
-            if (stock.next_day_bestest_5) {
-                tr.classList.add("bestest-5-row");
-            }
-            if (isRowExpanded) {
-                tr.classList.add("expanded");
-            }
+                tr = document.createElement("tr");
+                tr.dataset.rowKey = rowKey;
+                tr.dataset.symbol = stock.symbol;
+                tr.setAttribute("data-symbol", stock.symbol);
 
-            let bucketHtml = "";
+                if (stock.rank_position <= 2) {
+                    tr.classList.add("top-choice-row");
+                }
+                if (stock.next_day_bestest_5) {
+                    tr.classList.add("bestest-5-row");
+                }
+                if (isRowExpanded) {
+                    tr.classList.add("expanded");
+                }
+
+                let bucketHtml = "";
             const distMeta = stock.gap_bucket_distribution || {};
             const probs = distMeta.bucket_probabilities || { "0-1%": 0.45, "1-2%": 0.30, "2-3%": 0.15, "3%+": 0.10 };
             const isSufficient = distMeta.is_sufficient === true || distMeta.is_empirical === true;
@@ -2335,7 +2728,7 @@ function initTradexoDashboard() {
                         ${estGap >= 0 ? '+' : ''}${estGap}% EST
                     </span>
                 </td>
-                <td data-label="LTP"><strong>₹${ltpVal}</strong></td>
+                <td data-label="LTP" class="ltp-cell"><strong>₹${ltpVal}</strong></td>
                 <td data-label="CHANGE">
                     <span class="${(stock.change_pts || 0) >= 0 ? 'text-bullish' : 'text-bearish'}" style="font-weight:700;font-size:12px;">
                         ${(stock.change_pts || 0) >= 0 ? '+' : ''}${(stock.change_pts || 0).toFixed(2)} (${(stock.pct_change || 0) >= 0 ? '+' : ''}${(stock.pct_change || 0).toFixed(2)}%)
@@ -2387,10 +2780,14 @@ function initTradexoDashboard() {
             stocksTableBody.appendChild(tr);
 
             // Register into O(1) Node Dictionary
-            stockTableNodes.set(stock.symbol, {
+            const ltpEl = tr.querySelector('[data-label="LTP"] strong') || tr.querySelector('[data-label="LTP"]');
+            const changeEl = tr.querySelector('[data-label="CHANGE"] span') || tr.querySelector('[data-label="CHANGE"]');
+            stockNodes.set(stock.symbol, {
                 tr: tr,
-                ltpStrong: tr.querySelector('[data-label="LTP"] strong') || tr.querySelector('[data-label="LTP"]'),
-                changeSpan: tr.querySelector('[data-label="CHANGE"] span') || tr.querySelector('[data-label="CHANGE"]')
+                ltp: ltpEl,
+                ltpStrong: ltpEl,
+                change: changeEl,
+                changeSpan: changeEl
             });
 
             if (bucketHtml) {
@@ -2418,9 +2815,14 @@ function initTradexoDashboard() {
                         viewInstitutionalFlowDeals(stock.symbol);
                     });
                 }
+            } catch (rowErr) {
+                console.warn("Error rendering scanner table row:", stock && stock.symbol, rowErr);
             }
         });
+    } catch (tableErr) {
+        console.error("Fatal error rendering scanner table:", tableErr);
     }
+}
 
     // -------------------------------------------------------------
     // Institutional Flow (Pillar 6)  —  scanner row chip + expand detail.
@@ -3120,47 +3522,63 @@ function initTradexoDashboard() {
 
                         // CE: OI (0)
                         const ceOi = (ce.open_interest || 0).toLocaleString();
-                        if (node.ceOi.textContent.trim() !== ceOi) node.ceOi.textContent = ceOi;
+                        if (node.ceOi && node.ceOi.textContent && node.ceOi.textContent.trim() !== ceOi) {
+                            node.ceOi.textContent = ceOi;
+                        }
 
                         // CE: CHNG IN OI (1)
                         const ceChg = `${(ce.change_in_oi || 0) >= 0 ? '+' : ''}${(ce.change_in_oi || 0).toLocaleString()}`;
-                        if (node.ceChg.textContent.trim() !== ceChg) {
-                            node.ceChg.textContent = ceChg;
+                        if (node.ceChg) {
+                            if (node.ceChg.textContent && node.ceChg.textContent.trim() !== ceChg) {
+                                node.ceChg.textContent = ceChg;
+                            }
                             node.ceChg.style.color = (ce.change_in_oi || 0) >= 0 ? '#22c55e' : '#ef4444';
                         }
 
                         // CE: VOL (2)
                         const ceVol = (ce.volume || 0).toLocaleString();
-                        if (node.ceVol.textContent.trim() !== ceVol) node.ceVol.textContent = ceVol;
+                        if (node.ceVol && node.ceVol.textContent && node.ceVol.textContent.trim() !== ceVol) {
+                            node.ceVol.textContent = ceVol;
+                        }
 
                         // CE: LTP (3)
                         const ceLtp = `₹${(ce.ltp || 0).toFixed(2)}`;
-                        if (node.ceLtp.textContent.trim() !== ceLtp) {
-                            node.ceLtp.textContent = ceLtp;
+                        if (node.ceLtp) {
+                            if (node.ceLtp.textContent && node.ceLtp.textContent.trim() !== ceLtp) {
+                                node.ceLtp.textContent = ceLtp;
+                            }
+                            node.ceLtp.onclick = () => openOptionsDemoTradeModal({ symbol: cleanSym, strike: s.strike_price, leg: 'CE', ltp: ce.ltp || 1.0, lot_size: data.lot_size || 250, underlying: data.underlying_value || 0 });
                         }
-                        node.ceLtp.onclick = () => openOptionsDemoTradeModal({ symbol: cleanSym, strike: s.strike_price, leg: 'CE', ltp: ce.ltp || 1.0, lot_size: data.lot_size || 250, underlying: data.underlying_value || 0 });
 
                         // PE: LTP (5)
                         const peLtp = `₹${(pe.ltp || 0).toFixed(2)}`;
-                        if (node.peLtp.textContent.trim() !== peLtp) {
-                            node.peLtp.textContent = peLtp;
+                        if (node.peLtp) {
+                            if (node.peLtp.textContent && node.peLtp.textContent.trim() !== peLtp) {
+                                node.peLtp.textContent = peLtp;
+                            }
+                            node.peLtp.onclick = () => openOptionsDemoTradeModal({ symbol: cleanSym, strike: s.strike_price, leg: 'PE', ltp: pe.ltp || 1.0, lot_size: data.lot_size || 250, underlying: data.underlying_value || 0 });
                         }
-                        node.peLtp.onclick = () => openOptionsDemoTradeModal({ symbol: cleanSym, strike: s.strike_price, leg: 'PE', ltp: pe.ltp || 1.0, lot_size: data.lot_size || 250, underlying: data.underlying_value || 0 });
 
                         // PE: VOL (6)
                         const peVol = (pe.volume || 0).toLocaleString();
-                        if (node.peVol.textContent.trim() !== peVol) node.peVol.textContent = peVol;
+                        if (node.peVol && node.peVol.textContent && node.peVol.textContent.trim() !== peVol) {
+                            node.peVol.textContent = peVol;
+                        }
 
                         // PE: CHNG IN OI (7)
                         const peChg = `${(pe.change_in_oi || 0) >= 0 ? '+' : ''}${(pe.change_in_oi || 0).toLocaleString()}`;
-                        if (node.peChg.textContent.trim() !== peChg) {
-                            node.peChg.textContent = peChg;
+                        if (node.peChg) {
+                            if (node.peChg.textContent && node.peChg.textContent.trim() !== peChg) {
+                                node.peChg.textContent = peChg;
+                            }
                             node.peChg.style.color = (pe.change_in_oi || 0) >= 0 ? '#22c55e' : '#ef4444';
                         }
 
                         // PE: OI (8)
                         const peOi = (pe.open_interest || 0).toLocaleString();
-                        if (node.peOi.textContent.trim() !== peOi) node.peOi.textContent = peOi;
+                        if (node.peOi && node.peOi.textContent && node.peOi.textContent.trim() !== peOi) {
+                            node.peOi.textContent = peOi;
+                        }
                     });
                 });
                 return;
@@ -7205,21 +7623,20 @@ function initTradexoDashboard() {
         });
     }
 
-    fetchTickerIndices();
-    fetchLivePrices();
-    if (!window._tradexoLivePricesInterval) {
-        window._tradexoLivePricesInterval = setInterval(fetchLivePrices, 1000);
-    }
-    initWebSocket();
-    if (window.lucide && typeof window.lucide.createIcons === 'function') {
-        window.lucide.createIcons();
+}
+
+function safeInitTradexoDashboard() {
+    try {
+        initTradexoDashboard();
+    } catch (fatalErr) {
+        console.error("Fatal uncaught exception during dashboard initialization:", fatalErr);
     }
 }
 
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initTradexoDashboard);
+    document.addEventListener("DOMContentLoaded", safeInitTradexoDashboard);
 } else {
-    initTradexoDashboard();
+    safeInitTradexoDashboard();
 }
 
 let cachedLiveTradeSetups = [];
@@ -10623,36 +11040,62 @@ function initSystemHealthDiagnostics() {
     }, 1000);
 }
 
-initSystemHealthDiagnostics();
-
-
-
-// Wire Options Chain View Mode Toggles (ALL / CALLS / PUTS)
-function initOcViewToggles() {
-    const ocToggles = document.getElementById("ocViewToggles");
-    if (ocToggles) {
-        ocToggles.addEventListener("click", function(e) {
-            const btn = e.target.closest(".oc-toggle-btn");
-            if (!btn) return;
-            const mode = btn.dataset.ocMode || "all";
-            ocToggles.querySelectorAll(".oc-toggle-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            const ocTable = document.querySelector(".oc-matrix-table");
-            if (ocTable) {
-                if (mode === "all") {
-                    delete ocTable.dataset.ocView;
-                } else {
-                    ocTable.dataset.ocView = mode;
-                }
-            }
-        });
+function safeInitSystemHealthDiagnostics() {
+    try {
+        if (typeof initSystemHealthDiagnostics === "function") {
+            initSystemHealthDiagnostics();
+        }
+    } catch (healthErr) {
+        console.warn("Non-fatal error in system health diagnostics setup:", healthErr);
     }
 }
 
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initOcViewToggles);
+    document.addEventListener("DOMContentLoaded", safeInitSystemHealthDiagnostics);
 } else {
-    initOcViewToggles();
+    safeInitSystemHealthDiagnostics();
+}
+
+// Wire Options Chain View Mode Toggles (ALL / CALLS / PUTS)
+function initOcViewToggles() {
+    try {
+        const ocToggles = document.getElementById("ocViewToggles");
+        if (ocToggles) {
+            ocToggles.addEventListener("click", function(e) {
+                const btn = e.target.closest(".oc-toggle-btn");
+                if (!btn) return;
+                const mode = btn.dataset.ocMode || "all";
+                ocToggles.querySelectorAll(".oc-toggle-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                const ocTable = document.querySelector(".oc-matrix-table");
+                if (ocTable) {
+                    if (mode === "all") {
+                        delete ocTable.dataset.ocView;
+                    } else {
+                        ocTable.dataset.ocView = mode;
+                    }
+                }
+            });
+        }
+    } catch (ocErr) {
+        console.warn("Error wiring OC view toggles:", ocErr);
+    }
+}
+
+function safeInitOcViewToggles() {
+    try {
+        if (typeof initOcViewToggles === "function") {
+            initOcViewToggles();
+        }
+    } catch (ocErr) {
+        console.warn("Non-fatal error in OC view toggles setup:", ocErr);
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", safeInitOcViewToggles);
+} else {
+    safeInitOcViewToggles();
 }
 
 

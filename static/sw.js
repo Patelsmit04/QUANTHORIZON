@@ -2,7 +2,7 @@
    TRADEXO PWA SERVICE WORKER (Phase 4 — Lock-Screen Web Push Notifications)
    ========================================================================== */
 
-const CACHE_NAME = 'tradexo-cache-v1';
+const CACHE_NAME = 'tradexo-cache-v2';
 const ASSETS_TO_CACHE = [
     '/',
     '/static/styles.css',

@@ -3,7 +3,7 @@
    PRD-FE-TRADEXO-V47 Master Specification
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&family=Fira+Code:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&family=Fira+Code:wght@400;500;600;700&display=swap');
 
 :root,
 [data-theme="dark"],
@@ -78,10 +78,10 @@ html.dark-mode {
     --cat-orange: #fb923c;
     --cat-aqua: #2dd4bf;
 
-    --font-brand: 'Syne', 'Plus Jakarta Sans', -apple-system, sans-serif;
-    --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    --font-brand: 'Syne', 'Inter', -apple-system, sans-serif;
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
     --radius-xl: 8px;
     --radius-lg: 6px;
@@ -215,9 +215,9 @@ html, body {
 }
 
 .app-logo-frame {
-    background: var(--bg-surface) !important;
-    border: 1px solid var(--border-subtle) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Adaptive Theme Wordmarks */
@@ -497,10 +497,10 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 .app-shell {
     display: flex;
     align-items: stretch;
-    min-height: 100vh;
+    height: 100vh;
     width: 100% !important;
     max-width: 100% !important;
-    overflow-x: hidden !important;
+    overflow: hidden !important;
     box-sizing: border-box;
 }
 
@@ -511,6 +511,8 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     display: flex;
     flex-direction: column;
     overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: 100vh;
     box-sizing: border-box;
 }
 
@@ -523,10 +525,10 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     border-right: 1px solid var(--glass-border);
-    position: sticky;
-    top: 0;
+    position: relative;
     height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 200;
     transition: width 0.22s ease;
 }
@@ -538,40 +540,31 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 .sidebar-header {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 12px;
-    padding: 18px 16px;
+    padding: 16px 16px;
     border-bottom: 1px solid var(--glass-border);
     flex-shrink: 0;
 }
 
-.sidebar-brand-text { display: flex; flex-direction: column; min-width: 0; flex: 1 1 auto; }
-.drawer-subtitle {
-    font-family: var(--font-heading, inherit);
-    font-size: 8.5px;
-    font-weight: 700;
-    letter-spacing: 0.35px;
-    color: var(--gold, #d4af37);
-    margin-top: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
-}
+.sidebar-brand-text { display: none !important; }
+.drawer-subtitle { display: none !important; }
 .app-sidebar.collapsed .sidebar-brand-text { display: none; }
 
 .sidebar-collapse-btn {
-    width: 20px; height: 20px;
+    width: 24px; height: 24px;
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%;
     border: 1px solid var(--glass-border-strong);
     background: transparent;
     color: var(--ink-muted);
-    font-size: 9px;
+    font-size: 10px;
     cursor: pointer;
     flex-shrink: 0;
+    margin-left: auto;
     transition: all 0.2s ease;
 }
-.sidebar-collapse-btn i { font-size: 9px; }
+.sidebar-collapse-btn i { font-size: 10px; }
 .sidebar-collapse-btn:hover { background: var(--gold-bg); color: var(--gold); }
 .app-sidebar.collapsed .sidebar-collapse-btn i { transform: rotate(180deg); }
 
@@ -664,19 +657,37 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     text-transform: uppercase;
 }
 
-@media (min-width: 1024px) {
-    /* Hide topbar brand wordmark on desktop when sidebar is already showing TRADEXO logo */
-    .topbar-brand .brand-wordmark-img {
-        display: none !important;
-    }
+.topbar-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
 }
 
-@media (max-width: 1023px) {
-    .workstation-context-tag {
-        display: none !important;
-    }
-    .topbar-brand .brand-wordmark-img {
-        display: block !important;
+.topbar-tradexo-heading {
+    display: inline-flex !important;
+    align-items: center !important;
+    font-family: var(--font-brand) !important;
+    font-weight: 800 !important;
+    font-size: 22px !important;
+    letter-spacing: 0.18em !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    text-transform: uppercase !important;
+    user-select: none !important;
+}
+
+.tradexo-trade {
+    color: var(--ink-primary, #0f172a) !important;
+}
+
+.tradexo-xo {
+    color: #d97706 !important;
+}
+
+@media (max-width: 640px) {
+    .topbar-tradexo-heading {
+        font-size: 18px !important;
+        letter-spacing: 0.12em !important;
     }
 }
 
@@ -732,25 +743,25 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
 
 /* App Logo Frame — Square with Circular Corners (Enlarged) */
 .app-logo-frame {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
     aspect-ratio: 1 / 1;
-    border-radius: 14px;
-    background: #0f1420;
-    border: 1px solid var(--glass-border-strong);
+    border-radius: 12px;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
     overflow: hidden;
-    padding: 4px;
+    padding: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     flex-shrink: 0;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .app-logo-frame:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
+    transform: scale(1.04);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2) !important;
 }
 
 .app-logo-frame img {
@@ -759,6 +770,7 @@ button, .btn, .tab-btn, .search-box input, .sort-box select, .modal-close-btn {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    background: transparent !important;
     display: block;
 }
 
@@ -1505,7 +1517,7 @@ input:checked + .slider:before { transform: translateX(16px); }
 
 .table-scroll { overflow-x: auto !important; max-width: 100% !important; width: 100% !important; -webkit-overflow-scrolling: touch; box-sizing: border-box !important; }
 
-.data-table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+.data-table { width: 100%; border-collapse: collapse; min-width: 0; table-layout: fixed; }
 
 .data-table thead th {
     text-align: left;
@@ -4296,13 +4308,14 @@ html, body, #root, #app, .app-shell {
 }
 
 /* 2. Compact Toolbar Container, Search Box, Sort Box & Standalone Filter Pills */
-.toolbar-container {
+.toolbar-container,
+#scannerSection .toolbar-container {
     display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 12px !important;
     background: #ffffff !important;
-    padding: 12px 16px !important;
+    padding: 14px 16px !important;
     border-radius: 12px !important;
     border: 1px solid #e2e8f0 !important;
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
@@ -4311,7 +4324,8 @@ html, body, #root, #app, .app-shell {
     box-sizing: border-box !important;
 }
 
-#scannerFilterTabs {
+#scannerFilterTabs,
+#scannerSection #scannerFilterTabs {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
@@ -4319,11 +4333,22 @@ html, body, #root, #app, .app-shell {
     width: 100% !important;
 }
 
-.toolbar-controls-row {
+.toolbar-controls-row,
+#scannerSection .toolbar-controls-row {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 14px !important;
     width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 768px) {
+    .toolbar-controls-row,
+    #scannerSection .toolbar-controls-row {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
 }
 
 /* REQ-SCAN-001 & REQ-SCAN-004: Table Accordion & Header Sorting Rules */
@@ -4390,112 +4415,261 @@ html, body, #root, #app, .app-shell {
     transform: translateY(-1px);
 }
 
-.search-box {
-    position: relative;
+.search-box,
+#scannerSection .search-box {
+    position: relative !important;
     display: flex !important;
     align-items: center !important;
     background: #f8fafc !important;
     border: 1.5px solid #cbd5e1 !important;
     border-radius: 8px !important;
-    padding: 0 12px !important;
-    height: 38px !important;
-    min-height: 38px !important;
-    max-height: 38px !important;
-    flex: 1 1 0 !important;
-    width: 50% !important;
+    padding: 0 14px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    flex: 1 1 45% !important;
     min-width: 0 !important;
-    max-width: none !important;
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
 }
 
-.search-box:focus-within {
+.search-box:focus-within,
+#scannerSection .search-box:focus-within {
     background: #ffffff !important;
     border-color: #d97706 !important;
     box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15) !important;
 }
 
-.search-box i {
+.search-box i,
+#scannerSection .search-box i {
     color: #64748b !important;
-    font-size: 12px;
-    margin-right: 8px;
-    flex-shrink: 0;
+    font-size: 13px !important;
+    margin-right: 10px !important;
+    flex-shrink: 0 !important;
 }
 
-.search-box input {
+.search-box input,
+#scannerSection .search-box input {
     background: transparent !important;
     border: none !important;
     outline: none !important;
     color: #0f172a !important;
-    font-size: 12.5px !important;
-    font-weight: 700 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
     width: 100% !important;
-    height: 36px !important;
-    min-height: 36px !important;
-    max-height: 36px !important;
-    line-height: 36px !important;
+    height: 38px !important;
+    line-height: 38px !important;
     padding: 0 !important;
     margin: 0 !important;
 }
 
-.search-box input::placeholder {
+.search-box input::placeholder,
+#scannerSection .search-box input::placeholder {
     color: #94a3b8 !important;
     font-weight: 500 !important;
 }
 
-.sort-box {
-    position: relative;
+.sort-box,
+#scannerSection .sort-box {
+    position: relative !important;
     display: flex !important;
     align-items: center !important;
     background: #f8fafc !important;
     border: 1.5px solid #cbd5e1 !important;
     border-radius: 8px !important;
-    padding: 0 12px !important;
-    height: 38px !important;
-    min-height: 38px !important;
-    max-height: 38px !important;
-    flex: 1 1 0 !important;
-    width: 50% !important;
+    padding: 0 14px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    flex: 1 1 45% !important;
     min-width: 0 !important;
-    max-width: none !important;
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
 }
 
 .sort-box:focus-within,
-.sort-box:hover {
+.sort-box:hover,
+#scannerSection .sort-box:focus-within,
+#scannerSection .sort-box:hover {
     background: #ffffff !important;
     border-color: #d97706 !important;
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15) !important;
 }
 
-.sort-box i {
+.sort-box i,
+#scannerSection .sort-box i {
     color: #64748b !important;
-    font-size: 12px;
-    margin-right: 8px;
-    flex-shrink: 0;
+    font-size: 13px !important;
+    margin-right: 10px !important;
+    flex-shrink: 0 !important;
 }
 
-.sort-box select {
+.sort-box select,
+#scannerSection .sort-box select {
     background: transparent !important;
     border: none !important;
     outline: none !important;
     color: #0f172a !important;
-    font-size: 12.5px !important;
-    font-weight: 700 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
     width: 100% !important;
-    height: 36px !important;
-    min-height: 36px !important;
-    max-height: 36px !important;
-    line-height: 36px !important;
+    height: 38px !important;
+    line-height: 38px !important;
     padding: 0 !important;
     margin: 0 !important;
-    cursor: pointer;
-    appearance: auto;
+    cursor: pointer !important;
+    appearance: auto !important;
 }
 
-.sort-box select option {
+.sort-box select option,
+#scannerSection .sort-box select option {
     background: #ffffff !important;
     color: #0f172a !important;
+}
+
+@media (max-width: 768px) {
+    .search-box,
+    .sort-box,
+    #scannerSection .search-box,
+    #scannerSection .sort-box {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        min-width: 0 !important;
+    }
+}
+
+/* Zero Horizontal Scroll for Signal Engine Data Table & Expanded Cards */
+#scannerSection .table-container,
+#scannerSection .table-scroll,
+#scannerSection #btstTableWrapper {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+#scannerDataTable {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+    box-sizing: border-box !important;
+    border-collapse: collapse !important;
+}
+
+#scannerDataTable thead th {
+    padding: 9px 5px !important;
+    font-size: 10px !important;
+    letter-spacing: 0.03em !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+}
+
+#scannerDataTable thead th:nth-child(2) {
+    text-align: left !important;
+}
+
+#scannerDataTable tbody td {
+    padding: 8px 4px !important;
+    font-size: 11.5px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    box-sizing: border-box !important;
+}
+
+#scannerDataTable tbody td[data-label="TICKER"] {
+    text-align: left !important;
+    padding-left: 6px !important;
+}
+
+#scannerDataTable .symbol-with-logo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+#scannerDataTable .symbol-name {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+}
+
+#scannerDataTable .rank-badge {
+    padding: 2px 6px !important;
+    font-size: 10.5px !important;
+}
+
+#scannerDataTable .signal-badge {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+}
+
+#scannerDataTable .score-pill {
+    padding: 2px 6px !important;
+    font-size: 10.5px !important;
+}
+
+#scannerDataTable .est-gap-pill {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+}
+
+#scannerDataTable .badge-amber-vol {
+    padding: 2px 5px !important;
+    font-size: 9.5px !important;
+}
+
+#scannerDataTable .vol-surge-container {
+    font-size: 10.5px !important;
+}
+
+#scannerDataTable .pillar-weight-badge {
+    font-size: 10px !important;
+}
+
+#scannerDataTable .view-detail-btn {
+    padding: 4px 7px !important;
+    font-size: 9.5px !important;
+    gap: 4px !important;
+}
+
+/* Expanded Accordion Card (Stock Details) — Fit 100% Width with Zero Scroll */
+#scannerDataTable tr.gap-distribution-row td.gap-distribution-td {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    padding: 12px 14px !important;
+    background: #ffffff !important;
+}
+
+#scannerDataTable .card-expanded-body {
+    width: 100% !important;
+    max-width: 720px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+}
+
+#scannerDataTable .gap-dist-card-box {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+}
+
+#scannerDataTable .action-bar-4grid {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* REQ-6: Remove the down arrow below the stock logo on PC / Desktop */
+@media (min-width: 768px) {
+    #scannerDataTable .row-expand-toggle,
+    .row-expand-toggle {
+        display: none !important;
+    }
 }
 
 /* Standalone LIVE Stock Quick Filters — Center Aligned Row */

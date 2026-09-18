@@ -1,6 +1,236 @@
 {
   "trades": [
     {
+      "id": "2026-09-14_GODFRYPHLP",
+      "lock_date": "2026-09-14",
+      "lock_time": "16:52:59",
+      "symbol": "GODFRYPHLP",
+      "raw_ticker": "GODFRYPHLP.NS",
+      "liquidity_tier": "TIER_2",
+      "confirmed_pillars_count": 4,
+      "confirmed_pillars": [
+        "Pillar 2: Vol Persistence (2.67x) + T+1 Delivery Confirmed",
+        "Pillar 3: RS vs Nifty (Underperforming -0.81%, RS Slope Down)",
+        "Pillar 4: Vol Spike (4.02x, Persistence: 4 bars)",
+        "Pillar 5: Marubozu Close (Range Pos: 13.74%)"
+      ],
+      "oi_magnitude": {
+        "actual_oi_pct": 0.0,
+        "avg_10d_oi_pct": 0.0,
+        "multiplier_used": 1.5,
+        "threshold": 0.0,
+        "is_above_threshold": false,
+        "data_status": "DATA_UNAVAILABLE"
+      },
+      "expiry_discount_applied": false,
+      "delivery_t1_validation": {
+        "delivery_pct": 45.17,
+        "avg_10d_delivery_pct": 37.95,
+        "delivery_t1_confirmed": true,
+        "data_status": "HISTORY_FILE"
+      },
+      "fundamental_quality": {
+        "verdict": "STABLE",
+        "gate_applied": null,
+        "macro_gate_applied": "Capped P1_HIGH -> P2_MEDIUM (Global Macro Risk: GIFT Nifty pullback < -0.3%)",
+        "sector": null,
+        "trailing_pe": 21.977646,
+        "return_on_equity": null,
+        "debt_to_equity": null,
+        "earnings_growth": null,
+        "red_flags": [],
+        "yellow_flags": [],
+        "data_status": "AVAILABLE"
+      },
+      "news_signal": {
+        "verdict": "POSITIVE",
+        "sentiment_score": 0.7,
+        "nlp_method": "KEYWORD_WEIGHTED_SENTIMENT",
+        "red_hits": [],
+        "green_hits": [
+          {
+            "keyword": "surge",
+            "headline": "Cigarette Stock Jumps: Godfrey Phillips India Extends Gains, Share Price Surges 7% - NDTV Profit"
+          },
+          {
+            "keyword": "surges",
+            "headline": "Cigarette Stock Jumps: Godfrey Phillips India Extends Gains, Share Price Surges 7% - NDTV Profit"
+          }
+        ],
+        "headline_count": 5,
+        "lookback_hours": 72,
+        "gate_applied": null
+      },
+      "depth_analysis": "GODFRYPHLP (TIER_2) — STBT (SELL) PUT (PE), MODERATE conviction, confidence 89/100. Price Rs.1927.00 is trading below VWAP (Rs.1934.35) with RSI at 41.5 (bearish momentum), on a 4.02x volume surge vs the session baseline. 4 of 5 technical pillars confirmed (weight 4.1/4 required for TIER_2): Pillar 2: Vol Persistence (2.67x) + T+1 Delivery Confirmed; Pillar 3: RS vs Nifty (Underperforming -0.81%, RS Slope Down); Pillar 4: Vol Spike (4.02x, Persistence: 4 bars); Pillar 5: Marubozu Close (Range Pos: 13.74%). Estimated next-day open gap: -2.0%. Futures OI data was unavailable for this scan — Pillar 1 excluded, not assumed. Fundamentals (unknown sector): P/E 22.0x. Quality verdict: STABLE. No red or yellow flags identified. Stock-specific news: 5 recent headline(s), verdict POSITIVE. Positive mentions — 'surge' in \"Cigarette Stock Jumps: Godfrey Phillips India Extends Gains, Share Price Surges 7% - NDTV Profit\"; 'surges' in \"Cigarette Stock Jumps: Godfrey Phillips India Extends Gains, Share Price Surges 7% - NDTV Profit\". Broader market backdrop: Week Ahead: Aug CPI Inflation, US Fed Verdict, Crude Oil Among Five Key Triggers To Drive D-Street - NDTV Profit; H2 CY2026: Six key events likely to shape market's trajectory - Business Standard; Sensex, Nifty slip amid RBI norms, global cues; banks lead decline - India Today. This is a probability-ranked read from the data available at lock time, not a guaranteed outcome — treat confidence/priority as relative conviction, not certainty.",
+      "signal": "STBT (SELL)",
+      "option_type": "PUT (PE)",
+      "priority_level": "P2_MEDIUM",
+      "confidence_score": 89,
+      "close_price_325": 1927.0,
+      "predicted_gap_pct": -2.0,
+      "day_high": 1960.9,
+      "day_low": 1921.6,
+      "vwap": 1934.35,
+      "volume_spike": 4.02,
+      "rsi": 41.5,
+      "rank_reason": "Confirmed 4.09/4 Pillar Weight [TIER_2]",
+      "status": "COMPLETED",
+      "open_price_915": 1937.0,
+      "gap_pct": 0.52,
+      "variance_error_pct": 2.52,
+      "accuracy_score_pct": 62.2,
+      "outcome": "LOSS",
+      "evaluated_at": "2026-09-18 09:59:22 IST"
+    },
+    {
+      "id": "2026-09-14_COCHINSHIP",
+      "lock_date": "2026-09-14",
+      "lock_time": "16:52:59",
+      "symbol": "COCHINSHIP",
+      "raw_ticker": "COCHINSHIP.NS",
+      "liquidity_tier": "TIER_2",
+      "confirmed_pillars_count": 4,
+      "confirmed_pillars": [
+        "Pillar 2: Vol Persistence (2.34x) + T+1 Delivery Confirmed",
+        "Pillar 3: RS vs Nifty (Underperforming -7.7%, RS Slope Down)",
+        "Pillar 4: Vol Spike (4.6x, Persistence: 3 bars)",
+        "Pillar 5: Marubozu Close (Range Pos: 4.07%)"
+      ],
+      "oi_magnitude": {
+        "actual_oi_pct": 0.0,
+        "avg_10d_oi_pct": 0.0,
+        "multiplier_used": 1.5,
+        "threshold": 0.0,
+        "is_above_threshold": false,
+        "data_status": "DATA_UNAVAILABLE"
+      },
+      "expiry_discount_applied": false,
+      "delivery_t1_validation": {
+        "delivery_pct": 40.86,
+        "avg_10d_delivery_pct": 32.31,
+        "delivery_t1_confirmed": true,
+        "data_status": "HISTORY_FILE"
+      },
+      "fundamental_quality": {
+        "verdict": "STABLE",
+        "gate_applied": null,
+        "macro_gate_applied": "Capped P1_HIGH -> P2_MEDIUM (Global Macro Risk: GIFT Nifty pullback < -0.3%)",
+        "sector": "Industrials",
+        "trailing_pe": 53.485672,
+        "return_on_equity": null,
+        "debt_to_equity": 28.466,
+        "earnings_growth": -0.193,
+        "red_flags": [],
+        "yellow_flags": [
+          "Earnings declining sharply (-19.3%)"
+        ],
+        "data_status": "AVAILABLE"
+      },
+      "news_signal": {
+        "verdict": "NEUTRAL",
+        "sentiment_score": 0.0,
+        "nlp_method": "KEYWORD_WEIGHTED_SENTIMENT",
+        "red_hits": [],
+        "green_hits": [],
+        "headline_count": 5,
+        "lookback_hours": 72,
+        "gate_applied": null
+      },
+      "depth_analysis": "COCHINSHIP (TIER_2) — STBT (SELL) PUT (PE), MODERATE conviction, confidence 89/100. Price Rs.1381.00 is trading below VWAP (Rs.1402.26) with RSI at 37.3 (bearish momentum), on a 4.60x volume surge vs the session baseline. 4 of 5 technical pillars confirmed (weight 4.1/4 required for TIER_2): Pillar 2: Vol Persistence (2.34x) + T+1 Delivery Confirmed; Pillar 3: RS vs Nifty (Underperforming -7.7%, RS Slope Down); Pillar 4: Vol Spike (4.6x, Persistence: 3 bars); Pillar 5: Marubozu Close (Range Pos: 4.07%). Estimated next-day open gap: -2.1%. Futures OI data was unavailable for this scan — Pillar 1 excluded, not assumed. Fundamentals (Industrials): P/E 53.5x, Debt/Equity 28%, earnings growth -19.3%. Quality verdict: STABLE. Watch items — Earnings declining sharply (-19.3%). Stock-specific news: 5 recent headline(s), verdict NEUTRAL. Broader market backdrop: Week Ahead: Aug CPI Inflation, US Fed Verdict, Crude Oil Among Five Key Triggers To Drive D-Street - NDTV Profit; H2 CY2026: Six key events likely to shape market's trajectory - Business Standard; Sensex, Nifty slip amid RBI norms, global cues; banks lead decline - India Today. This is a probability-ranked read from the data available at lock time, not a guaranteed outcome — treat confidence/priority as relative conviction, not certainty.",
+      "signal": "STBT (SELL)",
+      "option_type": "PUT (PE)",
+      "priority_level": "P2_MEDIUM",
+      "confidence_score": 89,
+      "close_price_325": 1381.0,
+      "predicted_gap_pct": -2.1,
+      "day_high": 1491.8,
+      "day_low": 1376.3,
+      "vwap": 1402.26,
+      "volume_spike": 4.6,
+      "rsi": 37.3,
+      "rank_reason": "Confirmed 4.09/4 Pillar Weight [TIER_2]",
+      "status": "COMPLETED",
+      "open_price_915": 1388.0,
+      "gap_pct": 0.51,
+      "variance_error_pct": 2.61,
+      "accuracy_score_pct": 60.9,
+      "outcome": "LOSS",
+      "evaluated_at": "2026-09-18 09:59:22 IST"
+    },
+    {
+      "id": "2026-09-14_JSWSTEEL",
+      "lock_date": "2026-09-14",
+      "lock_time": "16:52:59",
+      "symbol": "JSWSTEEL",
+      "raw_ticker": "JSWSTEEL.NS",
+      "liquidity_tier": "TIER_1",
+      "confirmed_pillars_count": 4,
+      "confirmed_pillars": [
+        "Pillar 2: Vol Persistence Only (2.68x) [Delivery NOT confirmed]",
+        "Pillar 3: RS vs Nifty (Underperforming -1.52%, RS Slope Down)",
+        "Pillar 4: Vol Spike (5.85x, Persistence: 4 bars)",
+        "Pillar 5: Marubozu Close (Range Pos: 0.0%)"
+      ],
+      "oi_magnitude": {
+        "actual_oi_pct": 0.0,
+        "avg_10d_oi_pct": 0.0,
+        "multiplier_used": 1.5,
+        "threshold": 0.0,
+        "is_above_threshold": false,
+        "data_status": "DATA_UNAVAILABLE"
+      },
+      "expiry_discount_applied": false,
+      "delivery_t1_validation": {
+        "delivery_pct": 53.87,
+        "avg_10d_delivery_pct": 54.32,
+        "delivery_t1_confirmed": false,
+        "data_status": "HISTORY_FILE"
+      },
+      "fundamental_quality": {
+        "verdict": "STABLE",
+        "gate_applied": null,
+        "macro_gate_applied": "Capped P1_HIGH -> P2_MEDIUM (Global Macro Risk: GIFT Nifty pullback < -0.3%)",
+        "sector": null,
+        "trailing_pe": 12.483963,
+        "return_on_equity": null,
+        "debt_to_equity": null,
+        "earnings_growth": null,
+        "red_flags": [],
+        "yellow_flags": [],
+        "data_status": "AVAILABLE"
+      },
+      "news_signal": {
+        "verdict": "NEUTRAL",
+        "sentiment_score": 0.0,
+        "nlp_method": "KEYWORD_WEIGHTED_SENTIMENT",
+        "red_hits": [],
+        "green_hits": [],
+        "headline_count": 5,
+        "lookback_hours": 72,
+        "gate_applied": null
+      },
+      "depth_analysis": "JSWSTEEL (TIER_1) — STBT (SELL) PUT (PE), MODERATE conviction, confidence 93/100. Price Rs.1265.00 is trading below VWAP (Rs.1276.07) with RSI at 28.2 (bearish momentum), on a 5.85x volume surge vs the session baseline. 4 of 5 technical pillars confirmed (weight 3.6/3 required for TIER_1): Pillar 2: Vol Persistence Only (2.68x) [Delivery NOT confirmed]; Pillar 3: RS vs Nifty (Underperforming -1.52%, RS Slope Down); Pillar 4: Vol Spike (5.85x, Persistence: 4 bars); Pillar 5: Marubozu Close (Range Pos: 0.0%). Estimated next-day open gap: -2.4%. Futures OI data was unavailable for this scan — Pillar 1 excluded, not assumed. Fundamentals (unknown sector): P/E 12.5x. Quality verdict: STABLE. No red or yellow flags identified. Stock-specific news: 5 recent headline(s), verdict NEUTRAL. Broader market backdrop: Week Ahead: Aug CPI Inflation, US Fed Verdict, Crude Oil Among Five Key Triggers To Drive D-Street - NDTV Profit; H2 CY2026: Six key events likely to shape market's trajectory - Business Standard; Sensex, Nifty slip amid RBI norms, global cues; banks lead decline - India Today. This is a probability-ranked read from the data available at lock time, not a guaranteed outcome — treat confidence/priority as relative conviction, not certainty.",
+      "signal": "STBT (SELL)",
+      "option_type": "PUT (PE)",
+      "priority_level": "P2_MEDIUM",
+      "confidence_score": 93,
+      "close_price_325": 1265.0,
+      "predicted_gap_pct": -2.4,
+      "day_high": 1286.4,
+      "day_low": 1265.0,
+      "vwap": 1276.07,
+      "volume_spike": 5.85,
+      "rsi": 28.2,
+      "rank_reason": "Confirmed 3.58/3 Pillar Weight [TIER_1]",
+      "status": "COMPLETED",
+      "open_price_915": 1265.7,
+      "gap_pct": 0.06,
+      "variance_error_pct": 2.46,
+      "accuracy_score_pct": 63.1,
+      "outcome": "NEUTRAL",
+      "evaluated_at": "2026-09-18 09:59:23 IST"
+    },
+    {
       "id": "2026-09-11_HCLTECH",
       "lock_date": "2026-09-11",
       "lock_time": "16:43:21",
@@ -76,12 +306,13 @@
       "volume_spike": 2.31,
       "rsi": 63.0,
       "rank_reason": "Confirmed 2.02/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 1252.0,
+      "gap_pct": 2.62,
+      "variance_error_pct": 0.82,
+      "accuracy_score_pct": 87.7,
+      "outcome": "JACKPOT WIN",
+      "evaluated_at": "2026-09-18 09:59:23 IST"
     },
     {
       "id": "2026-09-11_MOTHERSON",
@@ -146,12 +377,13 @@
       "volume_spike": 3.16,
       "rsi": 73.8,
       "rank_reason": "Confirmed 2.02/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 165.26,
+      "gap_pct": 0.24,
+      "variance_error_pct": 2.16,
+      "accuracy_score_pct": 67.6,
+      "outcome": "NEUTRAL",
+      "evaluated_at": "2026-09-18 09:59:23 IST"
     },
     {
       "id": "2026-09-11_HINDZINC",
@@ -216,12 +448,13 @@
       "volume_spike": 3.66,
       "rsi": 67.8,
       "rank_reason": "Confirmed 2.02/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 574.75,
+      "gap_pct": -0.67,
+      "variance_error_pct": 2.87,
+      "accuracy_score_pct": 56.9,
+      "outcome": "WIN",
+      "evaluated_at": "2026-09-18 09:59:24 IST"
     },
     {
       "id": "2026-09-11_MRF",
@@ -292,12 +525,13 @@
       "volume_spike": 2.63,
       "rsi": 61.3,
       "rank_reason": "Confirmed 2.5300000000000002/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 129595.0,
+      "gap_pct": 0.94,
+      "variance_error_pct": 0.96,
+      "accuracy_score_pct": 85.6,
+      "outcome": "WIN",
+      "evaluated_at": "2026-09-18 09:59:24 IST"
     },
     {
       "id": "2026-09-11_CONCOR",
@@ -363,12 +597,13 @@
       "volume_spike": 3.67,
       "rsi": 65.7,
       "rank_reason": "Confirmed 3.04/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 499.35,
+      "gap_pct": -0.36,
+      "variance_error_pct": 2.56,
+      "accuracy_score_pct": 61.6,
+      "outcome": "LOSS",
+      "evaluated_at": "2026-09-18 09:59:24 IST"
     },
     {
       "id": "2026-09-11_AUROPHARMA",
@@ -438,12 +673,13 @@
       "volume_spike": 6.13,
       "rsi": 67.0,
       "rank_reason": "Confirmed 2.0300000000000002/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 1688.0,
+      "gap_pct": 0.72,
+      "variance_error_pct": 1.48,
+      "accuracy_score_pct": 77.8,
+      "outcome": "WIN",
+      "evaluated_at": "2026-09-18 09:59:24 IST"
     },
     {
       "id": "2026-09-11_JUBLFOOD",
@@ -508,12 +744,13 @@
       "volume_spike": 3.7,
       "rsi": 68.7,
       "rank_reason": "Confirmed 2.02/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 470.75,
+      "gap_pct": -0.06,
+      "variance_error_pct": 2.36,
+      "accuracy_score_pct": 64.6,
+      "outcome": "NEUTRAL",
+      "evaluated_at": "2026-09-18 09:59:25 IST"
     },
     {
       "id": "2026-09-11_BOSCHLTD",
@@ -593,12 +830,13 @@
       "volume_spike": 3.46,
       "rsi": 65.6,
       "rank_reason": "Confirmed 2.02/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 48385.0,
+      "gap_pct": -0.94,
+      "variance_error_pct": 3.14,
+      "accuracy_score_pct": 52.9,
+      "outcome": "WIN",
+      "evaluated_at": "2026-09-18 09:59:25 IST"
     },
     {
       "id": "2026-09-11_BAJAJ-AUTO",
@@ -668,12 +906,13 @@
       "volume_spike": 3.54,
       "rsi": 46.6,
       "rank_reason": "Confirmed 2.02/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 11692.0,
+      "gap_pct": 0.14,
+      "variance_error_pct": 1.66,
+      "accuracy_score_pct": 75.1,
+      "outcome": "NEUTRAL",
+      "evaluated_at": "2026-09-18 09:59:25 IST"
     },
     {
       "id": "2026-09-11_PERSISTENT",
@@ -739,12 +978,13 @@
       "volume_spike": 11.41,
       "rsi": 67.4,
       "rank_reason": "Confirmed 2.5300000000000002/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 5654.0,
+      "gap_pct": 2.14,
+      "variance_error_pct": 0.06,
+      "accuracy_score_pct": 99.1,
+      "outcome": "JACKPOT WIN",
+      "evaluated_at": "2026-09-18 09:59:25 IST"
     },
     {
       "id": "2026-09-11_MANKIND",
@@ -810,12 +1050,13 @@
       "volume_spike": 11.89,
       "rsi": 64.6,
       "rank_reason": "Confirmed 2.5300000000000002/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 2284.0,
+      "gap_pct": 1.29,
+      "variance_error_pct": 0.81,
+      "accuracy_score_pct": 87.8,
+      "outcome": "WIN",
+      "evaluated_at": "2026-09-18 09:59:26 IST"
     },
     {
       "id": "2026-09-11_BIOCON",
@@ -883,12 +1124,13 @@
       "volume_spike": 4.5,
       "rsi": 82.8,
       "rank_reason": "Confirmed 2.5300000000000002/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 391.25,
+      "gap_pct": -0.92,
+      "variance_error_pct": 3.62,
+      "accuracy_score_pct": 45.7,
+      "outcome": "LOSS",
+      "evaluated_at": "2026-09-18 09:59:26 IST"
     },
     {
       "id": "2026-09-11_ICICIBANK",
@@ -964,12 +1206,13 @@
       "volume_spike": 3.8,
       "rsi": 68.9,
       "rank_reason": "Confirmed 2.02/3 Pillar Weight [TIER_1]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 1380.8,
+      "gap_pct": -0.14,
+      "variance_error_pct": 2.44,
+      "accuracy_score_pct": 63.4,
+      "outcome": "NEUTRAL",
+      "evaluated_at": "2026-09-18 09:59:26 IST"
     },
     {
       "id": "2026-09-11_DRREDDY",
@@ -1036,12 +1279,13 @@
       "volume_spike": 3.04,
       "rsi": 79.7,
       "rank_reason": "Confirmed 2.02/3 Pillar Weight [TIER_1]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 1163.7,
+      "gap_pct": -0.57,
+      "variance_error_pct": 3.17,
+      "accuracy_score_pct": 52.5,
+      "outcome": "LOSS",
+      "evaluated_at": "2026-09-18 09:59:26 IST"
     },
     {
       "id": "2026-09-11_PIIND",
@@ -1118,12 +1362,13 @@
       "volume_spike": 20.99,
       "rsi": 17.6,
       "rank_reason": "Confirmed 3.04/4 Pillar Weight [TIER_2]",
-      "status": "PENDING_EVALUATION",
-      "open_price_915": null,
-      "gap_pct": null,
-      "variance_error_pct": null,
-      "accuracy_score_pct": null,
-      "outcome": "PENDING"
+      "status": "COMPLETED",
+      "open_price_915": 2263.6,
+      "gap_pct": -0.18,
+      "variance_error_pct": 2.52,
+      "accuracy_score_pct": 62.2,
+      "outcome": "NEUTRAL",
+      "evaluated_at": "2026-09-18 09:59:27 IST"
     },
     {
       "id": "2026-09-10_KOTAKBANK",
@@ -6933,14 +7178,14 @@
       "evaluated_at": "2026-09-11 11:50:36 IST"
     }
   ],
-  "total_trades": 78,
-  "wins": 7,
-  "losses": 34,
-  "neutrals": 37,
-  "win_rate_pct": 17.1,
-  "avg_gap_pct": -0.14,
-  "prediction_accuracy_pct": 60.3,
-  "avg_variance_error_pct": 2.65,
-  "last_updated": "2026-09-11 17:01:19 IST",
-  "jackpot_wins": 2
+  "total_trades": 96,
+  "wins": 14,
+  "losses": 39,
+  "neutrals": 43,
+  "win_rate_pct": 26.4,
+  "avg_gap_pct": -0.06,
+  "prediction_accuracy_pct": 61.8,
+  "avg_variance_error_pct": 2.55,
+  "last_updated": "2026-09-18 09:59:27 IST",
+  "jackpot_wins": 4
 }

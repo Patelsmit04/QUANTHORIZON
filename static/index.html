@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/static/icon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
-    <link rel="apple-touch-icon" href="/static/logo.png">
+    <link rel="apple-touch-icon" href="/static/logo_tx_transparent.png">
     <link rel="manifest" href="/static/manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,7 +16,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b0f19">
 
-    <!-- Google Fonts: Fira Code (Tradexo Master Design System) + Plus Jakarta Sans -->
+    <!-- Google Fonts: Inter & JetBrains Mono (Institutional Typography) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
@@ -89,14 +94,7 @@
         <aside class="app-sidebar" id="appSidebar">
             <div class="sidebar-header">
                 <div class="app-logo-frame">
-                    <img src="/static/logo.png" alt="TRADEXO Logo">
-                </div>
-                <div class="sidebar-brand-text">
-                    <div class="drawer-title">
-                        <img src="/static/tradexo_wordmark_dark_bg.png" alt="TRADEXO" class="brand-wordmark-img brand-wordmark-dark">
-                        <img src="/static/tradexo_wordmark_light_bg.png" alt="TRADEXO" class="brand-wordmark-img brand-wordmark-light">
-                    </div>
-                    <div class="drawer-subtitle" style="margin-top: 6px;">Market To Conviction</div>
+                    <img src="/static/logo_tx_transparent.png" alt="TRADEXO Logo">
                 </div>
                 <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar" aria-label="Collapse sidebar">
                     <i class="fa-solid fa-angles-left"></i>
@@ -189,42 +187,15 @@
                 </button>
 
                 <div class="topbar-brand">
-                    <div class="topbar-brand-title">
-                        <img src="/static/tradexo_wordmark_dark_bg.png" alt="TRADEXO" class="brand-wordmark-img brand-wordmark-dark sm">
-                        <img src="/static/tradexo_wordmark_light_bg.png" alt="TRADEXO" class="brand-wordmark-img brand-wordmark-light sm">
-                    </div>
-                    <span class="workstation-context-tag"><i class="fa-solid fa-terminal"></i> WORKSTATION</span>
-                </div>
-
-                <div class="topbar-market-badge-wrap" style="display:flex;align-items:center;gap:10px;">
-                    <div id="topbarMarketStatusBadge" class="market-status-pill market-status-closed" title="Authoritative Indian Stock Market Status">
-                        <span class="status-pulse-dot"></span>
-                        <span id="topbarMarketStatusText">MARKET CLOSED</span>
-                        <span id="topbarMarketStatusTime" class="market-status-sub">(LAST CLOSE FROZEN)</span>
-                    </div>
-                    <div id="liveTickHeartbeat" class="tick-heartbeat" title="1-Second Live Fast-Path Telemetry">
-                        <span class="heartbeat-dot"></span>
-                        <span class="heartbeat-label">1s LIVE</span>
-                    </div>
+                    <h1 class="topbar-tradexo-heading">
+                        <span class="tradexo-trade">TRADE</span><span class="tradexo-xo">XO</span>
+                    </h1>
                 </div>
 
                 <div class="topbar-spacer"></div>
 
                 <!-- Right Header Chrome Buttons -->
                 <div class="header-actions">
-                    <button id="topbarScanBtn" class="btn btn-primary btn-sm topbar-action-btn" title="Force Scan 230+ Stocks Now">
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                        <span class="btn-text">FORCE SCAN</span>
-                    </button>
-
-                    <button id="topbarExportCsvBtn" class="btn btn-secondary btn-sm topbar-action-btn" title="Export Active Watchlist to CSV">
-                        <i class="fa-solid fa-file-arrow-down"></i>
-                        <span class="btn-text">EXPORT CSV</span>
-                    </button>
-
-                    <button id="themeToggleBtn" class="btn btn-secondary btn-icon" title="Toggle Theme (Champagne Dark / Clean Slate)" aria-label="Toggle Theme">
-                        <i class="fa-solid fa-moon text-gold" id="themeToggleIcon"></i>
-                    </button>
 
                     <button id="winRateBtn" class="btn btn-secondary winrate-topbar-btn" title="View BTST Win Rate Analytics">
                         <i class="fa-solid fa-chart-pie text-sub"></i>
@@ -2287,7 +2258,7 @@
             <div class="modal-header">
                 <div class="modal-title-group" style="display: flex; align-items: center; gap: 10px;">
                     <div class="app-logo-frame sm">
-                        <img src="/static/logo.png" alt="TRADEXO">
+                        <img src="/static/logo_tx_transparent.png" alt="TRADEXO">
                     </div>
                     <h2>Win Rate & Gap Prediction Accuracy Analytics</h2>
                 </div>
@@ -2873,7 +2844,7 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=48.0.0"></script>
+    <script src="/static/app.js?v=50.1.0"></script>
 
 </body>
 </html>

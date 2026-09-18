@@ -1,110 +1,6 @@
 {
   "events": [
     {
-      "timestamp": "2026-09-02 21:42:42 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "BAJAJFINSV",
-            "GRASIM",
-            "HINDALCO",
-            "NTPC",
-            "TATASTEEL",
-            "TITAN",
-            "ULTRACEMCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['BAJAJFINSV', 'GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-09-02 21:43:14 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "BAJAJFINSV",
-            "GRASIM",
-            "HINDALCO",
-            "NTPC",
-            "TATASTEEL",
-            "TITAN",
-            "ULTRACEMCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['BAJAJFINSV', 'GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-09-02 21:43:47 IST",
-      "trigger": "30s_in_process_daemon",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "BAJAJFINSV",
-            "GRASIM",
-            "HINDALCO",
-            "NTPC",
-            "TATASTEEL",
-            "TITAN",
-            "ULTRACEMCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['BAJAJFINSV', 'GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 100,
-      "resulting_status": "NOMINAL"
-    },
-    {
-      "timestamp": "2026-09-02 21:44:01 IST",
-      "trigger": "manual_ui",
-      "actions_count": 1,
-      "actions": [
-        {
-          "step": 5,
-          "action": "AUTO_RECONCILE_330_LOCK",
-          "locked_count": 0,
-          "symbols": [
-            "BAJAJFINSV",
-            "GRASIM",
-            "HINDALCO",
-            "NTPC",
-            "TATASTEEL",
-            "TITAN",
-            "ULTRACEMCO"
-          ],
-          "description": "Auto-locked 0 high-conviction candidates (['BAJAJFINSV', 'GRASIM', 'HINDALCO']) into persistent journal.",
-          "verified": false
-        }
-      ],
-      "all_verified": false,
-      "resulting_score": 98,
-      "resulting_status": "NOMINAL"
-    },
-    {
       "timestamp": "2026-09-02 21:44:05 IST",
       "trigger": "pytest_heal_1",
       "actions_count": 1,
@@ -2522,10 +2418,84 @@
       "all_verified": true,
       "resulting_score": 100,
       "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-09-13 20:15:38 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 6,
+          "action": "CLEAR_TRANSIENT_HEALTH_ANOMALIES",
+          "description": "Auto-reconciled process liveness: cleared 1 cold start(s) and 0 transient error(s).",
+          "verified": true
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-09-13 20:20:42 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 2,
+          "action": "CLEAR_STALE_LOCK",
+          "file": "news_refresh.lock",
+          "age_seconds": 307,
+          "description": "Safely removed orphaned lock news_refresh.lock (307s old) to unblock background tasks.",
+          "verified": true
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-09-13 20:47:56 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 1,
+      "actions": [
+        {
+          "step": 6,
+          "action": "CLEAR_TRANSIENT_HEALTH_ANOMALIES",
+          "description": "Auto-reconciled process liveness: cleared 1 cold start(s) and 0 transient error(s).",
+          "verified": true
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
+    },
+    {
+      "timestamp": "2026-09-18 09:59:22 IST",
+      "trigger": "30s_in_process_daemon",
+      "actions_count": 2,
+      "actions": [
+        {
+          "step": 3,
+          "action": "AUTO_REFRESH_MARKET_SCAN",
+          "timestamp": "2026-09-18 10:07:25 IST",
+          "total_scanned": 208,
+          "description": "Refreshed full 5-Pillar scan for 208 stocks (9 BTST / 1 STBT).",
+          "verified": true
+        },
+        {
+          "step": 6,
+          "action": "CLEAR_TRANSIENT_HEALTH_ANOMALIES",
+          "description": "Auto-reconciled process liveness: cleared 1 cold start(s) and 0 transient error(s).",
+          "verified": true
+        }
+      ],
+      "all_verified": true,
+      "resulting_score": 100,
+      "resulting_status": "NOMINAL"
     }
   ],
-  "total_fixes_applied": 1093,
-  "last_healing_pass": "2026-09-12 22:30:54 IST",
+  "total_fixes_applied": 1098,
+  "last_healing_pass": "2026-09-18 09:59:22 IST",
   "last_score": 100,
   "last_all_verified": true
 }

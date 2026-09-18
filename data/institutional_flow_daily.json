@@ -4440,5 +4440,3169 @@
         "as_of": "2026-09-11T19:30:12.163333+05:30"
       }
     }
+  },
+  "2026-09-14": {
+    "live_trigger": {
+      "AEROPLANE": {
+        "symbol": "AEROPLANE",
+        "buy_value_cr": 52.11,
+        "sell_value_cr": 63.43,
+        "buy_count": 2,
+        "sell_count": 3,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -11.33,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "AHCL": {
+        "symbol": "AHCL",
+        "buy_value_cr": 33.39,
+        "sell_value_cr": 33.41,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.03,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "ANTELOPUS": {
+        "symbol": "ANTELOPUS",
+        "buy_value_cr": 132.77,
+        "sell_value_cr": 131.21,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.56,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "ASIANTILES": {
+        "symbol": "ASIANTILES",
+        "buy_value_cr": 14.16,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 14.16,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "AWFIS": {
+        "symbol": "AWFIS",
+        "buy_value_cr": 127.72,
+        "sell_value_cr": 114.73,
+        "buy_count": 6,
+        "sell_count": 5,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 12.99,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "BLACKBUCK": {
+        "symbol": "BLACKBUCK",
+        "buy_value_cr": 120.97,
+        "sell_value_cr": 155.53,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -34.56,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "BODALCHEM": {
+        "symbol": "BODALCHEM",
+        "buy_value_cr": 11.98,
+        "sell_value_cr": 17.2,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -5.22,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "ELECTHERM": {
+        "symbol": "ELECTHERM",
+        "buy_value_cr": 20.53,
+        "sell_value_cr": 20.53,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.0,
+        "dominant_side": "NONE",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "FILATEX": {
+        "symbol": "FILATEX",
+        "buy_value_cr": 21.18,
+        "sell_value_cr": 21.27,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.09,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "GCSL": {
+        "symbol": "GCSL",
+        "buy_value_cr": 12.01,
+        "sell_value_cr": 30.93,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -18.92,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "GRANULES": {
+        "symbol": "GRANULES",
+        "buy_value_cr": 418.11,
+        "sell_value_cr": 1508.64,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -1090.53,
+        "dominant_side": "SELL",
+        "tier": "STRONG",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "JAMNAAUTO": {
+        "symbol": "JAMNAAUTO",
+        "buy_value_cr": 230.87,
+        "sell_value_cr": 127.94,
+        "buy_count": 4,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 102.94,
+        "dominant_side": "BUY",
+        "tier": "MODERATE",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "LUMINO": {
+        "symbol": "LUMINO",
+        "buy_value_cr": 18.43,
+        "sell_value_cr": 18.89,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.46,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "MOBIKWIK": {
+        "symbol": "MOBIKWIK",
+        "buy_value_cr": 54.32,
+        "sell_value_cr": 53.39,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.92,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "MOLBIO": {
+        "symbol": "MOLBIO",
+        "buy_value_cr": 608.35,
+        "sell_value_cr": 586.41,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 21.94,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "MVELECTRO": {
+        "symbol": "MVELECTRO",
+        "buy_value_cr": 85.39,
+        "sell_value_cr": 84.08,
+        "buy_count": 3,
+        "sell_count": 3,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.31,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "PCJEWELLER": {
+        "symbol": "PCJEWELLER",
+        "buy_value_cr": 67.95,
+        "sell_value_cr": 66.71,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.24,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "PINELABS": {
+        "symbol": "PINELABS",
+        "buy_value_cr": 712.19,
+        "sell_value_cr": 695.73,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 16.46,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "QUADFUTURE": {
+        "symbol": "QUADFUTURE",
+        "buy_value_cr": 96.78,
+        "sell_value_cr": 98.1,
+        "buy_count": 5,
+        "sell_count": 5,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -1.32,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "RATNAVEER": {
+        "symbol": "RATNAVEER",
+        "buy_value_cr": 33.28,
+        "sell_value_cr": 23.2,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.08,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "RAYMOND": {
+        "symbol": "RAYMOND",
+        "buy_value_cr": 348.29,
+        "sell_value_cr": 351.03,
+        "buy_count": 6,
+        "sell_count": 6,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -2.74,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "SHANKESH": {
+        "symbol": "SHANKESH",
+        "buy_value_cr": 129.37,
+        "sell_value_cr": 147.91,
+        "buy_count": 7,
+        "sell_count": 8,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -18.54,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "SHAREINDIA": {
+        "symbol": "SHAREINDIA",
+        "buy_value_cr": 23.81,
+        "sell_value_cr": 23.89,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.08,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "SMSPHARMA": {
+        "symbol": "SMSPHARMA",
+        "buy_value_cr": 24.84,
+        "sell_value_cr": 24.84,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.01,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "SUNSHINE": {
+        "symbol": "SUNSHINE",
+        "buy_value_cr": 17.59,
+        "sell_value_cr": 32.94,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -15.35,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "TECHNOCRAF": {
+        "symbol": "TECHNOCRAF",
+        "buy_value_cr": 10.05,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.05,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "WESTLIFE": {
+        "symbol": "WESTLIFE",
+        "buy_value_cr": 397.58,
+        "sell_value_cr": 400.61,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -3.02,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      },
+      "NRBBEARING": {
+        "symbol": "NRBBEARING",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 25.25,
+        "buy_count": 0,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -25.25,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:27:58.151624+05:30"
+      }
+    },
+    "last_checkpoint": "eod_archive",
+    "last_updated": "2026-09-14T21:34:48.448660+05:30",
+    "deals_by_checkpoint": {
+      "live_trigger": [
+        {
+          "symbol": "GRANULES",
+          "side": "SELL",
+          "value_cr": 1160.0,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "SELL",
+          "value_cr": 348.6425,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 303.1135,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "BUY",
+          "value_cr": 227.84,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "SELL",
+          "value_cr": 227.84,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 197.1824,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 195.9998,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 193.0893,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 192.4723,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 191.9992,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 191.9195,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 186.7394,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 184.4511,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 182.0062,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "SELL",
+          "value_cr": 172.7668,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "BUY",
+          "value_cr": 169.7449,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 160.2022,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "BLACKBUCK",
+          "side": "SELL",
+          "value_cr": 155.5335,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 147.5266,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 141.079,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "SELL",
+          "value_cr": 127.936,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "BLACKBUCK",
+          "side": "BUY",
+          "value_cr": 120.9705,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 116.481,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 116.4124,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 114.9999,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 112.1106,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 107.7134,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 103.7564,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 100.0,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 93.0045,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 71.1869,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 71.169,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 70.0,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PCJEWELLER",
+          "side": "BUY",
+          "value_cr": 67.9491,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "PCJEWELLER",
+          "side": "SELL",
+          "value_cr": 66.7055,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 60.4727,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 58.8349,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 48.3563,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "BUY",
+          "value_cr": 46.3879,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 45.5269,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "SELL",
+          "value_cr": 45.3681,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "SELL",
+          "value_cr": 42.4043,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "BUY",
+          "value_cr": 42.258,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "BUY",
+          "value_cr": 35.4256,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "SELL",
+          "value_cr": 35.3742,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "BUY",
+          "value_cr": 34.6113,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "SELL",
+          "value_cr": 34.2842,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 34.039,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 34.0203,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "BUY",
+          "value_cr": 33.2819,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "SUNSHINE",
+          "side": "SELL",
+          "value_cr": 32.9376,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 32.936,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 32.1546,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 32.0912,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "BUY",
+          "value_cr": 31.4421,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "SELL",
+          "value_cr": 31.2221,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "SHANKESH",
+          "side": "BUY",
+          "value_cr": 31.1791,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "GCSL",
+          "side": "SELL",
+          "value_cr": 30.9299,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "SHANKESH",
+          "side": "SELL",
+          "value_cr": 29.696,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "BUY",
+          "value_cr": 28.6118,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 27.936,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "SELL",
+          "value_cr": 27.6353,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "BUY",
+          "value_cr": 27.6159,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "SELL",
+          "value_cr": 27.4096,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "SELL",
+          "value_cr": 26.4353,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "BUY",
+          "value_cr": 26.3984,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "QUADFUTURE",
+          "side": "SELL",
+          "value_cr": 26.1986,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "SELL",
+          "value_cr": 26.0611,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "BUY",
+          "value_cr": 25.708,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "QUADFUTURE",
+          "side": "BUY",
+          "value_cr": 25.531,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        },
+        {
+          "symbol": "NRBBEARING",
+          "side": "SELL",
+          "value_cr": 25.25,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:27:58.151624+05:30"
+        }
+      ],
+      "final_check": [
+        {
+          "symbol": "GRANULES",
+          "side": "SELL",
+          "value_cr": 1160.0,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "SELL",
+          "value_cr": 348.6425,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 303.1135,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "BUY",
+          "value_cr": 227.84,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "SELL",
+          "value_cr": 227.84,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 197.1824,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 195.9998,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 193.0893,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 192.4723,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 191.9992,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 191.9195,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 186.7394,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 184.4511,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 182.0062,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "SELL",
+          "value_cr": 172.7668,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "BUY",
+          "value_cr": 169.7449,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 160.2022,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "BLACKBUCK",
+          "side": "SELL",
+          "value_cr": 155.5335,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 147.5266,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 141.079,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "SELL",
+          "value_cr": 127.936,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "BLACKBUCK",
+          "side": "BUY",
+          "value_cr": 120.9705,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 116.481,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 116.4124,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 114.9999,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 112.1106,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 107.7134,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 103.7564,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 100.0,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 93.0045,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 71.1869,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 71.169,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 70.0,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PCJEWELLER",
+          "side": "BUY",
+          "value_cr": 67.9491,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "PCJEWELLER",
+          "side": "SELL",
+          "value_cr": 66.7055,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 60.4727,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 58.8349,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 48.3563,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "BUY",
+          "value_cr": 46.3879,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 45.5269,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "SELL",
+          "value_cr": 45.3681,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "SELL",
+          "value_cr": 42.4043,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "BUY",
+          "value_cr": 42.258,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "BUY",
+          "value_cr": 35.4256,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "SELL",
+          "value_cr": 35.3742,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "BUY",
+          "value_cr": 34.6113,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "SELL",
+          "value_cr": 34.2842,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 34.039,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 34.0203,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "BUY",
+          "value_cr": 33.2819,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "SUNSHINE",
+          "side": "SELL",
+          "value_cr": 32.9376,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 32.936,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 32.1546,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 32.0912,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "BUY",
+          "value_cr": 31.4421,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "SELL",
+          "value_cr": 31.2221,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "SHANKESH",
+          "side": "BUY",
+          "value_cr": 31.1791,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "GCSL",
+          "side": "SELL",
+          "value_cr": 30.9299,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "SHANKESH",
+          "side": "SELL",
+          "value_cr": 29.696,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "BUY",
+          "value_cr": 28.6118,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 27.936,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "SELL",
+          "value_cr": 27.6353,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "BUY",
+          "value_cr": 27.6159,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "SELL",
+          "value_cr": 27.4096,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "SELL",
+          "value_cr": 26.4353,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "BUY",
+          "value_cr": 26.3984,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "QUADFUTURE",
+          "side": "SELL",
+          "value_cr": 26.1986,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "SELL",
+          "value_cr": 26.0611,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "BUY",
+          "value_cr": 25.708,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "QUADFUTURE",
+          "side": "BUY",
+          "value_cr": 25.531,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        },
+        {
+          "symbol": "NRBBEARING",
+          "side": "SELL",
+          "value_cr": 25.25,
+          "deal_type": "bulk",
+          "deal_date": "11-Sep-2026",
+          "as_of": "2026-09-14T21:34:17.851553+05:30"
+        }
+      ],
+      "eod_archive": [
+        {
+          "symbol": "GRANULES",
+          "side": "SELL",
+          "value_cr": 1160.0,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "SELL",
+          "value_cr": 1160.0,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "SELL",
+          "value_cr": 348.6425,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 303.1135,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 303.1135,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "BUY",
+          "value_cr": 227.84,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "SELL",
+          "value_cr": 227.84,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 197.1824,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 195.9998,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 193.0893,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 192.4723,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 191.9992,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 191.9195,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 186.7394,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 184.4511,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 182.0062,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "SELL",
+          "value_cr": 172.7668,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "WESTLIFE",
+          "side": "BUY",
+          "value_cr": 169.7449,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 160.2022,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "BLACKBUCK",
+          "side": "SELL",
+          "value_cr": 155.5335,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "BLACKBUCK",
+          "side": "SELL",
+          "value_cr": 155.5335,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "SELL",
+          "value_cr": 147.5266,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PINELABS",
+          "side": "BUY",
+          "value_cr": 141.079,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "SELL",
+          "value_cr": 127.936,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "SELL",
+          "value_cr": 127.936,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "SELL",
+          "value_cr": 127.936,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "SELL",
+          "value_cr": 127.936,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "BLACKBUCK",
+          "side": "BUY",
+          "value_cr": 120.9705,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "BLACKBUCK",
+          "side": "BUY",
+          "value_cr": 120.9705,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 116.481,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 116.4124,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 114.9999,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 114.9999,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "BUY",
+          "value_cr": 112.1106,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 107.7134,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 103.7564,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 102.4242,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 100.7141,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 100.0,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 100.0,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MOLBIO",
+          "side": "SELL",
+          "value_cr": 93.0045,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 75.0001,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 71.1869,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 71.169,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 70.0,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 70.0,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PCJEWELLER",
+          "side": "BUY",
+          "value_cr": 67.9491,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "PCJEWELLER",
+          "side": "SELL",
+          "value_cr": 66.7055,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 60.4727,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 60.0,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 58.8349,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 49.9999,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 49.9999,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 49.9999,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 48.3563,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "BUY",
+          "value_cr": 46.3879,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 45.5269,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "SELL",
+          "value_cr": 45.3681,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "SELL",
+          "value_cr": 42.4043,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "BUY",
+          "value_cr": 42.258,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 39.9999,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 36.3564,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "BUY",
+          "value_cr": 35.4256,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "SELL",
+          "value_cr": 35.3742,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "BUY",
+          "value_cr": 34.6113,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "BLACKBUCK",
+          "side": "BUY",
+          "value_cr": 34.563,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "SELL",
+          "value_cr": 34.2842,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 34.039,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 34.0203,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RATNAVEER",
+          "side": "BUY",
+          "value_cr": 33.2819,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "SUNSHINE",
+          "side": "SELL",
+          "value_cr": 32.9376,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 32.936,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 32.936,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "BUY",
+          "value_cr": 32.1546,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "RAYMOND",
+          "side": "SELL",
+          "value_cr": 32.0912,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "BUY",
+          "value_cr": 31.4421,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "ANTELOPUS",
+          "side": "SELL",
+          "value_cr": 31.2221,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "SHANKESH",
+          "side": "BUY",
+          "value_cr": 31.1791,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GCSL",
+          "side": "SELL",
+          "value_cr": 30.9299,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "LOTUSDEV",
+          "side": "BUY",
+          "value_cr": 30.2625,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "LOTUSDEV",
+          "side": "SELL",
+          "value_cr": 30.2625,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "SHANKESH",
+          "side": "SELL",
+          "value_cr": 29.696,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "BUY",
+          "value_cr": 28.6118,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 28.0008,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 27.936,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 27.936,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "SELL",
+          "value_cr": 27.6353,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "AWFIS",
+          "side": "BUY",
+          "value_cr": 27.6159,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "MVELECTRO",
+          "side": "SELL",
+          "value_cr": 27.4096,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 27.2915,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "SELL",
+          "value_cr": 26.4353,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "BUY",
+          "value_cr": 26.3984,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "QUADFUTURE",
+          "side": "SELL",
+          "value_cr": 26.1986,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 26.175,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "SELL",
+          "value_cr": 26.0611,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "AEROPLANE",
+          "side": "BUY",
+          "value_cr": 25.708,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "QUADFUTURE",
+          "side": "BUY",
+          "value_cr": 25.531,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "NRBBEARING",
+          "side": "SELL",
+          "value_cr": 25.25,
+          "deal_type": "bulk",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "NRBBEARING",
+          "side": "SELL",
+          "value_cr": 25.25,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 25.0002,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "GRANULES",
+          "side": "BUY",
+          "value_cr": 25.0002,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        },
+        {
+          "symbol": "JAMNAAUTO",
+          "side": "BUY",
+          "value_cr": 25.0,
+          "deal_type": "block",
+          "deal_date": "11-SEP-2026",
+          "as_of": "2026-09-14T21:34:48.440033+05:30"
+        }
+      ]
+    },
+    "final_check": {
+      "AEROPLANE": {
+        "symbol": "AEROPLANE",
+        "buy_value_cr": 52.11,
+        "sell_value_cr": 63.43,
+        "buy_count": 2,
+        "sell_count": 3,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -11.33,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "AHCL": {
+        "symbol": "AHCL",
+        "buy_value_cr": 33.39,
+        "sell_value_cr": 33.41,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.03,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "ANTELOPUS": {
+        "symbol": "ANTELOPUS",
+        "buy_value_cr": 132.77,
+        "sell_value_cr": 131.21,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.56,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "ASIANTILES": {
+        "symbol": "ASIANTILES",
+        "buy_value_cr": 14.16,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 14.16,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "AWFIS": {
+        "symbol": "AWFIS",
+        "buy_value_cr": 127.72,
+        "sell_value_cr": 114.73,
+        "buy_count": 6,
+        "sell_count": 5,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 12.99,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "BLACKBUCK": {
+        "symbol": "BLACKBUCK",
+        "buy_value_cr": 120.97,
+        "sell_value_cr": 155.53,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -34.56,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "BODALCHEM": {
+        "symbol": "BODALCHEM",
+        "buy_value_cr": 11.98,
+        "sell_value_cr": 17.2,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -5.22,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "ELECTHERM": {
+        "symbol": "ELECTHERM",
+        "buy_value_cr": 20.53,
+        "sell_value_cr": 20.53,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.0,
+        "dominant_side": "NONE",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "FILATEX": {
+        "symbol": "FILATEX",
+        "buy_value_cr": 21.18,
+        "sell_value_cr": 21.27,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.09,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "GCSL": {
+        "symbol": "GCSL",
+        "buy_value_cr": 12.01,
+        "sell_value_cr": 30.93,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -18.92,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "GRANULES": {
+        "symbol": "GRANULES",
+        "buy_value_cr": 418.11,
+        "sell_value_cr": 1508.64,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -1090.53,
+        "dominant_side": "SELL",
+        "tier": "STRONG",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "JAMNAAUTO": {
+        "symbol": "JAMNAAUTO",
+        "buy_value_cr": 230.87,
+        "sell_value_cr": 127.94,
+        "buy_count": 4,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 102.94,
+        "dominant_side": "BUY",
+        "tier": "MODERATE",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "LUMINO": {
+        "symbol": "LUMINO",
+        "buy_value_cr": 18.43,
+        "sell_value_cr": 18.89,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.46,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "MOBIKWIK": {
+        "symbol": "MOBIKWIK",
+        "buy_value_cr": 54.32,
+        "sell_value_cr": 53.39,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.92,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "MOLBIO": {
+        "symbol": "MOLBIO",
+        "buy_value_cr": 608.35,
+        "sell_value_cr": 586.41,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 21.94,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "MVELECTRO": {
+        "symbol": "MVELECTRO",
+        "buy_value_cr": 85.39,
+        "sell_value_cr": 84.08,
+        "buy_count": 3,
+        "sell_count": 3,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.31,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "PCJEWELLER": {
+        "symbol": "PCJEWELLER",
+        "buy_value_cr": 67.95,
+        "sell_value_cr": 66.71,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.24,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "PINELABS": {
+        "symbol": "PINELABS",
+        "buy_value_cr": 712.19,
+        "sell_value_cr": 695.73,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 16.46,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "QUADFUTURE": {
+        "symbol": "QUADFUTURE",
+        "buy_value_cr": 96.78,
+        "sell_value_cr": 98.1,
+        "buy_count": 5,
+        "sell_count": 5,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -1.32,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "RATNAVEER": {
+        "symbol": "RATNAVEER",
+        "buy_value_cr": 33.28,
+        "sell_value_cr": 23.2,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.08,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "RAYMOND": {
+        "symbol": "RAYMOND",
+        "buy_value_cr": 348.29,
+        "sell_value_cr": 351.03,
+        "buy_count": 6,
+        "sell_count": 6,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -2.74,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "SHANKESH": {
+        "symbol": "SHANKESH",
+        "buy_value_cr": 129.37,
+        "sell_value_cr": 147.91,
+        "buy_count": 7,
+        "sell_count": 8,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -18.54,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "SHAREINDIA": {
+        "symbol": "SHAREINDIA",
+        "buy_value_cr": 23.81,
+        "sell_value_cr": 23.89,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.08,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "SMSPHARMA": {
+        "symbol": "SMSPHARMA",
+        "buy_value_cr": 24.84,
+        "sell_value_cr": 24.84,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.01,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "SUNSHINE": {
+        "symbol": "SUNSHINE",
+        "buy_value_cr": 17.59,
+        "sell_value_cr": 32.94,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -15.35,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "TECHNOCRAF": {
+        "symbol": "TECHNOCRAF",
+        "buy_value_cr": 10.05,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.05,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "WESTLIFE": {
+        "symbol": "WESTLIFE",
+        "buy_value_cr": 397.58,
+        "sell_value_cr": 400.61,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -3.02,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      },
+      "NRBBEARING": {
+        "symbol": "NRBBEARING",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 25.25,
+        "buy_count": 0,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -25.25,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:17.851553+05:30"
+      }
+    },
+    "eod_archive": {
+      "AEROPLANE": {
+        "symbol": "AEROPLANE",
+        "buy_value_cr": 52.11,
+        "sell_value_cr": 63.43,
+        "buy_count": 2,
+        "sell_count": 3,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -11.33,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "AHCL": {
+        "symbol": "AHCL",
+        "buy_value_cr": 33.39,
+        "sell_value_cr": 33.41,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.03,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "ANTELOPUS": {
+        "symbol": "ANTELOPUS",
+        "buy_value_cr": 132.77,
+        "sell_value_cr": 131.21,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.56,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "ASIANTILES": {
+        "symbol": "ASIANTILES",
+        "buy_value_cr": 14.16,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 14.16,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "AWFIS": {
+        "symbol": "AWFIS",
+        "buy_value_cr": 127.72,
+        "sell_value_cr": 114.73,
+        "buy_count": 6,
+        "sell_count": 5,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 12.99,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "BLACKBUCK": {
+        "symbol": "BLACKBUCK",
+        "buy_value_cr": 276.5,
+        "sell_value_cr": 311.07,
+        "buy_count": 3,
+        "sell_count": 2,
+        "deal_types": [
+          "block",
+          "bulk"
+        ],
+        "net_value_cr": -34.56,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "BODALCHEM": {
+        "symbol": "BODALCHEM",
+        "buy_value_cr": 11.98,
+        "sell_value_cr": 17.2,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -5.22,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "ELECTHERM": {
+        "symbol": "ELECTHERM",
+        "buy_value_cr": 20.53,
+        "sell_value_cr": 20.53,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.0,
+        "dominant_side": "NONE",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "FILATEX": {
+        "symbol": "FILATEX",
+        "buy_value_cr": 21.18,
+        "sell_value_cr": 21.27,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.09,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "GCSL": {
+        "symbol": "GCSL",
+        "buy_value_cr": 12.01,
+        "sell_value_cr": 30.93,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -18.92,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "GRANULES": {
+        "symbol": "GRANULES",
+        "buy_value_cr": 1532.19,
+        "sell_value_cr": 2668.64,
+        "buy_count": 18,
+        "sell_count": 3,
+        "deal_types": [
+          "block",
+          "bulk"
+        ],
+        "net_value_cr": -1136.45,
+        "dominant_side": "SELL",
+        "tier": "STRONG",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "JAMNAAUTO": {
+        "symbol": "JAMNAAUTO",
+        "buy_value_cr": 486.74,
+        "sell_value_cr": 511.74,
+        "buy_count": 9,
+        "sell_count": 4,
+        "deal_types": [
+          "block",
+          "bulk"
+        ],
+        "net_value_cr": -25.0,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "LUMINO": {
+        "symbol": "LUMINO",
+        "buy_value_cr": 18.43,
+        "sell_value_cr": 18.89,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.46,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "MOBIKWIK": {
+        "symbol": "MOBIKWIK",
+        "buy_value_cr": 54.32,
+        "sell_value_cr": 53.39,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 0.92,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "MOLBIO": {
+        "symbol": "MOLBIO",
+        "buy_value_cr": 608.35,
+        "sell_value_cr": 586.41,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 21.94,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "MVELECTRO": {
+        "symbol": "MVELECTRO",
+        "buy_value_cr": 85.39,
+        "sell_value_cr": 84.08,
+        "buy_count": 3,
+        "sell_count": 3,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.31,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "PCJEWELLER": {
+        "symbol": "PCJEWELLER",
+        "buy_value_cr": 67.95,
+        "sell_value_cr": 66.71,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 1.24,
+        "dominant_side": "BUY",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "PINELABS": {
+        "symbol": "PINELABS",
+        "buy_value_cr": 712.19,
+        "sell_value_cr": 695.73,
+        "buy_count": 4,
+        "sell_count": 4,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 16.46,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "QUADFUTURE": {
+        "symbol": "QUADFUTURE",
+        "buy_value_cr": 96.78,
+        "sell_value_cr": 98.1,
+        "buy_count": 5,
+        "sell_count": 5,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -1.32,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "RATNAVEER": {
+        "symbol": "RATNAVEER",
+        "buy_value_cr": 33.28,
+        "sell_value_cr": 23.2,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.08,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "RAYMOND": {
+        "symbol": "RAYMOND",
+        "buy_value_cr": 348.29,
+        "sell_value_cr": 351.03,
+        "buy_count": 6,
+        "sell_count": 6,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -2.74,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "SHANKESH": {
+        "symbol": "SHANKESH",
+        "buy_value_cr": 129.37,
+        "sell_value_cr": 147.91,
+        "buy_count": 7,
+        "sell_count": 8,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -18.54,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "SHAREINDIA": {
+        "symbol": "SHAREINDIA",
+        "buy_value_cr": 23.81,
+        "sell_value_cr": 23.89,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.08,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "SMSPHARMA": {
+        "symbol": "SMSPHARMA",
+        "buy_value_cr": 24.84,
+        "sell_value_cr": 24.84,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -0.01,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "SUNSHINE": {
+        "symbol": "SUNSHINE",
+        "buy_value_cr": 17.59,
+        "sell_value_cr": 32.94,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -15.35,
+        "dominant_side": "SELL",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "TECHNOCRAF": {
+        "symbol": "TECHNOCRAF",
+        "buy_value_cr": 10.05,
+        "sell_value_cr": 0.0,
+        "buy_count": 1,
+        "sell_count": 0,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": 10.05,
+        "dominant_side": "BUY",
+        "tier": "WEAK",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "WESTLIFE": {
+        "symbol": "WESTLIFE",
+        "buy_value_cr": 397.58,
+        "sell_value_cr": 400.61,
+        "buy_count": 2,
+        "sell_count": 2,
+        "deal_types": [
+          "bulk"
+        ],
+        "net_value_cr": -3.02,
+        "dominant_side": "SELL",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "NRBBEARING": {
+        "symbol": "NRBBEARING",
+        "buy_value_cr": 0.0,
+        "sell_value_cr": 50.5,
+        "buy_count": 0,
+        "sell_count": 2,
+        "deal_types": [
+          "block",
+          "bulk"
+        ],
+        "net_value_cr": -50.5,
+        "dominant_side": "SELL",
+        "tier": "MODERATE",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      },
+      "LOTUSDEV": {
+        "symbol": "LOTUSDEV",
+        "buy_value_cr": 30.26,
+        "sell_value_cr": 30.26,
+        "buy_count": 1,
+        "sell_count": 1,
+        "deal_types": [
+          "block"
+        ],
+        "net_value_cr": 0.0,
+        "dominant_side": "NONE",
+        "tier": "BELOW_THRESHOLD",
+        "as_of": "2026-09-14T21:34:48.440033+05:30"
+      }
+    }
   }
 }

@@ -406,5 +406,29 @@
       }
     ],
     "status": "DISCREPANCIES_FOUND"
+  },
+  {
+    "date": "2026-09-14",
+    "run_at": "2026-09-14T21:34:48.046298+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 28,
+    "archive_symbol_count": 29,
+    "symbols_only_in_live": [],
+    "symbols_only_in_archive": [
+      "LOTUSDEV"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "JAMNAAUTO",
+        "live_net_value_cr": 102.94,
+        "archive_net_value_cr": -25.0
+      },
+      {
+        "symbol": "NRBBEARING",
+        "live_net_value_cr": -25.25,
+        "archive_net_value_cr": -50.5
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
   }
 ]
