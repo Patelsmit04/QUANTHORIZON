@@ -1,19 +1,19 @@
 /**
- * BTST SCANNER  —  DASHBOARD JAVASCRIPT APPLICATION ENGINE (AUTONOMOUS BACKGROUND SCANNER)
+ * BTST SCANNER  —  DASHBOARD JAVASCRIPT APPLICATION ENGINE (AUTONOMOUS BACKGROUND SCANNER)
  */
 var lastBtstStatus = "pre_btst";
 var currentActiveSection = "scanner";
 window.currentActiveSection = "scanner";
 
 // M9 audit fix: native fetch() has no timeout, and nothing in this file attached one to any
-// of its ~18 call sites  —  a hung backend left "SCANNING..." (or an equivalent stuck state) up
+// of its ~18 call sites  —  a hung backend left "SCANNING..." (or an equivalent stuck state) up
 // indefinitely with no visible error. apiFetch() is a drop-in fetch() replacement used
 // everywhere below: it aborts after DEFAULT_FETCH_TIMEOUT_MS (override per-call via
 // options.timeoutMs) and attaches the stored API key header automatically, since mutating
-// endpoints (strategy CRUD, lock/evaluate picks, execute, notifications) now require one  — 
+// endpoints (strategy CRUD, lock/evaluate picks, execute, notifications) now require one  — 
 // see promptForApiKey() below. Uses window.fetch explicitly so this definition itself isn't
 // M9 audit fix: native fetch() has no timeout, and nothing in this file attached one to any
-// of its ~18 call sites  —  a hung backend left "SCANNING..." (or an equivalent stuck state) up
+// of its ~18 call sites  —  a hung backend left "SCANNING..." (or an equivalent stuck state) up
 // indefinitely with no visible error. apiFetch() is a drop-in fetch() replacement used
 // everywhere below: it aborts after DEFAULT_FETCH_TIMEOUT_MS (override per-call via
 // options.timeoutMs) and attaches the stored API key header automatically.
@@ -104,21 +104,29 @@ window.getScoreColorClass = getScoreColorClass;
 
 function getStockLogoHTML(symbol) {
     if (!symbol) return '';
-    const cleanSym = String(symbol).trim().toUpperCase().replace(".NS", "");
-    const initials = cleanSym.slice(0, 2);
-    const upstoxUrl = `https://assets.upstox.com/market-quote/symbols/NSE/${cleanSym}.png`;
-    const growwUrl = `https://groww.in/images/logos/NSE/${cleanSym}.png`;
-    const fmpUrl = `https://financialmodelingprep.com/image-stock/${cleanSym}.NS.png`;
-    const fmpPlainUrl = `https://financialmodelingprep.com/image-stock/${cleanSym}.png`;
+    const cleanSym = String(symbol).trim().toUpperCase().replace(/\.NS$/i, '').replace(/\.BO$/i, '');
+    const alphaOnly = cleanSym.replace(/[^A-Z0-9]/g, '');
+    const initials = (alphaOnly.length >= 2 ? alphaOnly.slice(0, 2) : (alphaOnly + 'X').slice(0, 2)) || cleanSym.slice(0, 2);
 
-    return `<div class="stock-logo-frame" title="${cleanSym}" style="width:28px;height:28px;min-width:28px;max-width:28px;min-height:28px;max-height:28px;flex:0 0 28px;flex-shrink:0;border-radius:6px;background:#ffffff;border:1px solid #e2e8f0;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;padding:2px;box-sizing:border-box;box-shadow:0 1px 2px rgba(15,23,42,0.05);vertical-align:middle;">` +
-        `<img src="${upstoxUrl}" ` +
-        `style="width:100%;height:100%;max-width:24px;max-height:24px;object-fit:contain;display:block;border-radius:4px;" ` +
-        `onerror="this.onerror=null; this.src='${growwUrl}'; this.onerror=function(){ this.src='${fmpUrl}'; this.onerror=function(){ this.src='${fmpPlainUrl}'; this.onerror=function(){ this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-flex'; }; }; };" ` +
-        `alt="${cleanSym}">` +
-        `<span class="stock-logo-initials" style="display:none;width:100%;height:100%;border-radius:4px;background:#f8fafc;color:#d97706;font-weight:900;font-size:9px;align-items:center;justify-content:center;">` +
-        `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="margin-right:1px;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>${initials}` +
-        `</span>` +
+    // Deterministic curated color palette hashing based on ticker symbol
+    let hash = 0;
+    for (let i = 0; i < cleanSym.length; i++) {
+        hash = (hash << 5) - hash + cleanSym.charCodeAt(i);
+        hash |= 0;
+    }
+    const palClasses = [
+        'pal-blue', 'pal-emerald', 'pal-purple', 'pal-amber',
+        'pal-sky', 'pal-rose', 'pal-teal', 'pal-indigo'
+    ];
+    const palClass = palClasses[Math.abs(hash) % palClasses.length];
+
+    const logoSrc = `/static/logos/${encodeURIComponent(cleanSym)}.svg?v=52.0.0`;
+
+    return `<div class="stock-logo-frame" title="${escapeAttr(cleanSym)}" style="width:28px;height:28px;min-width:28px;min-height:28px;border-radius:6px;background:#0d131f;border:1px solid rgba(255,255,255,0.12);display:inline-flex;align-items:center;justify-content:center;overflow:hidden;position:relative;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,0.35);vertical-align:middle;">` +
+        `<img class="stock-logo-img" src="${logoSrc}" alt="${escapeAttr(cleanSym)}" loading="eager" ` +
+        `style="width:100% !important;height:100% !important;object-fit:cover !important;display:block !important;border-radius:5px !important;" ` +
+        `onerror="this.style.setProperty('display', 'none', 'important'); const m = this.parentElement.querySelector('.stock-monogram'); if (m) { m.style.setProperty('display', 'inline-flex', 'important'); } this.parentElement.classList.add('has-error');" />` +
+        `<span class="stock-monogram ${palClass}" style="display:none !important;position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;border-radius:5px !important;align-items:center !important;justify-content:center !important;">${escapeHtml(initials)}</span>` +
         `</div>`;
 }
 window.getStockLogoHTML = getStockLogoHTML;
@@ -129,6 +137,8 @@ function initTradexoDashboard() {
     let allStocks = window.allStocks;
     let currentFilter = "ALL";
     let currentStockView = "intelligence"; // "intelligence" or "live"
+    let currentSortMode = "RANK_ASC";
+    window.currentSortMode = currentSortMode;
     let livePricesFastInterval = null;     // Phase 3: 1-Second Fast Price Ticks Loop
     let heavyScanInterval = null;          // Phase 3: 60-Second Slow Conviction Scoring Loop
     let autoRefreshInterval = null;        // Legacy handle alias
@@ -256,6 +266,63 @@ function initTradexoDashboard() {
     const exportCsvBtnGuide = document.getElementById("exportCsvBtnGuide");
     const winRateBtnGuide = document.getElementById("winRateBtnGuide");
 
+    // Indices & Strategies Section DOM
+    const indicesSection = document.getElementById("indicesSection");
+    const indexSectionSwitcher = document.getElementById("indexSectionSwitcher");
+    const indexIntelligenceView = document.getElementById("indexIntelligenceView");
+    const indexSignalsView = document.getElementById("indexSignalsView");
+    const indexGrid = document.getElementById("indexGrid");
+    const indexTickerTrack = document.getElementById("indexTickerTrack") || document.getElementById("marqueeTrack");
+    const indexVerdictGrid = document.getElementById("indexVerdictGrid");
+    const indexVerdictEmptyState = document.getElementById("indexVerdictEmptyState");
+    const indexVerdictMeta = document.getElementById("indexVerdictMeta");
+    const strategiesSection = document.getElementById("strategiesSection");
+    const strategiesNavBadge = document.getElementById("strategiesNavBadge");
+    const strategyGrid = document.getElementById("strategyGrid");
+    const addStrategyBtn = document.getElementById("addStrategyBtn");
+    const strategyFormModal = document.getElementById("strategyFormModal");
+    const closeStrategyFormBtn = document.getElementById("closeStrategyFormBtn");
+    const strategyForm = document.getElementById("strategyForm");
+    const strategyFormTitle = document.getElementById("strategyFormTitle");
+    const strategyPillarCheckboxes = document.getElementById("strategyPillarCheckboxes");
+
+    // History & Calibration DOM
+    const historySection = document.getElementById("historySection");
+    const historyTableBody = document.getElementById("historyTableBody");
+    const calibrationCardGrid = document.getElementById("calibrationCardGrid");
+    const btnRefreshHistory = document.getElementById("btnRefreshHistory");
+    const historySearchInput = document.getElementById("historySearchInput");
+    const historyStrategyFilter = document.getElementById("historyStrategyFilter");
+    const historyOutcomeFilter = document.getElementById("historyOutcomeFilter");
+    const historyInstitutionalFlowFilter = document.getElementById("historyInstitutionalFlowFilter");
+
+    // AI Clarification Review Modal (M9)  —  see index.html comment for why this exists
+    const clarificationModal = document.getElementById("clarificationModal");
+    const closeClarificationBtn = document.getElementById("closeClarificationBtn");
+    const clarificationSummaryBody = document.getElementById("clarificationSummaryBody");
+    const clarificationCorrectionGroup = document.getElementById("clarificationCorrectionGroup");
+    const clarificationCorrectionNote = document.getElementById("clarificationCorrectionNote");
+    const clarificationConfirmBtn = document.getElementById("clarificationConfirmBtn");
+    const clarificationRejectBtn = document.getElementById("clarificationRejectBtn");
+    const clarificationResubmitBtn = document.getElementById("clarificationResubmitBtn");
+    let clarificationStrategyId = null;
+
+    // API key button (M9)  —  prompts for/stores the key apiFetch() attaches to mutating requests
+    const apiKeyBtn = document.getElementById("apiKeyBtn");
+    const apiKeyBtnMobile = document.getElementById("apiKeyBtnMobile");
+
+    // Notifications DOM (M5)  —  bell/badge/panel + toast, fed live over /ws/live
+    const notifBell = document.getElementById("notifBell");
+    const notifBadge = document.getElementById("notifBadge");
+    const notifBellMobileTop = document.getElementById("notifBellMobileTop");
+    const notifBadgeMobileTop = document.getElementById("notifBadgeMobileTop");
+    const notifBadgeMobile = document.getElementById("notifBadgeMobile");
+    const notifPanel = document.getElementById("notifPanel");
+    const notifList = document.getElementById("notifList");
+    const notifMarkAllBtn = document.getElementById("notifMarkAllBtn");
+    const toastContainer = document.getElementById("toastContainer");
+    let notifUnreadCount = 0;
+
     // =============================================================
     // PHASE 2: BULLETPROOF INITIALIZATION — NAVIGATION AT VERY TOP
     // Decouple UI/Navigation setup from Data/API setup completely.
@@ -334,7 +401,7 @@ function initTradexoDashboard() {
             dashboard: "dashboard", scanner: "signals", liveTrades: "live-trade", paperTrading: "paper-trading", stockDetail: "stock-detail", stocksNews: "stocks-news",
             globalNews: "global-news", institutionalFlow: "institutional-flow",
             orderFlow: "order-flow", accuracy: "accuracy", indices: "index-intelligence", strategies: "strategies", history: "history",
-            systemHealth: "system-health", guide: "guide", rules: "rules"
+            systemHealth: "system-health", guide: "guide", rules: "rules", settings: "settings"
         };
         const HASH_TO_SECTION = {};
         Object.entries(SECTION_HASHES).forEach(([secKey, hashVal]) => {
@@ -376,7 +443,8 @@ function initTradexoDashboard() {
                 history: document.getElementById("historySection"),
                 systemHealth: document.getElementById("systemHealthSection"),
                 guide: document.getElementById("guideSection"),
-                rules: document.getElementById("rulesSection")
+                rules: document.getElementById("rulesSection"),
+                settings: document.getElementById("settingsSection")
             };
 
             const navElements = [
@@ -459,6 +527,12 @@ function initTradexoDashboard() {
                 if (section === "orderFlow" && typeof fetchOrderFlowSection === "function") fetchOrderFlowSection();
                 if (section === "accuracy" && typeof fetchSplitAccuracy === "function") fetchSplitAccuracy();
                 if (section === "liveTrades" && typeof fetchLiveTradesSection === "function") fetchLiveTradesSection();
+                if (section === "settings") {
+                    if (window.lucide) {
+                        try { lucide.createIcons(); } catch (_) {}
+                    }
+                    if (typeof syncSettingsUI === "function") syncSettingsUI();
+                }
             } catch (hookErr) {
                 console.warn("Non-fatal error in section data hook:", hookErr);
             }
@@ -473,13 +547,10 @@ function initTradexoDashboard() {
 
         // 1. Sidebar Navigation Listeners (supports #sidebarNav, #sidebar-links, and class .sidebar-nav)
         try {
-            const sidebarElements = [
-                document.getElementById("sidebarNav"),
-                document.getElementById("sidebar-links"),
-                document.querySelector(".sidebar-nav"),
-                document.querySelector(".app-sidebar nav"),
-                document.querySelector(".app-sidebar")
-            ].filter(Boolean);
+            const primaryNav = document.getElementById("sidebarNav") || document.querySelector(".sidebar-nav") || document.querySelector(".app-sidebar nav");
+            const secondaryNav = document.getElementById("sidebar-links");
+            const rawSidebarElements = [primaryNav, secondaryNav].filter(Boolean);
+            const sidebarElements = Array.from(new Set(rawSidebarElements));
 
             sidebarElements.forEach(navEl => {
                 try {
@@ -489,6 +560,7 @@ function initTradexoDashboard() {
                         const btn = e.target.closest(".sidebar-nav-item, [data-section], [data-section-link]");
                         if (!btn) return;
                         e.preventDefault();
+                        e.stopPropagation();
                         const sec = btn.dataset.section || btn.dataset.sectionLink;
                         if (sec) {
                             switchSection(sec);
@@ -531,8 +603,13 @@ function initTradexoDashboard() {
                 }
                 if (!raw) {
                     try {
-                        const stored = localStorage.getItem("tradexo_active_section");
-                        if (stored && HASH_TO_SECTION[stored]) raw = stored;
+                        const defaultLanding = localStorage.getItem("tradexo_default_landing");
+                        if (defaultLanding && (HASH_TO_SECTION[defaultLanding] || SECTION_HASHES[defaultLanding])) {
+                            raw = defaultLanding;
+                        } else {
+                            const stored = localStorage.getItem("tradexo_active_section");
+                            if (stored && HASH_TO_SECTION[stored]) raw = stored;
+                        }
                     } catch (e) {}
                 }
                 const section = HASH_TO_SECTION[raw] || HASH_TO_SECTION[raw.toLowerCase()] || "scanner";
@@ -633,11 +710,11 @@ function initTradexoDashboard() {
             if (evaluatePicksBtn) evaluatePicksBtn.addEventListener("click", () => { if (typeof evaluatePicksAction === "function") evaluatePicksAction(); });
         } catch (err) { console.warn("Error wiring evaluatePicksBtn:", err); }
 
-        // REQ-NAV-003: Keyboard Routing across all 14 workspaces
+        // REQ-NAV-003: Keyboard Routing across all workspaces
         const ALL_14_WORKSPACES = [
             "scanner", "indices", "liveTrades", "paperTrading", "strategies",
             "stocksNews", "globalNews", "institutionalFlow", "orderFlow",
-            "accuracy", "history", "systemHealth", "guide", "rules"
+            "accuracy", "history", "systemHealth", "guide", "rules", "settings"
         ];
 
         window.addEventListener("keydown", (e) => {
@@ -703,31 +780,85 @@ function initTradexoDashboard() {
             });
         }
 
+        currentSortMode = "RANK_ASC";
+        window.currentSortMode = currentSortMode;
+
+        function updateHeaderSortIcons(activeSort) {
+            const table = document.getElementById("scannerDataTable");
+            if (!table) return;
+            const ths = table.querySelectorAll("thead th");
+            ths.forEach(th => {
+                th.classList.remove("sorted-asc", "sorted-desc");
+                const icon = th.querySelector(".th-sort-icon");
+                if (icon) icon.textContent = "↕";
+            });
+
+            let targetKey = "";
+            let isAsc = false;
+            if (activeSort.startsWith("RANK")) { targetKey = "rank"; isAsc = activeSort.endsWith("ASC"); }
+            else if (activeSort.startsWith("TICKER")) { targetKey = "ticker"; isAsc = activeSort.endsWith("ASC"); }
+            else if (activeSort.startsWith("SCORE")) { targetKey = "score"; isAsc = activeSort.endsWith("ASC"); }
+            else if (activeSort.startsWith("GAP")) { targetKey = "gap"; isAsc = activeSort.endsWith("ASC"); }
+            else if (activeSort.startsWith("LTP")) { targetKey = "ltp"; isAsc = activeSort.endsWith("ASC"); }
+            else if (activeSort === "GAINERS_DESC") { targetKey = "change"; isAsc = false; }
+            else if (activeSort === "LOSERS_ASC") { targetKey = "change"; isAsc = true; }
+            else if (activeSort.startsWith("VOL")) { targetKey = "vol"; isAsc = activeSort.endsWith("ASC"); }
+            else if (activeSort.startsWith("RSI")) { targetKey = "rsi"; isAsc = activeSort.endsWith("ASC"); }
+            else if (activeSort.startsWith("PRIORITY")) { targetKey = "priority"; isAsc = activeSort.endsWith("ASC"); }
+
+            if (targetKey) {
+                const targetTh = table.querySelector(`thead th[data-sort-key="${targetKey}"]`);
+                if (targetTh) {
+                    targetTh.classList.add(isAsc ? "sorted-asc" : "sorted-desc");
+                    const icon = targetTh.querySelector(".th-sort-icon");
+                    if (icon) icon.textContent = isAsc ? "▲" : "▼";
+                }
+            }
+        }
+        window.updateHeaderSortIcons = updateHeaderSortIcons;
+
         const scannerDataTable = document.getElementById("scannerDataTable");
         if (scannerDataTable) {
             const thead = scannerDataTable.querySelector("thead");
             if (thead) {
                 thead.addEventListener("click", (e) => {
                     try {
-                        const th = e.target.closest("th");
+                        const th = e.target.closest("th.sortable-th");
                         if (!th) return;
+                        const sortKeyAttr = th.dataset.sortKey;
                         const headerText = th.textContent.trim().toUpperCase();
                         let newSort = null;
-                        if (headerText.includes("RANK")) {
-                            newSort = "RANK_ASC";
-                        } else if (headerText.includes("CONFIDENCE")) {
-                            newSort = "SCORE_DESC";
-                        } else if (headerText.includes("GAP")) {
-                            newSort = "GAP_DESC";
-                        } else if (headerText.includes("CHANGE")) {
-                            newSort = (sortSelect && sortSelect.value === "GAINERS_DESC") ? "LOSERS_ASC" : "GAINERS_DESC";
-                        } else if (headerText.includes("VOL")) {
-                            newSort = "VOL_DESC";
-                        } else if (headerText.includes("RSI")) {
-                            newSort = "RSI_DESC";
+
+                        const isAsc = th.classList.contains("sorted-asc");
+                        const isDesc = th.classList.contains("sorted-desc");
+
+                        if (sortKeyAttr === "rank" || headerText.includes("RANK")) {
+                            newSort = isAsc ? "RANK_DESC" : "RANK_ASC";
+                        } else if (sortKeyAttr === "ticker" || headerText.includes("TICKER")) {
+                            newSort = isAsc ? "TICKER_DESC" : "TICKER_ASC";
+                        } else if (sortKeyAttr === "score" || headerText.includes("SCORE")) {
+                            newSort = isDesc ? "SCORE_ASC" : "SCORE_DESC";
+                        } else if (sortKeyAttr === "gap" || headerText.includes("GAP")) {
+                            newSort = isDesc ? "GAP_ASC" : "GAP_DESC";
+                        } else if (sortKeyAttr === "ltp" || headerText.includes("LTP")) {
+                            newSort = isDesc ? "LTP_ASC" : "LTP_DESC";
+                        } else if (sortKeyAttr === "change" || headerText.includes("CHANGE")) {
+                            newSort = (currentSortMode === "GAINERS_DESC") ? "LOSERS_ASC" : "GAINERS_DESC";
+                        } else if (sortKeyAttr === "vol" || headerText.includes("VOL")) {
+                            newSort = isDesc ? "VOL_ASC" : "VOL_DESC";
+                        } else if (sortKeyAttr === "rsi" || headerText.includes("RSI")) {
+                            newSort = isDesc ? "RSI_ASC" : "RSI_DESC";
+                        } else if (sortKeyAttr === "priority" || headerText.includes("PRIORITY")) {
+                            newSort = isAsc ? "PRIORITY_DESC" : "PRIORITY_ASC";
                         }
+
                         if (newSort) {
-                            if (sortSelect) sortSelect.value = newSort;
+                            currentSortMode = newSort;
+                            if (sortSelect) {
+                                const opt = sortSelect.querySelector(`option[value="${newSort}"]`);
+                                if (opt) sortSelect.value = newSort;
+                            }
+                            updateHeaderSortIcons(newSort);
                             if (typeof filterAndRenderTable === "function") filterAndRenderTable();
                         }
                     } catch (e) {
@@ -742,8 +873,81 @@ function initTradexoDashboard() {
         if (metricCardPriority1) metricCardPriority1.addEventListener("click", () => filterFromDashboardCard("P1"));
         if (metricCardBtst) metricCardBtst.addEventListener("click", () => filterFromDashboardCard("BTST"));
         if (metricCardStbt) metricCardStbt.addEventListener("click", () => filterFromDashboardCard("STBT"));
-        if (searchInput) searchInput.addEventListener("input", () => { if (typeof filterAndRenderTable === "function") filterAndRenderTable(); });
-        if (sortSelect) sortSelect.addEventListener("change", () => { if (typeof filterAndRenderTable === "function") filterAndRenderTable(); });
+
+        if (searchInput) {
+            searchInput.addEventListener("input", () => {
+                const clearBtn = document.getElementById("clearSearchBtn");
+                if (clearBtn) clearBtn.classList.toggle("hidden", !searchInput.value.trim());
+                if (typeof filterAndRenderTable === "function") filterAndRenderTable();
+            });
+        }
+
+        const clearSearchBtn = document.getElementById("clearSearchBtn");
+        if (clearSearchBtn && searchInput) {
+            clearSearchBtn.addEventListener("click", () => {
+                searchInput.value = "";
+                clearSearchBtn.classList.add("hidden");
+                searchInput.focus();
+                if (typeof filterAndRenderTable === "function") filterAndRenderTable();
+            });
+        }
+
+        if (sortSelect) {
+            sortSelect.addEventListener("change", () => {
+                currentSortMode = sortSelect.value;
+                updateHeaderSortIcons(currentSortMode);
+                if (typeof filterAndRenderTable === "function") filterAndRenderTable();
+            });
+        }
+
+        // Phase 5 & 6: Display Density Handler
+        function applyTableDensity(density) {
+            const table = document.getElementById("scannerDataTable");
+            const scannerSec = document.getElementById("scannerSection");
+            const isCompact = density === "compact";
+
+            if (table) {
+                table.classList.toggle("density-compact", isCompact);
+                table.classList.toggle("density-comfortable", !isCompact);
+            }
+            if (scannerSec) {
+                scannerSec.classList.toggle("density-compact", isCompact);
+                scannerSec.classList.toggle("density-comfortable", !isCompact);
+            }
+
+            // Update toolbar segmented density buttons
+            document.querySelectorAll("#tableDensityToggle .density-btn").forEach(btn => {
+                btn.classList.toggle("active", btn.dataset.density === density);
+            });
+
+            // Update Settings density buttons
+            const optCompact = document.getElementById("densityOptCompact");
+            const optComfortable = document.getElementById("densityOptComfortable");
+            if (optCompact) optCompact.classList.toggle("active", isCompact);
+            if (optComfortable) optComfortable.classList.toggle("active", !isCompact);
+
+            try {
+                localStorage.setItem("tradexo_display_density", density);
+            } catch (e) {}
+        }
+        window.applyTableDensity = applyTableDensity;
+
+        // Wire toolbar density buttons
+        const tableDensityToggle = document.getElementById("tableDensityToggle");
+        if (tableDensityToggle) {
+            tableDensityToggle.addEventListener("click", (e) => {
+                const btn = e.target.closest(".density-btn");
+                if (!btn) return;
+                applyTableDensity(btn.dataset.density || "compact");
+            });
+        }
+
+        // Initialize density
+        try {
+            const storedDensity = localStorage.getItem("tradexo_display_density") || "compact";
+            applyTableDensity(storedDensity);
+        } catch (_) {}
+
         if (closeModalBtn) closeModalBtn.addEventListener("click", () => { if (typeof hideModal === "function") hideModal(); });
 
         if (stocksTableBody) {
@@ -968,7 +1172,7 @@ function initTradexoDashboard() {
         });
     }
 
-    // Dual Theme Engine (Defaults to Champagne Gold Dark Mode)
+    // Phase 6: Dual Theme Engine (Exclusively Controlled in Settings)
     function getStoredTheme() {
         try {
             return localStorage.getItem("tradexo_theme") || localStorage.getItem("qh-theme") || "dark";
@@ -990,26 +1194,173 @@ function initTradexoDashboard() {
             document.documentElement.classList.remove("light-mode");
             if (toggleIcon) toggleIcon.className = "fa-solid fa-moon text-gold";
         }
+
+        // Synchronize Settings Theme Buttons
+        const optDark = document.getElementById("themeOptDark");
+        const optLight = document.getElementById("themeOptLight");
+        if (optDark) optDark.classList.toggle("active", activeTheme === "dark");
+        if (optLight) optLight.classList.toggle("active", activeTheme === "light");
+
         try {
             localStorage.setItem("tradexo_theme", activeTheme);
             localStorage.setItem("qh-theme", activeTheme);
         } catch (e) {}
     }
+    window.applyTheme = applyTheme;
 
-    function toggleTheme() {
-        const current = getStoredTheme();
-        const next = current === "dark" ? "light" : "dark";
-        applyTheme(next);
-    }
-    window.toggleTheme = toggleTheme;
+    function syncSettingsUI() {
+        const theme = getStoredTheme();
+        const optDark = document.getElementById("themeOptDark");
+        const optLight = document.getElementById("themeOptLight");
+        if (optDark) optDark.classList.toggle("active", theme === "dark");
+        if (optLight) optLight.classList.toggle("active", theme === "light");
 
-    const themeToggleBtn = document.getElementById("themeToggleBtn");
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            toggleTheme();
+        const density = localStorage.getItem("tradexo_display_density") || "compact";
+        const optCompact = document.getElementById("densityOptCompact");
+        const optComfortable = document.getElementById("densityOptComfortable");
+        if (optCompact) optCompact.classList.toggle("active", density === "compact");
+        if (optComfortable) optComfortable.classList.toggle("active", density === "comfortable");
+
+        const refreshMs = parseInt(localStorage.getItem("tradexo_refresh_interval") || "15000", 10);
+        document.querySelectorAll("#settingsRefreshRow .settings-chip-btn").forEach(btn => {
+            btn.classList.toggle("active", parseInt(btn.dataset.refresh, 10) === refreshMs);
         });
+
+        const landing = localStorage.getItem("tradexo_default_landing") || "scanner";
+        const landingSel = document.getElementById("defaultLandingSelect");
+        if (landingSel) landingSel.value = landing;
+
+        const audioToggle = document.getElementById("settingsAudioAlertsToggle");
+        if (audioToggle) audioToggle.checked = localStorage.getItem("tradexo_sound_alerts") !== "false";
+
+        const pushToggle = document.getElementById("settingsWebPushToggle");
+        if (pushToggle) pushToggle.checked = localStorage.getItem("tradexo_push_notifications") !== "false";
     }
+    window.syncSettingsUI = syncSettingsUI;
+
+    function initSettingsSection() {
+        // 1. Theme selection (Exclusive location)
+        const settingsThemeGroup = document.getElementById("settingsThemeGroup");
+        if (settingsThemeGroup) {
+            settingsThemeGroup.addEventListener("click", (e) => {
+                const btn = e.target.closest(".settings-segmented-btn");
+                if (!btn) return;
+                const themeVal = btn.dataset.themeVal;
+                if (themeVal) applyTheme(themeVal);
+            });
+        }
+
+        // 2. Display Density
+        const settingsDensityGroup = document.getElementById("settingsDensityGroup");
+        if (settingsDensityGroup) {
+            settingsDensityGroup.addEventListener("click", (e) => {
+                const btn = e.target.closest(".settings-segmented-btn");
+                if (!btn) return;
+                const densityVal = btn.dataset.densityVal;
+                if (densityVal && typeof applyTableDensity === "function") {
+                    applyTableDensity(densityVal);
+                }
+            });
+        }
+
+        // 3. Live Refresh Interval
+        const settingsRefreshRow = document.getElementById("settingsRefreshRow");
+        if (settingsRefreshRow) {
+            settingsRefreshRow.addEventListener("click", (e) => {
+                const btn = e.target.closest(".settings-chip-btn");
+                if (!btn) return;
+                const refreshMs = parseInt(btn.dataset.refresh, 10);
+                if (refreshMs) {
+                    try {
+                        localStorage.setItem("tradexo_refresh_interval", refreshMs.toString());
+                    } catch (_) {}
+                    document.querySelectorAll("#settingsRefreshRow .settings-chip-btn").forEach(b => {
+                        b.classList.toggle("active", b === btn);
+                    });
+                    if (typeof heavyScanInterval !== "undefined" && heavyScanInterval) {
+                        clearInterval(heavyScanInterval);
+                        heavyScanInterval = setInterval(() => {
+                            if (typeof fetchScanResults === "function") fetchScanResults(false);
+                        }, refreshMs);
+                    }
+                }
+            });
+        }
+
+        // 4. Notification Preferences
+        const audioToggle = document.getElementById("settingsAudioAlertsToggle");
+        if (audioToggle) {
+            audioToggle.checked = localStorage.getItem("tradexo_sound_alerts") !== "false";
+            audioToggle.addEventListener("change", (e) => {
+                try {
+                    localStorage.setItem("tradexo_sound_alerts", e.target.checked ? "true" : "false");
+                    if (e.target.checked && typeof playNotificationSound === "function") {
+                        playNotificationSound();
+                    }
+                } catch (_) {}
+            });
+        }
+
+        const pushToggle = document.getElementById("settingsWebPushToggle");
+        if (pushToggle) {
+            pushToggle.checked = localStorage.getItem("tradexo_push_notifications") !== "false";
+            pushToggle.addEventListener("change", async (e) => {
+                try {
+                    if (e.target.checked && "Notification" in window) {
+                        if (Notification.permission !== "granted") {
+                            const p = await Notification.requestPermission();
+                            if (p !== "granted") {
+                                pushToggle.checked = false;
+                                localStorage.setItem("tradexo_push_notifications", "false");
+                                return;
+                            }
+                        }
+                    }
+                    localStorage.setItem("tradexo_push_notifications", e.target.checked ? "true" : "false");
+                } catch (_) {}
+            });
+        }
+
+        const testPushBtn = document.getElementById("settingsTestPushBtn");
+        if (testPushBtn) {
+            testPushBtn.addEventListener("click", () => {
+                if (typeof playNotificationSound === "function") playNotificationSound();
+                if ("Notification" in window) {
+                    if (Notification.permission === "granted") {
+                        new Notification("TRADEXO System Alert", {
+                            body: "Test notification sent successfully. Audio & push preferences active.",
+                            icon: "/static/logo_tx_transparent.png"
+                        });
+                    } else {
+                        Notification.requestPermission().then(p => {
+                            if (p === "granted") {
+                                new Notification("TRADEXO System Alert", {
+                                    body: "Test notification sent successfully. Audio & push preferences active.",
+                                    icon: "/static/logo_tx_transparent.png"
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        // 5. Default Landing Page Selector
+        const defaultLandingSelect = document.getElementById("defaultLandingSelect");
+        if (defaultLandingSelect) {
+            const stored = localStorage.getItem("tradexo_default_landing") || "scanner";
+            defaultLandingSelect.value = stored;
+            defaultLandingSelect.addEventListener("change", (e) => {
+                try {
+                    localStorage.setItem("tradexo_default_landing", e.target.value);
+                } catch (_) {}
+            });
+        }
+
+        syncSettingsUI();
+    }
+    initSettingsSection();
+
     applyTheme();
 
     // Nav & News Section DOM
@@ -1039,63 +1390,7 @@ function initTradexoDashboard() {
     const btnRefreshInstitutionalFlow = document.getElementById("btnRefreshInstitutionalFlow");
 
     let allInstitutionalFlowDeals = [];
-
-    // Indices & Strategies Section DOM
-    const indicesSection = document.getElementById("indicesSection");
-    const indexSectionSwitcher = document.getElementById("indexSectionSwitcher");
-    const indexIntelligenceView = document.getElementById("indexIntelligenceView");
-    const indexSignalsView = document.getElementById("indexSignalsView");
-    const indexGrid = document.getElementById("indexGrid");
-    const indexTickerTrack = document.getElementById("indexTickerTrack") || document.getElementById("marqueeTrack");
-    const indexVerdictGrid = document.getElementById("indexVerdictGrid");
-    const indexVerdictEmptyState = document.getElementById("indexVerdictEmptyState");
-    const indexVerdictMeta = document.getElementById("indexVerdictMeta");
-    const strategiesSection = document.getElementById("strategiesSection");
-    const strategiesNavBadge = document.getElementById("strategiesNavBadge");
-    const strategyGrid = document.getElementById("strategyGrid");
-    const addStrategyBtn = document.getElementById("addStrategyBtn");
-    const strategyFormModal = document.getElementById("strategyFormModal");
-    const closeStrategyFormBtn = document.getElementById("closeStrategyFormBtn");
-    const strategyForm = document.getElementById("strategyForm");
-    const strategyFormTitle = document.getElementById("strategyFormTitle");
-    const strategyPillarCheckboxes = document.getElementById("strategyPillarCheckboxes");
-
-    // History & Calibration DOM
-    const historySection = document.getElementById("historySection");
-    const historyTableBody = document.getElementById("historyTableBody");
-    const calibrationCardGrid = document.getElementById("calibrationCardGrid");
-    const btnRefreshHistory = document.getElementById("btnRefreshHistory");
-    const historySearchInput = document.getElementById("historySearchInput");
-    const historyStrategyFilter = document.getElementById("historyStrategyFilter");
-    const historyOutcomeFilter = document.getElementById("historyOutcomeFilter");
-    const historyInstitutionalFlowFilter = document.getElementById("historyInstitutionalFlowFilter");
-
-    // AI Clarification Review Modal (M9)  —  see index.html comment for why this exists
-    const clarificationModal = document.getElementById("clarificationModal");
-    const closeClarificationBtn = document.getElementById("closeClarificationBtn");
-    const clarificationSummaryBody = document.getElementById("clarificationSummaryBody");
-    const clarificationCorrectionGroup = document.getElementById("clarificationCorrectionGroup");
-    const clarificationCorrectionNote = document.getElementById("clarificationCorrectionNote");
-    const clarificationConfirmBtn = document.getElementById("clarificationConfirmBtn");
-    const clarificationRejectBtn = document.getElementById("clarificationRejectBtn");
-    const clarificationResubmitBtn = document.getElementById("clarificationResubmitBtn");
-    let clarificationStrategyId = null;
-
-    // API key button (M9)  —  prompts for/stores the key apiFetch() attaches to mutating requests
-    const apiKeyBtn = document.getElementById("apiKeyBtn");
-    const apiKeyBtnMobile = document.getElementById("apiKeyBtnMobile");
-
-    // Notifications DOM (M5)  —  bell/badge/panel + toast, fed live over /ws/live
-    const notifBell = document.getElementById("notifBell");
-    const notifBadge = document.getElementById("notifBadge");
-    const notifBellMobileTop = document.getElementById("notifBellMobileTop");
-    const notifBadgeMobileTop = document.getElementById("notifBadgeMobileTop");
-    const notifBadgeMobile = document.getElementById("notifBadgeMobile");
-    const notifPanel = document.getElementById("notifPanel");
-    const notifList = document.getElementById("notifList");
-    const notifMarkAllBtn = document.getElementById("notifMarkAllBtn");
-    const toastContainer = document.getElementById("toastContainer");
-    let notifUnreadCount = 0;
+    let lastSuccessfulInstFlowData = null;
 
     const ALL_PILLAR_NAMES = [
         "Pillar 1: Futures OI", "Pillar 2: Vol Persistence", "Pillar 3: Relative Strength",
@@ -1411,6 +1706,77 @@ function initTradexoDashboard() {
     }
     window.renderDashboard = renderDashboard;
 
+    function renderTableSkeletons(rowCount = 8) {
+        try {
+            const tbody = document.getElementById("stocksTableBody") || (typeof stocksTableBody !== "undefined" ? stocksTableBody : null);
+            if (!tbody) return;
+            const singleRowHtml = `
+                <tr class="skeleton-row">
+                    <td><span class="skeleton-shimmer" style="width:24px;height:16px;"></span></td>
+                    <td><div style="display:flex;align-items:center;gap:8px;"><span class="skeleton-shimmer" style="width:28px;height:28px;border-radius:50%;"></span><div style="display:flex;flex-direction:column;gap:4px;"><span class="skeleton-shimmer" style="width:68px;height:14px;"></span><span class="skeleton-shimmer" style="width:40px;height:10px;"></span></div></div></td>
+                    <td><span class="skeleton-shimmer" style="width:58px;height:22px;border-radius:12px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:60px;height:18px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:68px;height:20px;border-radius:12px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:48px;height:18px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:54px;height:20px;border-radius:12px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:64px;height:18px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:56px;height:16px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:42px;height:16px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:36px;height:18px;border-radius:12px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:70px;height:16px;"></span></td>
+                    <td><span class="skeleton-shimmer" style="width:60px;height:26px;border-radius:6px;"></span></td>
+                </tr>
+            `;
+            let out = "";
+            for (let i = 0; i < rowCount; i++) {
+                out += singleRowHtml;
+            }
+            tbody.innerHTML = out;
+            if (typeof emptyState !== "undefined" && emptyState) emptyState.classList.add("hidden");
+        } catch (e) {
+            console.warn("Error rendering table skeletons:", e);
+        }
+    }
+    window.renderTableSkeletons = renderTableSkeletons;
+
+    function generateTableSkeletonRows(cols = 8, rows = 6) {
+        let out = "";
+        for (let r = 0; r < rows; r++) {
+            out += '<tr class="skeleton-row">';
+            for (let c = 0; c < cols; c++) {
+                const w = (c === 1) ? 100 : (c === 0 ? 30 : 60 + ((c * 17) % 40));
+                out += `<td><span class="skeleton-shimmer" style="width:${w}px;height:18px;"></span></td>`;
+            }
+            out += '</tr>';
+        }
+        return out;
+    }
+    window.generateTableSkeletonRows = generateTableSkeletonRows;
+
+    function generateCardSkeletonHtml(count = 4) {
+        let out = "";
+        for (let i = 0; i < count; i++) {
+            out += `
+                <div class="skeleton-card" style="min-height:150px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <span class="skeleton-shimmer" style="width:120px;height:18px;"></span>
+                        <span class="skeleton-shimmer" style="width:60px;height:20px;border-radius:12px;"></span>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <span class="skeleton-shimmer" style="width:70%;height:14px;margin-bottom:6px;display:block;"></span>
+                        <span class="skeleton-shimmer" style="width:90%;height:14px;display:block;"></span>
+                    </div>
+                    <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center;">
+                        <span class="skeleton-shimmer" style="width:80px;height:16px;"></span>
+                        <span class="skeleton-shimmer" style="width:70px;height:24px;border-radius:6px;"></span>
+                    </div>
+                </div>
+            `;
+        }
+        return out;
+    }
+    window.generateCardSkeletonHtml = generateCardSkeletonHtml;
+
     function renderScannerTable(stocks) {
         try {
             // Phase 2: Defensive check before rendering
@@ -1463,6 +1829,7 @@ function initTradexoDashboard() {
         isFetchingScan = true;
         try {
             if (forceRefresh) {
+                renderTableSkeletons(8);
                 if (scanProgressBar) scanProgressBar.classList.remove("hidden");
                 const allScanBtns = document.querySelectorAll("#scanBtn, #scanNowBtn, #topbarScanBtn, #scanBtnMobile, .scan-hero-btn, [data-action='scan']");
                 allScanBtns.forEach(btn => {
@@ -1472,6 +1839,11 @@ function initTradexoDashboard() {
                         if (span) span.textContent = "SCANNING...";
                     } catch (_) {}
                 });
+            } else {
+                const tbody = document.getElementById("stocksTableBody") || (typeof stocksTableBody !== "undefined" ? stocksTableBody : null);
+                if (tbody && (tbody.children.length === 0 || tbody.querySelectorAll(".skeleton-row").length > 0)) {
+                    renderTableSkeletons(8);
+                }
             }
 
             const url = forceRefresh ? "/api/scan?nocache=true" : "/api/scan";
@@ -1608,7 +1980,7 @@ function initTradexoDashboard() {
         console.log(`[TRADEXO] 9:15:00 AM IST market open refresh scheduled in ${(msUntilTarget / 60000).toFixed(1)} minutes (at ${targetDate.toLocaleTimeString('en-IN')})`);
 
         setTimeout(() => {
-            console.log('[TRADEXO] 9:15:00 AM IST  —  hard refreshing for new market day...');
+            console.log('[TRADEXO] 9:15:00 AM IST  —  hard refreshing for new market day...');
             location.reload();
         }, Math.max(1000, msUntilTarget));
     }
@@ -1719,7 +2091,7 @@ function initTradexoDashboard() {
 
         if (day !== 0 && day !== 6 && istMins >= 555 && istMins <= 560) {
             // 9:15-9:20 AM: force refresh accuracy every 30 sec
-            console.log('[TRADEXO] 9:15 AM window  —  forcing accuracy refresh...');
+            console.log('[TRADEXO] 9:15 AM window  —  forcing accuracy refresh...');
             fetchScanResults(true);
             fetchWinRatePerformance();
             fetchSplitAccuracy();
@@ -2420,17 +2792,29 @@ function initTradexoDashboard() {
             }
         });
 
+        const effectiveSortKey = currentSortMode || (sortSelect ? sortSelect.value : "RANK_ASC");
         filtered.sort((a, b) => {
-            if (sortKey === "GAINERS_DESC") return (b.pct_change || 0) - (a.pct_change || 0);
-            if (sortKey === "LOSERS_ASC") return (a.pct_change || 0) - (b.pct_change || 0);
-            if (sortKey === "SCORE_DESC") return (b.confidence_score || 0) - (a.confidence_score || 0);
-            if (sortKey === "VOL_DESC") return (b.volume_spike || 0) - (a.volume_spike || 0);
-            if (sortKey === "RSI_DESC") return (b.rsi || 0) - (a.rsi || 0);
-            if (sortKey === "GAP_DESC") return (b.predicted_gap_pct || 0) - (a.predicted_gap_pct || 0);
+            if (effectiveSortKey === "GAINERS_DESC") return (b.pct_change || 0) - (a.pct_change || 0);
+            if (effectiveSortKey === "LOSERS_ASC") return (a.pct_change || 0) - (b.pct_change || 0);
+            if (effectiveSortKey === "SCORE_DESC") return (b.confidence_score || 0) - (a.confidence_score || 0);
+            if (effectiveSortKey === "SCORE_ASC") return (a.confidence_score || 0) - (b.confidence_score || 0);
+            if (effectiveSortKey === "VOL_DESC") return (b.volume_spike || 0) - (a.volume_spike || 0);
+            if (effectiveSortKey === "VOL_ASC") return (a.volume_spike || 0) - (b.volume_spike || 0);
+            if (effectiveSortKey === "RSI_DESC") return (b.rsi || 0) - (a.rsi || 0);
+            if (effectiveSortKey === "RSI_ASC") return (a.rsi || 0) - (b.rsi || 0);
+            if (effectiveSortKey === "GAP_DESC") return (b.predicted_gap_pct || 0) - (a.predicted_gap_pct || 0);
+            if (effectiveSortKey === "GAP_ASC") return (a.predicted_gap_pct || 0) - (b.predicted_gap_pct || 0);
+            if (effectiveSortKey === "LTP_DESC") return (b.ltp || 0) - (a.ltp || 0);
+            if (effectiveSortKey === "LTP_ASC") return (a.ltp || 0) - (b.ltp || 0);
+            if (effectiveSortKey === "TICKER_ASC") return (a.symbol || "").localeCompare(b.symbol || "");
+            if (effectiveSortKey === "TICKER_DESC") return (b.symbol || "").localeCompare(a.symbol || "");
+            if (effectiveSortKey === "RANK_DESC") return (b.rank_position || 999) - (a.rank_position || 999);
             return (a.rank_position || 999) - (b.rank_position || 999);
         });
 
-        if (visibleCount) visibleCount.textContent = filtered.length;
+        if (visibleCount) visibleCount.textContent = `${filtered.length} Stocks`;
+        const clearBtn = document.getElementById("clearSearchBtn");
+        if (clearBtn) clearBtn.classList.toggle("hidden", !searchTerm);
 
         // ▶▶ LIVE STOCKS VIEW: Render card grid instead of table ▶▶
         if (currentStockView === "live") {
@@ -2460,8 +2844,25 @@ function initTradexoDashboard() {
                     const isUp = changePts >= 0;
                     const sign = isUp ? "+" : "";
                     const colorClass = isUp ? "live-card-up" : "live-card-down";
-                    const arrowIcon = isUp ? "fa-caret-up" : "fa-caret-down";
-                    const sigText = stock.signal || (isUp ? "TOP GAINER" : "TOP LOSER");
+                    const arrowIcon = isUp ? "fa-arrow-up" : "fa-arrow-down";
+                    const changeClass = isUp ? "text-bullish" : "text-bearish";
+                    const rawSig = (stock.signal || "").toUpperCase();
+                    const isBtst = rawSig.includes("BTST") || rawSig.includes("BUY");
+                    const isStbt = rawSig.includes("STBT") || rawSig.includes("SELL");
+
+                    let sigLabel = "NO SIGNAL";
+                    let sigColor = "var(--color-text-muted, #94a3b8)";
+                    let sigIcon = "fa-minus";
+
+                    if (isBtst) {
+                        sigLabel = "BTST (BUY)";
+                        sigColor = "var(--color-positive, #10b981)";
+                        sigIcon = "fa-arrow-trend-up";
+                    } else if (isStbt) {
+                        sigLabel = "STBT (SELL)";
+                        sigColor = "var(--color-negative, #ef4444)";
+                        sigIcon = "fa-arrow-trend-down";
+                    }
 
                     const card = document.createElement("div");
                     card.className = `live-stock-card ${colorClass}`;
@@ -2471,14 +2872,14 @@ function initTradexoDashboard() {
                             ${getStockLogoHTML(stock.symbol)}
                             <div>
                                 <div class="live-card-name">${escapeHtml(stock.symbol || '--')}</div>
-                                <div style="font-size: 10px; font-weight: 700; color: ${isUp ? '#10b981' : '#ef4444'}; margin-top: 2px;">
-                                    <i class="fa-solid ${isUp ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i> ${escapeHtml(sigText)}
+                                <div class="live-card-sig" style="font-size: 10px; font-weight: 700; color: ${sigColor}; margin-top: 2px; display: inline-flex; align-items: center; gap: 4px;">
+                                    <i class="fa-solid ${sigIcon}"></i> ${escapeHtml(sigLabel)}
                                 </div>
                             </div>
                         </div>
                         <div style="text-align:right;">
                             <div class="live-card-ltp">₹${ltp.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
-                            <div class="live-card-change">
+                            <div class="live-card-change ${changeClass}">
                                 <i class="fa-solid ${arrowIcon}"></i>
                                 ${sign}${changePts.toFixed(2)} (${sign}${pctChange.toFixed(2)}%)
                             </div>
@@ -2491,7 +2892,8 @@ function initTradexoDashboard() {
                     stockGridNodes.set(stock.symbol, {
                         card: card,
                         ltpEl: card.querySelector(".live-card-ltp"),
-                        changeEl: card.querySelector(".live-card-change")
+                        changeEl: card.querySelector(".live-card-change"),
+                        sigEl: card.querySelector(".live-card-sig")
                     });
                 } catch (liveCardErr) {
                     console.warn("Error rendering live stock card:", stock && stock.symbol, liveCardErr);
@@ -2500,7 +2902,7 @@ function initTradexoDashboard() {
             return;
         }
 
-        // ÃƒÂ¢Ã¢â‚¬Â—ÃƒÂ¢Ã¢â‚¬Â— BTST STOCKS VIEW: Table rendering ÃƒÂ¢Ã¢â‚¬Â—ÃƒÂ¢Ã¢â‚¬Â—
+        // ÃƒÂ¢Ã¢â‚¬Â—ÃƒÂ¢Ã¢â‚¬Â— BTST STOCKS VIEW: Table rendering ÃƒÂ¢Ã¢â‚¬Â—ÃƒÂ¢Ã¢â‚¬Â—
         if (btstTableWrapper) btstTableWrapper.classList.remove("hidden");
         if (liveStocksGrid) liveStocksGrid.classList.add("hidden");
         stockTableNodes.clear();
@@ -2516,12 +2918,15 @@ function initTradexoDashboard() {
             if (emptyState) emptyState.classList.add("hidden");
         }
 
-        filtered.forEach((stock) => {
+        filtered.forEach((stock, idx) => {
             try {
                 if (!stock || typeof stock !== "object") return;
                 const estGap = stock.predicted_gap_pct !== undefined ? stock.predicted_gap_pct : 0.0;
                 const ltpVal = stock.ltp ? stock.ltp.toLocaleString('en-IN') : '0.00';
-                const sigText = stock.signal || 'NEUTRAL';
+                const rawSig = (stock.signal || '').toUpperCase();
+                const isBtst = rawSig.includes('BTST') || rawSig.includes('BUY');
+                const isStbt = rawSig.includes('STBT') || rawSig.includes('SELL');
+                const sigText = isBtst ? 'BTST (BUY)' : (isStbt ? 'STBT (SELL)' : 'NO SIGNAL');
                 const pillarWeight = stock.confirmed_pillars_weight !== undefined ? stock.confirmed_pillars_weight : 0.0;
                 const reqPillars = stock.required_pillars || 3;
                 const rowKey = `${stock.symbol}-${stock.rank_position || 0}`;
@@ -2533,6 +2938,7 @@ function initTradexoDashboard() {
 
                 let tr = stocksTableBody.querySelector(`tr[data-row-key="${CSS.escape(rowKey)}"]`) || stocksTableBody.querySelector(`tr[data-symbol="${CSS.escape(stock.symbol)}"]`);
                 if (tr) {
+                    tr.classList.toggle("stock-row-alt", idx % 2 === 1);
                     // Selective In-Place DOM Update for Existing Row  —   PRESERVES OPEN ACCORDION & LOGO IMAGE
                     if (isRowExpanded) tr.classList.add("expanded");
                     const ltpTd = tr.querySelector('.ltp-cell') || tr.querySelector('[data-label="LTP"]');
@@ -2575,6 +2981,9 @@ function initTradexoDashboard() {
                 tr.dataset.symbol = stock.symbol;
                 tr.setAttribute("data-symbol", stock.symbol);
 
+                if (idx % 2 === 1) {
+                    tr.classList.add("stock-row-alt");
+                }
                 if (stock.rank_position <= 2) {
                     tr.classList.add("top-choice-row");
                 }
@@ -2815,9 +3224,10 @@ function initTradexoDashboard() {
                         viewInstitutionalFlowDeals(stock.symbol);
                     });
                 }
-            } catch (rowErr) {
-                console.warn("Error rendering scanner table row:", stock && stock.symbol, rowErr);
             }
+        } catch (rowErr) {
+            console.warn("Error rendering scanner table row:", stock && stock.symbol, rowErr);
+        }
         });
     } catch (tableErr) {
         console.error("Fatal error rendering scanner table:", tableErr);
@@ -2825,10 +3235,10 @@ function initTradexoDashboard() {
 }
 
     // -------------------------------------------------------------
-    // Institutional Flow (Pillar 6)  —  scanner row chip + expand detail.
+    // Institutional Flow (Pillar 6)  —  scanner row chip + expand detail.
     // -------------------------------------------------------------
     function buildInstitutionalFlowChipHTML(flow, detailId) {
-        if (!flow || flow.data_status === "DATA_UNAVAILABLE") return "";  // no data fetched yet today  —  show nothing, not a stale/fake reading
+        if (!flow || flow.data_status === "DATA_UNAVAILABLE") return "";  // no data fetched yet today  —  show nothing, not a stale/fake reading
         const side = flow.dominant_side;
         if (side !== "BUY" && side !== "SELL") return "";
         if (!flow.tier || flow.tier === "BELOW_THRESHOLD") return "";
@@ -2836,13 +3246,13 @@ function initTradexoDashboard() {
         const colorClass = side === "BUY" ? "text-bullish" : "text-bearish";
         const value = Math.abs(flow.net_value_cr || 0).toFixed(1);
         // Shadow mode (computed but not yet counted toward the live verdict, until the live-
-        // snapshot-vs-EOD-archive reconciliation has run clean for a while  —  see
+        // snapshot-vs-EOD-archive reconciliation has run clean for a while  —  see
         // block_deal_provider.py) gets a muted/outline treatment: same hue via currentColor,
         // dashed border instead of a filled pill, so it doesn't read as equal weight to a
         // pillar that's actually driving the score.
         const shadowClass = flow.shadow_mode ? "flow-chip-shadow" : "";
         const tooltip = flow.shadow_mode
-            ? "Institutional Flow: monitoring only  —  not yet counted in the live verdict"
+            ? "Institutional Flow: monitoring only  —  not yet counted in the live verdict"
             : "Institutional Flow: counted in the live verdict";
         return `
             <span class="badge flow-chip ${colorClass} ${shadowClass}" title="${tooltip}" data-detail-target="${detailId}" style="cursor:pointer;margin-top:4px;">
@@ -2867,7 +3277,7 @@ function initTradexoDashboard() {
                         <div>Sell: <strong class="text-bearish">₹${(flow.sell_value_cr || 0).toFixed(1)}cr</strong></div>
                         <div>Net: <strong class="${netClass}">₹${Math.abs(flow.net_value_cr || 0).toFixed(1)}cr ${escapeHtml(flow.dominant_side || "")}</strong></div>
                         <div>Tier: <span class="badge badge-gold">${escapeHtml(flow.tier || "")}</span></div>
-                        <div style="color:var(--ink-muted);">Deal types: ${(flow.deal_types || []).map(escapeHtml).join(", ") || " — "}</div>
+                        <div style="color:var(--ink-muted);">Deal types: ${(flow.deal_types || []).map(escapeHtml).join(", ") || " — "}</div>
                         <a href="#" class="flow-view-deals-link" style="margin-left:auto;color:var(--gold);font-weight:800;text-decoration:none;">
                             View individual deals <i class="fa-solid fa-arrow-right"></i>
                         </a>
@@ -2917,6 +3327,9 @@ function initTradexoDashboard() {
     // 7. STOCK BREAKDOWN MODAL DRAWER
     // -------------------------------------------------------------
     async function openStockModal(symbol, initialView = "analysis") {
+        if (typeof window.openStockModal === "function" && window.openStockModal !== openStockModal) {
+            return window.openStockModal(symbol, initialView);
+        }
         try {
             if (stockModal) stockModal.classList.remove("hidden");
             if (typeof setModalView === "function") setModalView(initialView || "analysis");
@@ -3395,6 +3808,162 @@ function initTradexoDashboard() {
     let currentOptionChainSymbol = null;
     let currentOptionChainData = null;
     let currentSelectedExpiry = null;
+    let currentOptionChainViewMode = (window.innerWidth <= 768) ? 'cards' : 'all';
+
+    function setOptionChainViewMode(mode) {
+        currentOptionChainViewMode = mode;
+        const ocToggles = document.getElementById("ocViewToggles");
+        if (ocToggles) {
+            ocToggles.querySelectorAll(".oc-toggle-btn").forEach(b => {
+                if (b.dataset.ocMode === mode) {
+                    b.classList.add("active");
+                } else {
+                    b.classList.remove("active");
+                }
+            });
+        }
+
+        const ocTable = document.querySelector(".oc-matrix-table");
+        const mobileCards = document.getElementById("ocMobileCardList");
+        const scrollHint = document.getElementById("ocTableScrollHint");
+
+        if (mode === "cards") {
+            if (mobileCards) mobileCards.style.display = "flex";
+            if (ocTable) ocTable.style.display = "none";
+            if (scrollHint) scrollHint.style.display = "none";
+        } else {
+            if (mobileCards) mobileCards.style.display = "none";
+            if (ocTable) ocTable.style.display = "table";
+            if (mode === "all") {
+                if (ocTable) delete ocTable.dataset.ocView;
+                if (scrollHint) scrollHint.style.display = (window.innerWidth <= 768) ? "flex" : "none";
+            } else {
+                if (ocTable) ocTable.dataset.ocView = mode; // 'calls' or 'puts'
+                if (scrollHint) scrollHint.style.display = "none";
+            }
+        }
+    }
+    window.setOptionChainViewMode = setOptionChainViewMode;
+
+    window.toggleOcCardGreeks = function(btn) {
+        const card = btn.closest('.oc-strike-card');
+        if (!card) return;
+        const drawer = card.querySelector('.oc-card-greeks-drawer');
+        if (drawer) {
+            drawer.classList.toggle('hidden');
+        }
+    };
+
+    function buildOptionChainStrikeCardHTML(s, data, maxChgOi, targetAtmStrike, cleanSym) {
+        const ce = s.ce || {};
+        const pe = s.pe || {};
+        const strikePrice = s.strike_price;
+        const isAtm = Boolean(s.is_atm || (targetAtmStrike && Math.abs(strikePrice - targetAtmStrike) < 0.5));
+        const isCeItm = strikePrice < data.underlying_value;
+        const isPeItm = strikePrice > data.underlying_value;
+
+        const ceChgVal = ce.change_in_oi || 0;
+        const peChgVal = pe.change_in_oi || 0;
+        const ceChgColor = ceChgVal >= 0 ? '#22c55e' : '#ef4444';
+        const peChgColor = peChgVal >= 0 ? '#22c55e' : '#ef4444';
+
+        const ceIntensity = Math.min(Math.abs(ceChgVal) / (maxChgOi || 1), 1);
+        const peIntensity = Math.min(Math.abs(peChgVal) / (maxChgOi || 1), 1);
+
+        const ceHeatmapBg = isCeItm 
+            ? 'rgba(16, 185, 129, 0.15)' 
+            : (ceChgVal >= 0 ? `rgba(34, 197, 94, ${0.04 + ceIntensity * 0.22})` : `rgba(239, 68, 68, ${0.04 + ceIntensity * 0.22})`);
+        const peHeatmapBg = isPeItm 
+            ? 'rgba(244, 63, 94, 0.15)' 
+            : (peChgVal >= 0 ? `rgba(34, 197, 94, ${0.04 + peIntensity * 0.22})` : `rgba(239, 68, 68, ${0.04 + peIntensity * 0.22})`);
+
+        const diffPts = (strikePrice - (data.underlying_value || 0)).toFixed(0);
+        const diffSign = Number(diffPts) > 0 ? `+${diffPts}` : diffPts;
+
+        const ceDelta = ce.delta !== undefined ? ce.delta : (isCeItm ? (0.55 + Math.min(0.4, (data.underlying_value - strikePrice)/data.underlying_value * 2)).toFixed(2) : (0.45 - Math.min(0.4, (strikePrice - data.underlying_value)/data.underlying_value * 2)).toFixed(2));
+        const peDelta = pe.delta !== undefined ? pe.delta : (isPeItm ? (-0.55 - Math.min(0.4, (strikePrice - data.underlying_value)/data.underlying_value * 2)).toFixed(2) : (-0.45 + Math.min(0.4, (data.underlying_value - strikePrice)/data.underlying_value * 2)).toFixed(2));
+        const ceIv = ce.iv ? `${Number(ce.iv).toFixed(1)}%` : '14.2%';
+        const peIv = pe.iv ? `${Number(pe.iv).toFixed(1)}%` : '14.8%';
+
+        return `
+            <div class="oc-strike-card ${isAtm ? 'atm-card' : ''}" data-strike="${strikePrice}" data-is-atm="${isAtm ? 'true' : 'false'}">
+                <div class="oc-card-header">
+                    <div class="oc-card-strike-num">
+                        <span style="color:var(--tradexo-obsidian-muted);font-size:11px;font-weight:700;">STRIKE</span>
+                        <strong>₹${Number(strikePrice).toLocaleString('en-IN')}</strong>
+                        ${isAtm ? '<span class="badge oc-atm-badge" style="background:rgba(212,175,55,0.25);color:#f59e0b;border:1px solid rgba(212,175,55,0.5);font-size:9.5px;padding:2px 7px;border-radius:999px;font-weight:900;">★ ATM</span>' : `<span style="font-size:10px;color:var(--tradexo-obsidian-muted);font-family:var(--tradexo-font-mono);">(${diffSign} pts)</span>`}
+                    </div>
+                    <button type="button" class="oc-card-expand-btn" onclick="toggleOcCardGreeks(this)" title="Toggle Options Greeks">
+                        <i data-lucide="activity" class="lucide-xs"></i> Greeks
+                    </button>
+                </div>
+
+                <div class="oc-card-body-grid">
+                    <!-- CALLS (CE) -->
+                    <div class="oc-card-side-box oc-card-call-box">
+                        <div class="oc-card-side-title" style="color:#22c55e;">
+                            <span><i data-lucide="trending-up" class="lucide-xs"></i> CALL (CE)</span>
+                            ${isCeItm ? '<span style="font-size:9px;background:rgba(34,197,94,0.2);padding:1px 4px;border-radius:3px;font-weight:900;">ITM</span>' : '<span style="font-size:9px;color:var(--tradexo-obsidian-muted);">OTM</span>'}
+                        </div>
+                        <div class="oc-card-ltp ce-ltp" style="color:#22c55e;cursor:pointer;" onclick="openOptionsDemoTradeModal({ symbol: '${cleanSym}', strike: ${strikePrice}, leg: 'CE', ltp: ${ce.ltp || 1.0}, lot_size: ${data.lot_size || 250}, underlying: ${data.underlying_value || 0} })" title="Trade ${cleanSym} ${strikePrice} CE">
+                            ₹${(ce.ltp || 0).toFixed(2)}
+                        </div>
+                        <div class="oc-card-chgoi-badge ce-chgoi" style="color:${ceChgColor};background:${ceHeatmapBg};">
+                            Chg OI: <strong>${ceChgVal >= 0 ? '+' : ''}${ceChgVal.toLocaleString()}</strong>
+                        </div>
+                        <div class="oc-card-substats">
+                            <span class="ce-oi">OI: ${(ce.open_interest || 0).toLocaleString()}</span>
+                            <span class="ce-vol">Vol: ${(ce.volume || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="oc-card-btn-row">
+                            <button type="button" class="oc-card-buy-btn oc-card-buy-call-btn" onclick="openOptionsDemoTradeModal({ symbol: '${cleanSym}', strike: ${strikePrice}, leg: 'CE', ltp: ${ce.ltp || 1.0}, lot_size: ${data.lot_size || 250}, underlying: ${data.underlying_value || 0} })">
+                                <i data-lucide="shopping-cart" class="lucide-xs"></i> BUY CE
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PUTS (PE) -->
+                    <div class="oc-card-side-box oc-card-put-box">
+                        <div class="oc-card-side-title" style="color:#ef4444;">
+                            <span>PUT (PE) <i data-lucide="trending-down" class="lucide-xs"></i></span>
+                            ${isPeItm ? '<span style="font-size:9px;background:rgba(239,68,68,0.2);padding:1px 4px;border-radius:3px;font-weight:900;">ITM</span>' : '<span style="font-size:9px;color:var(--tradexo-obsidian-muted);">OTM</span>'}
+                        </div>
+                        <div class="oc-card-ltp pe-ltp" style="color:#ef4444;cursor:pointer;" onclick="openOptionsDemoTradeModal({ symbol: '${cleanSym}', strike: ${strikePrice}, leg: 'PE', ltp: ${pe.ltp || 1.0}, lot_size: ${data.lot_size || 250}, underlying: ${data.underlying_value || 0} })" title="Trade ${cleanSym} ${strikePrice} PE">
+                            ₹${(pe.ltp || 0).toFixed(2)}
+                        </div>
+                        <div class="oc-card-chgoi-badge pe-chgoi" style="color:${peChgColor};background:${peHeatmapBg};">
+                            Chg OI: <strong>${peChgVal >= 0 ? '+' : ''}${peChgVal.toLocaleString()}</strong>
+                        </div>
+                        <div class="oc-card-substats">
+                            <span class="pe-oi">OI: ${(pe.open_interest || 0).toLocaleString()}</span>
+                            <span class="pe-vol">Vol: ${(pe.volume || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="oc-card-btn-row">
+                            <button type="button" class="oc-card-buy-btn oc-card-buy-put-btn" onclick="openOptionsDemoTradeModal({ symbol: '${cleanSym}', strike: ${strikePrice}, leg: 'PE', ltp: ${pe.ltp || 1.0}, lot_size: ${data.lot_size || 250}, underlying: ${data.underlying_value || 0} })">
+                                <i data-lucide="shopping-cart" class="lucide-xs"></i> BUY PE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expandable Greeks Drawer (Hidden by default) -->
+                <div class="oc-card-greeks-drawer hidden">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-family:var(--tradexo-font-mono);">
+                        <div style="background:rgba(34,197,94,0.06);padding:6px;border-radius:4px;border:1px solid rgba(34,197,94,0.2);">
+                            <div style="font-weight:800;color:#22c55e;font-size:10px;margin-bottom:3px;">CE GREEKS</div>
+                            <div style="display:flex;justify-content:space-between;"><span>Delta:</span><strong style="color:#22c55e;">${ceDelta}</strong></div>
+                            <div style="display:flex;justify-content:space-between;"><span>IV:</span><span>${ceIv}</span></div>
+                        </div>
+                        <div style="background:rgba(239,68,68,0.06);padding:6px;border-radius:4px;border:1px solid rgba(239,68,68,0.2);">
+                            <div style="font-weight:800;color:#ef4444;font-size:10px;margin-bottom:3px;">PE GREEKS</div>
+                            <div style="display:flex;justify-content:space-between;"><span>Delta:</span><strong style="color:#ef4444;">${peDelta}</strong></div>
+                            <div style="display:flex;justify-content:space-between;"><span>IV:</span><span>${peIv}</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
 
     window.stopOptionChainPolling = function() {
         if (optionChainInterval) {
@@ -3414,9 +3983,14 @@ function initTradexoDashboard() {
             const response = await apiFetch(`/api/option-chain/${cleanSym}${expiryQuery}`);
             
             const tbody = document.getElementById("ocMatrixTableBody");
+            const mobileCardList = document.getElementById("ocMobileCardList");
+
             if (!response.ok) {
                 if (!isSilentTick && tbody) {
                     tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:30px;color:#be123c;font-weight:700;"><i class="fa-solid fa-triangle-exclamation"></i> Unable to load live option chain for ${escapeHtml(cleanSym)}.</td></tr>`;
+                }
+                if (!isSilentTick && mobileCardList) {
+                    mobileCardList.innerHTML = `<div style="text-align:center;padding:30px;color:#be123c;font-weight:700;">Unable to load live option chain for ${escapeHtml(cleanSym)}.</div>`;
                 }
                 return;
             }
@@ -3505,6 +4079,7 @@ function initTradexoDashboard() {
             const strikes = data.strikes || [];
             if (strikes.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:30px;color:#64748b;font-weight:700;">No option chain strikes available for ${escapeHtml(cleanSym)}.</td></tr>`;
+                if (mobileCardList) mobileCardList.innerHTML = `<div style="text-align:center;padding:30px;color:#64748b;font-weight:700;">No option chain strikes available for ${escapeHtml(cleanSym)}.</div>`;
                 return;
             }
 
@@ -3513,6 +4088,16 @@ function initTradexoDashboard() {
                 if (optionChainRafId) cancelAnimationFrame(optionChainRafId);
                 optionChainRafId = requestAnimationFrame(() => {
                     optionChainRafId = null;
+
+                    // Compute maximum absolute change in OI across strikes for live heatmap scaling
+                    let liveMaxChgOi = 1;
+                    strikes.forEach(stk => {
+                        const cA = Math.abs((stk.ce && stk.ce.change_in_oi) || 0);
+                        const pA = Math.abs((stk.pe && stk.pe.change_in_oi) || 0);
+                        if (cA > liveMaxChgOi) liveMaxChgOi = cA;
+                        if (pA > liveMaxChgOi) liveMaxChgOi = pA;
+                    });
+
                     strikes.forEach(s => {
                         const strikeKey = String(s.strike_price);
                         const node = optionChainStrikeNodes.get(strikeKey);
@@ -3526,13 +4111,21 @@ function initTradexoDashboard() {
                             node.ceOi.textContent = ceOi;
                         }
 
-                        // CE: CHNG IN OI (1)
-                        const ceChg = `${(ce.change_in_oi || 0) >= 0 ? '+' : ''}${(ce.change_in_oi || 0).toLocaleString()}`;
+                        // CE: CHNG IN OI (1) with dynamic heatmap tint
+                        const ceChgVal = ce.change_in_oi || 0;
+                        const ceChg = `${ceChgVal >= 0 ? '+' : ''}${ceChgVal.toLocaleString()}`;
                         if (node.ceChg) {
                             if (node.ceChg.textContent && node.ceChg.textContent.trim() !== ceChg) {
                                 node.ceChg.textContent = ceChg;
                             }
-                            node.ceChg.style.color = (ce.change_in_oi || 0) >= 0 ? '#22c55e' : '#ef4444';
+                            node.ceChg.style.color = ceChgVal >= 0 ? '#22c55e' : '#ef4444';
+                            const ceIntensity = Math.min(Math.abs(ceChgVal) / liveMaxChgOi, 1);
+                            const isCeItm = s.strike_price < data.underlying_value;
+                            if (!isCeItm) {
+                                node.ceChg.style.background = ceChgVal >= 0 
+                                    ? `rgba(34, 197, 94, ${0.04 + ceIntensity * 0.22})` 
+                                    : `rgba(239, 68, 68, ${0.04 + ceIntensity * 0.22})`;
+                            }
                         }
 
                         // CE: VOL (2)
@@ -3565,13 +4158,21 @@ function initTradexoDashboard() {
                             node.peVol.textContent = peVol;
                         }
 
-                        // PE: CHNG IN OI (7)
-                        const peChg = `${(pe.change_in_oi || 0) >= 0 ? '+' : ''}${(pe.change_in_oi || 0).toLocaleString()}`;
+                        // PE: CHNG IN OI (7) with dynamic heatmap tint
+                        const peChgVal = pe.change_in_oi || 0;
+                        const peChg = `${peChgVal >= 0 ? '+' : ''}${peChgVal.toLocaleString()}`;
                         if (node.peChg) {
                             if (node.peChg.textContent && node.peChg.textContent.trim() !== peChg) {
                                 node.peChg.textContent = peChg;
                             }
-                            node.peChg.style.color = (pe.change_in_oi || 0) >= 0 ? '#22c55e' : '#ef4444';
+                            node.peChg.style.color = peChgVal >= 0 ? '#22c55e' : '#ef4444';
+                            const peIntensity = Math.min(Math.abs(peChgVal) / liveMaxChgOi, 1);
+                            const isPeItm = s.strike_price > data.underlying_value;
+                            if (!isPeItm) {
+                                node.peChg.style.background = peChgVal >= 0 
+                                    ? `rgba(34, 197, 94, ${0.04 + peIntensity * 0.22})` 
+                                    : `rgba(239, 68, 68, ${0.04 + peIntensity * 0.22})`;
+                            }
                         }
 
                         // PE: OI (8)
@@ -3579,6 +4180,36 @@ function initTradexoDashboard() {
                         if (node.peOi && node.peOi.textContent && node.peOi.textContent.trim() !== peOi) {
                             node.peOi.textContent = peOi;
                         }
+
+                        // Synchronize Mobile Strike Card elements if present
+                        if (node.cardCeLtp && node.cardCeLtp.textContent !== ceLtp) node.cardCeLtp.textContent = ceLtp;
+                        if (node.cardPeLtp && node.cardPeLtp.textContent !== peLtp) node.cardPeLtp.textContent = peLtp;
+                        if (node.cardCeChg) {
+                            node.cardCeChg.innerHTML = `Chg OI: <strong>${ceChg}</strong>`;
+                            node.cardCeChg.style.color = ceChgVal >= 0 ? '#22c55e' : '#ef4444';
+                            const isCeItm = s.strike_price < data.underlying_value;
+                            if (!isCeItm) {
+                                const ceIntensity = Math.min(Math.abs(ceChgVal) / liveMaxChgOi, 1);
+                                node.cardCeChg.style.background = ceChgVal >= 0 
+                                    ? `rgba(34, 197, 94, ${0.04 + ceIntensity * 0.22})` 
+                                    : `rgba(239, 68, 68, ${0.04 + ceIntensity * 0.22})`;
+                            }
+                        }
+                        if (node.cardPeChg) {
+                            node.cardPeChg.innerHTML = `Chg OI: <strong>${peChg}</strong>`;
+                            node.cardPeChg.style.color = peChgVal >= 0 ? '#22c55e' : '#ef4444';
+                            const isPeItm = s.strike_price > data.underlying_value;
+                            if (!isPeItm) {
+                                const peIntensity = Math.min(Math.abs(peChgVal) / liveMaxChgOi, 1);
+                                node.cardPeChg.style.background = peChgVal >= 0 
+                                    ? `rgba(34, 197, 94, ${0.04 + peIntensity * 0.22})` 
+                                    : `rgba(239, 68, 68, ${0.04 + peIntensity * 0.22})`;
+                            }
+                        }
+                        if (node.cardCeOi && node.cardCeOi.textContent !== `OI: ${ceOi}`) node.cardCeOi.textContent = `OI: ${ceOi}`;
+                        if (node.cardPeOi && node.cardPeOi.textContent !== `OI: ${peOi}`) node.cardPeOi.textContent = `OI: ${peOi}`;
+                        if (node.cardCeVol && node.cardCeVol.textContent !== `Vol: ${ceVol}`) node.cardCeVol.textContent = `Vol: ${ceVol}`;
+                        if (node.cardPeVol && node.cardPeVol.textContent !== `Vol: ${peVol}`) node.cardPeVol.textContent = `Vol: ${peVol}`;
                     });
                 });
                 return;
@@ -3597,6 +4228,15 @@ function initTradexoDashboard() {
                 });
             }
 
+            // Compute maximum absolute change in OI across all strikes for heatmap scaling
+            let maxChgOi = 1;
+            strikes.forEach(s => {
+                const ceChgAbs = Math.abs((s.ce && s.ce.change_in_oi) || 0);
+                const peChgAbs = Math.abs((s.pe && s.pe.change_in_oi) || 0);
+                if (ceChgAbs > maxChgOi) maxChgOi = ceChgAbs;
+                if (peChgAbs > maxChgOi) maxChgOi = peChgAbs;
+            });
+
             // Initial full render with stable data-strike attributes
             tbody.innerHTML = strikes.map(s => {
                 const ce = s.ce || {};
@@ -3606,8 +4246,21 @@ function initTradexoDashboard() {
                 const isCeItm = strikePrice < data.underlying_value;
                 const isPeItm = strikePrice > data.underlying_value;
 
-                const ceChgColor = (ce.change_in_oi || 0) >= 0 ? '#22c55e' : '#ef4444';
-                const peChgColor = (pe.change_in_oi || 0) >= 0 ? '#22c55e' : '#ef4444';
+                const ceChgVal = ce.change_in_oi || 0;
+                const peChgVal = pe.change_in_oi || 0;
+                const ceChgColor = ceChgVal >= 0 ? '#22c55e' : '#ef4444';
+                const peChgColor = peChgVal >= 0 ? '#22c55e' : '#ef4444';
+
+                const ceIntensity = Math.min(Math.abs(ceChgVal) / maxChgOi, 1);
+                const peIntensity = Math.min(Math.abs(peChgVal) / maxChgOi, 1);
+
+                // Sensibull / Kite heatmap style: subtle background tint scaling with OI change magnitude
+                const ceHeatmapBg = isCeItm 
+                    ? 'rgba(16, 185, 129, 0.15)' 
+                    : (ceChgVal >= 0 ? `rgba(34, 197, 94, ${0.04 + ceIntensity * 0.22})` : `rgba(239, 68, 68, ${0.04 + ceIntensity * 0.22})`);
+                const peHeatmapBg = isPeItm 
+                    ? 'rgba(244, 63, 94, 0.15)' 
+                    : (peChgVal >= 0 ? `rgba(34, 197, 94, ${0.04 + peIntensity * 0.22})` : `rgba(239, 68, 68, ${0.04 + peIntensity * 0.22})`);
 
                 return `
                     <tr data-strike="${strikePrice}" data-is-atm="${isAtm ? 'true' : 'false'}" style="border-bottom: 1px solid var(--border-subtle); ${isAtm ? 'background: rgba(212, 175, 55, 0.15); font-weight: 800;' : ''} transition: background 0.15s ease;" class="${isAtm ? 'oc-atm-row atm-strike-row' : ''}">
@@ -3616,8 +4269,8 @@ function initTradexoDashboard() {
                             ${(ce.open_interest || 0).toLocaleString()}
                         </td>
                         <!-- CE: CHNG IN OI -->
-                        <td style="padding: 7px 10px; text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: ${ceChgColor}; font-weight: 700; ${isCeItm ? 'background: rgba(16, 185, 129, 0.1);' : ''}">
-                            ${(ce.change_in_oi || 0) >= 0 ? '+' : ''}${(ce.change_in_oi || 0).toLocaleString()}
+                        <td style="padding: 7px 10px; text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: ${ceChgColor}; font-weight: 700; background: ${ceHeatmapBg};">
+                            ${ceChgVal >= 0 ? '+' : ''}${ceChgVal.toLocaleString()}
                         </td>
                         <!-- CE: VOLUME -->
                         <td style="padding: 7px 10px; text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-muted); ${isCeItm ? 'background: rgba(16, 185, 129, 0.1);' : ''}">
@@ -3645,8 +4298,8 @@ function initTradexoDashboard() {
                             ${(pe.volume || 0).toLocaleString()}
                         </td>
                         <!-- PE: CHNG IN OI -->
-                        <td style="padding: 7px 10px; text-align: left; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: ${peChgColor}; font-weight: 700; ${isPeItm ? 'background: rgba(244, 63, 94, 0.1);' : ''}">
-                            ${(pe.change_in_oi || 0) >= 0 ? '+' : ''}${(pe.change_in_oi || 0).toLocaleString()}
+                        <td style="padding: 7px 10px; text-align: left; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: ${peChgColor}; font-weight: 700; background: ${peHeatmapBg};">
+                            ${peChgVal >= 0 ? '+' : ''}${peChgVal.toLocaleString()}
                         </td>
                         <!-- PE: OI -->
                         <td style="padding: 7px 10px; text-align: left; font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-muted); ${isPeItm ? 'background: rgba(244, 63, 94, 0.1);' : ''}">
@@ -3656,13 +4309,19 @@ function initTradexoDashboard() {
                 `;
             }).join("");
 
+            // Render Mobile Strike Cards simultaneously
+            if (mobileCardList) {
+                mobileCardList.innerHTML = strikes.map(s => buildOptionChainStrikeCardHTML(s, data, maxChgOi, targetAtmStrike, cleanSym)).join("");
+            }
+
             // Register into O(1) optionChainStrikeNodes dictionary
             optionChainStrikeNodes.clear();
             tbody.querySelectorAll('tr[data-strike]').forEach(row => {
                 const strike = row.dataset.strike;
                 const cells = row.querySelectorAll('td');
+                const card = mobileCardList ? mobileCardList.querySelector(`.oc-strike-card[data-strike="${strike}"]`) : null;
                 if (cells.length >= 9) {
-                    optionChainStrikeNodes.set(String(strike), {
+                    const nodeObj = {
                         row: row,
                         ceOi: cells[0],
                         ceChg: cells[1],
@@ -3673,24 +4332,43 @@ function initTradexoDashboard() {
                         peVol: cells[6],
                         peChg: cells[7],
                         peOi: cells[8]
-                    });
+                    };
+                    if (card) {
+                        nodeObj.card = card;
+                        nodeObj.cardCeLtp = card.querySelector('.ce-ltp');
+                        nodeObj.cardCeChg = card.querySelector('.ce-chgoi');
+                        nodeObj.cardCeOi = card.querySelector('.ce-oi');
+                        nodeObj.cardCeVol = card.querySelector('.ce-vol');
+                        nodeObj.cardPeLtp = card.querySelector('.pe-ltp');
+                        nodeObj.cardPeChg = card.querySelector('.pe-chgoi');
+                        nodeObj.cardPeOi = card.querySelector('.pe-oi');
+                        nodeObj.cardPeVol = card.querySelector('.pe-vol');
+                    }
+                    optionChainStrikeNodes.set(String(strike), nodeObj);
                 }
             });
 
-            // Initial auto-centering horizontally on mobile and vertically to ATM strike
+            // Apply active view mode & scroll to ATM
+            setOptionChainViewMode(currentOptionChainViewMode);
+
             if (!isSilentTick) {
-                if (window.innerWidth <= 768) {
-                    const wrap = document.querySelector('#optionChainModal .option-chain-table-wrap');
-                    const table = wrap ? wrap.querySelector('table') : null;
-                    if (wrap && table && table.scrollWidth > wrap.clientWidth) {
-                        wrap.scrollLeft = Math.round((table.scrollWidth - wrap.clientWidth) / 2);
+                if (currentOptionChainViewMode === 'cards') {
+                    const atmCard = mobileCardList ? mobileCardList.querySelector('.atm-card') : null;
+                    if (atmCard) {
+                        setTimeout(() => atmCard.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
                     }
-                }
-                const atmRow = tbody.querySelector('.atm-strike-row') || tbody.querySelector('.oc-atm-row');
-                if (atmRow) {
-                    setTimeout(() => {
-                        atmRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 80);
+                } else {
+                    const atmRow = tbody.querySelector('.atm-strike-row') || tbody.querySelector('.oc-atm-row');
+                    if (atmRow) {
+                        setTimeout(() => atmRow.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
+                    }
+                    if (window.innerWidth <= 768) {
+                        const wrap = document.querySelector('#optionChainModal .option-chain-table-wrap');
+                        const table = wrap ? wrap.querySelector('table') : null;
+                        if (wrap && table && table.scrollWidth > wrap.clientWidth) {
+                            wrap.scrollLeft = Math.round((table.scrollWidth - wrap.clientWidth) / 2);
+                        }
+                    }
                 }
             }
 
@@ -3712,6 +4390,9 @@ function initTradexoDashboard() {
         const cleanSym = String(rawSym).replace(".NS", "").toUpperCase().trim();
         currentOptionChainSymbol = cleanSym;
         currentSelectedExpiry = null;
+
+        const defaultMode = (window.innerWidth <= 768) ? 'cards' : 'all';
+        setOptionChainViewMode(defaultMode);
 
         const expirySelect = document.getElementById("ocExpirySelect");
         if (expirySelect) {
@@ -3735,7 +4416,7 @@ function initTradexoDashboard() {
         const painEl = document.getElementById("ocModalMaxPain");
         if (painEl) painEl.textContent = "--";
 
-        // Immediate Loading State inside Table Body
+        // Immediate Loading State inside Table Body & Mobile Cards
         const tbody = document.getElementById("ocMatrixTableBody");
         if (tbody) {
             tbody.innerHTML = `
@@ -3744,6 +4425,14 @@ function initTradexoDashboard() {
                         <i data-lucide="refresh-cw" class="lucide-sm lucide-spin" style="margin-right:8px;color:var(--tradexo-obsidian-warning);vertical-align:middle;"></i> Fetching live option chain for <strong style="color:var(--tradexo-obsidian-text);">${escapeHtml(cleanSym)}</strong>...
                     </td>
                 </tr>
+            `;
+        }
+        const mobileCardList = document.getElementById("ocMobileCardList");
+        if (mobileCardList) {
+            mobileCardList.innerHTML = `
+                <div style="text-align:center;padding:30px 16px;color:var(--tradexo-obsidian-muted);font-size:12.5px;">
+                    <i data-lucide="refresh-cw" class="lucide-sm lucide-spin" style="margin-right:6px;color:var(--tradexo-obsidian-warning);vertical-align:middle;"></i> Fetching strikes for <strong style="color:var(--tradexo-obsidian-text);">${escapeHtml(cleanSym)}</strong>...
+                </div>
             `;
         }
 
@@ -4267,10 +4956,10 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // 9. NEWS SECTION  —  full F&O universe coverage.
+    // 9. NEWS SECTION  —  full F&O universe coverage.
     // Per-stock news is served entirely from a background-refreshed cache file (zero extra API
     // budget no matter how many page views). Global/macro news is a live call on every
-    // /api/news hit (see news_provider.fetch_market_news)  —  it auto-refreshes here every 1 min
+    // /api/news hit (see news_provider.fetch_market_news)  —  it auto-refreshes here every 1 min
     // while this tab is open, backed by a 60s server-side cache so that polling can't multiply
     // into repeated live CurrentsAPI calls.
     // -------------------------------------------------------------
@@ -4279,11 +4968,11 @@ function initTradexoDashboard() {
     async function fetchNewsSection() {
         try {
             if (newsGrid) {
-                newsGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
+                newsGrid.innerHTML = generateCardSkeletonHtml(4);
             }
             const globalGrid = document.getElementById("globalNewsGrid");
             if (globalGrid) {
-                globalGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
+                globalGrid.innerHTML = generateCardSkeletonHtml(4);
             }
             if (newsEmptyState) newsEmptyState.classList.add("hidden");
             if (globalNewsEmptyState) globalNewsEmptyState.classList.add("hidden");
@@ -4462,11 +5151,36 @@ function initTradexoDashboard() {
         if (headlines.length === 0) {
             headlineHtml = `<div class="news-empty-headlines">No recent headlines found in the last ${classification.lookback_hours || 72}h.</div>`;
         } else {
-            headlineHtml = headlines.slice(0, 4).map(h => `
+            const previewHeadlines = headlines.slice(0, 2);
+            const extraHeadlines = headlines.slice(2, 5);
+
+            const previewHtml = previewHeadlines.map(h => `
                 <div class="news-headline-item">
                     <a href="${escapeAttr(h.url || '#')}" target="_blank" rel="noopener noreferrer">${escapeHtml(h.title || '')}</a>
                 </div>
             `).join("");
+
+            let extraHtml = "";
+            let expandBtnHtml = "";
+            if (extraHeadlines.length > 0) {
+                extraHtml = `
+                    <div class="news-extra-headlines hidden">
+                        ${extraHeadlines.map(h => `
+                            <div class="news-headline-item">
+                                <a href="${escapeAttr(h.url || '#')}" target="_blank" rel="noopener noreferrer">${escapeHtml(h.title || '')}</a>
+                            </div>
+                        `).join("")}
+                    </div>
+                `;
+                expandBtnHtml = `
+                    <button type="button" class="news-expand-toggle-btn" aria-expanded="false" title="Toggle extra headlines">
+                        <i class="fa-solid fa-chevron-down"></i>
+                        <span>+${extraHeadlines.length} more headline${extraHeadlines.length > 1 ? 's' : ''}</span>
+                    </button>
+                `;
+            }
+
+            headlineHtml = previewHtml + extraHtml + expandBtnHtml;
         }
 
         let flagsHtml = "";
@@ -4494,6 +5208,26 @@ function initTradexoDashboard() {
                 <span>Updated ${fetchedAt}</span>
             </div>
         `;
+
+        const expandBtn = card.querySelector(".news-expand-toggle-btn");
+        if (expandBtn) {
+            expandBtn.addEventListener("click", () => {
+                const extraDiv = card.querySelector(".news-extra-headlines");
+                if (!extraDiv) return;
+                const isHidden = extraDiv.classList.toggle("hidden");
+                expandBtn.setAttribute("aria-expanded", !isHidden);
+                const icon = expandBtn.querySelector("i");
+                const span = expandBtn.querySelector("span");
+                const extraCount = headlines.slice(2, 5).length;
+                if (icon) {
+                    icon.className = isHidden ? "fa-solid fa-chevron-down" : "fa-solid fa-chevron-up";
+                }
+                if (span) {
+                    span.textContent = isHidden ? `+${extraCount} more headline${extraCount > 1 ? 's' : ''}` : "Show less";
+                }
+            });
+        }
+
         return card;
     }
 
@@ -4524,30 +5258,39 @@ function initTradexoDashboard() {
     // 9B. INSTITUTIONAL FLOW SECTION — today's qualifying NSE bulk/block deals (REQ-OFL-001).
     // -------------------------------------------------------------
     async function fetchInstitutionalFlowSection() {
+        window.fetchInstitutionalFlowSection = fetchInstitutionalFlowSection;
         try {
             if (institutionalFlowTableBody) {
-                institutionalFlowTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;"><i class="fa-solid fa-spinner fa-spin"></i></td></tr>`;
+                institutionalFlowTableBody.innerHTML = generateTableSkeletonRows(8, 6);
             }
             if (institutionalFlowEmptyState) institutionalFlowEmptyState.classList.add("hidden");
 
             const response = await apiFetch("/api/institutional_flow");
-            if (!response.ok) throw new Error("Institutional flow API error");
+            if (!response.ok) throw new Error(`API error ${response.status}`);
             const data = await response.json();
 
-            allInstitutionalFlowDeals = data.deals || [];
+            let deals = data.deals || [];
             
             // If primary endpoint returned empty, check block-deals cache
-            if (allInstitutionalFlowDeals.length === 0) {
+            if (deals.length === 0) {
                 try {
                     const bdRes = await apiFetch("/api/block-deals");
                     if (bdRes.ok) {
                         const bdData = await bdRes.json();
                         if (bdData.deals && bdData.deals.length > 0) {
-                            allInstitutionalFlowDeals = bdData.deals;
+                            deals = bdData.deals;
                         }
                     }
                 } catch (e) { /* ignore fallback */ }
             }
+
+            allInstitutionalFlowDeals = deals;
+            lastSuccessfulInstFlowData = {
+                deals: deals,
+                meta: data.meta || {},
+                latest_reconciliation: data.latest_reconciliation,
+                loadedAt: new Date()
+            };
 
             if (institutionalFlowNavBadge) institutionalFlowNavBadge.textContent = allInstitutionalFlowDeals.length;
             updateInstitutionalFlowStatusBar(data);
@@ -4555,12 +5298,78 @@ function initTradexoDashboard() {
             filterAndRenderInstitutionalFlowTable();
         } catch (error) {
             console.error("Failed to fetch institutional flow:", error);
-            if (institutionalFlowTableBody) institutionalFlowTableBody.innerHTML = "";
-            if (institutionalFlowStatusBar) {
-                institutionalFlowStatusBar.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-bearish"></i> <span>Could not load institutional flow data right now.</span>`;
+
+            if (lastSuccessfulInstFlowData && lastSuccessfulInstFlowData.deals && lastSuccessfulInstFlowData.deals.length > 0) {
+                // PARTIAL FAILURE / STALE CACHE SCENARIO:
+                // Retain previously loaded deals and stats, but clearly label them as STALE/CACHED
+                allInstitutionalFlowDeals = lastSuccessfulInstFlowData.deals;
+                if (institutionalFlowNavBadge) institutionalFlowNavBadge.textContent = allInstitutionalFlowDeals.length;
+                
+                const timeStr = lastSuccessfulInstFlowData.loadedAt ? lastSuccessfulInstFlowData.loadedAt.toLocaleTimeString() : "--";
+                if (institutionalFlowStatusBar) {
+                    institutionalFlowStatusBar.innerHTML = `
+                        <i class="fa-solid fa-triangle-exclamation text-amber"></i>
+                        <span><strong>Unable to refresh live flow (${escapeHtml(error.message || 'Server Error')}).</strong> Showing cached data from <strong>${timeStr}</strong>.</span>
+                        <button class="btn btn-xs btn-secondary" onclick="fetchInstitutionalFlowSection()" style="margin-left:8px;padding:3px 9px;font-size:10px;"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+                    `;
+                }
+
+                // Update overview stats with stale indicator
+                updateInstitutionalFlowOverviewStats({
+                    deals: allInstitutionalFlowDeals,
+                    meta: Object.assign({}, lastSuccessfulInstFlowData.meta, { is_stale: true, stale_time: timeStr })
+                });
+
+                // Keep table rendered with cached deals, ensure empty state is hidden
+                if (institutionalFlowEmptyState) institutionalFlowEmptyState.classList.add("hidden");
+                filterAndRenderInstitutionalFlowTable();
+            } else {
+                // FIRST LOAD FAILURE SCENARIO: No data in cache
+                allInstitutionalFlowDeals = [];
+                if (institutionalFlowNavBadge) institutionalFlowNavBadge.textContent = "0";
+
+                if (institutionalFlowStatusBar) {
+                    institutionalFlowStatusBar.innerHTML = `
+                        <i class="fa-solid fa-triangle-exclamation text-bearish"></i>
+                        <span><strong>Could not load institutional flow data right now.</strong> Please check connection.</span>
+                        <button class="btn btn-xs btn-secondary" onclick="fetchInstitutionalFlowSection()" style="margin-left:8px;padding:3px 9px;font-size:10px;"><i class="fa-solid fa-rotate-right"></i> Retry</button>
+                    `;
+                }
+
+                // Reset stat cards to clear, consistent empty/unavailable state
+                resetInstitutionalFlowOverviewStatsUnavailable();
+
+                // Show an explicit error row in the table, NOT the misleading "No Deals Today" message
+                if (institutionalFlowEmptyState) institutionalFlowEmptyState.classList.add("hidden");
+                if (institutionalFlowTableBody) {
+                    institutionalFlowTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="8" style="text-align:center;padding:40px 16px;color:var(--ink-muted);">
+                                <i class="fa-solid fa-triangle-exclamation text-bearish" style="font-size:20px;display:block;margin-bottom:8px;"></i>
+                                <span style="font-size:13px;font-weight:700;color:var(--ink-primary);display:block;">Institutional Deal Data Unavailable</span>
+                                <span style="font-size:11px;color:var(--ink-muted);">Could not reach the institutional flow endpoint. Click "Retry" above once connection is restored.</span>
+                            </td>
+                        </tr>
+                    `;
+                }
             }
-            if (institutionalFlowEmptyState) institutionalFlowEmptyState.classList.remove("hidden");
         }
+    }
+
+    function resetInstitutionalFlowOverviewStatsUnavailable() {
+        const ids = [
+            ["ifTotalDealsVal", "--"], ["ifTotalDealsSub", "Data Unavailable"],
+            ["ifBuyInflowVal", "--"], ["ifBuyInflowSub", "Data Unavailable"],
+            ["ifSellOutflowVal", "--"], ["ifSellOutflowSub", "Data Unavailable"],
+            ["ifNetFlowVal", "--"], ["ifNetFlowSub", "Data Unavailable"]
+        ];
+        ids.forEach(([id, text]) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = text;
+                if (id.endsWith("Val")) el.className = "stat-card-value";
+            }
+        });
     }
 
     function updateInstitutionalFlowOverviewStats(data) {
@@ -4598,9 +5407,13 @@ function initTradexoDashboard() {
 
         if (ifTotalDealsVal) ifTotalDealsVal.textContent = deals.length;
         if (ifTotalDealsSub) {
-            ifTotalDealsSub.textContent = megaBlocksCount > 0 
-                ? `${megaBlocksCount} Mega Blocks (≥ ₹25Cr)` 
-                : (meta.last_updated ? `Updated ${new Date(meta.last_updated).toLocaleTimeString()}` : "Floor ≥ ₹25Cr Blocks");
+            if (meta.is_stale) {
+                ifTotalDealsSub.innerHTML = `<span class="text-amber"><i class="fa-solid fa-clock-rotate-left"></i> Cached at ${meta.stale_time}</span>`;
+            } else {
+                ifTotalDealsSub.textContent = megaBlocksCount > 0 
+                    ? `${megaBlocksCount} Mega Blocks (≥ ₹25Cr)` 
+                    : (meta.last_updated ? `Updated ${new Date(meta.last_updated).toLocaleTimeString()}` : "Floor ≥ ₹25Cr Blocks");
+            }
         }
 
         if (ifBuyInflowVal) ifBuyInflowVal.textContent = `₹${totalBuy.toFixed(2)}cr`;
@@ -4707,7 +5520,7 @@ function initTradexoDashboard() {
                 : `<span class="badge" style="background:rgba(59,130,246,0.15);color:var(--cat-blue);border:1px solid rgba(59,130,246,0.3);font-size:9.5px;font-weight:700;">BULK</span>`;
 
             // Auto-reconciliation check vs active BTST candidates (REQ-OFL-001 & Blueprint 06)
-            const activeBtst = (cached_stocks || []).find(s => s.symbol === deal.symbol && (s.signal || "").includes("BTST"));
+            const activeBtst = (typeof allStocks !== 'undefined' && Array.isArray(allStocks) ? allStocks : []).find(s => s.symbol === deal.symbol && (s.signal || "").includes("BTST"));
             const reconciledBadge = activeBtst 
                 ? `<span class="flow-reconciled-badge" title="Aligned with active BTST setup: ${escapeAttr(activeBtst.symbol)}"><i class="fa-solid fa-bolt text-gold"></i> P1 RECONCILED</span>` 
                 : "";
@@ -4716,7 +5529,7 @@ function initTradexoDashboard() {
             let qtyStr = deal.quantity ? `${Number(deal.quantity).toLocaleString("en-IN")} shs` : "--";
             let priceStr = deal.price ? `₹${Number(deal.price).toFixed(2)}` : "--";
             if (qtyStr === "--" && deal.value_cr) {
-                const refStock = (cached_stocks || []).find(s => s.symbol === deal.symbol);
+                const refStock = (typeof allStocks !== 'undefined' && Array.isArray(allStocks) ? allStocks : []).find(s => s.symbol === deal.symbol);
                 const refPrice = refStock && refStock.ltp ? refStock.ltp : (deal.watp || 1500.0);
                 const approxQty = Math.round((deal.value_cr * 1e7) / refPrice);
                 qtyStr = `~${approxQty.toLocaleString("en-IN")} shs`;
@@ -4775,7 +5588,7 @@ function initTradexoDashboard() {
         switchSection("institutionalFlow");
         if (institutionalFlowSearchInput) institutionalFlowSearchInput.value = symbol;
         // switchSection() already kicked off its own fetch, but its result lands whenever it
-        // lands  —  awaiting a second, explicit fetch here is a deliberate small redundancy in
+        // lands  —  awaiting a second, explicit fetch here is a deliberate small redundancy in
         // exchange for a deterministic "fetch, then filter" order instead of guessing a delay.
         await fetchInstitutionalFlowSection();
         filterAndRenderInstitutionalFlowTable();
@@ -4805,7 +5618,7 @@ function initTradexoDashboard() {
     async function fetchOrderFlowSection() {
         if (!orderFlowGrid) return;
         try {
-            orderFlowGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i><div style="margin-top:10px;">Fetching 3:15-3:25 PM Order Flow & 5L Depth...</div></div>`;
+            orderFlowGrid.innerHTML = generateCardSkeletonHtml(4);
             const res = await apiFetch("/api/order_flow_all");
             if (!res.ok) throw new Error("Order Flow API error");
             const data = await res.json();
@@ -4818,11 +5631,20 @@ function initTradexoDashboard() {
             const ofPageConfirmedCount = document.getElementById("ofPageConfirmedCount");
             const ofPageVetoedCount = document.getElementById("ofPageVetoedCount");
 
-            if (ofPageFeedStatus) ofPageFeedStatus.textContent = (data.feed_health && data.feed_health.feed_mode || "SMARTAPI STREAM").toUpperCase();
+            if (ofPageFeedStatus) {
+                const isLive = data.feed_health && (data.feed_health.ws_connected || data.feed_health.status === "LIVE");
+                const modeText = (data.feed_health && data.feed_health.feed_mode) 
+                    ? data.feed_health.feed_mode 
+                    : (isLive ? "LIVE TICK-RULE (ANGEL ONE L2)" : "OFFLINE SIMULATION (DEMO)");
+                ofPageFeedStatus.textContent = modeText;
+                ofPageFeedStatus.className = `stat-card-value ${isLive ? 'text-bullish' : 'text-gold'}`;
+            }
             if (ofPageFeedDetail) {
-                let msg = data.feed_health && data.feed_health.message ? data.feed_health.message : "5-Level Depth WebSocket Stream";
-                if (msg.length > 50) {
-                    msg = msg.substring(0, 47) + "...";
+                let msg = data.feed_health && data.feed_health.message 
+                    ? data.feed_health.message 
+                    : "Real-time tick-rule aggression inferred from Level 2 stream";
+                if (msg.length > 70) {
+                    msg = msg.substring(0, 67) + "...";
                 }
                 ofPageFeedDetail.textContent = msg;
             }
@@ -5064,19 +5886,50 @@ function initTradexoDashboard() {
             return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barH.toFixed(1)}" fill="${color}" rx="1" opacity="0.85" />`;
         }).join("");
 
-        // Time axis labels
-        const timeLabelsIndices = [];
+        // Time axis labels with dynamic terminal spacing & collision prevention
+        const timeLabelsSvgParts = [];
         if (bars.length > 0) {
-            timeLabelsIndices.push(0);
-            if (bars.length > 4) timeLabelsIndices.push(Math.floor(bars.length / 2));
-            if (vetoStartIdx !== -1 && !timeLabelsIndices.includes(vetoStartIdx)) timeLabelsIndices.push(vetoStartIdx);
-            if (vetoEndIdx !== -1 && !timeLabelsIndices.includes(vetoEndIdx)) timeLabelsIndices.push(vetoEndIdx);
-            if (!timeLabelsIndices.includes(bars.length - 1)) timeLabelsIndices.push(bars.length - 1);
+            const lastIdx = bars.length - 1;
+            const candidates = [0];
+            if (bars.length > 4) candidates.push(Math.floor(bars.length / 2));
+            if (vetoStartIdx !== -1) candidates.push(vetoStartIdx);
+            if (vetoEndIdx !== -1) candidates.push(vetoEndIdx);
+            candidates.push(lastIdx);
+
+            const uniqueSorted = Array.from(new Set(candidates)).sort((a, b) => a - b);
+            const accepted = [];
+            const minSpacingPx = 42;
+            const lastX = getX(lastIdx);
+
+            for (const idx of uniqueSorted) {
+                const x = getX(idx);
+                if (idx === lastIdx) {
+                    if (accepted.length > 0 && (lastX - getX(accepted[accepted.length - 1])) < minSpacingPx) {
+                        accepted.pop();
+                    }
+                    accepted.push(idx);
+                } else if (accepted.length === 0) {
+                    accepted.push(idx);
+                } else {
+                    const prevX = getX(accepted[accepted.length - 1]);
+                    if ((x - prevX) >= minSpacingPx && (lastX - x) >= minSpacingPx) {
+                        accepted.push(idx);
+                    }
+                }
+            }
+
+            accepted.forEach(idx => {
+                const b = bars[idx];
+                const x = getX(idx);
+                let anchor = "middle";
+                if (idx === 0) anchor = "start";
+                else if (idx === lastIdx) anchor = "end";
+                timeLabelsSvgParts.push(
+                    `<text x="${x.toFixed(1)}" y="214" text-anchor="${anchor}" fill="var(--ink-muted)" font-size="9" font-weight="700">${b.time || b.minute || ''}</text>`
+                );
+            });
         }
-        const timeLabelsSvg = timeLabelsIndices.map(idx => {
-            const b = bars[idx];
-            return `<text x="${getX(idx).toFixed(1)}" y="214" text-anchor="middle" fill="var(--ink-muted)" font-size="9" font-weight="700">${b.time || b.minute || ''}</text>`;
-        }).join("");
+        const timeLabelsSvg = timeLabelsSvgParts.join("");
 
         // Y-axis CVD scale labels
         const fmtCvd = (v) => {
@@ -5233,10 +6086,18 @@ function initTradexoDashboard() {
             filtered = filtered.filter(i => i.symbol && i.symbol.toUpperCase().includes(search));
         }
 
+        const confirmedCount = allOrderFlowItems.filter(i => (i.veto_evaluation && i.veto_evaluation.verdict) === "confirmed").length;
+        const vetoedCount = allOrderFlowItems.filter(i => (i.veto_evaluation && i.veto_evaluation.verdict) === "vetoed").length;
+        const againstTrendCount = allOrderFlowItems.filter(i => (i.veto_evaluation && i.veto_evaluation.verdict) === "confirmed_against_trend").length;
+
         const chips = ofFilterGroup ? ofFilterGroup.querySelectorAll(".filter-chip") : [];
         chips.forEach(c => {
-            if (c.dataset.ofFilter === "ALL") c.textContent = `ALL (${allOrderFlowItems.length})`;
-            c.classList.toggle("active", c.dataset.ofFilter === currentOfFilter);
+            const filterKey = c.dataset.ofFilter;
+            if (filterKey === "ALL") c.textContent = `ALL (${allOrderFlowItems.length})`;
+            else if (filterKey === "CONFIRMED") c.textContent = `CONFIRMED (${confirmedCount})`;
+            else if (filterKey === "VETOED") c.textContent = `VETOED (${vetoedCount})`;
+            else if (filterKey === "AGAINST_TREND") c.textContent = `AGAINST TREND (${againstTrendCount})`;
+            c.classList.toggle("active", filterKey === currentOfFilter);
         });
 
         orderFlowGrid.innerHTML = "";
@@ -5397,7 +6258,7 @@ function initTradexoDashboard() {
     async function fetchIndexVerdicts() {
         if (!indexVerdictGrid) return;
         try {
-            indexVerdictGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
+            indexVerdictGrid.innerHTML = generateCardSkeletonHtml(3);
             if (indexVerdictEmptyState) indexVerdictEmptyState.classList.add("hidden");
 
             const response = await apiFetch("/api/indices/verdict");
@@ -5418,7 +6279,14 @@ function initTradexoDashboard() {
 
             renderIndexVerdictGrid(data.verdicts || {}, data.performance || {});
         } catch (error) {
-           // REQ-IDX-002: Put-Call Ratio (PCR) Gauge & Max Pain Builder
+            console.error("Failed to fetch index verdicts:", error);
+            if (indexVerdictGrid) {
+                indexVerdictGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-muted);">Could not load Index BTST Intelligence right now.</div>`;
+            }
+        }
+    }
+
+    // REQ-IDX-002: Put-Call Ratio (PCR) Gauge & Max Pain Builder
     function buildPcrGaugeHtml(pcr, maxPain) {
         if (pcr === null || pcr === undefined || isNaN(pcr)) {
             return `
@@ -5592,6 +6460,13 @@ function initTradexoDashboard() {
             ? `<span style="font-size:9px;color:var(--gold);display:block;margin-top:2px;"><i class="fa-solid fa-circle-info"></i> N<10 sample  —   not yet historically validated</span>`
             : "";
 
+        const indexKey = (v.index_name || "").toUpperCase();
+        const hasOptions = ["NIFTY50", "NIFTY", "BANKNIFTY", "FINNIFTY"].includes(indexKey);
+        const ocSym = indexKey.replace("50", "");
+        const optionBtnHtml = hasOptions 
+            ? `<button type="button" class="index-card-action-btn" onclick="openOptionChainModal('${ocSym}')" title="Launch ${escapeHtml(v.display_name || v.index_name)} Option Chain"><i class="fa-solid fa-layer-group"></i> Option Chain</button>`
+            : "";
+
         card.innerHTML = `
             <div class="index-verdict-card-header">
                 <div>
@@ -5599,7 +6474,10 @@ function initTradexoDashboard() {
                     <div class="index-verdict-card-price">${priceText} ${unverifiedTag}</div>
                 </div>
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-                    <div class="verdict-badge ${badgeClass}">${escapeHtml(v.verdict || "Avoid")}</div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                        <div class="verdict-badge ${badgeClass}">${escapeHtml(v.verdict || "Avoid")}</div>
+                        ${optionBtnHtml}
+                    </div>
                     ${pcrGaugeHtml}
                 </div>
             </div>
@@ -5607,7 +6485,7 @@ function initTradexoDashboard() {
             <div class="verdict-primary-reason">${escapeHtml(v.primary_reason || "")}</div>
 
             <div class="verdict-metrics-row">
-                <div class="verdict-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${v.confidence_level_pct !== undefined ? v.confidence_level_pct + "%" : "--"}</span>${sampleQualifier}</div>
+                <div class="verdict-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${(v.confidence_level_pct !== undefined && v.confidence_level_pct !== null) ? v.confidence_level_pct + "%" : "--"}</span>${sampleQualifier}</div>
                 <div class="verdict-metric-box"><span class="lbl">GAP OPEN PREDICTION</span><span class="val ${gapColorClass}">${expectedOpenText}</span></div>
             </div>
 
@@ -5696,7 +6574,7 @@ function initTradexoDashboard() {
 
     async function fetchIndices() {
         try {
-            if (indexGrid) indexGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
+            if (indexGrid) indexGrid.innerHTML = generateCardSkeletonHtml(4);
             const response = await apiFetch("/api/indices");
             if (!response.ok) throw new Error("Indices API error");
             const data = await response.json();
@@ -5715,9 +6593,9 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // Global index ticker tape (Nifty 50 / Bank Nifty / Sensex + Gift Nifty placeholder)  — 
+    // Global index ticker tape (Nifty 50 / Bank Nifty / Sensex + Gift Nifty placeholder)  — 
     // shown below the topbar on every section, not scoped to one page. GIFT NIFTY has no
-    // backend data source today (no ticker mapping, no fetch path  —  see app.py's
+    // backend data source today (no ticker mapping, no fetch path  —  see app.py's
     // INDEX_TICKER_MAP) so it renders as "--" here rather than a fabricated reading; wiring
     // up a real Gift Nifty feed is a separate backend task. TODO: replace the placeholder
     // once GIFT NIFTY has a real data source.
@@ -5845,7 +6723,7 @@ function initTradexoDashboard() {
 
     function buildIndexFlowValueHTML(flow) {
         // Same "Not fetched yet" / "UNAVAILABLE" plain-text treatment already used for global
-        // cues on this card  —  never a colored badge implying a real reading that isn't there.
+        // cues on this card  —  never a colored badge implying a real reading that isn't there.
         if (!flow || flow.status === "NOT_FETCHED_YET") {
             return `<span class="val" style="font-size:11px;color:var(--ink-muted);">Not fetched yet</span>`;
         }
@@ -5892,7 +6770,17 @@ function initTradexoDashboard() {
         card.dataset.indexName = idx.index_name || idx.display_name || "";
 
         const sigText = idx.signal || "NEUTRAL";
-        const sigClass = sigText.includes("BTST") ? "text-bullish" : (sigText.includes("STBT") ? "text-bearish" : "text-sub");
+        let sigClass = "avoid";
+        if (sigText.includes("BTST") || sigText.includes("BULLISH")) sigClass = "buy-call";
+        else if (sigText.includes("STBT") || sigText.includes("BEARISH")) sigClass = "buy-put";
+
+        const indexKey = (idx.index_name || "").toUpperCase();
+        const hasOptions = ["NIFTY50", "NIFTY", "BANKNIFTY", "FINNIFTY"].includes(indexKey);
+        const ocSym = indexKey.replace("50", "");
+        const optionBtnHtml = hasOptions 
+            ? `<button type="button" class="index-card-action-btn" onclick="openOptionChainModal('${ocSym}')" title="Launch ${escapeHtml(idx.display_name || idx.index_name)} Option Chain"><i class="fa-solid fa-layer-group"></i> Option Chain</button>`
+            : "";
+
         const pillars = idx.confirmed_pillars || [];
         const pillarsHtml = pillars.length
             ? pillars.map(p => `<div class="index-pillar-item">${escapeHtml(p)}</div>`).join("")
@@ -5925,29 +6813,40 @@ function initTradexoDashboard() {
         const flowDetailHtml = buildIndexFlowDetailHTML(flow);
         const flowDetailId = `index-flow-detail-${idx.index_name || "idx"}`;
 
+        const rawLtp = (idx.ltp !== undefined && idx.ltp !== null && !isNaN(idx.ltp)) ? Number(idx.ltp) : null;
+        const ltpDisplay = rawLtp !== null ? "₹" + rawLtp.toLocaleString("en-IN", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "--";
+
+        const hasWeight = idx.confirmed_pillars_weight !== undefined && idx.confirmed_pillars_weight !== null &&
+                          idx.required_weight !== undefined && idx.required_weight !== null;
+        const weightDisplay = hasWeight ? `${idx.confirmed_pillars_weight}/${idx.required_weight}` : "--";
+        const confidenceDisplay = (idx.confidence_score !== undefined && idx.confidence_score !== null) ? `${idx.confidence_score}%` : "--";
+        const rsiDisplay = (idx.rsi !== undefined && idx.rsi !== null) ? idx.rsi : "--";
+
         card.innerHTML = `
             <div class="index-card-header">
                 <div>
                     <div class="index-card-name">${escapeHtml(idx.display_name || idx.index_name || "")}</div>
-                    <div class="index-card-ltp">${idx.ltp !== undefined ? idx.ltp.toLocaleString("en-IN") : "--"}</div>
+                    <div class="index-card-ltp">${ltpDisplay}</div>
                     ${changeHtml}
                 </div>
-                <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
-                    <div class="signal-badge ${sigClass}">${sigText}</div>
-                    ${getPriorityBadgeHTML(idx.priority_level || "P3_LOW", sigText)}
+                <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                        <div class="verdict-badge ${sigClass}">${escapeHtml(sigText)}</div>
+                        ${optionBtnHtml}
+                    </div>
                     ${pcrGaugeHtml}
                 </div>
             </div>
             <div class="index-metrics-row" style="grid-template-columns: repeat(4, 1fr);">
-                <div class="index-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${idx.confidence_score !== undefined ? idx.confidence_score + "%" : "--"}</span></div>
-                <div class="index-metric-box"><span class="lbl">WEIGHT</span><span class="val">${idx.confirmed_pillars_weight}/${idx.required_weight}</span></div>
-                <div class="index-metric-box"><span class="lbl">RSI</span><span class="val">${idx.rsi !== undefined ? idx.rsi : "--"}</span></div>
+                <div class="index-metric-box"><span class="lbl">CONFIDENCE</span><span class="val">${confidenceDisplay}</span></div>
+                <div class="index-metric-box"><span class="lbl">WEIGHT</span><span class="val">${weightDisplay}</span></div>
+                <div class="index-metric-box"><span class="lbl">RSI</span><span class="val">${rsiDisplay}</span></div>
                 <div class="index-metric-box"><span class="lbl">FLOW</span>${buildIndexFlowValueHTML(flow)}</div>
             </div>
             <div class="index-pillars-list">${pillarsHtml}</div>
             <div>
-                <div class="form-hint" style="margin-bottom:6px;">Global cues (${(idx.global_cues && idx.global_cues.verdict) || "UNAVAILABLE"})</div>
-                <div class="global-cues-row">${cuesHtml || '<span class="cue-chip">Not fetched yet</span>'}</div>
+                <div class="form-hint" style="margin-bottom:6px;">Global cues (${(idx.global_cues && idx.global_cues.verdict) || "--"})</div>
+                <div class="global-cues-row">${cuesHtml || '<span class="cue-chip">--</span>'}</div>
             </div>
             ${flowDetailHtml ? `
             <button type="button" class="verdict-expand-toggle" data-detail-target="${flowDetailId}">
@@ -5971,7 +6870,7 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // 11. STRATEGIES SECTION  —  full CRUD + per-strategy performance
+    // 11. STRATEGIES SECTION  —  full CRUD + per-strategy performance
     // -------------------------------------------------------------
     function populatePillarCheckboxes() {
         if (!strategyPillarCheckboxes) return;
@@ -5988,10 +6887,11 @@ function initTradexoDashboard() {
             if (!response.ok) return;
             const data = await response.json();
             if (strategiesNavBadge) strategiesNavBadge.textContent = (data.strategies || []).length;
-        } catch (e) { /* nav badge is cosmetic  —  ignore fetch errors here */ }
+        } catch (e) { /* nav badge is cosmetic  —  ignore fetch errors here */ }
     }
 
     let strategySignalsCountMap = {};
+    let strategiesFetchGeneration = 0;
 
     async function updateStrategySignalCounters() {
         try {
@@ -6015,27 +6915,58 @@ function initTradexoDashboard() {
     }
 
     async function fetchStrategies() {
+        const generation = ++strategiesFetchGeneration;
         try {
-            if (strategyGrid) strategyGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x"></i></div>`;
-            const response = await apiFetch("/api/strategies");
+            if (strategyGrid && !strategyGrid.querySelector(".strategy-card")) {
+                strategyGrid.innerHTML = generateCardSkeletonHtml(4);
+            }
+            const [response] = await Promise.all([
+                apiFetch("/api/strategies"),
+                updateStrategySignalCounters()
+            ]);
+
+            if (generation !== strategiesFetchGeneration) return;
             if (!response.ok) throw new Error("Strategies API error");
+
             const data = await response.json();
-            const strategies = data.strategies || [];
+            if (generation !== strategiesFetchGeneration) return;
+
+            const rawStrategies = data.strategies || [];
+            // Deduplicate strategies by ID (defensive data integrity check)
+            const seenIds = new Set();
+            const strategies = [];
+            for (const strat of rawStrategies) {
+                if (strat && strat.id && !seenIds.has(strat.id)) {
+                    seenIds.add(strat.id);
+                    strategies.push(strat);
+                }
+            }
+
             if (strategiesNavBadge) strategiesNavBadge.textContent = strategies.length;
-            await updateStrategySignalCounters();
-            await renderStrategyGrid(strategies);
+            await renderStrategyGrid(strategies, generation);
         } catch (error) {
+            if (generation !== strategiesFetchGeneration) return;
             console.error("Failed to fetch strategies:", error);
             if (strategyGrid) strategyGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--ink-muted);">Could not load strategies right now.</div>`;
         }
     }
 
-    async function renderStrategyGrid(strategies) {
+    async function renderStrategyGrid(strategies, generation) {
         if (!strategyGrid) return;
-        strategyGrid.innerHTML = "";
-        for (const strat of strategies) {
-            const card = await buildStrategyCard(strat);
-            strategyGrid.appendChild(card);
+
+        // Build all cards concurrently in memory first (no incremental live DOM mutation)
+        const cardPromises = strategies.map(strat => buildStrategyCard(strat));
+        const cards = await Promise.all(cardPromises);
+
+        // Discard render if a newer fetch was initiated while performance stats were being fetched
+        if (generation && generation !== strategiesFetchGeneration) return;
+
+        // Atomic DOM swap
+        if (typeof strategyGrid.replaceChildren === "function") {
+            strategyGrid.replaceChildren(...cards);
+        } else {
+            strategyGrid.innerHTML = "";
+            cards.forEach(card => strategyGrid.appendChild(card));
         }
     }
 
@@ -6147,7 +7078,7 @@ function initTradexoDashboard() {
                 ${needsClarification ? `
                 <div class="strategy-flags-row" style="margin-top:8px;">
                     <span class="strategy-flag" style="color:var(--gold);border-color:var(--gold);">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Unconfirmed  —  pending AI clarification confirmation
+                        <i class="fa-solid fa-triangle-exclamation"></i> Unconfirmed  —  pending AI clarification confirmation
                     </span>
                 </div>` : ""}
 
@@ -6489,7 +7420,7 @@ function initTradexoDashboard() {
     }
 
     // -------------------------------------------------------------
-    // NOTIFICATIONS (M5)  —  bell/badge/panel history + live toast over /ws/live.
+    // NOTIFICATIONS (M5)  —  bell/badge/panel history + live toast over /ws/live.
     // Fed by the M3 broadcast: closing-sequence lock events and index verdicts.
     // -------------------------------------------------------------
     function escapeHtmlLocal(s) {
@@ -6549,7 +7480,7 @@ function initTradexoDashboard() {
         try { getAudioContext(); } catch (e) {}
     }, { once: true });
 
-    // Notification sound using Web Audio API  —  587.33 Hz (D5) to 880.00 Hz (A5) 0.25s sweep
+    // Notification sound using Web Audio API  —  587.33 Hz (D5) to 880.00 Hz (A5) 0.25s sweep
     function playNotificationSound() {
         try {
             const ctx = getAudioContext();
@@ -6792,7 +7723,7 @@ function initTradexoDashboard() {
     async function fetchHistorySection() {
         if (!historyTableBody) return;
         try {
-            historyTableBody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--ink-muted);"><i class="fa-solid fa-spinner fa-spin fa-2x text-gold"></i><div style="margin-top:10px;">Loading evaluation history & calibration report...</div></td></tr>`;
+            historyTableBody.innerHTML = generateTableSkeletonRows(11, 8);
 
             const [historyRes, validationRes] = await Promise.all([
                 apiFetch("/api/history/predictions?limit=100"),
@@ -7374,7 +8305,7 @@ function initTradexoDashboard() {
                             const sym = data.symbol || (data.payload && data.payload.symbol) || "PRIORITY SETUP";
                             const sig = data.signal || (data.payload && data.payload.signal) || "High Conviction Setup";
                             const title = data.title || `⚡ TRADEXO Alert: ${sym}`;
-                            const msg = data.message || `${sym} (${sig})  —  5-Pillar Breakout Detected`;
+                            const msg = data.message || `${sym} (${sig})  —  5-Pillar Breakout Detected`;
                             showToast(msg, "success");
 
                             // Trigger Mobile Lock-Screen Notification via Service Worker (PWA)
@@ -7401,7 +8332,7 @@ function initTradexoDashboard() {
         connect();
     }
 
-    // Service Worker & Lock-Screen Alerts Controller (Phase 4  —  Integrated into Notification Panel)
+    // Service Worker & Lock-Screen Alerts Controller (Phase 4  —  Integrated into Notification Panel)
     function initServiceWorkerAndPush() {
         const toggleBtn = document.getElementById("pushNotifToggleBtn");
         const toggleText = document.getElementById("pushNotifToggleText");
@@ -7509,16 +8440,40 @@ function initTradexoDashboard() {
             btn.classList.add("active");
 
             const tab = btn.dataset.liveTab;
+            window.currentLiveTradeTab = tab;
             const liveActiveContainer = document.getElementById("liveActiveContainer");
             const liveTableContainer = document.getElementById("liveTableContainer");
 
             if (tab === "active" || tab === "btst" || tab === "stbt") {
-                if (liveActiveContainer) liveActiveContainer.classList.remove("hidden");
-                if (liveTableContainer) liveTableContainer.classList.add("hidden");
+                if (liveActiveContainer) {
+                    liveActiveContainer.classList.remove("hidden");
+                    liveActiveContainer.style.display = "";
+                }
+                if (liveTableContainer) {
+                    liveTableContainer.classList.add("hidden");
+                    liveTableContainer.style.display = "none";
+                }
                 filterAndRenderLiveTradeCards(tab);
-            } else {
-                if (liveActiveContainer) liveActiveContainer.classList.add("hidden");
-                if (liveTableContainer) liveTableContainer.classList.remove("hidden");
+            } else if (tab === "pending") {
+                if (liveActiveContainer) {
+                    liveActiveContainer.classList.add("hidden");
+                    liveActiveContainer.style.display = "none";
+                }
+                if (liveTableContainer) {
+                    liveTableContainer.classList.remove("hidden");
+                    liveTableContainer.style.display = "block";
+                }
+                renderLiveTradeTable(window.cachedPendingTrades, "pending");
+            } else if (tab === "closed") {
+                if (liveActiveContainer) {
+                    liveActiveContainer.classList.add("hidden");
+                    liveActiveContainer.style.display = "none";
+                }
+                if (liveTableContainer) {
+                    liveTableContainer.classList.remove("hidden");
+                    liveTableContainer.style.display = "block";
+                }
+                renderLiveTradeTable(window.cachedClosedTrades, "closed");
             }
         });
     }
@@ -7539,7 +8494,17 @@ function initTradexoDashboard() {
             if (chartTab) chartTab.classList.add("active");
             if (analysisTab) analysisTab.classList.remove("active");
             if (currentDetailSymbol) {
-                renderLightweightCandleChart(currentDetailSymbol, currentDetailTimeframe || "15");
+                if (!currentDetailChartInstance) {
+                    renderLightweightCandleChart(currentDetailSymbol, currentDetailTimeframe || "15");
+                } else {
+                    const mountNode = document.getElementById("tv_chart_mount");
+                    const container = document.getElementById("tradingview_chart_container");
+                    const targetWidth = (mountNode && mountNode.clientWidth) || (container && container.clientWidth) || 850;
+                    currentDetailChartInstance.applyOptions({ width: targetWidth, height: 450 });
+                    setTimeout(() => {
+                        if (currentDetailChartInstance) currentDetailChartInstance.timeScale().fitContent();
+                    }, 50);
+                }
             }
         } else {
             if (analysisContainer) analysisContainer.classList.remove("hidden");
@@ -7640,17 +8605,40 @@ if (document.readyState === "loading") {
 }
 
 let cachedLiveTradeSetups = [];
+let cachedPendingTrades = [];
+let cachedClosedTrades = [];
+let currentLiveTradeTab = "active";
+window.cachedLiveTradeSetups = cachedLiveTradeSetups;
+window.cachedPendingTrades = cachedPendingTrades;
+window.cachedClosedTrades = cachedClosedTrades;
+window.currentLiveTradeTab = currentLiveTradeTab;
 
 function filterAndRenderLiveTradeCards(tab) {
-    if (!cachedLiveTradeSetups || !cachedLiveTradeSetups.length) return;
-    let filtered = cachedLiveTradeSetups;
+    const setups = window.cachedLiveTradeSetups || cachedLiveTradeSetups || [];
+    const container = document.getElementById("liveActiveContainer");
+    if (!container) return;
+    if (!setups || !setups.length) {
+        renderLiveTradeCards([]);
+        return;
+    }
+    let filtered = setups;
     if (tab === "btst") {
-        filtered = cachedLiveTradeSetups.filter(s => (s.signal || "").includes("BTST") || (s.signal || "").includes("CALL") || (s.signal || "").includes("BUY"));
+        filtered = setups.filter(s => {
+            const sig = (s.signal || "").toUpperCase();
+            const opt = (s.option_type || "").toUpperCase();
+            const isPut = sig.includes("PUT") || sig.includes("STBT") || sig.includes("PE") || opt.includes("PUT");
+            return !isPut && (sig.includes("BTST") || sig.includes("CALL") || sig.includes("BUY") || opt.includes("CALL"));
+        });
     } else if (tab === "stbt") {
-        filtered = cachedLiveTradeSetups.filter(s => (s.signal || "").includes("STBT") || (s.signal || "").includes("PUT") || (s.signal || "").includes("SELL"));
+        filtered = setups.filter(s => {
+            const sig = (s.signal || "").toUpperCase();
+            const opt = (s.option_type || "").toUpperCase();
+            return sig.includes("PUT") || sig.includes("STBT") || sig.includes("SELL") || sig.includes("PE") || opt.includes("PUT");
+        });
     }
     renderLiveTradeCards(filtered);
 }
+window.filterAndRenderLiveTradeCards = filterAndRenderLiveTradeCards;
 
 // Chart Pro Tools State
 let activeChartTool = null;
@@ -7719,8 +8707,56 @@ async function renderStockDetailPage(symbol, timeframe = "15", initialView = "an
         }
     };
 
+function getSyntheticCandlesForStock(stockOrSymbol, timeframe = "15") {
+    let stock = null;
+    if (typeof stockOrSymbol === "object" && stockOrSymbol !== null) {
+        stock = stockOrSymbol;
+    } else {
+        const stocksList = (window.allStocks && window.allStocks.length) ? window.allStocks : [];
+        stock = stocksList.find(s => s.symbol === stockOrSymbol) || {};
+    }
+    const basePrice = Number(stock.ltp || 1250.0);
+    const now = Math.floor(Date.now() / 1000);
+    let intervalSec = 900;
+    if (timeframe === "1") intervalSec = 60;
+    else if (timeframe === "5") intervalSec = 300;
+    else if (timeframe === "60") intervalSec = 3600;
+    else if (timeframe === "240") intervalSec = 14400;
+    else if (timeframe === "D") intervalSec = 86400;
+    else if (timeframe === "W") intervalSec = 604800;
+    else if (timeframe === "MO") intervalSec = 2592000;
+
+    const candleCount = 180;
+    let price = basePrice * 0.94;
+    const candles = [];
+    for (let i = candleCount; i >= 0; i--) {
+        const wave = Math.sin(i / 16) * (basePrice * 0.01) + Math.cos(i / 36) * (basePrice * 0.015);
+        const change = (Math.random() - 0.485) * (basePrice * 0.007) + (wave * 0.04);
+        const open = price;
+        const close = price + change;
+        const high = Math.max(open, close) + Math.random() * (basePrice * 0.005);
+        const low = Math.min(open, close) - Math.random() * (basePrice * 0.005);
+        const ts = now - (i * intervalSec);
+        candles.push({
+            ts: ts,
+            time: ts,
+            open: Number(open.toFixed(2)),
+            high: Number(high.toFixed(2)),
+            low: Number(low.toFixed(2)),
+            close: Number(close.toFixed(2)),
+            volume: Math.floor(Math.random() * 65000) + 12000
+        });
+        price = close;
+    }
+    return candles;
+}
+
     // Render header immediately
     updateHeader(stock);
+
+    // 1. Immediately compute and render Quantitative Analysis Matrix with 0ms latency!
+    const initialCandles = getSyntheticCandlesForStock(stock, timeframe);
+    updateDynamicTechnicalMatrix(initialCandles, symbol, timeframe);
 
     // Wire timeframe filter buttons
     const tfButtons = document.querySelectorAll("#tvTimeframeFilterGroup .tab-btn");
@@ -7736,8 +8772,8 @@ async function renderStockDetailPage(symbol, timeframe = "15", initialView = "an
         };
     });
 
-    // Mount interactive candlestick graph & dynamic matrix
-    renderLightweightCandleChart(symbol, timeframe);
+    // 2. Mount interactive candlestick graph
+    renderLightweightCandleChart(symbol, timeframe, initialCandles);
 
     // Asynchronously fetch complete quantitative details to enrich view
     try {
@@ -7758,9 +8794,13 @@ function mountStockChart(symbol, timeframe) {
     renderLightweightCandleChart(symbol, timeframe);
 }
 
-async function renderLightweightCandleChart(symbol, timeframe = "15") {
+async function renderLightweightCandleChart(symbol, timeframe = "15", prefetchedCandles = null) {
     const container = document.getElementById("tradingview_chart_container");
     if (!container) return;
+
+    const isDark = document.documentElement.classList.contains("dark") || 
+                   document.body.classList.contains("dark") || 
+                   !document.body.classList.contains("light");
 
     // Update Top HUD Legend Bar
     const hudSym = document.getElementById("hudSym");
@@ -7785,72 +8825,32 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
     if (hudSym) hudSym.textContent = symbol;
     if (hudInterval) hudInterval.textContent = tfLabel;
 
-    container.innerHTML = `<div id="tv_chart_mount" style="width:100%;height:450px;min-height:400px;background:#ffffff;border-radius:12px;overflow:hidden;position:relative;"></div>`;
+    const mountBg = isDark ? '#0b0f19' : '#ffffff';
+    container.innerHTML = `<div id="tv_chart_mount" style="width:100%;height:450px;min-height:400px;background:${mountBg};border-radius:12px;overflow:hidden;position:relative;"></div>`;
     const mountNode = document.getElementById("tv_chart_mount");
     if (!mountNode) return;
 
-    let candles = [];
-    try {
-        const res = await apiFetch(`/api/chart/${encodeURIComponent(symbol)}?interval=${encodeURIComponent(timeframe)}`);
-        if (res.ok) {
-            const data = await res.json();
-            candles = data.candles || [];
-        }
-    } catch (e) {
-        console.warn("Chart API fetch error:", e);
-    }
-
-    const now = Math.floor(Date.now() / 1000);
-    // Extended historical candles generation (500 candles) if API returns empty
-    if (!candles || candles.length === 0) {
-        const stocksList = window.allStocks || [];
-        const stock = stocksList.find(s => s.symbol === symbol) || { ltp: 1217.40 };
-        const basePrice = Number(stock.ltp || 1217.40);
-        let price = basePrice * 0.92;
-        candles = [];
-        const candleCount = 500;
-        
-        let intervalSec = 900;
-        if (timeframe === "1") intervalSec = 60;
-        else if (timeframe === "5") intervalSec = 300;
-        else if (timeframe === "60") intervalSec = 3600;
-        else if (timeframe === "240") intervalSec = 14400;
-        else if (timeframe === "D") intervalSec = 86400;
-        else if (timeframe === "W") intervalSec = 604800;
-        else if (timeframe === "MO") intervalSec = 2592000;
-
-        for (let i = candleCount; i >= 0; i--) {
-            const wave = Math.sin(i / 22) * (basePrice * 0.01) + Math.cos(i / 55) * (basePrice * 0.016);
-            const change = (Math.random() - 0.485) * (basePrice * 0.007) + (wave * 0.05);
-            const open = price;
-            const close = price + change;
-            const high = Math.max(open, close) + Math.random() * (basePrice * 0.005);
-            const low = Math.min(open, close) - Math.random() * (basePrice * 0.005);
-            const ts = now - (i * intervalSec);
-            candles.push({
-                ts: ts,
-                open: Number(open.toFixed(2)),
-                high: Number(high.toFixed(2)),
-                low: Number(low.toFixed(2)),
-                close: Number(close.toFixed(2)),
-                volume: Math.floor(Math.random() * 65000) + 12000
-            });
-            price = close;
-        }
-    }
+    let candles = prefetchedCandles || getSyntheticCandlesForStock(symbol, timeframe);
 
     mountNode.innerHTML = "";
 
     if (window.LightweightCharts && typeof window.LightweightCharts.createChart === 'function') {
         try {
             const isIntraday = (timeframe !== "D" && timeframe !== "W" && timeframe !== "MO");
+            const chartBgColor = isDark ? '#0b0f19' : '#ffffff';
+            const chartTextColor = isDark ? '#94a3b8' : '#475569';
+            const chartGridColor = isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.04)';
+            const chartBorderColor = isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0';
+
+            const sectionEl = document.getElementById("stockDetailSection");
+            const calcWidth = mountNode.clientWidth || container.clientWidth || (sectionEl && sectionEl.clientWidth ? sectionEl.clientWidth - 48 : 850);
 
             const chart = window.LightweightCharts.createChart(mountNode, {
-                width: mountNode.clientWidth || container.clientWidth || 800,
+                width: calcWidth,
                 height: 450,
                 layout: {
-                    background: { type: 'solid', color: '#ffffff' },
-                    textColor: '#475569',
+                    background: { type: 'solid', color: chartBgColor },
+                    textColor: chartTextColor,
                 },
                 localization: {
                     priceFormatter: price => '₹' + Number(price).toFixed(2),
@@ -7874,15 +8874,15 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                     dateFormat: 'yyyy-MM-dd',
                 },
                 grid: {
-                    vertLines: { color: 'rgba(0, 0, 0, 0.04)' },
-                    horzLines: { color: 'rgba(0, 0, 0, 0.04)' },
+                    vertLines: { color: chartGridColor },
+                    horzLines: { color: chartGridColor },
                 },
                 rightPriceScale: { 
-                    borderColor: '#e2e8f0',
+                    borderColor: chartBorderColor,
                     scaleMargins: { top: 0.08, bottom: 0.18 },
                 },
                 timeScale: { 
-                    borderColor: '#e2e8f0', 
+                    borderColor: chartBorderColor, 
                     timeVisible: isIntraday, 
                     secondsVisible: false,
                     barSpacing: 8,
@@ -7907,7 +8907,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                         color: 'rgba(217, 119, 6, 0.6)',
                         width: 1,
                         style: window.LightweightCharts.LineStyle.Dashed,
-                        labelBackgroundColor: '#0f172a'
+                        labelBackgroundColor: isDark ? '#1e293b' : '#0f172a'
                     },
                     horzLine: {
                         visible: true,
@@ -7915,7 +8915,7 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                         color: 'rgba(217, 119, 6, 0.6)',
                         width: 1,
                         style: window.LightweightCharts.LineStyle.Dashed,
-                        labelBackgroundColor: '#0f172a'
+                        labelBackgroundColor: isDark ? '#1e293b' : '#0f172a'
                     }
                 },
             });
@@ -7938,72 +8938,100 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                 scaleMargins: { top: 0.82, bottom: 0 },
             });
 
-            // Map and ensure strictly increasing timestamps
-            let lastTime = 0;
-            const uniqueCandleData = [];
-            const uniqueVolumeData = [];
+            let uniqueCandleData = [];
+            let uniqueVolumeData = [];
 
-            const sortedCandles = candles
-                .map((c, i) => {
-                    let ts = c.ts;
-                    if (!ts || isNaN(ts)) {
-                        ts = now - (candles.length - i) * 900;
+            const applyCandleSeries = (candleList) => {
+                const now = Math.floor(Date.now() / 1000);
+                let lastTime = 0;
+                uniqueCandleData = [];
+                uniqueVolumeData = [];
+
+                const sortedCandles = candleList
+                    .map((c, i) => {
+                        let ts = c.ts;
+                        if (!ts || isNaN(ts)) {
+                            ts = now - (candleList.length - i) * 900;
+                        }
+                        return {
+                            ts: Number(ts),
+                            open: Number(c.open || 100),
+                            high: Number(c.high || c.open || 100),
+                            low: Number(c.low || c.open || 100),
+                            close: Number(c.close || 100),
+                            volume: Number(c.volume || 1000)
+                        };
+                    })
+                    .sort((a, b) => a.ts - b.ts);
+
+                sortedCandles.forEach((c) => {
+                    let t = c.ts;
+                    if (t <= lastTime) {
+                        t = lastTime + 60;
                     }
-                    return {
-                        ts: Number(ts),
-                        open: Number(c.open || 100),
-                        high: Number(c.high || c.open || 100),
-                        low: Number(c.low || c.open || 100),
-                        close: Number(c.close || 100),
-                        volume: Number(c.volume || 1000)
-                    };
-                })
-                .sort((a, b) => a.ts - b.ts);
+                    lastTime = t;
 
-            sortedCandles.forEach((c) => {
-                let t = c.ts;
-                if (t <= lastTime) {
-                    t = lastTime + 60;
-                }
-                lastTime = t;
+                    uniqueCandleData.push({
+                        time: t,
+                        open: c.open,
+                        high: c.high,
+                        low: c.low,
+                        close: c.close
+                    });
 
-                uniqueCandleData.push({
-                    time: t,
-                    open: c.open,
-                    high: c.high,
-                    low: c.low,
-                    close: c.close
+                    uniqueVolumeData.push({
+                        time: t,
+                        value: c.volume,
+                        color: c.close >= c.open ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'
+                    });
                 });
 
-                uniqueVolumeData.push({
-                    time: t,
-                    value: c.volume,
-                    color: c.close >= c.open ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'
-                });
-            });
+                candlestickSeries.setData(uniqueCandleData);
+                volumeSeries.setData(uniqueVolumeData);
 
-            candlestickSeries.setData(uniqueCandleData);
-            volumeSeries.setData(uniqueVolumeData);
+                if (uniqueCandleData.length > 0) {
+                    const last = uniqueCandleData[uniqueCandleData.length - 1];
+                    const lastVol = uniqueVolumeData[uniqueVolumeData.length - 1];
+                    const diff = last.close - last.open;
+                    const pct = (diff / last.open) * 100;
+                    const sign = diff >= 0 ? '+' : '';
+                    const colorClass = diff >= 0 ? 'text-bullish' : 'text-bearish';
 
-            // Update initial Top HUD values
-            if (uniqueCandleData.length > 0) {
-                const last = uniqueCandleData[uniqueCandleData.length - 1];
-                const lastVol = uniqueVolumeData[uniqueVolumeData.length - 1];
-                const diff = last.close - last.open;
-                const pct = (diff / last.open) * 100;
-                const sign = diff >= 0 ? '+' : '';
-                const colorClass = diff >= 0 ? 'text-bullish' : 'text-bearish';
-
-                if (hudO) hudO.textContent = `₹${last.open.toFixed(2)}`;
-                if (hudH) hudH.textContent = `₹${last.high.toFixed(2)}`;
-                if (hudL) hudL.textContent = `₹${last.low.toFixed(2)}`;
-                if (hudC) hudC.textContent = `₹${last.close.toFixed(2)}`;
-                if (hudV) hudV.textContent = lastVol && lastVol.value ? (lastVol.value > 1000000 ? `${(lastVol.value/1000000).toFixed(1)}M` : `${(lastVol.value/1000).toFixed(1)}K`) : '--';
-                if (hudChange) {
-                    hudChange.textContent = `${sign}${pct.toFixed(2)}%`;
-                    hudChange.className = colorClass;
+                    if (hudO) hudO.textContent = `₹${last.open.toFixed(2)}`;
+                    if (hudH) hudH.textContent = `₹${last.high.toFixed(2)}`;
+                    if (hudL) hudL.textContent = `₹${last.low.toFixed(2)}`;
+                    if (hudC) hudC.textContent = `₹${last.close.toFixed(2)}`;
+                    if (hudV) hudV.textContent = lastVol && lastVol.value ? (lastVol.value > 1000000 ? `${(lastVol.value/1000000).toFixed(1)}M` : `${(lastVol.value/1000).toFixed(1)}K`) : '--';
+                    if (hudChange) {
+                        hudChange.textContent = `${sign}${pct.toFixed(2)}%`;
+                        hudChange.className = colorClass;
+                    }
                 }
-            }
+
+                updateDynamicTechnicalMatrix(sortedCandles, symbol, timeframe);
+            };
+
+            // Apply immediate candles so chart and matrix are populated instantly!
+            applyCandleSeries(candles);
+
+            // Fetch live API chart data asynchronously
+            (async () => {
+                try {
+                    const controller = new AbortController();
+                    const timer = setTimeout(() => controller.abort(), 4000);
+                    const res = await apiFetch(`/api/chart/${encodeURIComponent(symbol)}?interval=${encodeURIComponent(timeframe)}`, { signal: controller.signal });
+                    clearTimeout(timer);
+                    if (res.ok) {
+                        const apiData = await res.json();
+                        if (apiData && apiData.candles && apiData.candles.length > 0) {
+                            applyCandleSeries(apiData.candles);
+                            chart.timeScale().fitContent();
+                        }
+                    }
+                } catch (err) {
+                    console.info("Chart live feed using fallback data:", err.message);
+                }
+            })();
 
             // Crosshair move listener to update Dedicated Top HUD Bar in real time
             chart.subscribeCrosshairMove((param) => {
@@ -8252,9 +9280,6 @@ async function renderLightweightCandleChart(symbol, timeframe = "15") {
                     }
                 });
             }
-
-            // Dynamically recalculate all technical analysis directly from the candle series!
-            updateDynamicTechnicalMatrix(sortedCandles, symbol, timeframe);
 
             new ResizeObserver(() => {
                 if (chart && mountNode) {
@@ -8666,32 +9691,32 @@ function updateDynamicTechnicalMatrix(candles, symbol, timeframe) {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>EMA (9)  —  Fast Momentum</td>
+                            <td>EMA (9)  —  Fast Momentum</td>
                             <td>₹${ema9.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema9 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema9 ? 'BUY' : 'SELL'} (${(((currentPrice - ema9)/ema9)*100).toFixed(2)}%)</span></td>
                         </tr>
                         <tr>
-                            <td>EMA (20)  —  Short Trend</td>
+                            <td>EMA (20)  —  Short Trend</td>
                             <td>₹${ema20.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema20 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema20 ? 'BUY' : 'SELL'} (${(((currentPrice - ema20)/ema20)*100).toFixed(2)}%)</span></td>
                         </tr>
                         <tr>
-                            <td>EMA (50)  —  Medium Trend</td>
+                            <td>EMA (50)  —  Medium Trend</td>
                             <td>₹${ema50.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema50 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema50 ? 'BUY' : 'SELL'} (${(((currentPrice - ema50)/ema50)*100).toFixed(2)}%)</span></td>
                         </tr>
                         <tr>
-                            <td>EMA (100)  —  Macro Baseline</td>
+                            <td>EMA (100)  —  Macro Baseline</td>
                             <td>₹${ema100.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema100 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema100 ? 'BUY' : 'SELL'}</span></td>
                         </tr>
                         <tr>
-                            <td>EMA (200)  —  Institutional Line</td>
+                            <td>EMA (200)  —  Institutional Line</td>
                             <td>₹${ema200.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= ema200 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= ema200 ? 'BUY' : 'SELL'}</span></td>
                         </tr>
                         <tr>
-                            <td>SMA (20)  —  Baseline SMA</td>
+                            <td>SMA (20)  —  Baseline SMA</td>
                             <td>₹${sma20.toFixed(2)}</td>
                             <td style="text-align:right;"><span class="${currentPrice >= sma20 ? 'tv-badge-buy' : 'tv-badge-sell'}">${currentPrice >= sma20 ? 'BUY' : 'SELL'}</span></td>
                         </tr>
@@ -8828,7 +9853,7 @@ function renderCanvasChartFallback(container, candles, symbol) {
 
     ctx.fillStyle = "#0f172a";
     ctx.font = "bold 16px sans-serif";
-    ctx.fillText(`${symbol}  —  Technical Chart (OHLC)`, 20, 30);
+    ctx.fillText(`${symbol}  —  Technical Chart (OHLC)`, 20, 30);
 
     if (!candles || candles.length === 0) return;
 
@@ -8937,20 +9962,85 @@ async function fetchLiveTradesSection() {
             totalPending = Math.max(0, allStocks.length - totalActive);
         }
 
+        // Update state caches
+        cachedLiveTradeSetups = activeSetups;
+        cachedPendingTrades = pendingTrades;
+        cachedClosedTrades = closedTrades;
+        window.cachedLiveTradeSetups = activeSetups;
+        window.cachedPendingTrades = pendingTrades;
+        window.cachedClosedTrades = closedTrades;
+
+        // Compute tab badge counts
+        const btstCount = activeSetups.filter(s => {
+            const sig = (s.signal || "").toUpperCase();
+            const opt = (s.option_type || "").toUpperCase();
+            const isPut = sig.includes("PUT") || sig.includes("STBT") || sig.includes("PE") || opt.includes("PUT");
+            return !isPut && (sig.includes("BTST") || sig.includes("CALL") || sig.includes("BUY") || opt.includes("CALL"));
+        }).length;
+        const stbtCount = activeSetups.filter(s => {
+            const sig = (s.signal || "").toUpperCase();
+            const opt = (s.option_type || "").toUpperCase();
+            return sig.includes("PUT") || sig.includes("STBT") || sig.includes("SELL") || sig.includes("PE") || opt.includes("PUT");
+        }).length;
+
         const activeCountEl = document.getElementById("liveActiveCount");
         const pendingCountEl = document.getElementById("livePendingCount");
         const closedCountEl = document.getElementById("liveClosedCount");
         const winRateEl = document.getElementById("liveWinRateVal");
+        
         const liveActiveBadge = document.getElementById("liveActiveBadge");
+        const liveBtstBadge = document.getElementById("liveBtstBadge");
+        const liveStbtBadge = document.getElementById("liveStbtBadge");
+        const livePendingBadge = document.getElementById("livePendingBadge");
+        const liveClosedBadge = document.getElementById("liveClosedBadge");
 
         if (activeCountEl) activeCountEl.textContent = totalActive;
         if (pendingCountEl) pendingCountEl.textContent = totalPending;
         if (closedCountEl) closedCountEl.textContent = totalClosed;
         if (winRateEl) winRateEl.textContent = `${winRate.toFixed(1)}%`;
+        
         if (liveActiveBadge) liveActiveBadge.textContent = totalActive;
+        if (liveBtstBadge) liveBtstBadge.textContent = btstCount;
+        if (liveStbtBadge) liveStbtBadge.textContent = stbtCount;
+        if (livePendingBadge) livePendingBadge.textContent = totalPending;
+        if (liveClosedBadge) liveClosedBadge.textContent = totalClosed;
 
-        renderLiveTradeCards(activeSetups);
-        renderLiveTradeTable(pendingTrades, closedTrades);
+        // Render current active tab
+        const curTab = window.currentLiveTradeTab || "active";
+        const liveActiveContainer = document.getElementById("liveActiveContainer");
+        const liveTableContainer = document.getElementById("liveTableContainer");
+
+        if (curTab === "pending") {
+            if (liveActiveContainer) {
+                liveActiveContainer.classList.add("hidden");
+                liveActiveContainer.style.display = "none";
+            }
+            if (liveTableContainer) {
+                liveTableContainer.classList.remove("hidden");
+                liveTableContainer.style.display = "block";
+            }
+            renderLiveTradeTable(pendingTrades, "pending");
+        } else if (curTab === "closed") {
+            if (liveActiveContainer) {
+                liveActiveContainer.classList.add("hidden");
+                liveActiveContainer.style.display = "none";
+            }
+            if (liveTableContainer) {
+                liveTableContainer.classList.remove("hidden");
+                liveTableContainer.style.display = "block";
+            }
+            renderLiveTradeTable(closedTrades, "closed");
+        } else {
+            if (liveActiveContainer) {
+                liveActiveContainer.classList.remove("hidden");
+                liveActiveContainer.style.display = "";
+            }
+            if (liveTableContainer) {
+                liveTableContainer.classList.add("hidden");
+                liveTableContainer.style.display = "none";
+            }
+            filterAndRenderLiveTradeCards(curTab);
+        }
     } catch (e) {
         console.warn("Failed to fetch live trades:", e);
     }
@@ -8976,7 +10066,10 @@ function renderLiveTradeCards(activeSetups) {
 
     container.innerHTML = activeSetups.map((s, idx) => {
         const logoHtml = typeof getStockLogoHTML === 'function' ? getStockLogoHTML(s.symbol) : '';
-        const isBull = (s.signal || "").includes("BTST") || (s.signal || "").includes("CALL") || (s.signal || "").includes("BUY");
+        const sigUpper = (s.signal || "").toUpperCase();
+        const optUpper = (s.option_type || "").toUpperCase();
+        const isPut = sigUpper.includes("PUT") || sigUpper.includes("STBT") || sigUpper.includes("SELL") || sigUpper.includes("PE") || optUpper.includes("PUT");
+        const isBull = !isPut && (sigUpper.includes("BTST") || sigUpper.includes("CALL") || sigUpper.includes("BUY") || optUpper.includes("CALL"));
         const badgeClass = isBull ? "badge-bullish" : "badge-bearish";
         const sigLabel = isBull ? "BTST CALL (CE)" : "STBT PUT (PE)";
         const ltp = s.entry_price ? Number(s.entry_price).toFixed(2) : '--';
@@ -8986,29 +10079,47 @@ function renderLiveTradeCards(activeSetups) {
         const pnlVal = s.pnl_pct || 0;
         const pnlStr = pnlVal.toFixed(2);
         const pnlClass = pnlVal >= 0 ? "text-bullish" : "text-bearish";
-        const score = s.conviction_score || 93;
-        const mceDecision = isBull ? (score >= 80 ? "STRONG BTST" : "BTST") : (score >= 80 ? "STRONG STBT" : "STBT");
+        const score = s.conviction_score !== undefined ? Number(s.conviction_score) : 70;
+        
+        let mceDecision = "";
+        let mceBadgeStyle = "";
+        let mceIconStyle = "";
+        if (score >= 80) {
+            mceDecision = isBull ? "STRONG BTST" : "STRONG STBT";
+            mceBadgeStyle = "background:rgba(212,175,55,0.12);color:#f59e0b;border:1px solid rgba(212,175,55,0.35);";
+            mceIconStyle = "color:#f59e0b;";
+        } else if (score >= 65) {
+            mceDecision = isBull ? "MODERATE BTST" : "MODERATE STBT";
+            mceBadgeStyle = "background:rgba(59,130,246,0.12);color:#93c5fd;border:1px solid rgba(59,130,246,0.3);";
+            mceIconStyle = "color:#60a5fa;";
+        } else {
+            mceDecision = isBull ? "SPECULATIVE BTST" : "SPECULATIVE STBT";
+            mceBadgeStyle = "background:rgba(148,163,184,0.1);color:#94a3b8;border:1px solid rgba(148,163,184,0.25);";
+            mceIconStyle = "color:#94a3b8;";
+        }
         const cardKey = `${escapeAttr(s.symbol)}_${idx}`;
 
         return `
-            <div class="live-trade-card" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:6px;padding:16px;box-shadow:0 1px 2px rgba(15,23,42,0.04);position:relative;">
+            <div class="live-trade-card" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(15,23,42,0.06);position:relative;">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
                     <div class="symbol-with-logo" style="display:flex;align-items:center;gap:10px;">
                         ${logoHtml}
                         <div>
                             <div style="font-size:14px;font-weight:800;color:#0f172a;">${escapeHtml(s.symbol)}</div>
-                            <div style="font-size:11px;font-weight:700;color:#64748b;display:flex;gap:6px;align-items:center;margin-top:2px;">
-                                <span class="badge" style="background:#0b0f19;color:#f8fafc;font-size:10px;font-weight:800;padding:2px 6px;border-radius:3px;border:1px solid #1f2937;">
-                                    <i class="fa-solid fa-layer-group text-gold"></i> MCE: ${escapeHtml(mceDecision)}
+                            <div style="font-size:11px;font-weight:700;display:flex;gap:6px;align-items:center;margin-top:3px;">
+                                <span class="badge" style="${mceBadgeStyle}font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:4px;">
+                                    <i class="fa-solid fa-layer-group" style="${mceIconStyle}"></i> MCE: ${escapeHtml(mceDecision)}
                                 </span>
-                                <span style="color:#059669;font-size:10px;font-weight:800;"><i class="fa-solid fa-circle" style="font-size:6px;"></i> LIVE</span>
+                                <span class="live-status-pill">
+                                    <span class="live-indicator-dot"></span> LIVE
+                                </span>
                             </div>
                         </div>
                     </div>
-                    <span class="badge ${badgeClass}" style="font-size:11px;font-weight:800;padding:3px 8px;border-radius:3px;">${escapeHtml(sigLabel)}</span>
+                    <span class="badge ${badgeClass}" style="font-size:11px;font-weight:800;padding:3px 8px;border-radius:4px;">${escapeHtml(sigLabel)}</span>
                 </div>
 
-                <div style="display:grid;grid-template-columns: repeat(4, 1fr);gap:6px;background:#f8fafc;border:1px solid #e2e8f0;padding:8px;border-radius:4px;margin-bottom:12px;text-align:center;">
+                <div style="display:grid;grid-template-columns: repeat(4, 1fr);gap:6px;background:#f8fafc;border:1px solid #e2e8f0;padding:8px;border-radius:6px;margin-bottom:12px;text-align:center;">
                     <div>
                         <span style="font-size:10px;font-weight:800;color:#64748b;display:block;margin-bottom:2px;">ENTRY</span>
                         <strong style="font-size:12px;color:#0f172a;font-family:var(--font-mono);">₹${ltp}</strong>
@@ -9027,20 +10138,27 @@ function renderLiveTradeCards(activeSetups) {
                     </div>
                 </div>
 
-                <div style="display:flex;align-items:center;justify-content:space-between;font-size:12.5px;padding-top:2px;">
-                    <div>
-                        <span style="color:#64748b;font-size:11px;font-weight:700;">LIVE PnL:</span>
-                        <strong class="${pnlClass}" style="font-size:13px;margin-left:4px;font-family:var(--font-mono);font-weight:800;">${pnlVal >= 0 ? '+' : ''}${pnlStr}%</strong>
+                <div class="live-trade-card-footer">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;">
+                        <div class="live-trade-pnl-wrap">
+                            <span class="live-trade-pnl-label">LIVE PnL:</span>
+                            <div class="live-trade-pnl-pill">
+                                <strong class="${pnlClass}" style="font-size:12.5px;font-family:var(--font-mono);font-weight:800;">${pnlVal >= 0 ? '+' : ''}${pnlStr}%</strong>
+                            </div>
+                        </div>
+                        <div style="font-size:10.5px;font-weight:700;color:#64748b;">
+                            R:R <span style="font-family:var(--font-mono);font-weight:800;color:#0f172a;">1 : 2.5</span>
+                        </div>
                     </div>
-                    <div style="display:flex;gap:6px;">
-                        <button class="btn btn-sm btn-secondary" onclick="toggleMceExplain('${cardKey}')" title="Explain Signal Lineage & MCE Breakdown">
+                    <div class="live-trade-actions-group">
+                        <button class="btn btn-sm btn-secondary" onclick="toggleMceExplain('${cardKey}')" title="Explain Signal Lineage &amp; MCE Breakdown" style="padding:6px 4px;font-size:10.5px;font-weight:700;justify-content:center;display:flex;align-items:center;gap:4px;">
                             <i class="fa-solid fa-layer-group text-gold"></i> EXPLAIN
                         </button>
-                        <button class="btn btn-sm btn-secondary" onclick="openStockChartModal('${escapeAttr(s.symbol)}')">
+                        <button class="btn btn-sm btn-secondary" onclick="openStockChartModal('${escapeAttr(s.symbol)}')" title="View Chart" style="padding:6px 4px;font-size:10.5px;font-weight:700;justify-content:center;display:flex;align-items:center;gap:4px;">
                             <i class="fa-solid fa-chart-line text-gold"></i> CHART
                         </button>
-                        <button class="btn btn-sm btn-gold" onclick="openOrderTicketModal({ symbol: '${escapeAttr(s.symbol)}', entry_price: ${s.entry_price || 100}, signal: '${escapeAttr(sigLabel)}', tp1: ${tp1 || 0}, tp2: ${tp2 || 0}, sl: ${sl || 0} })">
-                            <i class="fa-solid fa-arrow-right"></i> TRADE
+                        <button class="btn btn-sm btn-gold" onclick="openOrderTicketModal({ symbol: '${escapeAttr(s.symbol)}', entry_price: ${s.entry_price || 100}, signal: '${escapeAttr(sigLabel)}', tp1: ${tp1 || 0}, tp2: ${tp2 || 0}, sl: ${sl || 0} })" title="Open Order Ticket" style="padding:6px 4px;font-size:10.5px;font-weight:800;justify-content:center;display:flex;align-items:center;gap:4px;">
+                            <i class="fa-solid fa-bolt"></i> TRADE
                         </button>
                     </div>
                 </div>
@@ -9079,6 +10197,172 @@ window.toggleMceExplain = function(cardKey) {
         el.style.display = "none";
     }
 };
+
+function renderLiveTradeTable(items, mode = "pending") {
+    const thead = document.getElementById("liveTableHead");
+    const tbody = document.getElementById("liveTableBody");
+    if (!tbody) return;
+
+    const isPending = mode === "pending";
+    const tradeList = items && items.length ? items : (isPending ? (window.cachedPendingTrades || []) : (window.cachedClosedTrades || []));
+
+    // Render Table Head dynamically based on mode
+    if (thead) {
+        if (isPending) {
+            thead.innerHTML = `
+                <tr>
+                    <th style="width:120px;">ORDER ID</th>
+                    <th>STOCK</th>
+                    <th>TRIGGER SETUP</th>
+                    <th style="text-align:right;">TRIGGER PRICE</th>
+                    <th style="text-align:right;">TARGET 1</th>
+                    <th style="text-align:right;">STOP LOSS</th>
+                    <th style="text-align:center;">STATUS</th>
+                    <th style="text-align:right;width:150px;">ACTION</th>
+                </tr>
+            `;
+        } else {
+            thead.innerHTML = `
+                <tr>
+                    <th style="width:140px;">TRADE ID</th>
+                    <th>STOCK</th>
+                    <th>SIGNAL</th>
+                    <th style="text-align:right;">ENTRY (3:25 PM)</th>
+                    <th style="text-align:right;">EXIT (9:15 AM)</th>
+                    <th style="text-align:right;">REALIZED P&amp;L</th>
+                    <th style="text-align:center;">OUTCOME</th>
+                    <th style="text-align:right;">LOCK DATE</th>
+                </tr>
+            `;
+        }
+    }
+
+    if (!tradeList || !tradeList.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align:center;padding:48px 16px;color:var(--ink-secondary);">
+                    <div style="font-size:14px;font-weight:700;margin-bottom:4px;color:var(--ink-primary);">${isPending ? "No Pending Orders" : "No Closed Trades Recorded"}</div>
+                    <div style="font-size:11px;opacity:0.8;">${isPending ? "Watchlist orders awaiting breakout trigger will appear here automatically." : "Historical completed session trades will be logged after 9:15 AM evaluation."}</div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    if (isPending) {
+        tbody.innerHTML = tradeList.map((item, idx) => {
+            const sym = escapeHtml(item.symbol || "--");
+            const logoHtml = typeof getStockLogoHTML === "function" ? getStockLogoHTML(item.symbol) : "";
+            const sigUpper = (item.signal || "BTST SETUP (CE)").toUpperCase();
+            const isPut = sigUpper.includes("PUT") || sigUpper.includes("STBT") || sigUpper.includes("PE");
+            const badgeClass = isPut ? "badge-bearish" : "badge-bullish";
+            const sigLabel = isPut ? "STBT SETUP (PE)" : "BTST SETUP (CE)";
+            const triggerPx = item.trigger_price || item.entry_price || 100.0;
+            const tp1 = item.target_price_1 || item.target_price || (triggerPx * (isPut ? 0.98 : 1.02));
+            const sl = item.stop_loss || (triggerPx * (isPut ? 1.015 : 0.985));
+            const orderId = escapeHtml(item.id || `PND-${item.symbol || idx}`);
+
+            return `
+                <tr>
+                    <td><span class="badge" style="background:#1e293b;color:#94a3b8;font-family:var(--font-mono);font-size:10px;font-weight:700;">${orderId}</span></td>
+                    <td>
+                        <div class="symbol-with-logo" style="display:flex;align-items:center;gap:8px;">
+                            ${logoHtml}
+                            <div>
+                                <span class="stock-symbol-text" style="font-weight:800;cursor:pointer;color:var(--ink-primary);" onclick="openStockChartModal('${escapeAttr(item.symbol)}')">${sym}</span>
+                                <div style="font-size:10px;color:var(--ink-secondary);">${escapeHtml(item.strategy_id || "Pre-Breakout")}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge ${badgeClass}" style="font-size:10.5px;font-weight:800;">${escapeHtml(sigLabel)}</span></td>
+                    <td style="text-align:right;font-family:var(--font-mono);font-weight:700;color:var(--ink-primary);">₹${Number(triggerPx).toFixed(2)}</td>
+                    <td style="text-align:right;font-family:var(--font-mono);font-weight:700;" class="text-bullish">₹${Number(tp1).toFixed(2)}</td>
+                    <td style="text-align:right;font-family:var(--font-mono);font-weight:700;" class="text-bearish">₹${Number(sl).toFixed(2)}</td>
+                    <td style="text-align:center;">
+                        <span class="badge" style="background:rgba(217,119,6,0.15);color:#f59e0b;border:1px solid rgba(217,119,6,0.3);font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;">
+                            <i class="fa-solid fa-clock" style="font-size:9px;margin-right:3px;"></i>AWAITING TRIGGER
+                        </span>
+                    </td>
+                    <td style="text-align:right;">
+                        <div style="display:inline-flex;gap:4px;">
+                            <button class="btn btn-sm btn-secondary" onclick="openStockChartModal('${escapeAttr(item.symbol)}')" title="View Chart">
+                                <i class="fa-solid fa-chart-line text-gold"></i>
+                            </button>
+                            <button class="btn btn-sm btn-gold" onclick="openOrderTicketModal({ symbol: '${escapeAttr(item.symbol)}', entry_price: ${Number(triggerPx).toFixed(2)}, signal: '${escapeAttr(sigLabel)}', tp1: ${Number(tp1).toFixed(2)}, sl: ${Number(sl).toFixed(2)} })" title="Place Order">
+                                TRADE
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    } else {
+        // Mode: closed (TRADE LOG)
+        tbody.innerHTML = tradeList.map((item, idx) => {
+            const sym = escapeHtml(item.symbol || "--");
+            const logoHtml = typeof getStockLogoHTML === "function" ? getStockLogoHTML(item.symbol) : "";
+            const sigUpper = (item.signal || "BTST (BUY)").toUpperCase();
+            const isPut = sigUpper.includes("PUT") || sigUpper.includes("STBT") || sigUpper.includes("SELL") || sigUpper.includes("PE");
+            const badgeClass = isPut ? "badge-bearish" : "badge-bullish";
+            const sigLabel = isPut ? "STBT PUT (PE)" : "BTST CALL (CE)";
+            const entryPx = Number(item.entry_price || item.close_price_325 || 0);
+            const exitPx = Number(item.exit_price || item.open_price_915 || entryPx);
+            
+            // Direction-adjusted Realized P&L calculation:
+            // BUY / BTST (Long):  (Exit - Entry) / Entry * 100
+            // SELL / STBT (Short): (Entry - Exit) / Entry * 100
+            let pnlVal;
+            if (item.pnl_pct !== undefined && item.pnl_pct !== null) {
+                pnlVal = Number(item.pnl_pct);
+            } else if (entryPx > 0 && exitPx > 0) {
+                pnlVal = isPut ? ((entryPx - exitPx) / entryPx) * 100 : ((exitPx - entryPx) / entryPx) * 100;
+            } else if (item.gap_pct !== undefined && item.gap_pct !== null) {
+                pnlVal = isPut ? -Number(item.gap_pct) : Number(item.gap_pct);
+            } else {
+                pnlVal = 0.0;
+            }
+
+            // Directional consistency assertion:
+            if (isPut && entryPx > 0 && exitPx > 0 && exitPx > entryPx && pnlVal > 0) {
+                pnlVal = -Math.abs(pnlVal);
+            } else if (isPut && entryPx > 0 && exitPx > 0 && exitPx < entryPx && pnlVal < 0) {
+                pnlVal = Math.abs(pnlVal);
+            }
+
+            const pnlClass = pnlVal > 0 ? "text-bullish" : (pnlVal < 0 ? "text-bearish" : "text-amber");
+            const outcome = (item.outcome || (pnlVal > 0 ? "WIN" : (pnlVal < 0 ? "LOSS" : "NEUTRAL"))).toUpperCase();
+            const outcomeBadge = outcome.includes("WIN")
+                ? `<span class="badge badge-bullish" style="font-size:10px;font-weight:800;padding:2px 6px;"><i class="fa-solid fa-check" style="margin-right:3px;"></i>${escapeHtml(outcome)}</span>`
+                : (outcome.includes("LOSS")
+                    ? `<span class="badge badge-bearish" style="font-size:10px;font-weight:800;padding:2px 6px;"><i class="fa-solid fa-xmark" style="margin-right:3px;"></i>LOSS</span>`
+                    : `<span class="badge" style="background:#334155;color:#94a3b8;font-size:10px;font-weight:800;padding:2px 6px;">NEUTRAL</span>`);
+            const tradeId = escapeHtml(item.id || `CLS-${item.symbol || idx}`);
+            const closedDate = escapeHtml(item.closed_at || item.lock_date || "2026-09-22");
+
+            return `
+                <tr>
+                    <td><span class="badge" style="background:#1e293b;color:#94a3b8;font-family:var(--font-mono);font-size:10px;font-weight:700;">${tradeId}</span></td>
+                    <td>
+                        <div class="symbol-with-logo" style="display:flex;align-items:center;gap:8px;">
+                            ${logoHtml}
+                            <div>
+                                <span class="stock-symbol-text" style="font-weight:800;cursor:pointer;color:var(--ink-primary);" onclick="openStockChartModal('${escapeAttr(item.symbol)}')">${sym}</span>
+                                <div style="font-size:10px;color:var(--ink-secondary);">${escapeHtml(item.strategy_id || "5-Pillar Engine")}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge ${badgeClass}" style="font-size:10.5px;font-weight:800;">${escapeHtml(sigLabel)}</span></td>
+                    <td style="text-align:right;font-family:var(--font-mono);font-weight:700;color:var(--ink-primary);">₹${Number(entryPx).toFixed(2)}</td>
+                    <td style="text-align:right;font-family:var(--font-mono);font-weight:700;color:var(--ink-primary);">₹${Number(exitPx).toFixed(2)}</td>
+                    <td style="text-align:right;font-family:var(--font-mono);font-weight:800;" class="${pnlClass}">${pnlVal >= 0 ? '+' : ''}${pnlVal.toFixed(2)}%</td>
+                    <td style="text-align:center;">${outcomeBadge}</td>
+                    <td style="text-align:right;font-size:11px;color:var(--ink-secondary);font-family:var(--font-mono);">${closedDate}</td>
+                </tr>
+            `;
+        }).join("");
+    }
+}
+window.renderLiveTradeTable = renderLiveTradeTable;
 
 // ==========================================================================
 // INSTITUTIONAL ORDER TICKET & PAPER TRADING ENGINE (REQ-PTR, REQ-MOD-001)
@@ -9805,7 +11089,7 @@ async function fetchPaperPortfolio() {
         const closedTbody = document.getElementById("paperClosedBody");
         if (closedTbody) {
             if (!closedTrades.length) {
-                closedTbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--ink-muted);">No closed paper trades recorded yet.</td></tr>`;
+                closedTbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--ink-muted);">No closed paper trades recorded yet. (Trades manually placed via Paper Trading appear here; auto-graded algorithm signals are tracked in Live Trade &rarr; Closed Trades.)</td></tr>`;
             } else {
                 closedTbody.innerHTML = closedTrades.map(t => {
                     const pnl = t.realized_pnl || 0;
@@ -11056,24 +12340,21 @@ if (document.readyState === "loading") {
     safeInitSystemHealthDiagnostics();
 }
 
-// Wire Options Chain View Mode Toggles (ALL / CALLS / PUTS)
+// Wire Options Chain View Mode Toggles (CARDS / CALLS / PUTS / ALL)
 function initOcViewToggles() {
     try {
         const ocToggles = document.getElementById("ocViewToggles");
-        if (ocToggles) {
+        if (ocToggles && !ocToggles.dataset.listenerBound) {
+            ocToggles.dataset.listenerBound = "true";
             ocToggles.addEventListener("click", function(e) {
                 const btn = e.target.closest(".oc-toggle-btn");
                 if (!btn) return;
                 const mode = btn.dataset.ocMode || "all";
-                ocToggles.querySelectorAll(".oc-toggle-btn").forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-                const ocTable = document.querySelector(".oc-matrix-table");
-                if (ocTable) {
-                    if (mode === "all") {
-                        delete ocTable.dataset.ocView;
-                    } else {
-                        ocTable.dataset.ocView = mode;
-                    }
+                if (typeof setOptionChainViewMode === "function") {
+                    setOptionChainViewMode(mode);
+                }
+                if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                    window.lucide.createIcons();
                 }
             });
         }

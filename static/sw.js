@@ -2,7 +2,7 @@
    TRADEXO PWA SERVICE WORKER (Phase 4 — Lock-Screen Web Push Notifications)
    ========================================================================== */
 
-const CACHE_NAME = 'tradexo-cache-v2';
+const CACHE_NAME = 'tradexo-cache-v4';
 const ASSETS_TO_CACHE = [
     '/',
     '/static/styles.css',
@@ -37,12 +37,12 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Network-first with Cache fallback for app assets, network-only for API routes
+// Network-first with Cache fallback for app assets, network-only for API routes & stock logos
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // Never cache API or WebSocket requests
-    if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/ws/')) {
+    // Never cache API or WebSocket requests, and let static stock logos fetch directly
+    if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/ws/') || url.pathname.startsWith('/static/logos/')) {
         return;
     }
 

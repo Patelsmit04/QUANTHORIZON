@@ -91,4 +91,12 @@ def call_with_retry(
             time.sleep(backoff)
 
     logger.warning(f"[{label}] failed after {retries + 1} attempt(s): {last_error}")
+    try:
+        import sentry_config
+        if last_error:
+            sentry_config.capture_exception(last_error, label=label, provider="call_with_retry", retries_exhausted=retries + 1)
+        else:
+            sentry_config.capture_message(f"[{label}] failed after {retries + 1} attempts with no result", level="warning", label=label)
+    except Exception:
+        pass
     return None

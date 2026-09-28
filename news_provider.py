@@ -73,18 +73,80 @@ REQUEST_HEADERS = {
 RECENCY_HOURS = 72  # ignore headlines older than this
 
 RED_FLAG_KEYWORDS = [
-    "fraud", "scam", "probe", "investigation", "raid", "lawsuit", "sued", "downgrade",
-    "downgraded", "default", "bankruptcy", "insolvency", "resign", "resignation", "sacked",
-    "scandal", "penalty", "fine", "banned", "crash", "plunge", "plunges", "slump", "layoff",
-    "layoffs", "strike", "recall", "breach", "delayed", "halted", "suspended", "raided",
-    "seized", "collapse", "crisis", "warning",
+    # Severe corporate governance, legal & regulatory
+    "fraud", "scam", "probe", "investigation", "raid", "raided", "seized", "lawsuit", "sued",
+    "downgrade", "downgraded", "default", "bankruptcy", "insolvency", "resign", "resignation",
+    "sacked", "scandal", "penalty", "fine", "fined", "banned", "breach", "delayed", "halted",
+    "suspended", "warning", "warns", "regulatory scrutiny", "sebi action", "cbi probe", "ed raid",
+
+    # Market drops, selloffs, losses & weakness
+    "crash", "crashes", "crashed", "plunge", "plunges", "plunged", "plunging",
+    "slump", "slumps", "slumped", "slumping", "tumble", "tumbles", "tumbled", "tumbling",
+    "drop", "drops", "dropped", "dropping", "fall", "falls", "fell", "falling",
+    "decline", "declines", "declined", "declining", "slide", "slides", "slid", "sliding",
+    "slip", "slips", "slipped", "slipping", "deepen losses", "losses", "loss", "loses", "losing",
+    "negative returns", "in the red", "drags", "dragged", "drag", "bleeding", "bleeds",
+    "selloff", "sell-off", "selling pressure", "heavy selloff", "rout", "meltdown",
+    "52-week low", "multi-year low", "hits low", "hit low", "at risk", "risk", "risks",
+    "headwind", "headwinds", "fear", "fears", "panic", "cautious", "retreat", "retreats",
+    "cuts", "downward", "lower", "under pressure",
+
+    # Macro & Geopolitical risk
+    "crisis", "collapse", "war", "conflict", "escalation", "tensions",
+    "rate hike", "hawkish", "inflation spike", "bond yield spike",
+
+    # Operational & Financial distress
+    "layoff", "layoffs", "strike", "recall", "misses estimates", "missed estimates",
+    "profit drops", "profit falls", "profit slumps", "revenue drops", "loss widens",
+    "weak earnings", "guidance cut", "target price cut", "target cut"
+]
+
+RED_REGEX_PATTERNS = [
+    ("cut target price", re.compile(r'\bcuts?\s+(?:their\s+)?(?:price\s+)?target\b', re.IGNORECASE)),
+    ("slashed target", re.compile(r'\bslashe[ds]\s+(?:price\s+)?target\b', re.IGNORECASE)),
+    ("lowered target", re.compile(r'\blowere[ds]\s+(?:price\s+)?target\b', re.IGNORECASE)),
+    ("percentage down", re.compile(r'\b(?:down|fall|falls|drop|drops|slide|slides)\s+(?:by\s+|up\s+to\s+)?\d+(?:\.\d+)?%', re.IGNORECASE)),
+    ("steps down", re.compile(r'\bsteps?\s+down\b', re.IGNORECASE))
 ]
 
 GREEN_FLAG_KEYWORDS = [
-    "record profit", "upgrade", "upgraded", "buyback", "wins order", "bags order",
-    "expansion", "surge", "surges", "rally", "rallies", "outperform", "beats estimates",
-    "beat estimates", "strong earnings", "robust growth", "partnership", "acquisition",
-    "raises guidance", "record high", "all-time high", "expands capacity", "profit jumps",
+    # Earnings & Outperformance
+    "record profit", "profit jumps", "profit rises", "profit surges",
+    "profit up", "net profit up", "pat up", "revenue up", "strong earnings", "strong results",
+    "robust growth", "beats estimates", "beat estimates", "outperform", "outperformed",
+    "margin expansion", "expansion", "raises guidance", "raised guidance", "guidance raised",
+
+    # Stock & Market gains, rallies, breakouts
+    "upgrade", "upgraded", "buyback", "share buyback", "wins order", "win order", "bags order",
+    "bags contract", "wins contract", "order win", "contract win", "major order",
+    "surge", "surges", "surged", "surging", "rally", "rallies", "rallied", "rallying",
+    "gain", "gains", "gained", "gaining", "jump", "jumps", "jumped", "jumping",
+    "soar", "soars", "soared", "soaring", "rise", "rises", "rose", "rising",
+    "climb", "climbs", "climbed", "climbing", "advance", "advances", "advanced", "advancing",
+    "rebound", "rebounds", "rebounded", "rebounding", "extends rally",
+    "record high", "record highs", "all-time high", "all-time highs", "fresh highs", "fresh high",
+    "52-week high", "multi-year high", "bullish", "breakout", "uptrend", "turnaround",
+    "higher", "in the green", "expands capacity", "shares up", "stock up",
+
+    # Corporate actions, partnerships & macro positive
+    "partnership", "joint venture", "acquisition", "strategic investment",
+    "bonus issue", "special dividend", "dividend hike",
+    "rate cut", "dovish", "stimulus", "monetary easing"
+]
+
+GREEN_REGEX_PATTERNS = [
+    ("percentage up", re.compile(r'\b(?:up|gains?|rises?|jumps?|surges?|soars?)\s+(?:by\s+|up\s+to\s+)?\d+(?:\.\d+)?%', re.IGNORECASE)),
+    ("price today up", re.compile(r'\bprice\s+today\s+up\b', re.IGNORECASE))
+]
+
+_COMPILED_RED_PATTERNS = RED_REGEX_PATTERNS + [
+    (kw, re.compile(r'\b' + re.escape(kw) + r'\b', re.IGNORECASE))
+    for kw in sorted(RED_FLAG_KEYWORDS, key=len, reverse=True)
+]
+
+_COMPILED_GREEN_PATTERNS = GREEN_REGEX_PATTERNS + [
+    (kw, re.compile(r'\b' + re.escape(kw) + r'\b', re.IGNORECASE))
+    for kw in sorted(GREEN_FLAG_KEYWORDS, key=len, reverse=True)
 ]
 
 
@@ -334,12 +396,25 @@ def classify_news_signal(headlines: Optional[List[Dict[str, Any]]]) -> Dict[str,
     green_hits: List[Dict[str, str]] = []
 
     for h in headlines:
-        text = f"{h.get('title', '')} {h.get('description', '')}".lower()
-        for kw in RED_FLAG_KEYWORDS:
-            if kw in text:
-                red_hits.append({"keyword": kw, "headline": h.get("title", "")})
-        for kw in GREEN_FLAG_KEYWORDS:
-            if kw in text:
+        text = f"{h.get('title', '')} {h.get('description', '')}"
+        red_spans = []
+
+        # 1. Match red flags with word boundaries, longest compound phrases first
+        for kw, pat in _COMPILED_RED_PATTERNS:
+            for m in pat.finditer(text):
+                span = m.span()
+                # Prevent overlapping duplicate hits on the same phrase
+                if not any(s[0] <= span[0] and span[1] <= s[1] for s in red_spans):
+                    red_spans.append(span)
+                    red_hits.append({"keyword": kw, "headline": h.get("title", "")})
+
+        # 2. Match green flags with word boundaries
+        for kw, pat in _COMPILED_GREEN_PATTERNS:
+            for m in pat.finditer(text):
+                span = m.span()
+                # If green keyword is inside an already matched red phrase (e.g. "profit" inside "profit drops"), skip it
+                if any(s[0] <= span[0] and span[1] <= s[1] for s in red_spans):
+                    continue
                 green_hits.append({"keyword": kw, "headline": h.get("title", "")})
 
     red_count = len(red_hits)
@@ -351,6 +426,8 @@ def classify_news_signal(headlines: Optional[List[Dict[str, Any]]]) -> Dict[str,
         verdict = "CAUTION"
     elif green_count > red_count:
         verdict = "POSITIVE"
+    elif red_count > 0:
+        verdict = "CAUTION"
     else:
         verdict = "NEUTRAL"
 

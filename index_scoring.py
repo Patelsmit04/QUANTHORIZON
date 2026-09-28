@@ -49,6 +49,7 @@ from env_utils import get_ist_now
 from index_derivatives_analyzer import analyze_index_derivatives
 from options_greeks_analyzer import estimate_overnight_greeks_outlook
 from net_utils import call_with_retry
+import sentry_config
 
 logger = logging.getLogger("IndexScoring")
 
@@ -102,6 +103,7 @@ def fetch_global_cues() -> Optional[Dict[str, float]]:
             cues[name] = round(((latest_close - prev_close) / prev_close) * 100, 2)
     except Exception as e:
         logger.warning(f"Global cues fetch failed: {e}")
+        sentry_config.capture_exception(e, provider="index_scoring", function="fetch_global_cues")
         return None
 
     return cues if cues else None
@@ -341,6 +343,7 @@ def fetch_gift_nifty_live() -> Optional[Dict[str, Any]]:
                     return result
     except Exception as e:
         logger.debug(f"Moneycontrol GIFT Nifty scrape non-blocking bypass: {e}")
+        sentry_config.capture_exception(e, provider="index_scoring", function="fetch_gift_nifty_live")
 
     # Dynamic Fair-Value Correlation Provider (Guarantees zero disconnected/stale ~24,026 prices)
     gift_ltp = round(n_ltp + 18.50, 2)
@@ -433,11 +436,24 @@ def evaluate_index_signal(
     def _mult(pillar_name: str) -> float:
         return weight_mult.get(pillar_name, 1.0)
 
-    if df_index is None or df_index.empty or len(df_index) < 5:
-        if index_name == "GIFTNIFTY":
-            gift_live = fetch_gift_nifty_live()
-            if gift_live:
-                return gift_live
+    if index_name == "GIFTNIFTY":
+        gift_live = fetch_gift_nifty_live()
+        if gift_live:
+            return gift_live
+
+    # Authentic live/closing quote lookup for fallback
+    live_quote = None
+    try:
+        live_list = fetch_major_indices_live()
+        for l in (live_list or []):
+            if l.get("index_name") == index_name:
+                live_quote = l
+                break
+    except Exception:
+        pass
+
+    has_df = df_index is not None and not df_index.empty and len(df_index) >= 2
+    if not has_df and not live_quote:
         return {
             "index_name": index_name,
             "required_weight": REQUIRED_INDEX_WEIGHT,
@@ -447,27 +463,37 @@ def evaluate_index_signal(
             "reason": "Insufficient intraday data",
         }
 
-    df_index = df_index.dropna(subset=["Close", "Open", "High", "Low"]).copy()
-    latest = df_index.iloc[-1]
-    session_open = float(df_index.iloc[0]["Open"])
-    # Use the actual previous day's close when available (from daily data), otherwise
-    # fall back to session open which is a better proxy than the previous 5m candle.
-    prev_close = prev_close_override if prev_close_override is not None else session_open
-    daily_high = float(df_index["High"].max())
-    daily_low = float(df_index["Low"].min())
-    ltp = float(latest["Close"])
-    change_pts = round(ltp - prev_close, 2)
-    pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
+    if has_df:
+        df_clean = df_index.dropna(subset=["Close", "Open", "High", "Low"]).copy()
+        latest = df_clean.iloc[-1]
+        session_open = float(df_clean.iloc[0]["Open"])
+        prev_close = prev_close_override if prev_close_override is not None else (live_quote.get("prev_close") if live_quote else session_open)
+        daily_high = float(df_clean["High"].max())
+        daily_low = float(df_clean["Low"].min())
+        ltp = float(live_quote.get("ltp") if (live_quote and live_quote.get("ltp")) else latest["Close"])
+        change_pts = round(ltp - prev_close, 2)
+        pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
 
-    delta = df_index["Close"].diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
-    rs = gain / loss.replace(0, np.nan)
-    rsi_series = 100 - (100 / (1 + rs))
-    rsi = float(rsi_series.fillna(50.0).iloc[-1])
+        delta = df_clean["Close"].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+        rs = gain / loss.replace(0, np.nan)
+        rsi_series = 100 - (100 / (1 + rs))
+        rsi = float(rsi_series.fillna(50.0).iloc[-1])
 
-    day_range = daily_high - daily_low
-    range_position_pct = round(max(0.0, min(100.0, ((ltp - daily_low) / day_range) * 100.0)), 2) if day_range > 0 else 50.0
+        day_range = daily_high - daily_low
+        range_position_pct = round(max(0.0, min(100.0, ((ltp - daily_low) / day_range) * 100.0)), 2) if day_range > 0 else 50.0
+    else:
+        # Fallback to authentic quote from live poller/closing sequence
+        ltp = float(live_quote.get("ltp") or 0.0)
+        prev_close = float(prev_close_override if prev_close_override is not None else (live_quote.get("prev_close") or ltp))
+        change_pts = float(live_quote.get("change_pts") or round(ltp - prev_close, 2))
+        pct_change = float(live_quote.get("pct_change") or (round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0))
+        daily_high = float(live_quote.get("day_high") or ltp)
+        daily_low = float(live_quote.get("day_low") or ltp)
+        rsi = float(live_quote.get("rsi") or 50.0)
+        day_range = daily_high - daily_low
+        range_position_pct = round(max(0.0, min(100.0, ((ltp - daily_low) / day_range) * 100.0)), 2) if day_range > 0 else 50.0
 
     # Bias: no VWAP available (needs volume) — price vs session open + RSI plays that role instead.
     bullish_bias = pct_change > 0.1 and rsi >= 55
@@ -486,17 +512,29 @@ def evaluate_index_signal(
     # Pillar: Relative Strength vs Nifty 50 (Bank Nifty / Sensex only)
     p_rs_weight = 0.0
     rs_diff = None
-    if index_name != "NIFTY50" and df_nifty is not None and not df_nifty.empty:
-        n_open = float(df_nifty.iloc[0]["Open"])
-        n_ltp = float(df_nifty.iloc[-1]["Close"])
-        nifty_pct_change = round(((n_ltp - n_open) / n_open) * 100, 2)
-        rs_diff = round(pct_change - nifty_pct_change, 2)
-        if rs_diff >= 0.15 or (bullish_bias and rs_diff >= 0.05):
-            p_rs_weight = 1.0 * _mult("Index: Relative Strength")
-            confirmed_pillars.append(f"RS vs Nifty (Outperforming +{rs_diff}%)")
-        elif rs_diff <= -0.15 or (bearish_bias and rs_diff <= -0.05):
-            p_rs_weight = 1.0 * _mult("Index: Relative Strength")
-            confirmed_pillars.append(f"RS vs Nifty (Underperforming {rs_diff}%)")
+    if index_name != "NIFTY50":
+        nifty_pct_change = None
+        if df_nifty is not None and not df_nifty.empty:
+            n_open = float(df_nifty.iloc[0]["Open"])
+            n_ltp = float(df_nifty.iloc[-1]["Close"])
+            nifty_pct_change = round(((n_ltp - n_open) / n_open) * 100, 2)
+        elif live_quote:
+            try:
+                for l in (fetch_major_indices_live() or []):
+                    if l.get("index_name") == "NIFTY50" and l.get("pct_change") is not None:
+                        nifty_pct_change = float(l["pct_change"])
+                        break
+            except Exception:
+                pass
+
+        if nifty_pct_change is not None:
+            rs_diff = round(pct_change - nifty_pct_change, 2)
+            if rs_diff >= 0.15 or (bullish_bias and rs_diff >= 0.05):
+                p_rs_weight = 1.0 * _mult("Index: Relative Strength")
+                confirmed_pillars.append(f"RS vs Nifty (Outperforming +{rs_diff}%)")
+            elif rs_diff <= -0.15 or (bearish_bias and rs_diff <= -0.05):
+                p_rs_weight = 1.0 * _mult("Index: Relative Strength")
+                confirmed_pillars.append(f"RS vs Nifty (Underperforming {rs_diff}%)")
     pillar_weights["Index: Relative Strength"] = p_rs_weight
 
     # Pillar: Global Cues

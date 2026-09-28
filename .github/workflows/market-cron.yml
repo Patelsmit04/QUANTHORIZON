@@ -3,15 +3,15 @@ name: TRADEXO Market-Hours Cron & Keepalive
 # Free hosting tiers (Render, Vercel) spin down after 15 min or have serverless execution.
 # This workflow acts as the authoritative external cron trigger to ensure time-critical jobs
 # execute without failure:
-# 1. 09:16 AM IST: Prior-day BTST/STBT opening gap evaluation & accuracy auto-upgrade
+# 1. 09:15 AM IST: Prior-day BTST/STBT opening gap evaluation & accuracy auto-upgrade
 # 2. 03:25 PM IST: Pre-close 3:25 PM candidate auto-lock
 # 3. 03:30 PM IST: Sharp market bell lock & CAS settlement reconciliation
 # 4. Every 5 min (08:30 AM - 03:45 PM IST weekdays): Live 5-pillar scanner tick & dyno keepalive
 
 on:
   schedule:
-    # 9:16 AM IST (03:46 UTC) — 9:15 AM opening gap evaluation + win-rate refresh, weekdays
-    - cron: "46 3 * * 1-5"
+    # 9:15 AM IST (03:45 UTC) — 9:15 AM opening gap evaluation + win-rate refresh, weekdays
+    - cron: "45 3 * * 1-5"
     # 3:25 PM IST (09:55 UTC) — 3:25 PM BTST/STBT auto-lock snapshot
     - cron: "55 9 * * 1-5"
     # 3:30 PM IST (10:00 UTC) — 3:30 PM market closing bell lock
@@ -37,27 +37,39 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             if [ "${{ inputs.endpoint }}" = "lock_picks" ]; then
               echo "path=/api/lock_picks" >> "$GITHUB_OUTPUT"
+            elif [ "${{ inputs.endpoint }}" = "evaluate" ]; then
+              echo "path=/api/evaluate_picks" >> "$GITHUB_OUTPUT"
             elif [ "${{ inputs.endpoint }}" = "keepalive" ]; then
               echo "path=/api/cron/keepalive" >> "$GITHUB_OUTPUT"
             else
               echo "path=/api/cron/${{ inputs.endpoint }}" >> "$GITHUB_OUTPUT"
             fi
-          elif [ "${{ github.event.schedule }}" = "46 3 * * 1-5" ]; then
-            echo "path=/api/cron/evaluate" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event.schedule }}" = "45 3 * * 1-5" ]; then
+            echo "path=/api/evaluate_picks" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.event.schedule }}" = "55 9 * * 1-5" ] || [ "${{ github.event.schedule }}" = "0 10 * * 1-5" ]; then
             echo "path=/api/lock_picks" >> "$GITHUB_OUTPUT"
           else
             echo "path=/api/cron/scan" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Wake up sleeping instance (cold-start mitigation)
+        env:
+          APP_BASE_URL: ${{ secrets.QUANTHORIZON_APP_URL || secrets.TRADEXO_APP_URL || secrets.RENDER_APP_URL }}
+        run: |
+          if [ -n "$APP_BASE_URL" ]; then
+            echo "Pinging health endpoint to spin up cold instance..."
+            curl -s -m 45 "${APP_BASE_URL}/api/market_status" > /dev/null || true
+            sleep 3
+          fi
+
       - name: Call the endpoint
         env:
-          APP_BASE_URL: ${{ secrets.QUANTHORIZON_APP_URL || secrets.TRADEXO_APP_URL }}
+          APP_BASE_URL: ${{ secrets.QUANTHORIZON_APP_URL || secrets.TRADEXO_APP_URL || secrets.RENDER_APP_URL }}
           API_KEY: ${{ secrets.QUANTHORIZON_API_KEY || secrets.TRADEXO_API_KEY }}
           ENDPOINT_PATH: ${{ steps.pick.outputs.path }}
         run: |
           if [ -z "$APP_BASE_URL" ]; then
-            echo "::error::QUANTHORIZON_APP_URL / TRADEXO_APP_URL repo secret is not set."
+            echo "::error::QUANTHORIZON_APP_URL / TRADEXO_APP_URL / RENDER_APP_URL repo secret is not set."
             exit 1
           fi
           echo "Triggering: POST ${APP_BASE_URL}${ENDPOINT_PATH}"
@@ -68,7 +80,7 @@ jobs:
             AUTH_HEADER="-H X-API-Key:${API_KEY}"
           fi
 
-          http_code=$(curl -sS --max-time 180 -X POST "${APP_BASE_URL}${ENDPOINT_PATH}" \
+          http_code=$(curl -sS --retry 2 --retry-delay 5 --max-time 180 -X POST "${APP_BASE_URL}${ENDPOINT_PATH}" \
             $AUTH_HEADER \
             -o response.json -w "%{http_code}")
           

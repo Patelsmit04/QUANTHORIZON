@@ -1,5 +1,5 @@
 {
-  "date": "2026-09-14",
+  "date": "2026-09-24",
   "snapshot_done": true,
   "auto_lock_25_done": true,
   "final_bell_30_done": true,
@@ -9,9 +9,16 @@
   "lock_done": true,
   "snapshot_picks": [],
   "cas_close_prices": {},
+  "cas_index_prices": {
+    "NIFTY50": 23063.1,
+    "BANKNIFTY": 55438.5,
+    "FINNIFTY": 24865.2,
+    "SENSEX": 73580.54,
+    "GIFTNIFTY": 23081.6
+  },
   "lock_result": {
     "locked_count": 0,
-    "total_today_locked": 3
+    "total_today_locked": 5
   },
   "lock_timestamp": null,
   "btst_status": "confirmed"

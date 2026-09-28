@@ -2363,5 +2363,503 @@
     "errors_count": 0,
     "errors": [],
     "market_transitions": []
+  },
+  "2026-09-18": {
+    "date": "2026-09-18",
+    "generated_at": "2026-09-19 20:54:50 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-18 09:59:27 IST",
+          "evaluated_count": 18,
+          "wins": 14,
+          "losses": 39,
+          "win_rate_pct": 26.4,
+          "status": "SUCCESS",
+          "details": {}
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-09-18 23:04:18 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 10,
+          "symbols": [
+            "ULTRACEMCO",
+            "DLF",
+            "HDFCBANK",
+            "PFC",
+            "PIRAMALFIN",
+            "RAMCOCEM",
+            "POWERGRID",
+            "ACC",
+            "MGL",
+            "POLYCAB"
+          ],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-18 23:07:17 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-18 23:22:48 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-19": {
+    "date": "2026-09-19",
+    "generated_at": "2026-09-20 19:34:09 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [],
+      "locks": [
+        {
+          "timestamp": "2026-09-19 22:13:16 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 81,
+          "symbols": [
+            "CIPLA",
+            "GRASIM",
+            "POWERGRID",
+            "SBIN",
+            "MARUTI",
+            "ADANIENSOL",
+            "ASHOKLEY",
+            "AUROPHARMA",
+            "BANKBARODA",
+            "BHEL",
+            "BPCL",
+            "COCHINSHIP",
+            "COFORGE",
+            "CONCOR",
+            "IDEA",
+            "IOC",
+            "JSWENERGY",
+            "JUBLFOOD",
+            "NYKAA",
+            "OBEROIRLTY",
+            "PIIND",
+            "POLYCAB",
+            "RBLBANK",
+            "SBICARD",
+            "SIEMENS",
+            "TATAPOWER",
+            "UPL",
+            "WAAREEENER",
+            "WIPRO",
+            "NTPC",
+            "SUNPHARMA",
+            "TCS",
+            "BLUESTARCO",
+            "DIXON",
+            "JSWSTEEL",
+            "KPITTECH",
+            "LALPATHLAB",
+            "LT",
+            "SBILIFE",
+            "SUNTV",
+            "TATATECH",
+            "VOLTAS",
+            "BAJAJFINSV",
+            "INFY",
+            "KOTAKBANK",
+            "TATASTEEL",
+            "ADANIENT",
+            "ADANIPORTS",
+            "AXISBANK",
+            "BAJFINANCE",
+            "BHARTIARTL",
+            "HDFCBANK",
+            "ITC",
+            "RELIANCE",
+            "ABCAPITAL",
+            "ALKEM",
+            "APLAPOLLO",
+            "APOLLOHOSP",
+            "BANKINDIA",
+            "CANBK",
+            "CROMPTON",
+            "CYIENT",
+            "GMRAIRPORT",
+            "HYUNDAI",
+            "IEX",
+            "MOTILALOFS",
+            "PAGEIND",
+            "PETRONET",
+            "TRENT",
+            "VEDL",
+            "VMM",
+            "APOLLOTYRE",
+            "IRB",
+            "NATIONALUM",
+            "NMDC",
+            "SOLARINDS",
+            "SYNGENE",
+            "TATAELXSI",
+            "YESBANK",
+            "HINDUNILVR",
+            "M&M"
+          ],
+          "details": {}
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-20": {
+    "date": "2026-09-20",
+    "generated_at": "2026-09-21 07:47:18 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [],
+      "locks": [],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-21": {
+    "date": "2026-09-21",
+    "generated_at": "2026-09-22 15:41:37 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-21 16:32:13 IST",
+          "evaluated_count": 91,
+          "wins": 21,
+          "losses": 108,
+          "win_rate_pct": 16.3,
+          "status": "SUCCESS",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-21 16:32:20 IST",
+          "evaluated_count": 91,
+          "wins": 0,
+          "losses": 0,
+          "win_rate_pct": 16.3,
+          "status": "SUCCESS",
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_backfill"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-09-21 16:29:09 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 16,
+          "symbols": [
+            "ADANIENT",
+            "ADANIPORTS",
+            "AXISBANK",
+            "CIPLA",
+            "GRASIM",
+            "HDFCBANK",
+            "MARUTI",
+            "RELIANCE",
+            "NTPC",
+            "TCS",
+            "BHARTIARTL",
+            "POWERGRID",
+            "BAJFINANCE",
+            "SBIN",
+            "ITC",
+            "SUNPHARMA"
+          ],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-21 16:32:13 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-21 16:32:30 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-22": {
+    "date": "2026-09-22",
+    "generated_at": "2026-09-23 18:58:38 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-22 21:32:24 IST",
+          "evaluated_count": 0,
+          "wins": 0,
+          "losses": 0,
+          "win_rate_pct": 15.3,
+          "status": "SUCCESS",
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_backfill"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-09-22 21:33:32 IST",
+          "lock_type": "AUTO_RECONCILE_LOCK",
+          "locked_count": 210,
+          "symbols": [
+            "ITC",
+            "HINDUNILVR",
+            "LT"
+          ],
+          "details": {
+            "healed_by": "AutoReconcile"
+          }
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-23": {
+    "date": "2026-09-23",
+    "generated_at": "2026-09-24 13:29:24 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-23 18:59:18 IST",
+          "evaluated_count": 3,
+          "wins": 22,
+          "losses": 124,
+          "win_rate_pct": 15.1,
+          "status": "SUCCESS",
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-23 18:59:19 IST",
+          "evaluated_count": 3,
+          "wins": 0,
+          "losses": 0,
+          "win_rate_pct": 15.1,
+          "status": "SUCCESS",
+          "details": {
+            "healed_by": "AISentinel",
+            "trigger": "auto_backfill"
+          }
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-09-23 18:58:38 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 15,
+          "symbols": [
+            "HDFCBANK",
+            "IDEA",
+            "SWIGGY",
+            "CROMPTON",
+            "RECLTD",
+            "SHREECEM",
+            "BRITANNIA",
+            "BLUESTARCO",
+            "COALINDIA",
+            "APOLLOTYRE",
+            "BANKINDIA",
+            "BDL",
+            "ABB",
+            "TATACHEM",
+            "VOLTAS"
+          ],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-23 18:58:44 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-23 18:59:04 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-24": {
+    "date": "2026-09-24",
+    "generated_at": "2026-09-25 09:37:39 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-24 13:29:24 IST",
+          "evaluated_count": 13,
+          "wins": 27,
+          "losses": 128,
+          "win_rate_pct": 17.4,
+          "status": "SUCCESS",
+          "details": {}
+        }
+      ],
+      "locks": [
+        {
+          "timestamp": "2026-09-24 18:22:17 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 5,
+          "symbols": [
+            "BAJFINANCE",
+            "GRASIM",
+            "HINDALCO",
+            "AMBUJACEM",
+            "CANBK"
+          ],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-24 18:31:03 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-24 18:31:06 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        },
+        {
+          "timestamp": "2026-09-24 18:31:13 IST",
+          "lock_type": "BTST_330_LOCK",
+          "locked_count": 0,
+          "symbols": [],
+          "details": {}
+        }
+      ],
+      "transitions_count": 0,
+      "cold_starts_count": 0,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-25": {
+    "date": "2026-09-25",
+    "generated_at": "2026-09-26 21:02:27 IST",
+    "health_score": 85,
+    "status": "DEGRADED",
+    "status_label": "Degraded",
+    "issues": [],
+    "milestones": {
+      "evaluations": [
+        {
+          "timestamp": "2026-09-25 09:37:39 IST",
+          "evaluated_count": 7,
+          "wins": 28,
+          "losses": 133,
+          "win_rate_pct": 17.4,
+          "status": "SUCCESS",
+          "details": {}
+        }
+      ],
+      "locks": [],
+      "transitions_count": 0,
+      "cold_starts_count": 1,
+      "market_hours_cold_starts": 1
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
+  },
+  "2026-09-26": {
+    "date": "2026-09-26",
+    "generated_at": "2026-09-28 12:42:04 IST",
+    "health_score": 100,
+    "status": "OPTIMAL",
+    "status_label": "Optimal",
+    "issues": [],
+    "milestones": {
+      "evaluations": [],
+      "locks": [],
+      "transitions_count": 0,
+      "cold_starts_count": 2,
+      "market_hours_cold_starts": 0
+    },
+    "errors_count": 0,
+    "errors": [],
+    "market_transitions": []
   }
 }

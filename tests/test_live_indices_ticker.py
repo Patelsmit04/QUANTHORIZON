@@ -32,7 +32,7 @@ def test_fetch_major_indices_live_returns_all_four_indices():
         assert idx.get("ltp") is not None and idx.get("ltp") > 0
         assert idx.get("change_pts") is not None
         assert idx.get("pct_change") is not None
-        assert idx.get("display_name") in ["NIFTY 50", "BANK NIFTY", "SENSEX", "GIFT NIFTY"]
+        assert idx.get("display_name") in ["NIFTY 50", "BANK NIFTY", "SENSEX", "GIFT NIFTY", "FINNIFTY"]
 
 
 def test_api_indices_endpoint_returns_all_four_indices():

@@ -130,6 +130,11 @@ def evaluate_trade_outcome(
         logger.warning(f"[EVALUATION] Unrecognized signal direction '{signal}' for {symbol} — defaulting to BUY/BTST branch.")
         is_buy = True
 
+    # Direction-adjusted Realized P&L:
+    # For BUY/BTST:  (Open - Close) / Close * 100 == gap_pct
+    # For SELL/STBT: (Close - Open) / Close * 100 == -gap_pct
+    realized_pnl_pct = gap_pct if is_buy else round(-gap_pct, 2)
+
     if is_buy:
         if gap_pct >= BTST_JACKPOT_THRESHOLD:
             outcome = "JACKPOT WIN"
@@ -155,6 +160,7 @@ def evaluate_trade_outcome(
 
     return {
         "gap_pct": gap_pct,
+        "realized_pnl_pct": realized_pnl_pct,
         "variance_error_pct": variance_error,
         "accuracy_score_pct": accuracy_score,
         "outcome": outcome,

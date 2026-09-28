@@ -277,10 +277,12 @@ def evaluate_5_pillar_matrix(
     rsi_series = 100.0 - (100.0 / (1.0 + rs))
     rsi = float(rsi_series.fillna(50.0).iloc[-1])
 
-    # Trailing candles for volume spike
+    # Trailing candles for volume spike (normalized against session baseline with a 10.0x realistic market ceiling)
     recent_candles = df_today.iloc[-min(4, len(df_today)):]
     max_recent_vol = float(recent_candles['Volume'].max())
-    vol_spike_ratio = round(max_recent_vol / vol_sma_20, 2)
+    session_mean_vol = float(df_today['Volume'].mean()) if not df_today.empty else 1.0
+    effective_vol_baseline = max(vol_sma_20, session_mean_vol * 0.25, 1.0)
+    vol_spike_ratio = round(min(max_recent_vol / effective_vol_baseline, 10.0), 2)
 
     stock_pct_change = round(((ltp - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
     

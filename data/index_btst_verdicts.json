@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-09-14T21:33:47.134707",
+  "generated_at": "2026-09-24T18:37:01.576423",
   "index_prices_verified": {
     "NIFTY50": {
-      "price": 1764.6,
+      "price": 23063.1,
       "verified": true
     },
     "BANKNIFTY": {
-      "price": null,
-      "verified": false
+      "price": 55438.5,
+      "verified": true
     },
     "FINNIFTY": {
-      "price": 391.85,
+      "price": 24865.2,
       "verified": true
     },
     "SENSEX": {
-      "price": null,
-      "verified": false
+      "price": 73580.54,
+      "verified": true
     },
     "GIFTNIFTY": {
-      "price": 391.85,
+      "price": 23081.6,
       "verified": true
     }
   },
@@ -26,27 +26,34 @@
     "NIFTY50": {
       "index_name": "NIFTY50",
       "display_name": "Nifty 50",
-      "price": 1764.6,
+      "price": 23063.1,
       "price_verified": true,
       "verdict": "Avoid",
       "expected_open": {
         "direction": "Gap Down",
-        "points": 204.0,
-        "points_min": 163.0,
-        "points_max": 255.0,
-        "range_low": 23194.1,
-        "range_high": 23602.1,
-        "formatted": "-163 to -255 pts (Gap Down)",
+        "points": 115.9,
+        "points_min": 93.0,
+        "points_max": 145.0,
+        "range_low": 22947.2,
+        "range_high": 23179.0,
+        "formatted": "-93 to -145 pts (Gap Down)",
         "source": "options_straddle"
       },
       "confidence_level_pct": 50,
-      "primary_reason": "Macro News: Positive; Derivatives: Put Long Buildup (+1 more confirming).",
-      "greek_outlook": "Only 1 day(s) to expiry — theta decay is sharp and IV can swing fast overnight. ATM Call: delta 0.5081, theta -32.63/day, gamma 0.00262. ATM Put: delta -0.4891, theta -18.24/day, gamma 0.00389.",
+      "primary_reason": "Global Cues: Headwind (US/Asia + crude/INR against); Macro News: Positive (+2 more confirming).",
+      "greek_outlook": "ATM Call: delta 0.5461, theta -15.21/day, gamma 0.001224. ATM Put: delta -0.4534, theta -10.66/day, gamma 0.001238.",
       "key_overnight_catalysts": [
+        "Dow: -1.03%",
+        "Nasdaq: -0.69%",
+        "Nikkei: +0.76%",
+        "Hang Seng: -0.29%",
+        "Crude Oil: +1.61%",
+        "USD/INR: +0.27%",
+        "Global cues read: HEADWIND",
         "Macro news sentiment: POSITIVE",
-        "PCR: 1.057 (neutral)",
-        "Max Pain: 23450",
-        "OI Buildup: Put Long Buildup"
+        "PCR: 0.729 (neutral)",
+        "Max Pain: 23300",
+        "OI Buildup: Call Long Buildup"
       ],
       "invalidation_level": "N/A — no trade recommended",
       "highest_probability_btst_trade": {
@@ -55,135 +62,247 @@
       },
       "pillar_breakdown": {
         "confirmed_pillars": [
+          "Global Cues: Headwind (US/Asia + crude/INR against)",
           "Macro News: Positive",
-          "Derivatives: Put Long Buildup",
+          "Derivatives: Call Long Buildup",
           "Greeks: Calls carry lighter overnight theta burn"
         ],
         "pillar_weights": {
           "Index: Marubozu Close": 0.0,
           "Index: Relative Strength": 0.0,
-          "Index: Global Cues": 0.0,
+          "Index: Global Cues": 1.0,
           "Index: Macro News": 1.0,
           "Index: Derivatives Positioning": 1.0,
           "Index: Greeks Outlook": 1.0
         },
-        "rsi": 49.5,
-        "range_position_pct": 89.09,
+        "rsi": 49.3,
+        "range_position_pct": 7.21,
         "relative_strength": {
           "rs_diff": null,
           "data_status": "N/A_FOR_NIFTY50"
         },
         "global_cues": {
-          "verdict": "UNAVAILABLE",
-          "detail": {}
+          "verdict": "HEADWIND",
+          "detail": {
+            "DOW": -1.03,
+            "NASDAQ": -0.69,
+            "NIKKEI": 0.76,
+            "HANGSENG": -0.29,
+            "CRUDE": 1.61,
+            "USDINR": 0.27
+          }
         },
         "macro_news": {
           "verdict": "POSITIVE"
         },
         "derivatives": {
           "verified": true,
-          "pcr": 1.057,
-          "max_pain": 23450,
+          "pcr": 0.729,
+          "max_pain": 23300,
           "oi_buildup": {
-            "verdict": "PUT_LONG_BUILDUP",
-            "total_ce_oi_change": -397471,
-            "total_pe_oi_change": 833472
+            "verdict": "CALL_LONG_BUILDUP",
+            "total_ce_oi_change": 1069618.3846153845,
+            "total_pe_oi_change": 15716.076923076915
           },
           "support_resistance": {
             "resistance_strikes": [
               24000,
-              23800,
+              23500,
               24500
             ],
             "support_strikes": [
-              23300,
               23000,
-              23200
+              22000,
+              21000
             ]
           },
           "expected_move": {
-            "atm_strike": 23400,
-            "straddle_price": 204.0,
-            "days_to_expiry": 1,
-            "expected_overnight_move_points": 204.0,
-            "expected_range_low": 23194.1,
-            "expected_range_high": 23602.1
+            "atm_strike": 23050,
+            "straddle_price": 259.1,
+            "days_to_expiry": 5,
+            "expected_overnight_move_points": 115.9,
+            "expected_range_low": 22947.2,
+            "expected_range_high": 23179.0
           }
         },
         "greeks_outlook": {
           "verified": true,
-          "atm_strike": 23400,
-          "days_to_expiry": 1,
+          "atm_strike": 23050,
+          "days_to_expiry": 5,
           "call_greeks": {
-            "delta": 0.5081,
-            "gamma": 0.00262,
-            "theta_per_day": -32.63,
-            "vega": 4.88,
+            "delta": 0.5461,
+            "gamma": 0.001224,
+            "theta_per_day": -15.21,
+            "vega": 10.7,
             "risk_free_rate_assumed": 0.07
           },
           "put_greeks": {
-            "delta": -0.4891,
-            "gamma": 0.00389,
-            "theta_per_day": -18.24,
-            "vega": 4.88,
+            "delta": -0.4534,
+            "gamma": 0.001238,
+            "theta_per_day": -10.66,
+            "vega": 10.7,
             "risk_free_rate_assumed": 0.07
           },
           "better_positioned_side": "CALL (CE)",
-          "summary": "Only 1 day(s) to expiry — theta decay is sharp and IV can swing fast overnight. ATM Call: delta 0.5081, theta -32.63/day, gamma 0.00262. ATM Put: delta -0.4891, theta -18.24/day, gamma 0.00389."
+          "summary": "ATM Call: delta 0.5461, theta -15.21/day, gamma 0.001224. ATM Put: delta -0.4534, theta -10.66/day, gamma 0.001238."
         }
       },
-      "generated_at": "2026-09-14T21:33:47.134707"
+      "generated_at": "2026-09-24T18:37:01.576423"
     },
     "BANKNIFTY": {
       "index_name": "BANKNIFTY",
       "display_name": "Bank Nifty",
-      "price": null,
-      "price_verified": false,
+      "price": 55438.5,
+      "price_verified": true,
       "verdict": "Avoid",
       "expected_open": {
-        "direction": "Flat",
-        "points": 50.0,
-        "points_min": 40.0,
-        "points_max": 62.0,
-        "range_low": 0.0,
-        "range_high": 0.0,
-        "formatted": "±40 pts (Flat)",
-        "source": "technical_heuristic"
+        "direction": "Gap Down",
+        "points": 347.6,
+        "points_min": 278.0,
+        "points_max": 434.0,
+        "range_low": 55090.9,
+        "range_high": 55786.1,
+        "formatted": "-278 to -434 pts (Gap Down)",
+        "source": "options_straddle"
       },
       "confidence_level_pct": 50,
-      "primary_reason": "Unable to verify live closing price.",
-      "greek_outlook": "N/A — price unverified.",
+      "primary_reason": "RS vs Nifty (Underperforming -1.28%); Global Cues: Headwind (US/Asia + crude/INR against) (+3 more confirming).",
+      "greek_outlook": "ATM Call: delta 0.5387, theta -47.14/day, gamma 0.00038. ATM Put: delta -0.4558, theta -30.42/day, gamma 0.000445.",
       "key_overnight_catalysts": [
-        "Unable to verify live closing price."
+        "Dow: -1.03%",
+        "Nasdaq: -0.69%",
+        "Nikkei: +0.76%",
+        "Hang Seng: -0.29%",
+        "Crude Oil: +1.61%",
+        "USD/INR: +0.27%",
+        "Global cues read: HEADWIND",
+        "Macro news sentiment: POSITIVE",
+        "PCR: 0.748 (neutral)",
+        "Max Pain: 56500",
+        "OI Buildup: Call Long Buildup"
       ],
-      "invalidation_level": "N/A — price unverified",
+      "invalidation_level": "N/A — no trade recommended",
       "highest_probability_btst_trade": {
         "type": "Avoid",
-        "justification": "Unable to verify live closing price."
+        "justification": "Confirmed pillar weight fell short of the required threshold — no edge worth taking overnight risk for."
       },
-      "pillar_breakdown": null,
-      "generated_at": "2026-09-14T21:33:47.134707"
+      "pillar_breakdown": {
+        "confirmed_pillars": [
+          "RS vs Nifty (Underperforming -1.28%)",
+          "Global Cues: Headwind (US/Asia + crude/INR against)",
+          "Macro News: Positive",
+          "Derivatives: Call Long Buildup",
+          "Greeks: Calls carry lighter overnight theta burn"
+        ],
+        "pillar_weights": {
+          "Index: Marubozu Close": 0.0,
+          "Index: Relative Strength": 1.0,
+          "Index: Global Cues": 1.0,
+          "Index: Macro News": 1.0,
+          "Index: Derivatives Positioning": 1.0,
+          "Index: Greeks Outlook": 1.0
+        },
+        "rsi": 50.7,
+        "range_position_pct": 16.91,
+        "relative_strength": {
+          "rs_diff": -1.28,
+          "data_status": "AVAILABLE"
+        },
+        "global_cues": {
+          "verdict": "HEADWIND",
+          "detail": {
+            "DOW": -1.03,
+            "NASDAQ": -0.69,
+            "NIKKEI": 0.76,
+            "HANGSENG": -0.29,
+            "CRUDE": 1.61,
+            "USDINR": 0.27
+          }
+        },
+        "macro_news": {
+          "verdict": "POSITIVE"
+        },
+        "derivatives": {
+          "verified": true,
+          "pcr": 0.748,
+          "max_pain": 56500,
+          "oi_buildup": {
+            "verdict": "CALL_LONG_BUILDUP",
+            "total_ce_oi_change": 104071,
+            "total_pe_oi_change": -30729
+          },
+          "support_resistance": {
+            "resistance_strikes": [
+              57500,
+              58000,
+              57000
+            ],
+            "support_strikes": [
+              57500,
+              54000,
+              55000
+            ]
+          },
+          "expected_move": {
+            "atm_strike": 55400,
+            "straddle_price": 777.2,
+            "days_to_expiry": 5,
+            "expected_overnight_move_points": 347.6,
+            "expected_range_low": 55090.9,
+            "expected_range_high": 55786.1
+          }
+        },
+        "greeks_outlook": {
+          "verified": true,
+          "atm_strike": 55400,
+          "days_to_expiry": 5,
+          "call_greeks": {
+            "delta": 0.5387,
+            "gamma": 0.00038,
+            "theta_per_day": -47.14,
+            "vega": 25.76,
+            "risk_free_rate_assumed": 0.07
+          },
+          "put_greeks": {
+            "delta": -0.4558,
+            "gamma": 0.000445,
+            "theta_per_day": -30.42,
+            "vega": 25.73,
+            "risk_free_rate_assumed": 0.07
+          },
+          "better_positioned_side": "CALL (CE)",
+          "summary": "ATM Call: delta 0.5387, theta -47.14/day, gamma 0.00038. ATM Put: delta -0.4558, theta -30.42/day, gamma 0.000445."
+        }
+      },
+      "generated_at": "2026-09-24T18:37:01.576423"
     },
     "FINNIFTY": {
       "index_name": "FINNIFTY",
       "display_name": "FINNIFTY",
-      "price": 391.85,
+      "price": 24865.2,
       "price_verified": true,
       "verdict": "Avoid",
       "expected_open": {
-        "direction": "Flat",
-        "points": 3.6,
-        "points_min": 10.0,
-        "points_max": 15.0,
-        "range_low": 388.2,
-        "range_high": 395.5,
-        "formatted": "±10 pts (Flat)",
+        "direction": "Gap Down",
+        "points": 166.6,
+        "points_min": 133.0,
+        "points_max": 208.0,
+        "range_low": 24698.6,
+        "range_high": 25031.8,
+        "formatted": "-133 to -208 pts (Gap Down)",
         "source": "technical_heuristic"
       },
       "confidence_level_pct": 50,
-      "primary_reason": "RS vs Nifty (Underperforming -4.0%); Macro News: Positive.",
+      "primary_reason": "Marubozu Close (Range Pos: 0.0%); RS vs Nifty (Outperforming +0.32%) (+2 more confirming).",
       "greek_outlook": "Options data unavailable — Greeks outlook not verified.",
       "key_overnight_catalysts": [
+        "Dow: -1.03%",
+        "Nasdaq: -0.69%",
+        "Nikkei: +0.76%",
+        "Hang Seng: -0.29%",
+        "Crude Oil: +1.61%",
+        "USD/INR: +0.27%",
+        "Global cues read: HEADWIND",
         "Macro news sentiment: POSITIVE"
       ],
       "invalidation_level": "N/A — no trade recommended",
@@ -193,26 +312,35 @@
       },
       "pillar_breakdown": {
         "confirmed_pillars": [
-          "RS vs Nifty (Underperforming -4.0%)",
+          "Marubozu Close (Range Pos: 0.0%)",
+          "RS vs Nifty (Outperforming +0.32%)",
+          "Global Cues: Headwind (US/Asia + crude/INR against)",
           "Macro News: Positive"
         ],
         "pillar_weights": {
-          "Index: Marubozu Close": 0.0,
+          "Index: Marubozu Close": 1.0,
           "Index: Relative Strength": 1.0,
-          "Index: Global Cues": 0.0,
+          "Index: Global Cues": 1.0,
           "Index: Macro News": 1.0,
           "Index: Derivatives Positioning": 0.0,
           "Index: Greeks Outlook": 0.0
         },
-        "rsi": 35.6,
-        "range_position_pct": 11.73,
+        "rsi": 55.5,
+        "range_position_pct": 0.0,
         "relative_strength": {
-          "rs_diff": -4.0,
+          "rs_diff": 0.32,
           "data_status": "AVAILABLE"
         },
         "global_cues": {
-          "verdict": "UNAVAILABLE",
-          "detail": {}
+          "verdict": "HEADWIND",
+          "detail": {
+            "DOW": -1.03,
+            "NASDAQ": -0.69,
+            "NIKKEI": 0.76,
+            "HANGSENG": -0.29,
+            "CRUDE": 1.61,
+            "USDINR": 0.27
+          }
         },
         "macro_news": {
           "verdict": "POSITIVE"
@@ -233,111 +361,147 @@
           "reason": "Unable to verify live options chain data."
         }
       },
-      "generated_at": "2026-09-14T21:33:47.134707"
+      "generated_at": "2026-09-24T18:37:01.576423"
     },
     "SENSEX": {
       "index_name": "SENSEX",
       "display_name": "Sensex",
-      "price": null,
-      "price_verified": false,
+      "price": 73580.54,
+      "price_verified": true,
       "verdict": "Avoid",
       "expected_open": {
-        "direction": "Flat",
-        "points": 50.0,
-        "points_min": 40.0,
-        "points_max": 62.0,
-        "range_low": 0.0,
-        "range_high": 0.0,
-        "formatted": "±40 pts (Flat)",
+        "direction": "Gap Down",
+        "points": 463.6,
+        "points_min": 371.0,
+        "points_max": 580.0,
+        "range_low": 73116.9,
+        "range_high": 74044.1,
+        "formatted": "-371 to -580 pts (Gap Down)",
         "source": "technical_heuristic"
       },
       "confidence_level_pct": 50,
-      "primary_reason": "Unable to verify live closing price.",
-      "greek_outlook": "N/A — price unverified.",
+      "primary_reason": "RS vs Nifty (Underperforming -0.99%); Global Cues: Headwind (US/Asia + crude/INR against) (+1 more confirming).",
+      "greek_outlook": "Options data unavailable — Greeks outlook not verified.",
       "key_overnight_catalysts": [
-        "Unable to verify live closing price."
+        "Dow: -1.03%",
+        "Nasdaq: -0.69%",
+        "Nikkei: +0.76%",
+        "Hang Seng: -0.29%",
+        "Crude Oil: +1.61%",
+        "USD/INR: +0.27%",
+        "Global cues read: HEADWIND",
+        "Macro news sentiment: POSITIVE"
       ],
-      "invalidation_level": "N/A — price unverified",
+      "invalidation_level": "N/A — no trade recommended",
       "highest_probability_btst_trade": {
         "type": "Avoid",
-        "justification": "Unable to verify live closing price."
+        "justification": "Confirmed pillar weight fell short of the required threshold — no edge worth taking overnight risk for."
       },
-      "pillar_breakdown": null,
-      "generated_at": "2026-09-14T21:33:47.134707"
+      "pillar_breakdown": {
+        "confirmed_pillars": [
+          "RS vs Nifty (Underperforming -0.99%)",
+          "Global Cues: Headwind (US/Asia + crude/INR against)",
+          "Macro News: Positive"
+        ],
+        "pillar_weights": {
+          "Index: Marubozu Close": 0.0,
+          "Index: Relative Strength": 1.0,
+          "Index: Global Cues": 1.0,
+          "Index: Macro News": 1.0,
+          "Index: Derivatives Positioning": 0.0,
+          "Index: Greeks Outlook": 0.0
+        },
+        "rsi": 45.7,
+        "range_position_pct": 14.59,
+        "relative_strength": {
+          "rs_diff": -0.99,
+          "data_status": "AVAILABLE"
+        },
+        "global_cues": {
+          "verdict": "HEADWIND",
+          "detail": {
+            "DOW": -1.03,
+            "NASDAQ": -0.69,
+            "NIKKEI": 0.76,
+            "HANGSENG": -0.29,
+            "CRUDE": 1.61,
+            "USDINR": 0.27
+          }
+        },
+        "macro_news": {
+          "verdict": "POSITIVE"
+        },
+        "derivatives": {
+          "verified": false,
+          "reason": "Unable to verify live options chain data.",
+          "pcr": null,
+          "max_pain": null,
+          "oi_buildup": {
+            "verdict": "UNAVAILABLE"
+          },
+          "support_resistance": null,
+          "expected_move": null
+        },
+        "greeks_outlook": {
+          "verified": false,
+          "reason": "Unable to verify live options chain data."
+        }
+      },
+      "generated_at": "2026-09-24T18:37:01.576423"
     },
     "GIFTNIFTY": {
       "index_name": "GIFTNIFTY",
       "display_name": "GIFTNIFTY",
-      "price": 391.85,
+      "price": 23081.6,
       "price_verified": true,
       "verdict": "Buy Put",
       "expected_open": {
         "direction": "Gap Down",
-        "points": 4.0,
-        "points_min": 10.0,
-        "points_max": 15.0,
-        "range_low": 387.9,
-        "range_high": 395.9,
-        "formatted": "-10 to -15 pts (Gap Down)",
+        "points": 187.0,
+        "points_min": 150.0,
+        "points_max": 234.0,
+        "range_low": 22894.6,
+        "range_high": 23268.6,
+        "formatted": "-150 to -234 pts (Gap Down)",
         "source": "technical_heuristic"
       },
-      "confidence_level_pct": 85,
-      "primary_reason": "RS vs Nifty (Underperforming -13.17%); Macro News: Positive.",
+      "confidence_level_pct": 75,
+      "primary_reason": "GIFT NIFTY Real-Time Futures Correlation.",
       "greek_outlook": "Options data unavailable — Greeks outlook not verified.",
       "key_overnight_catalysts": [
-        "Macro news sentiment: POSITIVE"
+        "Global cues read: NEUTRAL",
+        "Macro news sentiment: NEUTRAL"
       ],
-      "invalidation_level": "Above 450.5 (today's session high)",
+      "invalidation_level": "Above 23081.6 (today's session high)",
       "highest_probability_btst_trade": {
         "type": "Put",
         "justification": "MODERATE — 2.0/2.0 pillar weight confirmed."
       },
       "pillar_breakdown": {
         "confirmed_pillars": [
-          "RS vs Nifty (Underperforming -13.17%)",
-          "Macro News: Positive"
+          "GIFT NIFTY Real-Time Futures Correlation"
         ],
-        "pillar_weights": {
-          "Index: Marubozu Close": 0.0,
-          "Index: Relative Strength": 1.0,
-          "Index: Global Cues": 0.0,
-          "Index: Macro News": 1.0,
-          "Index: Derivatives Positioning": 0.0,
-          "Index: Greeks Outlook": 0.0
-        },
-        "rsi": 32.2,
-        "range_position_pct": 6.68,
+        "pillar_weights": {},
+        "rsi": 50.0,
+        "range_position_pct": 50.0,
         "relative_strength": {
-          "rs_diff": -13.17,
-          "data_status": "AVAILABLE"
+          "rs_diff": null,
+          "data_status": "N/A"
         },
         "global_cues": {
-          "verdict": "UNAVAILABLE",
+          "verdict": "NEUTRAL",
           "detail": {}
         },
         "macro_news": {
-          "verdict": "POSITIVE"
+          "verdict": "NEUTRAL"
         },
-        "derivatives": {
-          "verified": false,
-          "reason": "Unable to verify live options chain data.",
-          "pcr": null,
-          "max_pain": null,
-          "oi_buildup": {
-            "verdict": "UNAVAILABLE"
-          },
-          "support_resistance": null,
-          "expected_move": null
-        },
-        "greeks_outlook": {
-          "verified": false,
-          "reason": "Unable to verify live options chain data."
-        }
+        "derivatives": null,
+        "greeks_outlook": null
       },
-      "generated_at": "2026-09-14T21:33:47.134707"
+      "generated_at": "2026-09-24T18:37:01.576423"
     }
   },
   "_meta": {
-    "completed_date": "2026-09-14"
+    "completed_date": "2026-09-24"
   }
 }

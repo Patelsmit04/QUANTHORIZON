@@ -1,0 +1,31 @@
+{
+  "name": "quanthorizon",
+  "version": "1.0.0",
+  "description": "A quantitative algorithmic trading and market intelligence platform for the Indian Equity Markets (National Stock Exchange of India — NSE). TRADEXO scans all 210 NSE F&O Whitelisted stocks and major benchmark indices (NIFTY 50, BANK NIFTY, SENSEX, GIFT NIFTY), combining a 6-pillar technical matrix with institutional block deal tracking, multi-timeframe Smart Money Concepts (SMC), an intraday strategy engine, and transparent mathematical accuracy calibration.",
+  "main": "playwright.config.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e:report": "npx playwright show-report e2e/report",
+    "test:mobile": "npx playwright test e2e/mobile-responsive.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Patelsmit04/QUANTHORIZON.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Patelsmit04/QUANTHORIZON/issues"
+  },
+  "homepage": "https://github.com/Patelsmit04/QUANTHORIZON#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}

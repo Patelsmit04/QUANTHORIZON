@@ -30,8 +30,22 @@ def test_smc_pivots_right_confirmation_no_repainting():
     df.iloc[15, df.columns.get_loc("High")] = 200.0
     pivots = smc_helpers.find_swing_pivots(df, left=2, right=2)
     sh_indices = [p["index"] for p in pivots["swing_highs"]]
+    # Pivot at 15 should be detected (library or fallback)
     assert 15 in sh_indices
-    # Pivot at 15 is only detected because n=30 > 15 + right (no lookahead beyond dataframe)
+
+def test_smc_pivots_return_format():
+    """Verify pivot return format is {swing_highs: [{index, price}, ...], swing_lows: [...]}."""
+    df = create_synthetic_ohlcv(40)
+    pivots = smc_helpers.find_swing_pivots(df, left=2, right=2)
+    assert isinstance(pivots, dict)
+    assert "swing_highs" in pivots
+    assert "swing_lows" in pivots
+    for p in pivots["swing_highs"]:
+        assert "index" in p
+        assert "price" in p
+    for p in pivots["swing_lows"]:
+        assert "index" in p
+        assert "price" in p
 
 def test_smc_strategy_evaluation():
     df = create_synthetic_ohlcv(40, "bullish")
@@ -39,6 +53,53 @@ def test_smc_strategy_evaluation():
     assert "strategy_id" in res
     assert res["strategy_id"] == "smc-institutional-v1"
     assert "signal" in res
+
+def test_smc_market_structure_returns_valid():
+    """detect_market_structure should return None or a valid structure string."""
+    df = create_synthetic_ohlcv(50, "bullish")
+    result = smc_helpers.detect_market_structure(df)
+    valid = {None, "bullish_bos", "bearish_bos", "bullish_choch", "bearish_choch"}
+    assert result in valid
+
+def test_smc_liquidity_sweep_returns_valid():
+    """detect_liquidity_sweep should return None or a valid sweep string."""
+    df = create_synthetic_ohlcv(50)
+    result = smc_helpers.detect_liquidity_sweep(df)
+    valid = {None, "buy_side_swept", "sell_side_swept"}
+    assert result in valid
+
+def test_smc_order_block_returns_valid():
+    """find_nearest_order_block should return None or dict with level/invalidation."""
+    df = create_synthetic_ohlcv(50, "bullish")
+    result = smc_helpers.find_nearest_order_block(df, direction="bullish_bos")
+    if result is not None:
+        assert "level" in result
+        assert "invalidation" in result
+
+def test_smc_fvg_returns_valid():
+    """find_nearest_fvg should return None or dict with level/invalidation."""
+    df = create_synthetic_ohlcv(50, "bullish")
+    result = smc_helpers.find_nearest_fvg(df, direction="bullish_bos")
+    if result is not None:
+        assert "level" in result
+        assert "invalidation" in result
+
+def test_smc_premium_discount_zone():
+    """premium_discount_zone should return one of premium/discount/equilibrium."""
+    df = create_synthetic_ohlcv(30)
+    result = smc_helpers.premium_discount_zone(df)
+    assert result in {"premium", "discount", "equilibrium"}
+
+def test_smc_distance_pct():
+    """distance_pct utility should calculate correctly."""
+    assert smc_helpers.distance_pct(100, 102) == 2.0
+    assert smc_helpers.distance_pct(100, 98) == 2.0
+    assert smc_helpers.distance_pct(0, 100) == 1.5  # edge case
+    assert smc_helpers.distance_pct(None, 100) == 1.5
+
+def test_smc_library_available():
+    """Verify that the smartmoneyconcepts library is installed and importable."""
+    assert smc_helpers._HAS_SMC_LIB is True, "smartmoneyconcepts library not installed"
 
 def test_strategy_a_vwap_pullback():
     df = create_synthetic_ohlcv(30, "bullish")

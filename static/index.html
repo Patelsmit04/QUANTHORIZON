@@ -18,7 +18,7 @@
 
     <!-- Google Fonts: Inter & JetBrains Mono (Institutional Typography) -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
     </style>
@@ -37,12 +37,41 @@
     <!-- FontAwesome Icons Fallback -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- TradingView Lightweight Charts (M6) with CDN Fallback -->
-    <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+    <!-- TradingView Lightweight Charts v4.2.0 (stable) with CDN Fallback -->
+    <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
     <script>
         if (!window.LightweightCharts) {
-            document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');
+            document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"><\/script>');
         }
+    </script>
+
+    <!-- Sentry Browser SDK — Error Tracking & Observability (CDN, no build step) -->
+    <script src="https://browser.sentry-cdn.com/8.40.0/bundle.tracing.min.js" crossorigin="anonymous"></script>
+    <script>
+        // Initialize Sentry lazily: fetch DSN from backend to avoid hardcoding secrets in HTML.
+        // If SENTRY_DSN is not configured on the backend, this is a complete no-op.
+        (function() {
+            if (!window.Sentry) return;
+            fetch('/api/sentry_dsn').then(function(r) { return r.json(); }).then(function(cfg) {
+                if (cfg && cfg.dsn) {
+                    Sentry.init({
+                        dsn: cfg.dsn,
+                        environment: cfg.environment || 'production',
+                        release: cfg.release || 'quanthorizon@1.0.0',
+                        tracesSampleRate: 0.1,
+                        ignoreErrors: [
+                            'ResizeObserver loop',
+                            'ResizeObserver loop completed with undelivered notifications',
+                            'Non-Error promise rejection',
+                            'ChunkLoadError',
+                            'NetworkError',
+                            'Load failed',
+                        ],
+                    });
+                    console.log('[Sentry] Frontend error tracking initialized.');
+                }
+            }).catch(function() { /* Sentry config not available — no-op */ });
+        })();
     </script>
 
     <!-- Institutional Theme Initialization (Defaults to Champagne Gold Dark Mode) -->
@@ -63,8 +92,8 @@
     </script>
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/styles.css?v=48.0.0">
-    <link rel="stylesheet" href="/static/mobile-audit.css?v=48.0.0">
+    <link rel="stylesheet" href="/static/styles.css?v=53.0.0">
+    <link rel="stylesheet" href="/static/mobile-audit.css?v=53.0.0">
 
 </head>
 <body>
@@ -97,81 +126,85 @@
                     <img src="/static/logo_tx_transparent.png" alt="TRADEXO Logo">
                 </div>
                 <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar" aria-label="Collapse sidebar">
-                    <i class="fa-solid fa-angles-left"></i>
+                    <i data-lucide="chevrons-left" class="lucide-sm"></i>
                 </button>
                 <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">
-                    <i class="fa-solid fa-xmark"></i>
+                    <i data-lucide="x" class="lucide-sm"></i>
                 </button>
             </div>
             <nav class="sidebar-nav" id="sidebarNav">
                 <button class="sidebar-nav-item active" data-section="scanner" title="Scanner">
-                    <i class="fa-solid fa-crosshairs"></i>
+                    <i data-lucide="crosshair" class="lucide-sm"></i>
                     <span class="nav-label">Scanner</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="indices" title="Index Intelligence">
-                    <i class="fa-solid fa-chart-column"></i>
+                    <i data-lucide="bar-chart-2" class="lucide-sm"></i>
                     <span class="nav-label">Index Intelligence</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="liveTrades" title="Live Trade">
-                    <i class="fa-solid fa-chart-line text-gold"></i>
+                    <i data-lucide="trending-up" class="lucide-sm text-gold"></i>
                     <span class="nav-label">Live Trade</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="paperTrading" title="Paper Trading Portfolio">
-                    <i class="fa-solid fa-wallet text-gold"></i>
+                    <i data-lucide="wallet" class="lucide-sm text-gold"></i>
                     <span class="nav-label">Paper Portfolio</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="strategies" title="Strategies">
-                    <i class="fa-solid fa-sliders"></i>
+                    <i data-lucide="sliders" class="lucide-sm"></i>
                     <span class="nav-label">Strategies</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="stocksNews" title="Stocks News">
-                    <i class="fa-solid fa-arrow-trend-up"></i>
+                    <i data-lucide="trending-up" class="lucide-sm"></i>
                     <span class="nav-label">Stocks News</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="globalNews" title="Global & Macro News">
-                    <i class="fa-solid fa-globe"></i>
+                    <i data-lucide="globe" class="lucide-sm"></i>
                     <span class="nav-label">Global &amp; Macro News</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="institutionalFlow" title="Institutional Flow">
-                    <i class="fa-solid fa-building-columns"></i>
+                    <i data-lucide="landmark" class="lucide-sm"></i>
                     <span class="nav-label">Institutional Flow</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="orderFlow" title="Order Flow">
-                    <i class="fa-solid fa-bolt text-gold"></i>
+                    <i data-lucide="zap" class="lucide-sm text-gold"></i>
                     <span class="nav-label">Order Flow</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="accuracy" title="Accuracy & Win Rate">
-                    <i class="fa-solid fa-bullseye text-gold"></i>
+                    <i data-lucide="target" class="lucide-sm text-gold"></i>
                     <span class="nav-label">Accuracy &amp; Win Rate</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="history" title="History & Calibration">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <i data-lucide="history" class="lucide-sm"></i>
                     <span class="nav-label">History &amp; Calibration</span>
                 </button>
                 <button class="sidebar-nav-item" data-section="systemHealth" title="System Health & Diagnostics">
-                    <i class="fa-solid fa-heart-pulse text-gold"></i>
+                    <i data-lucide="activity" class="lucide-sm text-gold"></i>
                     <span class="nav-label">System Health</span>
                 </button>
 
                 <div class="sidebar-nav-divider"></div>
 
-                <button class="sidebar-nav-item" data-section="guide" title="Guide / Export / Settings">
-                    <i class="fa-solid fa-gear"></i>
-                    <span class="nav-label">Guide / Export / Settings</span>
+                <button class="sidebar-nav-item" data-section="guide" title="Guide &amp; Documentation">
+                    <i data-lucide="book-open" class="lucide-sm"></i>
+                    <span class="nav-label">Guide &amp; Docs</span>
                 </button>
-                <button class="sidebar-nav-item" data-section="rules" title="Rules">
-                    <i class="fa-solid fa-scale-balanced"></i>
+                <button class="sidebar-nav-item" data-section="rules" title="Rules &amp; Scoring Logic">
+                    <i data-lucide="scale" class="lucide-sm"></i>
                     <span class="nav-label">Rules</span>
+                </button>
+                <button class="sidebar-nav-item" data-section="settings" title="Preferences &amp; System Settings">
+                    <i data-lucide="settings" class="lucide-sm text-gold"></i>
+                    <span class="nav-label">Settings</span>
                 </button>
 
             </nav>
 
             <div class="sidebar-footer">
                 <button class="sidebar-watch-intro-link" id="sidebarWatchIntroBtn" style="background:none;border:none;color:var(--gold,#f59e0b);font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;margin-bottom:8px;">
-                    <i class="fa-solid fa-circle-play"></i> Watch Platform Intro
+                    <i data-lucide="play-circle" class="lucide-sm"></i> Watch Platform Intro
                 </button>
                 <div class="paper-trade-badge">
-                    <i class="fa-solid fa-circle-info"></i> PAPER / SIMULATED ONLY — no real money moves through this system.
+                    <i data-lucide="info" class="lucide-sm"></i> PAPER / SIMULATED ONLY — no real money moves through this system.
                 </div>
             </div>
         </aside>
@@ -183,10 +216,13 @@
             <!-- Sticky Content Top Bar -->
             <header class="content-topbar">
                 <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
-                    <i class="fa-solid fa-bars"></i>
+                    <i data-lucide="menu" class="lucide-sm"></i>
                 </button>
 
                 <div class="topbar-brand">
+                    <div class="app-logo-frame sm topbar-logo-symbol" title="TRADEXO">
+                        <img src="/static/logo_tx_transparent.png" alt="TRADEXO Logo">
+                    </div>
                     <h1 class="topbar-tradexo-heading">
                         <span class="tradexo-trade">TRADE</span><span class="tradexo-xo">XO</span>
                     </h1>
@@ -198,13 +234,13 @@
                 <div class="header-actions">
 
                     <button id="winRateBtn" class="btn btn-secondary winrate-topbar-btn" title="View BTST Win Rate Analytics">
-                        <i class="fa-solid fa-chart-pie text-sub"></i>
+                        <i data-lucide="pie-chart" class="lucide-sm text-sub"></i>
                         <span>WIN RATE: <strong id="headerWinRateText">--%</strong></span>
                     </button>
 
                     <div class="notif-bell-wrap">
                         <button id="notifBell" class="btn-icon" title="Notifications" aria-label="Notifications">
-                            <i class="fa-solid fa-bell"></i>
+                            <i data-lucide="bell" class="lucide-sm"></i>
                             <span class="notif-badge hidden" id="notifBadge">0</span>
                         </button>
                     </div>
@@ -234,7 +270,7 @@
                 </div>
                 <div class="notif-push-toggle-card">
                     <div class="notif-push-toggle-content">
-                        <div class="notif-push-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+                        <div class="notif-push-icon"><i data-lucide="smartphone" class="lucide-sm"></i></div>
                         <div class="notif-push-text">
                             <strong>Lock-Screen Alerts</strong>
                             <span>Native phone alerts for Priority 1 setups</span>
@@ -246,7 +282,7 @@
                 </div>
                 <div style="padding: 6px 14px; display: flex; justify-content: flex-end; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.02);">
                     <button id="sendTestAlertBtn" class="btn btn-xs btn-pill btn-secondary" style="font-size: 11px; padding: 4px 10px;">
-                        <i class="fa-solid fa-paper-plane text-gold"></i> Send Test Alert
+                        <i data-lucide="send" class="lucide-sm text-gold"></i> Send Test Alert
                     </button>
                 </div>
                 <div id="notifList"><div class="notif-empty">No notifications yet.</div></div>
@@ -259,18 +295,18 @@
             <div id="dashboardSection">
 
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-table-cells text-gold"></i> DASHBOARD
+                    <h2 class="section-page-title"><i data-lucide="layout-grid" class="lucide-sm text-gold"></i> DASHBOARD
                         <span class="section-page-subtitle">Live Accuracy, Priority Mix &amp; Today's Snapshot</span>
                     </h2>
                     <div class="dashboard-heading-actions">
                         <button id="exportCsvBtn" class="btn btn-secondary" title="Export Watchlist to CSV">
-                            <i class="fa-solid fa-file-csv"></i><span>CSV</span>
+                            <i data-lucide="file-spreadsheet" class="lucide-sm"></i><span>CSV</span>
                         </button>
                         <button id="btnOrderBasket" class="btn btn-gold" title="Copy BTST/STBT Order Slips">
-                            <i class="fa-solid fa-list-check"></i><span class="btn-text-full">ORDER BASKET</span><span class="btn-text-mobile">BASKET</span>
+                            <i data-lucide="shopping-bag" class="lucide-sm"></i><span class="btn-text-full">ORDER BASKET</span><span class="btn-text-mobile">BASKET</span>
                         </button>
                         <button id="scanBtn" class="btn btn-primary scan-hero-btn">
-                            <i class="fa-solid fa-rotate"></i><span>SCAN NOW</span>
+                            <i data-lucide="refresh-cw" class="lucide-sm"></i><span>SCAN NOW</span>
                         </button>
                     </div>
                 </div>
@@ -282,7 +318,7 @@
                     <div class="metric-card" id="metricCardTotalScanned">
                         <div class="metric-header">
                             <span class="metric-title">TOTAL SCANNED</span>
-                            <div class="card-icon-bubble text-gold"><i class="fa-solid fa-list-check"></i></div>
+                            <div class="card-icon-bubble text-gold"><i data-lucide="shopping-bag" class="lucide-sm"></i></div>
                         </div>
                         <div class="metric-body">
                             <span id="totalScanned" class="metric-value">0</span>
@@ -294,7 +330,7 @@
                     <div class="metric-card card-p1" id="metricCardPriority1">
                         <div class="metric-header">
                             <span class="metric-title">P1 HIGH CONVICTION</span>
-                            <div class="card-icon-bubble text-gold"><i class="fa-solid fa-bolt"></i></div>
+                            <div class="card-icon-bubble text-gold"><i data-lucide="zap" class="lucide-sm"></i></div>
                         </div>
                         <div class="metric-body">
                             <span id="priority1Count" class="metric-value text-gold">0</span>
@@ -306,7 +342,7 @@
                     <div class="metric-card card-bullish" id="metricCardBtst">
                         <div class="metric-header">
                             <span class="metric-title">BTST CALLS (CE)</span>
-                            <div class="card-icon-bubble text-bullish"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                            <div class="card-icon-bubble text-bullish"><i data-lucide="trending-up" class="lucide-sm"></i></div>
                         </div>
                         <div class="metric-body">
                             <span id="btstCount" class="metric-value text-bullish">0</span>
@@ -318,7 +354,7 @@
                     <div class="metric-card card-bearish" id="metricCardStbt">
                         <div class="metric-header">
                             <span class="metric-title">STBT PUTS (PE)</span>
-                            <div class="card-icon-bubble text-bearish"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                            <div class="card-icon-bubble text-bearish"><i data-lucide="trending-down" class="lucide-sm"></i></div>
                         </div>
                         <div class="metric-body">
                             <span id="stbtCount" class="metric-value text-bearish">0</span>
@@ -337,7 +373,7 @@
             <div id="scannerSection">
 
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-crosshairs text-gold"></i> SIGNALS ENGINE
+                    <h2 class="section-page-title"><i data-lucide="crosshair" class="lucide-sm text-gold"></i> SIGNALS ENGINE
                         <span class="section-page-subtitle">Live-Ranked BTST/STBT Setups &amp; 230+ F&amp;O Live Stock Feed</span>
                     </h2>
                 </div>
@@ -346,25 +382,25 @@
 
                 <div class="index-section-switcher" id="stockSectionSwitcher" style="margin-top:8px;margin-bottom:14px;">
                     <button class="index-tab-btn active" data-stock-view="intelligence" id="stockViewIntelligenceBtn">
-                        <i class="fa-solid fa-brain"></i> BTST Stocks
+                        <i data-lucide="cpu" class="lucide-sm"></i> BTST Stocks
                     </button>
                     <button class="index-tab-btn" data-stock-view="live" id="stockViewLiveBtn">
-                        <i class="fa-solid fa-signal"></i> LIVE Stocks
+                        <i data-lucide="activity" class="lucide-sm"></i> LIVE Stocks
                     </button>
                 </div>
 
                 <!-- 3:14 - 3:30 PM Closing Sequence Progress Stepper Widget -->
                 <div class="closing-sequence-stepper hidden" id="closingSequenceStepper" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(15,23,42,0.05);">
                     <div style="font-size:12px;font-weight:800;color:#d97706;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
-                        <span><i class="fa-solid fa-clock-rotate-left"></i> 3:14 – 3:30 PM CLOSING LOCK SEQUENCE</span>
+                        <span><i data-lucide="history" class="lucide-sm"></i> 3:14 – 3:30 PM CLOSING LOCK SEQUENCE</span>
                         <span id="closingSequenceStatusText" style="color:#64748b;font-size:11px;font-weight:600;">Monitoring...</span>
                     </div>
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11px;font-weight:700;flex-wrap:wrap;">
-                        <span class="step-badge" id="stepSnapshot" style="padding:4px 10px;border-radius:6px;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;"><i class="fa-solid fa-camera"></i> 3:14 PM Snapshot</span>
-                        <i class="fa-solid fa-chevron-right" style="color:#94a3b8;"></i>
-                        <span class="step-badge" id="stepCas" style="padding:4px 10px;border-radius:6px;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;"><i class="fa-solid fa-clock"></i> 3:25 PM Auto-Lock</span>
-                        <i class="fa-solid fa-chevron-right" style="color:#94a3b8;"></i>
-                        <span class="step-badge" id="stepLock" style="padding:4px 10px;border-radius:6px;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;"><i class="fa-solid fa-lock"></i> 3:30 PM Market Bell Lock</span>
+                        <span class="step-badge" id="stepSnapshot" style="padding:4px 10px;border-radius:6px;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;"><i data-lucide="camera" class="lucide-sm"></i> 3:14 PM Snapshot</span>
+                        <i data-lucide="chevron-right" class="lucide-sm" style="color:#94a3b8;"></i>
+                        <span class="step-badge" id="stepCas" style="padding:4px 10px;border-radius:6px;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;"><i data-lucide="clock" class="lucide-sm"></i> 3:25 PM Auto-Lock</span>
+                        <i data-lucide="chevron-right" class="lucide-sm" style="color:#94a3b8;"></i>
+                        <span class="step-badge" id="stepLock" style="padding:4px 10px;border-radius:6px;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;"><i data-lucide="lock" class="lucide-sm"></i> 3:30 PM Market Bell Lock</span>
                     </div>
                 </div>
 
@@ -375,42 +411,59 @@
                     <!-- REQ-SCAN-003: Multi-filter toolbar (ALL, P1 HIGH CONVICTION, P2 MEDIUM, BTST, STBT, TOP 5 ONLY) -->
                     <div class="filter-group filter-tabs" id="scannerFilterTabs">
                         <button type="button" class="filter-chip active" data-filter="ALL" id="filterAllBtn">
-                            <i class="fa-solid fa-layer-group"></i> ALL
+                            <i data-lucide="layers" class="lucide-sm"></i> ALL
                         </button>
                         <button type="button" class="filter-chip" data-filter="P1" id="filterP1Btn">
-                            <i class="fa-solid fa-bolt text-gold"></i> P1 HIGH CONVICTION
+                            <i data-lucide="zap" class="lucide-sm text-gold"></i> P1 HIGH CONVICTION
                         </button>
                         <button type="button" class="filter-chip" data-filter="P2" id="filterP2Btn">
-                            <i class="fa-solid fa-shield-halved"></i> P2 MEDIUM
+                            <i data-lucide="shield" class="lucide-sm"></i> P2 MEDIUM
                         </button>
                         <button type="button" class="filter-chip" data-filter="BTST" id="filterBtstBtn">
-                            <i class="fa-solid fa-arrow-trend-up text-bullish"></i> BTST (BUY)
+                            <i data-lucide="trending-up" class="lucide-sm text-bullish"></i> BTST (BUY)
                         </button>
                         <button type="button" class="filter-chip" data-filter="STBT" id="filterStbtBtn">
-                            <i class="fa-solid fa-arrow-trend-down text-bearish"></i> STBT (SELL)
+                            <i data-lucide="trending-down" class="lucide-sm text-bearish"></i> STBT (SELL)
                         </button>
                         <button type="button" class="filter-chip" data-filter="TOP5" id="filterTop5Btn">
-                            <i class="fa-solid fa-crown text-gold"></i> TOP 5 ONLY
+                            <i data-lucide="crown" class="lucide-sm text-gold"></i> TOP 5 ONLY
                         </button>
                     </div>
 
                     <div class="toolbar-controls-row">
                         <div class="search-box">
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <i data-lucide="search" class="lucide-sm"></i>
                             <input type="text" id="searchInput" placeholder="Search Ticker (e.g. RELIANCE)...">
+                            <span class="search-count-badge" id="visibleCount">-- Stocks</span>
+                            <button type="button" id="clearSearchBtn" class="search-clear-btn hidden" aria-label="Clear search">
+                                <i data-lucide="x" class="lucide-xs"></i>
+                            </button>
                         </div>
 
-                        <div class="sort-box">
-                            <i class="fa-solid fa-sort"></i>
-                            <select id="sortSelect" aria-label="Sort stocks">
-                                <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
-                                <option value="GAINERS_DESC">Sort: Top Gainers (+% Change)</option>
-                                <option value="LOSERS_ASC">Sort: Top Losers (-% Change)</option>
-                                <option value="SCORE_DESC">Sort: Highest Confidence %</option>
-                                <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
-                                <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
-                                <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
-                            </select>
+                        <div class="toolbar-right-cluster">
+                            <div class="sort-box compact-sort-box" title="Sort active watchlist">
+                                <i data-lucide="arrow-up-down" class="lucide-sm text-gold"></i>
+                                <select id="sortSelect" aria-label="Sort stocks">
+                                    <option value="RANK_ASC">Sort: Priority Rank (#1 → #N)</option>
+                                    <option value="GAINERS_DESC">Sort: Top Gainers (+% Change)</option>
+                                    <option value="LOSERS_ASC">Sort: Top Losers (-% Change)</option>
+                                    <option value="SCORE_DESC">Sort: Highest Confidence %</option>
+                                    <option value="VOL_DESC">Sort: Volume Surge Ratio</option>
+                                    <option value="RSI_DESC">Sort: RSI (Strongest Momentum)</option>
+                                    <option value="GAP_DESC">Sort: Est. Overnight Gap %</option>
+                                    <option value="LTP_DESC">Sort: Highest Price (LTP)</option>
+                                    <option value="TICKER_ASC">Sort: Alphabetical (A → Z)</option>
+                                </select>
+                            </div>
+
+                            <div class="density-segmented-toggle" id="tableDensityToggle" role="group" aria-label="Table display density">
+                                <button type="button" class="density-btn active" data-density="compact" id="densityCompactBtn" title="Compact View (9 Core Columns, Kite Density)">
+                                    <i data-lucide="align-justify" class="lucide-xs"></i> <span>Compact</span>
+                                </button>
+                                <button type="button" class="density-btn" data-density="comfortable" id="densityComfortableBtn" title="Comfortable View (12-Column Full Matrix)">
+                                    <i data-lucide="layout-grid" class="lucide-xs"></i> <span>Matrix</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -419,26 +472,116 @@
                 <!-- Dynamic Stocks Data Table -->
                 <section class="table-container">
                     <div class="table-scroll" id="btstTableWrapper">
-                        <table class="data-table" id="scannerDataTable">
+                        <table class="data-table density-compact" id="scannerDataTable">
                             <thead>
                                 <tr>
-                                    <th>RANK</th>
-                                    <th>TICKER</th>
-                                    <th>SIGNAL</th>
-                                    <th>OPTION TYPE</th>
-                                    <th>PRIORITY LEVEL</th>
-                                    <th>CONFIDENCE SCORE</th>
-                                    <th>EST. OVERNIGHT GAP</th>
-                                    <th>LTP</th>
-                                    <th>CHANGE (+/-)</th>
-                                    <th>VOL SURGE</th>
-                                    <th>RSI</th>
-                                    <th>5-PILLAR WEIGHT</th>
+                                    <th data-sort-key="rank" class="sortable-th" title="Click to sort by Priority Rank">RANK <span class="th-sort-icon"></span></th>
+                                    <th data-sort-key="ticker" class="sortable-th" title="Click to sort by Ticker Symbol">TICKER <span class="th-sort-icon"></span></th>
+                                    <th data-sort-key="signal" class="sortable-th" title="Click to sort by Signal">SIGNAL <span class="th-sort-icon"></span></th>
+                                    <th class="col-secondary" data-col="option" data-label="OPTION TYPE">OPTION</th>
+                                    <th data-sort-key="priority" class="sortable-th" title="Click to sort by Priority Conviction">PRIORITY <span class="th-sort-icon"></span></th>
+                                    <th data-sort-key="score" class="sortable-th" title="Click to sort by Confidence Score">CONF. SCORE <span class="th-sort-icon"></span></th>
+                                    <th data-sort-key="gap" class="sortable-th" title="Click to sort by Estimated Gap %">EST. GAP <span class="th-sort-icon"></span></th>
+                                    <th data-sort-key="ltp" class="sortable-th" title="Click to sort by Last Traded Price">LTP <span class="th-sort-icon"></span></th>
+                                    <th data-sort-key="change" class="sortable-th" title="Click to sort by Price Change %">CHANGE <span class="th-sort-icon"></span></th>
+                                    <th data-sort-key="vol" class="sortable-th" title="Click to sort by Volume Surge Ratio">VOL SURGE <span class="th-sort-icon"></span></th>
+                                    <th class="col-secondary sortable-th" data-col="rsi" data-sort-key="rsi" data-label="RSI" title="Click to sort by RSI">RSI <span class="th-sort-icon"></span></th>
+                                    <th class="col-secondary" data-col="weight" data-label="PILLAR WEIGHT">5-PILLAR WT</th>
                                     <th>ACTION</th>
                                 </tr>
                             </thead>
                             <tbody id="stocksTableBody">
-                                <!-- Dynamic Rows Injected by JS -->
+                                <!-- Initial Skeleton Loading Rows -->
+                                <tr class="skeleton-row">
+                                    <td><span class="skeleton-shimmer" style="width:24px;height:16px;"></span></td>
+                                    <td><div style="display:flex;align-items:center;gap:8px;"><span class="skeleton-shimmer" style="width:28px;height:28px;border-radius:50%;"></span><div style="display:flex;flex-direction:column;gap:4px;"><span class="skeleton-shimmer" style="width:68px;height:14px;"></span><span class="skeleton-shimmer" style="width:40px;height:10px;"></span></div></div></td>
+                                    <td><span class="skeleton-shimmer" style="width:58px;height:22px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:68px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:48px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:54px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:64px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:56px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:42px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:36px;height:18px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:70px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:26px;border-radius:6px;"></span></td>
+                                </tr>
+                                <tr class="skeleton-row">
+                                    <td><span class="skeleton-shimmer" style="width:24px;height:16px;"></span></td>
+                                    <td><div style="display:flex;align-items:center;gap:8px;"><span class="skeleton-shimmer" style="width:28px;height:28px;border-radius:50%;"></span><div style="display:flex;flex-direction:column;gap:4px;"><span class="skeleton-shimmer" style="width:76px;height:14px;"></span><span class="skeleton-shimmer" style="width:44px;height:10px;"></span></div></div></td>
+                                    <td><span class="skeleton-shimmer" style="width:58px;height:22px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:68px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:48px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:54px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:64px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:56px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:42px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:36px;height:18px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:70px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:26px;border-radius:6px;"></span></td>
+                                </tr>
+                                <tr class="skeleton-row">
+                                    <td><span class="skeleton-shimmer" style="width:24px;height:16px;"></span></td>
+                                    <td><div style="display:flex;align-items:center;gap:8px;"><span class="skeleton-shimmer" style="width:28px;height:28px;border-radius:50%;"></span><div style="display:flex;flex-direction:column;gap:4px;"><span class="skeleton-shimmer" style="width:62px;height:14px;"></span><span class="skeleton-shimmer" style="width:36px;height:10px;"></span></div></div></td>
+                                    <td><span class="skeleton-shimmer" style="width:58px;height:22px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:68px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:48px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:54px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:64px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:56px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:42px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:36px;height:18px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:70px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:26px;border-radius:6px;"></span></td>
+                                </tr>
+                                <tr class="skeleton-row">
+                                    <td><span class="skeleton-shimmer" style="width:24px;height:16px;"></span></td>
+                                    <td><div style="display:flex;align-items:center;gap:8px;"><span class="skeleton-shimmer" style="width:28px;height:28px;border-radius:50%;"></span><div style="display:flex;flex-direction:column;gap:4px;"><span class="skeleton-shimmer" style="width:70px;height:14px;"></span><span class="skeleton-shimmer" style="width:42px;height:10px;"></span></div></div></td>
+                                    <td><span class="skeleton-shimmer" style="width:58px;height:22px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:68px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:48px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:54px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:64px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:56px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:42px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:36px;height:18px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:70px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:26px;border-radius:6px;"></span></td>
+                                </tr>
+                                <tr class="skeleton-row">
+                                    <td><span class="skeleton-shimmer" style="width:24px;height:16px;"></span></td>
+                                    <td><div style="display:flex;align-items:center;gap:8px;"><span class="skeleton-shimmer" style="width:28px;height:28px;border-radius:50%;"></span><div style="display:flex;flex-direction:column;gap:4px;"><span class="skeleton-shimmer" style="width:66px;height:14px;"></span><span class="skeleton-shimmer" style="width:38px;height:10px;"></span></div></div></td>
+                                    <td><span class="skeleton-shimmer" style="width:58px;height:22px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:68px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:48px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:54px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:64px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:56px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:42px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:36px;height:18px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:70px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:26px;border-radius:6px;"></span></td>
+                                </tr>
+                                <tr class="skeleton-row">
+                                    <td><span class="skeleton-shimmer" style="width:24px;height:16px;"></span></td>
+                                    <td><div style="display:flex;align-items:center;gap:8px;"><span class="skeleton-shimmer" style="width:28px;height:28px;border-radius:50%;"></span><div style="display:flex;flex-direction:column;gap:4px;"><span class="skeleton-shimmer" style="width:72px;height:14px;"></span><span class="skeleton-shimmer" style="width:40px;height:10px;"></span></div></div></td>
+                                    <td><span class="skeleton-shimmer" style="width:58px;height:22px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:68px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:48px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:54px;height:20px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:64px;height:18px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:56px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:42px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:36px;height:18px;border-radius:12px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:70px;height:16px;"></span></td>
+                                    <td><span class="skeleton-shimmer" style="width:60px;height:26px;border-radius:6px;"></span></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -454,7 +597,7 @@
 
                     <!-- Empty State Display -->
                     <div id="emptyState" class="empty-state hidden">
-                        <i class="fa-solid fa-radar fa-3x"></i>
+                        <i data-lucide="radar" class="lucide-sm lucide-lg"></i>
                         <h3>No Priority Signals Found</h3>
                         <p>Try unchecking "Tier 1 Only" or clicking "SCAN NOW" to fetch fresh market data.</p>
                     </div>
@@ -466,30 +609,30 @@
             <!-- ============================== LIVE TRADE SECTION ============================== -->
             <div id="liveTradesSection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-chart-line text-gold"></i> LIVE TRADE DASHBOARD
-                        <span class="section-page-subtitle">Real-Time Setup Monitoring, Entry/Exit Levels, Trailing Stop &amp; Order Book</span>
+                    <h2 class="section-page-title"><i data-lucide="trending-up" class="lucide-sm text-gold"></i> LIVE TRADE DASHBOARD
+                        <span class="section-page-subtitle">Algorithm-generated live signal tracking &amp; auto-evaluated setups — separate from your virtual Paper Portfolio</span>
                     </h2>
                 </div>
 
                 <!-- 4x Overview Stat Cards Grid -->
                 <div class="stats-overview-grid" style="margin-top:14px;margin-bottom:16px;">
                     <div class="stat-card" style="border-top:3px solid var(--gold, #d4af37);">
-                        <div class="stat-card-title"><i class="fa-solid fa-bolt text-gold"></i> ACTIVE SETUPS</div>
+                        <div class="stat-card-title"><i data-lucide="zap" class="lucide-sm text-gold"></i> ACTIVE SETUPS</div>
                         <div class="stat-card-value text-gold" id="liveActiveCount">0</div>
                         <div class="stat-card-footer">Monitored live with target &amp; stop loss</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #3b82f6;">
-                        <div class="stat-card-title"><i class="fa-solid fa-clock-rotate-left text-cyan"></i> PENDING ORDERS</div>
+                        <div class="stat-card-title"><i data-lucide="history" class="lucide-sm text-cyan"></i> PENDING ORDERS</div>
                         <div class="stat-card-value text-cyan" id="livePendingCount">0</div>
                         <div class="stat-card-footer">Awaiting trigger price or entry</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #10b981;">
-                        <div class="stat-card-title"><i class="fa-solid fa-square-check text-bullish"></i> CLOSED TRADES</div>
+                        <div class="stat-card-title"><i data-lucide="check-square" class="lucide-sm text-bullish"></i> CLOSED TRADES</div>
                         <div class="stat-card-value text-bullish" id="liveClosedCount">0</div>
-                        <div class="stat-card-footer">Completed session trades</div>
+                        <div class="stat-card-footer">Algorithm-evaluated closed signals (auto-graded)</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #8b5cf6;">
-                        <div class="stat-card-title"><i class="fa-solid fa-chart-pie text-gold"></i> WIN RATE</div>
+                        <div class="stat-card-title"><i data-lucide="pie-chart" class="lucide-sm text-gold"></i> WIN RATE</div>
                         <div class="stat-card-value text-gold" id="liveWinRateVal">--%</div>
                         <div class="stat-card-footer">Live session accuracy</div>
                     </div>
@@ -499,27 +642,19 @@
                 <div class="filter-bar sticky-filter-row" style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
                     <div class="filter-group" id="liveTradesFilterGroup">
                         <button class="tab-btn active" id="liveTabActive" data-live-tab="active">
-                            <i class="fa-solid fa-fire text-gold"></i> ALL ACTIVE (<span id="liveActiveBadge">0</span>)
+                            <i data-lucide="flame" class="lucide-sm text-gold"></i> ALL ACTIVE (<span id="liveActiveBadge">0</span>)
                         </button>
                         <button class="tab-btn" id="liveTabBtst" data-live-tab="btst">
-                            <i class="fa-solid fa-arrow-trend-up text-bullish"></i> BTST CALLS
+                            <i data-lucide="trending-up" class="lucide-sm text-bullish"></i> BTST CALLS (<span id="liveBtstBadge">0</span>)
                         </button>
                         <button class="tab-btn" id="liveTabStbt" data-live-tab="stbt">
-                            <i class="fa-solid fa-arrow-trend-down text-bearish"></i> STBT PUTS
+                            <i data-lucide="trending-down" class="lucide-sm text-bearish"></i> STBT PUTS (<span id="liveStbtBadge">0</span>)
                         </button>
                         <button class="tab-btn" id="liveTabPending" data-live-tab="pending">
-                            <i class="fa-solid fa-hourglass-half"></i> PENDING ORDERS
+                            <i data-lucide="hourglass" class="lucide-sm"></i> PENDING ORDERS (<span id="livePendingBadge">0</span>)
                         </button>
                         <button class="tab-btn" id="liveTabClosed" data-live-tab="closed">
-                            <i class="fa-solid fa-receipt"></i> TRADE LOG
-                        </button>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <button type="button" class="btn btn-outline text-gold" onclick="openOptionChainModal('NIFTY')" title="Launch 1-Second NIFTY Option Chain" style="font-size:11.5px;padding:6px 12px;font-weight:700;">
-                            <i class="fa-solid fa-layer-group"></i> NIFTY OPTION CHAIN
-                        </button>
-                        <button type="button" class="btn btn-outline text-gold" onclick="openOptionChainModal('BANKNIFTY')" title="Launch 1-Second BANKNIFTY Option Chain" style="font-size:11.5px;padding:6px 12px;font-weight:700;">
-                            <i class="fa-solid fa-layer-group"></i> BANKNIFTY
+                            <i data-lucide="receipt" class="lucide-sm"></i> TRADE LOG (<span id="liveClosedBadge">0</span>)
                         </button>
                     </div>
                 </div>
@@ -532,16 +667,16 @@
                 <!-- Pending / Closed Table Container -->
                 <div id="liveTableContainer" class="table-container hidden" style="margin-top:4px;">
                     <table class="data-table">
-                        <thead>
-                            <tr>
+                        <thead id="liveTableHead">
+                            <tr id="liveTableHeadRow">
                                 <th>ORDER ID</th>
                                 <th>STOCK</th>
                                 <th>SIGNAL</th>
-                                <th>ENTRY PRICE</th>
-                                <th>TARGET</th>
+                                <th>ENTRY / TRIGGER</th>
+                                <th>TARGET 1</th>
                                 <th>STOP LOSS</th>
-                                <th>P&amp;L</th>
                                 <th>STATUS</th>
+                                <th>ACTION</th>
                             </tr>
                         </thead>
                         <tbody id="liveTableBody">
@@ -555,18 +690,18 @@
             <!-- ============================== PAPER TRADING PORTFOLIO SECTION (Issue 7 Fix) ============================== -->
             <div id="paperTradingSection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-wallet text-gold"></i> PAPER TRADING PORTFOLIO
-                        <span class="section-page-subtitle">Virtual Account Balance, Live Mark-to-Market P&amp;L, Positions &amp; Closed Trades</span>
+                    <h2 class="section-page-title"><i data-lucide="wallet" class="lucide-sm text-gold"></i> PAPER TRADING PORTFOLIO
+                        <span class="section-page-subtitle">Your manually-placed virtual trades &amp; simulated positions — separate from the algorithm's auto-tracked Live Trade signals</span>
                     </h2>
                     <div class="dashboard-heading-actions" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                         <button id="btnPaperEquityTrade" class="btn btn-pill btn-secondary" onclick="openOrderTicketModal({ symbol: 'RELIANCE', entry_price: 2980, is_equity: true })" title="Open Equity Order Ticket">
-                            <i class="fa-solid fa-arrow-trend-up text-cyan"></i><span>EQUITY TICKET</span>
+                            <i data-lucide="trending-up" class="lucide-sm text-cyan"></i><span>EQUITY TICKET</span>
                         </button>
                         <button id="btnPaperNewTrade" class="btn btn-pill btn-gold" title="Open Virtual Options Demo Trade Modal">
-                            <i class="fa-solid fa-plus"></i><span>NEW OPTION TRADE</span>
+                            <i data-lucide="plus" class="lucide-sm"></i><span>NEW OPTION TRADE</span>
                         </button>
                         <button id="resetPaperAccountBtn" class="btn btn-pill btn-secondary" title="Reset virtual account balance to ₹10,00,000">
-                            <i class="fa-solid fa-rotate-left"></i><span>RESET ₹10L CAPITAL</span>
+                            <i data-lucide="rotate-ccw" class="lucide-sm"></i><span>RESET ₹10L CAPITAL</span>
                         </button>
                     </div>
                 </div>
@@ -574,42 +709,42 @@
                 <!-- 8x Portfolio Overview Stat Cards Grid (REQ-PTR-001) -->
                 <div class="stats-overview-grid" style="margin-top:14px;margin-bottom:16px;">
                     <div class="stat-card" style="border-top:3px solid var(--gold, #d4af37);">
-                        <div class="stat-card-title"><i class="fa-solid fa-chart-pie text-gold"></i> TOTAL EQUITY</div>
+                        <div class="stat-card-title"><i data-lucide="pie-chart" class="lucide-sm text-gold"></i> TOTAL EQUITY</div>
                         <div class="stat-card-value text-gold" id="paperTotalEquity">₹10,00,000.00</div>
                         <div class="stat-card-footer">Starting Capital: ₹10,00,000</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #3b82f6;">
-                        <div class="stat-card-title"><i class="fa-solid fa-vault text-cyan"></i> AVAILABLE CASH</div>
+                        <div class="stat-card-title"><i data-lucide="lock" class="lucide-sm text-cyan"></i> AVAILABLE CASH</div>
                         <div class="stat-card-value text-cyan" id="paperCashBalance">₹10,00,000.00</div>
                         <div class="stat-card-footer">Available for new trades</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #6366f1;">
-                        <div class="stat-card-title"><i class="fa-solid fa-coins text-gold"></i> INVESTED MARGIN</div>
+                        <div class="stat-card-title"><i data-lucide="coins" class="lucide-sm text-gold"></i> INVESTED MARGIN</div>
                         <div class="stat-card-value text-gold" id="paperInvestedMargin">₹0.00</div>
                         <div class="stat-card-footer">Capital locked in open positions</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #10b981;">
-                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-up text-bullish"></i> UNREALIZED MTM P&amp;L</div>
+                        <div class="stat-card-title"><i data-lucide="trending-up" class="lucide-sm text-bullish"></i> UNREALIZED MTM P&amp;L</div>
                         <div class="stat-card-value text-bullish" id="paperUnrealizedPnl">+₹0.00</div>
                         <div class="stat-card-footer">Active open positions live mark</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #8b5cf6;">
-                        <div class="stat-card-title"><i class="fa-solid fa-sack-dollar text-gold"></i> REALIZED P&amp;L</div>
+                        <div class="stat-card-title"><i data-lucide="circle-dollar-sign" class="lucide-sm text-gold"></i> REALIZED P&amp;L</div>
                         <div class="stat-card-value text-gold" id="paperRealizedPnl">₹0.00</div>
                         <div class="stat-card-footer">Booked profit / loss from closed trades</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #ec4899;">
-                        <div class="stat-card-title"><i class="fa-solid fa-receipt text-cyan"></i> TOTAL BROKERAGE PAID</div>
+                        <div class="stat-card-title"><i data-lucide="receipt" class="lucide-sm text-cyan"></i> TOTAL BROKERAGE PAID</div>
                         <div class="stat-card-value text-cyan" id="paperBrokeragePaid">₹0.00</div>
                         <div class="stat-card-footer">Regulatory charges &amp; brokerage</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #06b6d4;">
-                        <div class="stat-card-title"><i class="fa-solid fa-bullseye text-cyan"></i> WIN RATE</div>
+                        <div class="stat-card-title"><i data-lucide="target" class="lucide-sm text-cyan"></i> WIN RATE</div>
                         <div class="stat-card-value text-cyan" id="paperWinRate">--%</div>
                         <div class="stat-card-footer"><span id="paperWinningTradesCount">0</span> winning / <span id="paperTotalTradesCount">0</span> closed</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #eab308;">
-                        <div class="stat-card-title"><i class="fa-solid fa-percent text-gold"></i> TOTAL RETURN</div>
+                        <div class="stat-card-title"><i data-lucide="percent" class="lucide-sm text-gold"></i> TOTAL RETURN</div>
                         <div class="stat-card-value text-gold" id="paperTotalReturn">0.00%</div>
                         <div class="stat-card-footer">Net virtual account ROI</div>
                     </div>
@@ -618,7 +753,7 @@
                 <!-- Open Positions Table -->
                 <div class="card" style="margin-bottom:20px;padding:16px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                        <h3 style="font-size:15px;font-weight:800;color:var(--ink-primary);margin:0;"><i class="fa-solid fa-layer-group text-gold"></i> OPEN POSITIONS (<span id="paperOpenPositionsCount">0</span>)</h3>
+                        <h3 style="font-size:15px;font-weight:800;color:var(--ink-primary);margin:0;"><i data-lucide="layers" class="lucide-sm text-gold"></i> OPEN POSITIONS (<span id="paperOpenPositionsCount">0</span>)</h3>
                         <span style="font-size:11px;color:var(--ink-muted);">Auto-evaluates against live ticks &amp; targets</span>
                     </div>
                     <div class="table-container">
@@ -647,8 +782,8 @@
                 <!-- Closed Trade History Table -->
                 <div class="card" style="padding:16px;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                        <h3 style="font-size:15px;font-weight:800;color:var(--ink-primary);margin:0;"><i class="fa-solid fa-receipt text-cyan"></i> CLOSED TRADES JOURNAL</h3>
-                        <span style="font-size:11px;color:var(--ink-muted);">Realized performance archive</span>
+                        <h3 style="font-size:15px;font-weight:800;color:var(--ink-primary);margin:0;"><i data-lucide="receipt" class="lucide-sm text-cyan"></i> CLOSED PAPER TRADES JOURNAL</h3>
+                        <span style="font-size:11px;color:var(--ink-muted);">User-placed virtual trades archive &middot; Independent of algorithm signal tracking</span>
                     </div>
                     <div class="table-container">
                         <table class="data-table" id="paperClosedTable">
@@ -667,7 +802,7 @@
                                 </tr>
                             </thead>
                             <tbody id="paperClosedBody">
-                                <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--ink-muted);">No closed paper trades recorded yet.</td></tr>
+                                <tr><td colspan="10" style="text-align:center;padding:32px;color:var(--ink-muted);">No closed paper trades recorded yet. (Trades manually placed via Paper Trading appear here; auto-graded algorithm signals are tracked in Live Trade &rarr; Closed Trades.)</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -678,30 +813,30 @@
             <div id="stocksNewsSection" class="hidden">
 
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-arrow-trend-up text-cyan"></i> STOCKS NEWS
+                    <h2 class="section-page-title"><i data-lucide="trending-up" class="lucide-sm text-cyan"></i> STOCKS NEWS
                         <span class="section-page-subtitle">Individual Indian F&amp;O Stock Impact Analysis</span>
                     </h2>
                 </div>
 
                 <section class="news-toolbar sticky-filter-row">
                     <div class="news-status-bar" id="newsStatusBar">
-                        <i class="fa-solid fa-circle-info"></i>
+                        <i data-lucide="info" class="lucide-sm"></i>
                         <span>Loading news coverage...</span>
                     </div>
 
                     <div class="toolbar-actions">
                         <div class="search-box">
-                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <i data-lucide="search" class="lucide-sm"></i>
                             <input type="text" id="newsSearchInput" placeholder="Search stock or company name...">
                         </div>
                     </div>
 
                     <div class="news-verdict-filters" id="newsVerdictFilters">
-                        <button class="tab-btn active" data-verdict="ALL"><i class="fa-solid fa-border-all"></i> ALL</button>
-                        <button class="tab-btn" data-verdict="NEGATIVE"><i class="fa-solid fa-triangle-exclamation"></i> NEGATIVE</button>
-                        <button class="tab-btn" data-verdict="CAUTION"><i class="fa-solid fa-flag"></i> CAUTION</button>
-                        <button class="tab-btn" data-verdict="POSITIVE"><i class="fa-solid fa-circle-check"></i> POSITIVE</button>
-                        <button class="tab-btn" data-verdict="NEUTRAL"><i class="fa-solid fa-minus"></i> NEUTRAL</button>
+                        <button class="tab-btn active" data-verdict="ALL"><i data-lucide="layout-grid" class="lucide-sm"></i> ALL</button>
+                        <button class="tab-btn" data-verdict="NEGATIVE"><i data-lucide="alert-triangle" class="lucide-sm"></i> NEGATIVE</button>
+                        <button class="tab-btn" data-verdict="CAUTION"><i data-lucide="flag" class="lucide-sm"></i> CAUTION</button>
+                        <button class="tab-btn" data-verdict="POSITIVE"><i data-lucide="check-circle-2" class="lucide-sm"></i> POSITIVE</button>
+                        <button class="tab-btn" data-verdict="NEUTRAL"><i data-lucide="minus" class="lucide-sm"></i> NEUTRAL</button>
                     </div>
                 </section>
 
@@ -710,7 +845,7 @@
                 </section>
 
                 <div id="newsEmptyState" class="empty-state hidden">
-                    <i class="fa-solid fa-newspaper fa-3x"></i>
+                    <i data-lucide="newspaper" class="lucide-sm lucide-lg"></i>
                     <h3>No News Cached Yet</h3>
                     <p>The background job refreshes news for every F&amp;O stock up to 3x/day to stay within the API budget. Check back after the next scheduled pass.</p>
                 </div>
@@ -722,23 +857,23 @@
             <div id="globalNewsSection" class="hidden">
 
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-globe text-gold"></i> GLOBAL &amp; MACRO NEWS
+                    <h2 class="section-page-title"><i data-lucide="globe" class="lucide-sm text-gold"></i> GLOBAL &amp; MACRO NEWS
                         <span class="section-page-subtitle">S&amp;P 500, Commodities, Forex, Fed/RBI Policy + Indian Stock Impact Mapping</span>
                     </h2>
                 </div>
 
                 <section class="news-toolbar sticky-filter-row">
                     <div class="news-status-bar" id="globalNewsStatusBar">
-                        <i class="fa-solid fa-circle-info"></i>
+                        <i data-lucide="info" class="lucide-sm"></i>
                         <span>Loading global &amp; macro news...</span>
                     </div>
 
                     <div class="news-verdict-filters" id="globalNewsVerdictFilters">
-                        <button class="tab-btn active" data-verdict="ALL"><i class="fa-solid fa-border-all"></i> ALL</button>
-                        <button class="tab-btn" data-verdict="NEGATIVE"><i class="fa-solid fa-triangle-exclamation"></i> NEGATIVE</button>
-                        <button class="tab-btn" data-verdict="CAUTION"><i class="fa-solid fa-flag"></i> CAUTION</button>
-                        <button class="tab-btn" data-verdict="POSITIVE"><i class="fa-solid fa-circle-check"></i> POSITIVE</button>
-                        <button class="tab-btn" data-verdict="NEUTRAL"><i class="fa-solid fa-minus"></i> NEUTRAL</button>
+                        <button class="tab-btn active" data-verdict="ALL"><i data-lucide="layout-grid" class="lucide-sm"></i> ALL</button>
+                        <button class="tab-btn" data-verdict="NEGATIVE"><i data-lucide="alert-triangle" class="lucide-sm"></i> NEGATIVE</button>
+                        <button class="tab-btn" data-verdict="CAUTION"><i data-lucide="flag" class="lucide-sm"></i> CAUTION</button>
+                        <button class="tab-btn" data-verdict="POSITIVE"><i data-lucide="check-circle-2" class="lucide-sm"></i> POSITIVE</button>
+                        <button class="tab-btn" data-verdict="NEUTRAL"><i data-lucide="minus" class="lucide-sm"></i> NEUTRAL</button>
                     </div>
                 </section>
 
@@ -747,7 +882,7 @@
                 </section>
 
                 <div id="globalNewsEmptyState" class="empty-state hidden">
-                    <i class="fa-solid fa-globe fa-3x"></i>
+                    <i data-lucide="globe" class="lucide-sm lucide-lg"></i>
                     <h3>No Global News Cached Yet</h3>
                     <p>The background job refreshes global &amp; macro coverage on the same budget-aware schedule as Stocks News. Check back after the next scheduled pass.</p>
                 </div>
@@ -758,38 +893,38 @@
             <!-- ============================== INSTITUTIONAL FLOW SECTION (REQ-OFL-001) ============================== -->
             <div id="institutionalFlowSection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-building-columns text-gold"></i> INSTITUTIONAL FLOW
+                    <h2 class="section-page-title"><i data-lucide="landmark" class="lucide-sm text-gold"></i> INSTITUTIONAL FLOW
                         <span class="section-page-subtitle">Today's NSE Bulk &amp; Block Deals — Highlighting Transactions &ge; &#8377;25 Cr Floor (REQ-OFL-001)</span>
                     </h2>
                     <button id="btnRefreshInstitutionalFlow" class="btn btn-pill btn-secondary">
-                        <i class="fa-solid fa-rotate-right"></i> REFRESH
+                        <i data-lucide="refresh-cw" class="lucide-sm"></i> REFRESH
                     </button>
                 </div>
 
                 <div class="news-status-bar" id="institutionalFlowStatusBar">
-                    <i class="fa-solid fa-circle-info"></i>
+                    <i data-lucide="info" class="lucide-sm"></i>
                     <span>Loading live institutional flow checkpoints...</span>
                 </div>
 
                 <!-- 4x Overview Stat Cards Grid -->
                 <div class="stats-overview-grid" style="margin-top:14px;margin-bottom:16px;">
                     <div class="stat-card" style="border-top:3px solid var(--gold);">
-                        <div class="stat-card-title"><i class="fa-solid fa-building-columns text-gold"></i> TOTAL DEALS</div>
+                        <div class="stat-card-title"><i data-lucide="landmark" class="lucide-sm text-gold"></i> TOTAL DEALS</div>
                         <div class="stat-card-value" id="ifTotalDealsVal">0</div>
                         <div class="stat-card-footer" id="ifTotalDealsSub">Floor &ge; &#8377;25Cr Blocks</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #10b981;">
-                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-up text-bullish"></i> BUY ACCUMULATION</div>
+                        <div class="stat-card-title"><i data-lucide="trending-up" class="lucide-sm text-bullish"></i> BUY ACCUMULATION</div>
                         <div class="stat-card-value text-bullish" id="ifBuyInflowVal">&#8377;0.00cr</div>
                         <div class="stat-card-footer" id="ifBuyInflowSub">0 Institutional Buys</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid #ef4444;">
-                        <div class="stat-card-title"><i class="fa-solid fa-arrow-trend-down text-bearish"></i> SELL DISTRIBUTION</div>
+                        <div class="stat-card-title"><i data-lucide="trending-down" class="lucide-sm text-bearish"></i> SELL DISTRIBUTION</div>
                         <div class="stat-card-value text-bearish" id="ifSellOutflowVal">&#8377;0.00cr</div>
                         <div class="stat-card-footer" id="ifSellOutflowSub">0 Institutional Sells</div>
                     </div>
                     <div class="stat-card" style="border-top:3px solid var(--cat-blue);">
-                        <div class="stat-card-title"><i class="fa-solid fa-scale-balanced text-cyan"></i> NET INSTITUTIONAL FLOW</div>
+                        <div class="stat-card-title"><i data-lucide="scale" class="lucide-sm text-cyan"></i> NET INSTITUTIONAL FLOW</div>
                         <div class="stat-card-value text-gold" id="ifNetFlowVal">&#8377;0.00cr</div>
                         <div class="stat-card-footer" id="ifNetFlowSub">Net Bias Verdict</div>
                     </div>
@@ -798,12 +933,12 @@
                 <!-- Toolbar Container (Search Box + Filter Chips Rail) -->
                 <div class="toolbar-container" style="margin-bottom:16px;">
                     <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <i data-lucide="search" class="lucide-sm search-icon"></i>
                         <input type="text" id="institutionalFlowSearchInput" placeholder="Filter by symbol or institution (e.g. RELIANCE, LIC, MORGAN)...">
                     </div>
                     <div class="filter-group" id="instFlowFilterGroup">
                         <button class="filter-chip active" data-flow-filter="ALL">ALL DEALS</button>
-                        <button class="filter-chip" data-flow-filter="MEGA_BLOCK"><i class="fa-solid fa-crown text-gold"></i> &ge; &#8377;25 Cr BLOCKS</button>
+                        <button class="filter-chip" data-flow-filter="MEGA_BLOCK"><i data-lucide="crown" class="lucide-sm text-gold"></i> &ge; &#8377;25 Cr BLOCKS</button>
                         <button class="filter-chip" data-flow-filter="BUY">BUY ACCUMULATION</button>
                         <button class="filter-chip" data-flow-filter="SELL">SELL DISTRIBUTION</button>
                         <button class="filter-chip" data-flow-filter="BLOCK">BLOCK WINDOW</button>
@@ -837,11 +972,11 @@
                 <!-- Empty State -->
                 <div id="institutionalFlowEmptyState" class="empty-state hidden" style="padding: 48px 24px; border-radius: var(--radius-lg); background: var(--glass-bg); border: 1px solid var(--glass-border); margin-top: 16px; text-align: center;">
                     <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--gold-bg); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.3);">
-                        <i class="fa-solid fa-building-columns fa-2x text-gold"></i>
+                        <i data-lucide="landmark" class="lucide-sm lucide-md text-gold"></i>
                     </div>
                     <h3 style="font-family: var(--font-heading); font-size: 17px; font-weight: 800; color: var(--ink-primary); margin-bottom: 6px;">No Institutional Bulk or Block Deals Found Today</h3>
-                    <p style="font-size: 12px; color: var(--ink-secondary); max-width: 460px; margin: 0 auto 16px auto; line-height: 1.6;">
-                        NSE Bulk &amp; Block deal snapshots are monitored around the <strong>2:05–2:20 PM afternoon block window</strong> and verified at market close (3:45 PM). Institutional deals exceeding the <strong>&#8377;25 Cr threshold</strong> or 0.5% share count populate automatically.
+                    <p style="font-size: 12px; color: var(--ink-secondary); max-width: 480px; margin: 0 auto 16px auto; line-height: 1.6;">
+                        NSE Bulk &amp; Block deal snapshots are monitored after the <strong>2:05–2:20 PM afternoon block window</strong> (with 2:30 PM &amp; 3:15 PM live checks) and reconciled against NSE's official consolidated archive post-market. Institutional deals exceeding the <strong>&#8377;25 Cr threshold</strong> or 0.5% share count populate automatically.
                     </p>
                 </div>
             </div>
@@ -850,7 +985,7 @@
             <!-- ============================== ORDER FLOW SECTION ============================== -->
             <div id="orderFlowSection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW
+                    <h2 class="section-page-title"><i data-lucide="zap" class="lucide-sm text-gold"></i> ORDER FLOW
                         <span class="section-page-subtitle">3:15–3:25 PM Closing Aggression &amp; 5-Level Depth Analysis</span>
                     </h2>
                 </div>
@@ -858,22 +993,22 @@
                 <!-- 2x2 Stat Overview Grid -->
                 <div class="stats-overview-grid" style="margin-top:16px;margin-bottom:16px;">
                     <div class="stat-card">
-                        <div class="stat-card-title"><i class="fa-solid fa-plug"></i> FEED STATUS</div>
-                        <div class="stat-card-value text-gold" id="ofPageFeedStatus">SMARTAPI STREAM</div>
-                        <div class="stat-card-footer" id="ofPageFeedDetail">5-Level Depth WebSocket Stream</div>
+                        <div class="stat-card-title"><i data-lucide="plug" class="lucide-sm"></i> FEED STATUS</div>
+                        <div class="stat-card-value text-gold" id="ofPageFeedStatus">INITIALIZING TAPE</div>
+                        <div class="stat-card-footer" id="ofPageFeedDetail">Verifying Level 2 WebSocket / Feed Mode...</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-card-title"><i class="fa-solid fa-shield-halved"></i> TOTAL EVALUATED</div>
+                        <div class="stat-card-title"><i data-lucide="shield" class="lucide-sm"></i> TOTAL EVALUATED</div>
                         <div class="stat-card-value" id="ofPageTotalEvaluated">0</div>
                         <div class="stat-card-footer">Scanned F&amp;O Candidates</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-card-title"><i class="fa-solid fa-circle-check text-bullish"></i> CONFIRMED SETUPS</div>
+                        <div class="stat-card-title"><i data-lucide="check-circle-2" class="lucide-sm text-bullish"></i> CONFIRMED SETUPS</div>
                         <div class="stat-card-value text-bullish" id="ofPageConfirmedCount">0</div>
                         <div class="stat-card-footer">Passed Closing Aggression Gate</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-card-title"><i class="fa-solid fa-ban text-bearish"></i> VETOED SETUPS</div>
+                        <div class="stat-card-title"><i data-lucide="ban" class="lucide-sm text-bearish"></i> VETOED SETUPS</div>
                         <div class="stat-card-value text-bearish" id="ofPageVetoedCount">0</div>
                         <div class="stat-card-footer">Capped to P3 LOW Conviction</div>
                     </div>
@@ -884,7 +1019,7 @@
                     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
                         <div>
                             <div style="font-size:13px;font-weight:800;color:var(--gold);letter-spacing:0.6px;text-transform:uppercase;display:flex;align-items:center;gap:8px;">
-                                <i class="fa-solid fa-chart-line text-gold"></i> 1-MINUTE SYNTHETIC CUMULATIVE VOLUME DELTA (CVD) ENGINE
+                                <i data-lucide="trending-up" class="lucide-sm text-gold"></i> 1-MINUTE SYNTHETIC CUMULATIVE VOLUME DELTA (CVD) ENGINE
                                 <span class="badge" style="font-size:9.5px;padding:2px 7px;background:rgba(16,185,129,0.15);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.3);font-weight:700;">REQ-OFL-002</span>
                             </div>
                             <div style="font-size:11px;color:var(--ink-secondary);margin-top:2px;">
@@ -937,7 +1072,7 @@
                         <div>
                             <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;">Closing Veto Gate</div>
                             <div id="cvdVetoGateBadge" style="margin-top:2px;"><span class="badge badge-gold" style="font-size:11px;font-weight:800;padding:3px 8px;">CONFIRMED</span></div>
-                            <div style="font-size:9.5px;color:var(--ink-secondary);">3:15–3:25 PM Window</div>
+                            <div style="font-size:9.5px;color:var(--ink-secondary);" title="Evaluated strictly on the 3:15–3:25 PM closing aggression window, decoupled from the chart timeframe selector.">Fixed 3:15–3:25 PM Window (Decoupled)</div>
                         </div>
                     </div>
 
@@ -949,7 +1084,7 @@
 
                     <!-- Tape Intelligence Insight Callout -->
                     <div id="cvdTapeInsight" style="margin-top:10px;font-size:11px;color:var(--ink-secondary);background:var(--glass-bg-soft);padding:8px 12px;border-radius:6px;border:1px solid var(--gridline);display:flex;align-items:center;gap:8px;">
-                        <i class="fa-solid fa-lightbulb text-gold"></i>
+                        <i data-lucide="lightbulb" class="lucide-sm text-gold"></i>
                         <span id="cvdTapeInsightText">Loading live tick-rule CVD analytics...</span>
                     </div>
                 </div>
@@ -957,7 +1092,7 @@
                 <!-- Search Bar & Filter Chips Rail -->
                 <div class="toolbar-container" style="margin-bottom:16px;">
                     <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <i data-lucide="search" class="lucide-sm search-icon"></i>
                         <input type="text" id="orderFlowSearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
                     </div>
                     <div class="filter-group" id="ofFilterGroup">
@@ -975,7 +1110,7 @@
 
                 <div id="orderFlowEmptyState" class="empty-state hidden" style="padding: 50px 24px; border-radius: var(--radius-lg); background: var(--glass-bg); border: 1px solid var(--glass-border); margin-top: 16px;">
                     <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--gold-bg); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.3);">
-                        <i class="fa-solid fa-bolt fa-2x text-gold"></i>
+                        <i data-lucide="zap" class="lucide-sm lucide-md text-gold"></i>
                     </div>
                     <h3 style="font-family: var(--font-heading); font-size: 18px; font-weight: 800; color: var(--ink-primary); margin-bottom: 6px;">No Active Order Flow Setups Found</h3>
                     <p style="font-size: 12px; color: var(--ink-secondary); max-width: 480px; line-height: 1.6; margin-bottom: 16px;">
@@ -983,10 +1118,10 @@
                     </p>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
                         <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: var(--bullish); border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">
-                            <i class="fa-solid fa-circle-check" style="margin-right: 4px;"></i> WebSocket Stream Ready
+                            <i data-lucide="check-circle-2" class="lucide-sm" style="margin-right: 4px;"></i> WebSocket Stream Ready
                         </span>
                         <span class="badge" style="background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(212, 175, 55, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">
-                            <i class="fa-solid fa-clock" style="margin-right: 4px;"></i> 3:15 PM Power Hour Trigger
+                            <i data-lucide="clock" class="lucide-sm" style="margin-right: 4px;"></i> 3:15 PM Power Hour Trigger
                         </span>
                     </div>
                 </div>
@@ -996,12 +1131,12 @@
             <!-- ============================== ACCURACY & PERFORMANCE SECTION ============================== -->
             <div id="accuracySection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-bullseye text-gold"></i> ACCURACY &amp; PERFORMANCE
+                    <h2 class="section-page-title"><i data-lucide="target" class="lucide-sm text-gold"></i> ACCURACY &amp; PERFORMANCE
                         <span class="section-page-subtitle">Real-Time Win Rate, Horizon Breakdown &amp; Historical Signal Verification</span>
                     </h2>
                     <div class="dashboard-heading-actions">
                         <button id="btnRefreshAccuracy" class="btn btn-pill btn-secondary" title="Refresh Accuracy Metrics">
-                            <i class="fa-solid fa-rotate"></i><span>REFRESH</span>
+                            <i data-lucide="refresh-cw" class="lucide-sm"></i><span>REFRESH</span>
                         </button>
                     </div>
                 </div>
@@ -1010,7 +1145,7 @@
                 <section class="split-accuracy-grid" style="margin-top:16px;margin-bottom:24px;">
                     <div class="metric-card" style="border-top:3px solid var(--gold);">
                         <div class="metric-header">
-                            <span class="metric-title"><i class="fa-solid fa-bolt text-gold"></i> BTST — STOCKS</span>
+                            <span class="metric-title"><i data-lucide="zap" class="lucide-sm text-gold"></i> BTST — STOCKS</span>
                             <span class="badge badge-gold" id="splitBtstStocksBadge">0.0% ACC</span>
                         </div>
                         <div class="metric-body" style="margin-top:6px;">
@@ -1020,7 +1155,7 @@
                     </div>
                     <div class="metric-card" style="border-top:3px solid #3b82f6;">
                         <div class="metric-header">
-                            <span class="metric-title"><i class="fa-solid fa-chart-column text-cyan"></i> BTST — INDICES</span>
+                            <span class="metric-title"><i data-lucide="bar-chart-2" class="lucide-sm text-cyan"></i> BTST — INDICES</span>
                             <span class="badge badge-cyan" id="splitBtstIndicesBadge">0.0% ACC</span>
                         </div>
                         <div class="metric-body" style="margin-top:6px;">
@@ -1030,7 +1165,7 @@
                     </div>
                     <div class="metric-card" style="border-top:3px solid #10b981;">
                         <div class="metric-header">
-                            <span class="metric-title"><i class="fa-solid fa-microchip text-bullish"></i> INTRADAY — STOCKS</span>
+                            <span class="metric-title"><i data-lucide="cpu" class="lucide-sm text-bullish"></i> INTRADAY — STOCKS</span>
                             <span class="badge badge-bullish" id="splitIntraStocksBadge">0.0% ACC</span>
                         </div>
                         <div class="metric-body" style="margin-top:6px;">
@@ -1040,7 +1175,7 @@
                     </div>
                     <div class="metric-card" style="border-top:3px solid #8b5cf6;">
                         <div class="metric-header">
-                            <span class="metric-title"><i class="fa-solid fa-sliders text-amber"></i> INTRADAY — INDICES</span>
+                            <span class="metric-title"><i data-lucide="sliders" class="lucide-sm text-amber"></i> INTRADAY — INDICES</span>
                             <span class="badge badge-amber" id="splitIntraIndicesBadge">0.0% ACC</span>
                         </div>
                         <div class="metric-body" style="margin-top:6px;">
@@ -1054,7 +1189,7 @@
                 <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:16px;margin-bottom:24px;">
                     <div class="stock-card" style="padding:20px;">
                         <div style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
-                            <i class="fa-solid fa-bolt text-gold"></i> BTST Stock Signal Verification
+                            <i data-lucide="zap" class="lucide-sm text-gold"></i> BTST Stock Signal Verification
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">
                             <div style="background:var(--glass-bg-soft);padding:10px;border-radius:4px;border:1px solid var(--gridline);">
@@ -1078,7 +1213,7 @@
 
                     <div class="stock-card" style="padding:20px;">
                         <div style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
-                            <i class="fa-solid fa-microchip text-bullish"></i> Intraday SMC &amp; Algo Setups
+                            <i data-lucide="cpu" class="lucide-sm text-bullish"></i> Intraday SMC &amp; Algo Setups
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;">
                             <div style="background:var(--glass-bg-soft);padding:10px;border-radius:4px;border:1px solid var(--gridline);">
@@ -1106,26 +1241,36 @@
             <!-- ============================== INDEX INTELLIGENCE SECTION ============================== -->
             <div id="indicesSection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-chart-column text-gold"></i> INDEX INTELLIGENCE
+                    <h2 class="section-page-title"><i data-lucide="bar-chart-2" class="lucide-sm text-gold"></i> INDEX INTELLIGENCE
                         <span class="section-page-subtitle">Post-Close Verdict &amp; Live Index Signals</span>
                     </h2>
                 </div>
-                <div class="index-section-switcher" id="indexSectionSwitcher" style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-                    <div style="display:flex;gap:6px;">
-                        <button class="index-tab-btn active" data-index-view="intelligence">
-                            <i class="fa-solid fa-brain"></i> BTST Intelligence
+                <div class="index-section-switcher" id="indexSectionSwitcher" style="margin-top:14px;">
+                    <div class="index-tabs-group" style="display:flex;gap:6px;flex-shrink:0;">
+                        <button class="index-tab-btn active" data-index-view="intelligence" style="white-space:nowrap;flex-shrink:0;">
+                            <i data-lucide="cpu" class="lucide-sm"></i> BTST Intelligence
                         </button>
-                        <button class="index-tab-btn" data-index-view="signals">
-                            <i class="fa-solid fa-signal"></i> Live Index Signals
+                        <button class="index-tab-btn" data-index-view="signals" style="white-space:nowrap;flex-shrink:0;">
+                            <i data-lucide="activity" class="lucide-sm"></i> Live Index Signals
                         </button>
                     </div>
-                    <div style="display:flex;gap:8px;">
-                        <button type="button" class="btn btn-outline text-gold" onclick="openOptionChainModal('NIFTY')" title="Launch Live NIFTY Option Chain" style="font-size:11px;padding:5px 10px;font-weight:700;">
-                            <i class="fa-solid fa-layer-group"></i> NIFTY OPTION CHAIN
-                        </button>
-                        <button type="button" class="btn btn-outline text-gold" onclick="openOptionChainModal('BANKNIFTY')" title="Launch Live BANKNIFTY Option Chain" style="font-size:11px;padding:5px 10px;font-weight:700;">
-                            <i class="fa-solid fa-layer-group"></i> BANKNIFTY
-                        </button>
+                    <div class="index-actions-group" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                        <div class="dropdown" style="position:relative;flex-shrink:0;">
+                            <button type="button" class="index-card-action-btn" id="quickOptionChainBtn" onclick="document.getElementById('quickOptionChainMenu')?.classList.toggle('hidden');" title="Quick Option Chain Launcher" style="white-space:nowrap;flex-shrink:0;">
+                                <i data-lucide="layers" class="lucide-sm"></i> Live Option Chains <i data-lucide="chevron-down" class="lucide-xs"></i>
+                            </button>
+                            <div id="quickOptionChainMenu" class="dropdown-menu hidden" style="position:absolute;right:0;top:calc(100% + 4px);z-index:100;background:var(--tradexo-obsidian-surface);border:1px solid rgba(212,175,55,0.3);border-radius:8px;padding:6px;min-width:180px;box-shadow:0 12px 28px rgba(0,0,0,0.6);display:flex;flex-direction:column;gap:4px;">
+                                <button type="button" class="btn btn-sm btn-ghost text-gold" style="text-align:left;justify-content:flex-start;width:100%;padding:6px 10px;font-size:12px;white-space:nowrap;" onclick="openOptionChainModal('NIFTY'); document.getElementById('quickOptionChainMenu')?.classList.add('hidden');">
+                                    <i data-lucide="layers" class="lucide-sm"></i> <strong>NIFTY 50</strong>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-ghost text-gold" style="text-align:left;justify-content:flex-start;width:100%;padding:6px 10px;font-size:12px;white-space:nowrap;" onclick="openOptionChainModal('BANKNIFTY'); document.getElementById('quickOptionChainMenu')?.classList.add('hidden');">
+                                    <i data-lucide="layers" class="lucide-sm"></i> <strong>BANK NIFTY</strong>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-ghost text-gold" style="text-align:left;justify-content:flex-start;width:100%;padding:6px 10px;font-size:12px;white-space:nowrap;" onclick="openOptionChainModal('FINNIFTY'); document.getElementById('quickOptionChainMenu')?.classList.add('hidden');">
+                                    <i data-lucide="layers" class="lucide-sm"></i> <strong>FINNIFTY</strong>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1140,7 +1285,7 @@
                         <!-- Dynamic structured verdict cards injected by JS -->
                     </section>
                     <div id="indexVerdictEmptyState" class="empty-state hidden">
-                        <i class="fa-solid fa-chart-line fa-3x text-gold"></i>
+                        <i data-lucide="trending-up" class="lucide-sm lucide-lg text-gold"></i>
                         <h3>Index BTST Intelligence Pending Market Close</h3>
                         <p>This deeper derivatives + Greeks + macro read runs once, shortly after market close (3:45 PM IST).</p>
                     </div>
@@ -1157,7 +1302,7 @@
             <!-- ============================== STRATEGIES SECTION ============================== -->
             <div id="strategiesSection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-sliders text-gold"></i> STRATEGIES
+                    <h2 class="section-page-title"><i data-lucide="sliders" class="lucide-sm text-gold"></i> STRATEGIES
                         <span class="section-page-subtitle">5-Pillar Matrix + Your Custom Presets</span>
                     </h2>
                 </div>
@@ -1165,7 +1310,7 @@
                 <section class="toolbar-container">
                     <div class="legend-subtitle">Presets on top of the existing pillars/gates — add, edit, or remove any of your own; the built-in Default 5-Pillar strategy can be edited but not deleted.</div>
                     <button id="addStrategyBtn" class="btn btn-pill btn-primary" style="min-height:44px;">
-                        <i class="fa-solid fa-plus"></i> ADD STRATEGY
+                        <i data-lucide="plus" class="lucide-sm"></i> ADD STRATEGY
                     </button>
                 </section>
 
@@ -1173,10 +1318,10 @@
                 <div class="ai-strategy-builder-card" id="aiStrategyBuilderCard" style="margin-bottom:20px;">
                     <div class="ai-builder-header">
                         <div class="ai-builder-title-group">
-                            <h3 class="ai-builder-title"><i class="fa-solid fa-wand-magic-sparkles text-gold"></i> AI Natural-Language Strategy Builder</h3>
+                            <h3 class="ai-builder-title"><i data-lucide="sparkles" class="lucide-sm text-gold"></i> AI Natural-Language Strategy Builder</h3>
                             <span class="ai-builder-subtitle">Describe your setup in plain English. The AI Clarifier converts your natural language rules into verified quantitative parameters &amp; execution rules.</span>
                         </div>
-                        <span class="badge badge-gold" style="font-size:10px;"><i class="fa-solid fa-microchip"></i> AI CLARIFIER V2</span>
+                        <span class="badge badge-gold" style="font-size:10px;"><i data-lucide="cpu" class="lucide-sm"></i> AI CLARIFIER V2</span>
                     </div>
 
                     <div class="ai-builder-input-group">
@@ -1184,10 +1329,10 @@
                     </div>
 
                     <div class="ai-builder-quick-prompts">
-                        <span class="ai-prompt-chip" data-prompt="VWAP Pullback with 2x Volume Surge on 5-minute candles: Buy when price pulls back to VWAP and bounces with strong bullish delta. Target 1.5% profit, stop loss 0.75%."><i class="fa-solid fa-bolt text-gold"></i> VWAP Pullback</span>
-                        <span class="ai-prompt-chip" data-prompt="Opening Range Breakout 15m (ORB 30): Enter when 9:15-9:45 AM high is broken with volume exceeding 20-day average. Target 1.8% profit, stop loss 0.8%."><i class="fa-solid fa-chart-line text-cyan"></i> ORB Breakout</span>
-                        <span class="ai-prompt-chip" data-prompt="Smart Money Concepts (SMC): 15-minute Order Block re-entry in discount zone after sell-side liquidity sweep. Target 3.0% profit, stop loss 1.0%."><i class="fa-solid fa-building-columns text-bullish"></i> SMC Order Block</span>
-                        <span class="ai-prompt-chip" data-prompt="Derivatives OI Surge: Buy Call when Call OI unwinds by 20% and Put OI surges by 30% with PCR > 1.30. Target 2.5% profit, stop loss 1.0%."><i class="fa-solid fa-layer-group text-amber"></i> OI Surge</span>
+                        <span class="ai-prompt-chip" data-prompt="VWAP Pullback with 2x Volume Surge on 5-minute candles: Buy when price pulls back to VWAP and bounces with strong bullish delta. Target 1.5% profit, stop loss 0.75%."><i data-lucide="zap" class="lucide-sm text-gold"></i> VWAP Pullback</span>
+                        <span class="ai-prompt-chip" data-prompt="Opening Range Breakout 15m (ORB 30): Enter when 9:15-9:45 AM high is broken with volume exceeding 20-day average. Target 1.8% profit, stop loss 0.8%."><i data-lucide="trending-up" class="lucide-sm text-cyan"></i> ORB Breakout</span>
+                        <span class="ai-prompt-chip" data-prompt="Smart Money Concepts (SMC): 15-minute Order Block re-entry in discount zone after sell-side liquidity sweep. Target 3.0% profit, stop loss 1.0%."><i data-lucide="landmark" class="lucide-sm text-bullish"></i> SMC Order Block</span>
+                        <span class="ai-prompt-chip" data-prompt="Derivatives OI Surge: Buy Call when Call OI unwinds by 20% and Put OI surges by 30% with PCR > 1.30. Target 2.5% profit, stop loss 1.0%."><i data-lucide="layers" class="lucide-sm text-amber"></i> OI Surge</span>
                     </div>
 
                     <div class="ai-builder-controls-row">
@@ -1195,14 +1340,14 @@
                             <input type="text" id="aiStrategyNameInput" class="form-input" placeholder="Strategy Name (optional, e.g. Institutional VWAP)">
                         </div>
                         <button type="button" id="btnAiClarifySubmit" class="btn btn-pill btn-primary">
-                            <i class="fa-solid fa-sparkles"></i> COMPOSE &amp; CLARIFY VIA AI
+                            <i data-lucide="sparkles" class="lucide-sm"></i> COMPOSE &amp; CLARIFY VIA AI
                         </button>
                     </div>
                     <div id="aiStrategyStatus" class="form-hint" style="margin-top:8px;"></div>
                 </div>
 
                 <div class="paper-trade-notice">
-                    <i class="fa-solid fa-circle-info"></i>
+                    <i data-lucide="info" class="lucide-sm"></i>
                     <span>All strategy execution is PAPER/SIMULATED only — no real broker order placement is executed (Market data &amp; tick-rule order flow are streamed read-only).</span>
                 </div>
 
@@ -1215,18 +1360,18 @@
             <!-- ============================== HISTORY & CALIBRATION SECTION ============================== -->
             <div id="historySection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-clock-rotate-left text-gold"></i> HISTORY &amp; CALIBRATION
+                    <h2 class="section-page-title"><i data-lucide="history" class="lucide-sm text-gold"></i> HISTORY &amp; CALIBRATION
                         <span class="section-page-subtitle">Realized Gap Buckets &amp; Walk-Forward Outcomes</span>
                     </h2>
                     <button id="btnRefreshHistory" class="btn btn-pill btn-secondary">
-                        <i class="fa-solid fa-rotate-right"></i> REFRESH HISTORY
+                        <i data-lucide="refresh-cw" class="lucide-sm"></i> REFRESH HISTORY
                     </button>
                 </div>
 
                 <!-- History Toolbar Filters -->
                 <div class="toolbar-container" style="margin-bottom:16px;flex-wrap:wrap;gap:10px;">
                     <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <i data-lucide="search" class="lucide-sm search-icon"></i>
                         <input type="text" id="historySearchInput" placeholder="Filter by symbol (e.g. RELIANCE)...">
                     </div>
                     <div class="sort-box">
@@ -1256,10 +1401,10 @@
                     </div>
                     <label class="checkbox-item" style="white-space:nowrap;" title="Only setups where Institutional Flow (Pillar 6) contributed to the score">
                         <input type="checkbox" id="historyInstitutionalFlowFilter">
-                        <i class="fa-solid fa-building-columns"></i> Institutional Flow Only
+                        <i data-lucide="landmark" class="lucide-sm"></i> Institutional Flow Only
                     </label>
                     <button id="btnExportHistoryCsv" class="btn btn-pill btn-secondary" title="Export Filtered Signal Journal to CSV" style="margin-left:auto;">
-                        <i class="fa-solid fa-file-csv text-gold"></i> EXPORT CSV
+                        <i data-lucide="file-spreadsheet" class="lucide-sm text-gold"></i> EXPORT CSV
                     </button>
                 </div>
 
@@ -1292,7 +1437,7 @@
                 <!-- Calibration Report Sub-Section -->
                 <div style="margin-top:32px;margin-bottom:16px;">
                     <h3 style="font-size:16px;font-weight:800;color:var(--ink-primary);display:flex;align-items:center;gap:8px;">
-                        <i class="fa-solid fa-bullseye text-cyan"></i> CONFIDENCE CALIBRATION &amp; BUCKET ACCURACY REPORT
+                        <i data-lucide="target" class="lucide-sm text-cyan"></i> CONFIDENCE CALIBRATION &amp; BUCKET ACCURACY REPORT
                     </h3>
                 </div>
 
@@ -1303,7 +1448,7 @@
                 <!-- REQ-ACC-002: Predicted vs Actual Gap Distribution Histogram -->
                 <div class="stock-card" id="gapDistributionHistogramCard" style="margin-top:24px;padding:20px;">
                     <div style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-                        <i class="fa-solid fa-chart-simple text-gold"></i> PREDICTED VS. ACTUAL GAP DISTRIBUTION HISTOGRAM
+                        <i data-lucide="bar-chart-3" class="lucide-sm text-gold"></i> PREDICTED VS. ACTUAL GAP DISTRIBUTION HISTOGRAM
                     </div>
                     <div class="legend-subtitle" style="margin-bottom:16px;">
                         Empirical gap frequency comparison across buckets: &lt; -1.5%, -1.5% to -0.5%, -0.5% to 0.0%, 0.0% to +0.5%, +0.5% to +1.5%, &gt; +1.5%. Compares algorithm forecasted opening gap distribution against actual realized market gap-ups and gap-downs.
@@ -1316,7 +1461,7 @@
                 <!-- REQ-ACC-002: 30-Day Rolling Walk-Forward Pillar Weight Calibrations -->
                 <div class="stock-card" id="walkForwardPillarWeightsCard" style="margin-top:24px;padding:20px;">
                     <div style="font-size:15px;font-weight:800;color:var(--ink-primary);margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-                        <i class="fa-solid fa-scale-balanced text-cyan"></i> 30-DAY ROLLING WALK-FORWARD PILLAR WEIGHT CALIBRATION
+                        <i data-lucide="scale" class="lucide-sm text-cyan"></i> 30-DAY ROLLING WALK-FORWARD PILLAR WEIGHT CALIBRATION
                     </div>
                     <div class="legend-subtitle" style="margin-bottom:16px;">
                         Dynamic walk-forward optimization recalibrating each pillar's contribution weight based on rolling out-of-sample predictive hit rate. Prevents overfitting by bounding daily adjustments to &plusmn;15%/day.
@@ -1348,7 +1493,7 @@
                 <div class="section-heading-row health-section-header-row">
                     <div class="health-header-title-block">
                         <div class="health-header-title-line">
-                            <h2 class="section-page-title"><i class="fa-solid fa-heart-pulse text-gold"></i> SYSTEM HEALTH &amp; DIAGNOSTICS</h2>
+                            <h2 class="section-page-title"><i data-lucide="activity" class="lucide-sm text-gold"></i> SYSTEM HEALTH &amp; DIAGNOSTICS</h2>
                             <div class="health-telemetry-beacon" id="healthConnectionBeacon">
                                 <span class="beacon-pulse-dot"></span>
                                 <span class="beacon-label">TELEMETRY LIVE</span>
@@ -1361,7 +1506,7 @@
                     <div class="dashboard-heading-actions health-heading-actions-bar">
                         <!-- Auto-Refresh Cadence Selector -->
                         <div class="health-cadence-control" title="Auto-Refresh Polling Interval">
-                            <span class="cadence-label"><i class="fa-solid fa-rotate"></i> Poll:</span>
+                            <span class="cadence-label"><i data-lucide="refresh-cw" class="lucide-sm"></i> Poll:</span>
                             <div class="cadence-btn-group" id="healthCadenceSelector">
                                 <button type="button" class="cadence-btn" data-cadence="10">10s</button>
                                 <button type="button" class="cadence-btn active" data-cadence="30">30s</button>
@@ -1372,19 +1517,19 @@
                         </div>
 
                         <button id="btnHealthRunScanNow" class="btn btn-pill btn-primary" title="Trigger Full Live Market Scan Now">
-                            <i class="fa-solid fa-bolt"></i><span>FORCE SCAN NOW</span>
+                            <i data-lucide="zap" class="lucide-sm"></i><span>FORCE SCAN NOW</span>
                         </button>
                         <button id="btnHealthEvalNow" class="btn btn-pill btn-secondary" title="Trigger 9:15 AM Open Gap Evaluation Now">
-                            <i class="fa-solid fa-calculator"></i><span>EVALUATE PICKS</span>
+                            <i data-lucide="calculator" class="lucide-sm"></i><span>EVALUATE PICKS</span>
                         </button>
                         <button id="btnToggleLiveTerminal" class="btn btn-pill btn-secondary" title="Jump to Live Rolling Console">
-                            <i class="fa-solid fa-terminal"></i><span>LIVE CONSOLE</span>
+                            <i data-lucide="terminal" class="lucide-sm"></i><span>LIVE CONSOLE</span>
                         </button>
                         <button id="btnRefreshHealthPage" class="btn btn-pill btn-secondary" title="Refresh Live Diagnostics">
-                            <i class="fa-solid fa-arrows-rotate"></i><span>REFRESH</span>
+                            <i data-lucide="refresh-cw" class="lucide-sm"></i><span>REFRESH</span>
                         </button>
                         <button id="btnExportHealthReport" class="btn btn-pill btn-secondary" title="Download Daily Health JSON Audit">
-                            <i class="fa-solid fa-file-arrow-down"></i><span>EXPORT JSON</span>
+                            <i data-lucide="download" class="lucide-sm"></i><span>EXPORT JSON</span>
                         </button>
                     </div>
                 </div>
@@ -1393,7 +1538,7 @@
                 <div class="health-hero-control-banner" id="healthHeroControlBanner">
                     <div class="health-control-left">
                         <div class="health-control-shield-icon">
-                            <i class="fa-solid fa-shield-halved" id="healthControlShieldIcon"></i>
+                            <i data-lucide="shield" class="lucide-sm" id="healthControlShieldIcon"></i>
                         </div>
                         <div class="health-control-copy">
                             <div class="health-control-headline">
@@ -1406,15 +1551,15 @@
                             <!-- Live Engine Vitals HUD Pills -->
                             <div class="health-vitals-hud-row">
                                 <span class="health-vitals-chip" id="heroNextMilestoneCountdown">
-                                    <i class="fa-regular fa-hourglass-half text-gold"></i>
+                                    <i data-lucide="hourglass" class="lucide-sm text-gold"></i>
                                     <span>Next Event: <strong id="heroNextEventText">Calculating...</strong></span>
                                 </span>
                                 <span class="health-vitals-chip">
-                                    <i class="fa-solid fa-microchip text-indigo"></i>
+                                    <i data-lucide="cpu" class="lucide-sm text-indigo"></i>
                                     <span>Workers: <strong id="heroActiveWorkersText">24 Threads Active</strong></span>
                                 </span>
                                 <span class="health-vitals-chip">
-                                    <i class="fa-solid fa-database text-emerald"></i>
+                                    <i data-lucide="database" class="lucide-sm text-emerald"></i>
                                     <span>Store: <strong>Atomic SQLite / Wal</strong></span>
                                 </span>
                             </div>
@@ -1422,7 +1567,7 @@
                     </div>
                     <div class="health-control-action">
                         <button id="btnPageEmergencyKillSwitch" class="btn btn-pill btn-danger health-kill-btn">
-                            <i class="fa-solid fa-pause"></i> <span>PAUSE ENGINE</span>
+                            <i data-lucide="pause" class="lucide-sm"></i> <span>PAUSE ENGINE</span>
                         </button>
                     </div>
                 </div>
@@ -1432,7 +1577,7 @@
                     <!-- Card 1: Health Score Gauge -->
                     <div class="health-overview-card health-score-card">
                         <div class="health-card-header">
-                            <span class="health-card-title"><i class="fa-solid fa-gauge-high text-gold"></i> COMPOSITE HEALTH SCORE</span>
+                            <span class="health-card-title"><i data-lucide="gauge" class="lucide-sm text-gold"></i> COMPOSITE HEALTH SCORE</span>
                             <span class="health-card-badge nominal" id="pageHealthStatusBadge">NOMINAL</span>
                         </div>
                         <div class="health-score-gauge-wrap">
@@ -1484,7 +1629,7 @@
                             <div class="health-gauge-meta">
                                 <strong id="pageHealthSummaryTitle">ALL SYSTEMS NOMINAL</strong>
                                 <span id="pageHealthSummaryDesc">Zero operational anomalies or race conditions detected today.</span>
-                                <div class="health-timestamp-tag"><i class="fa-regular fa-clock"></i> Last Checked: <span id="pageHealthLastChecked">--</span></div>
+                                <div class="health-timestamp-tag"><i data-lucide="clock" class="lucide-sm"></i> Last Checked: <span id="pageHealthLastChecked">--</span></div>
                                 <div id="pageHealthIssuesPills" class="health-issues-pill-row"></div>
                             </div>
                         </div>
@@ -1513,7 +1658,7 @@
                     <!-- Card 2: Market State & Schedule Mode -->
                     <div class="health-overview-card">
                         <div class="health-card-header">
-                            <span class="health-card-title"><i class="fa-solid fa-clock text-cyan"></i> MARKET STATE &amp; SCHEDULE</span>
+                            <span class="health-card-title"><i data-lucide="clock" class="lucide-sm text-cyan"></i> MARKET STATE &amp; SCHEDULE</span>
                             <span class="health-card-badge info" id="pageMarketStateBadge">CHECKING...</span>
                         </div>
                         <div class="health-metric-content">
@@ -1531,7 +1676,7 @@
                             </div>
                             <div class="health-key-value-row">
                                 <span>Zero-Jitter Gating:</span>
-                                <strong class="text-bullish"><i class="fa-solid fa-lock"></i> Frozen Off-Market</strong>
+                                <strong class="text-bullish"><i data-lucide="lock" class="lucide-sm"></i> Frozen Off-Market</strong>
                             </div>
                             <div class="health-key-value-row">
                                 <span>Server Clock (IST):</span>
@@ -1543,7 +1688,7 @@
                     <!-- Card 3: Overnight Lock & Evaluation Stats -->
                     <div class="health-overview-card">
                         <div class="health-card-header">
-                            <span class="health-card-title"><i class="fa-solid fa-lock text-gold"></i> LOCK &amp; EVAL INTEGRITY</span>
+                            <span class="health-card-title"><i data-lucide="lock" class="lucide-sm text-gold"></i> LOCK &amp; EVAL INTEGRITY</span>
                             <span class="health-card-badge success" id="pageLockIntegrityBadge">PERSISTED</span>
                         </div>
                         <div class="health-metric-content">
@@ -1561,11 +1706,11 @@
                             </div>
                             <div class="health-key-value-row">
                                 <span>Disk Persistence:</span>
-                                <strong class="text-bullish"><i class="fa-solid fa-shield-halved"></i> trade_history.json</strong>
+                                <strong class="text-bullish"><i data-lucide="shield" class="lucide-sm"></i> trade_history.json</strong>
                             </div>
                             <div class="health-key-value-row">
                                 <span>Cold-Start Zero Wipe:</span>
-                                <strong class="text-bullish"><i class="fa-solid fa-check"></i> Verified Clean</strong>
+                                <strong class="text-bullish"><i data-lucide="check" class="lucide-sm"></i> Verified Clean</strong>
                             </div>
                         </div>
                     </div>
@@ -1573,7 +1718,7 @@
                     <!-- Card 4: Dyno Stability & Keepalive Uptime -->
                     <div class="health-overview-card">
                         <div class="health-card-header">
-                            <span class="health-card-title"><i class="fa-solid fa-server text-indigo"></i> CLOUD HOSTING &amp; DYNO</span>
+                            <span class="health-card-title"><i data-lucide="server" class="lucide-sm text-indigo"></i> CLOUD HOSTING &amp; DYNO</span>
                             <span class="health-card-badge nominal" id="pageDynoStatusBadge">STABLE</span>
                         </div>
                         <div class="health-metric-content">
@@ -1587,7 +1732,7 @@
                             </div>
                             <div class="health-key-value-row">
                                 <span>External Cron Uptime:</span>
-                                <strong class="text-bullish"><i class="fa-solid fa-circle-check"></i> GitHub Actions (Active)</strong>
+                                <strong class="text-bullish"><i data-lucide="check-circle-2" class="lucide-sm"></i> GitHub Actions (Active)</strong>
                             </div>
                             <div class="health-key-value-row">
                                 <span>Keepalive Cadence:</span>
@@ -1606,7 +1751,7 @@
                     <div class="ai-sentinel-header">
                         <div class="ai-sentinel-title-wrap">
                             <div class="ai-sentinel-icon-glow">
-                                <i class="fa-solid fa-robot"></i>
+                                <i data-lucide="bot" class="lucide-sm"></i>
                             </div>
                             <div>
                                 <div class="ai-sentinel-heading-row">
@@ -1622,7 +1767,7 @@
                         </div>
                         <div class="ai-sentinel-actions-wrap">
                             <button id="btnTriggerAiSelfHeal" class="btn btn-pill btn-primary sentinel-heal-btn" data-action="self-heal" title="1-Click AI Sentinel Self-Healing: Clear database locks, restart WebSockets, and refresh memory caches">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <i data-lucide="sparkles" class="lucide-sm"></i>
                                 <span>TRIGGER AI SELF-HEAL NOW</span>
                             </button>
                             <button id="triggerSelfHealBtn" class="btn btn-pill btn-primary sentinel-heal-btn" style="display:none;" aria-hidden="true" title="Self Heal Trigger Alias"></button>
@@ -1633,7 +1778,7 @@
                     <div class="sentinel-category-grid">
                         <div class="sentinel-cat-card" id="sentinelCatSched">
                             <div class="sentinel-cat-header">
-                                <span class="sentinel-cat-title"><i class="fa-solid fa-calendar-check text-cyan"></i> Core Lifecycle</span>
+                                <span class="sentinel-cat-title"><i data-lucide="calendar-check" class="lucide-sm text-cyan"></i> Core Lifecycle</span>
                                 <span class="sentinel-cat-score text-bullish" id="catScoreSched">100%</span>
                             </div>
                             <div class="sentinel-cat-bar-wrap">
@@ -1644,7 +1789,7 @@
 
                         <div class="sentinel-cat-card" id="sentinelCatData">
                             <div class="sentinel-cat-header">
-                                <span class="sentinel-cat-title"><i class="fa-solid fa-database text-gold"></i> Data Accuracy</span>
+                                <span class="sentinel-cat-title"><i data-lucide="database" class="lucide-sm text-gold"></i> Data Accuracy</span>
                                 <span class="sentinel-cat-score text-bullish" id="catScoreData">100%</span>
                             </div>
                             <div class="sentinel-cat-bar-wrap">
@@ -1655,7 +1800,7 @@
 
                         <div class="sentinel-cat-card" id="sentinelCatApi">
                             <div class="sentinel-cat-header">
-                                <span class="sentinel-cat-title"><i class="fa-solid fa-network-wired text-indigo"></i> Frontend APIs</span>
+                                <span class="sentinel-cat-title"><i data-lucide="network" class="lucide-sm text-indigo"></i> Frontend APIs</span>
                                 <span class="sentinel-cat-score text-bullish" id="catScoreApi">100%</span>
                             </div>
                             <div class="sentinel-cat-bar-wrap">
@@ -1666,7 +1811,7 @@
 
                         <div class="sentinel-cat-card" id="sentinelCatJournals">
                             <div class="sentinel-cat-header">
-                                <span class="sentinel-cat-title"><i class="fa-solid fa-bell text-amber"></i> Notifications &amp; DB</span>
+                                <span class="sentinel-cat-title"><i data-lucide="bell" class="lucide-sm text-amber"></i> Notifications &amp; DB</span>
                                 <span class="sentinel-cat-score text-bullish" id="catScoreJournals">100%</span>
                             </div>
                             <div class="sentinel-cat-bar-wrap">
@@ -1680,14 +1825,14 @@
                     <div class="sentinel-healing-stream-wrap" id="sentinelHealingStreamWrap">
                         <div class="sentinel-stream-header">
                             <div class="sentinel-stream-header-left">
-                                <span class="sentinel-stream-title"><i class="fa-solid fa-bolt-lightning text-gold"></i> AI Auto-Healing Action Stream</span>
+                                <span class="sentinel-stream-title"><i data-lucide="zap" class="lucide-sm text-gold"></i> AI Auto-Healing Action Stream</span>
                                 <span class="sentinel-stream-counter" id="sentinelFixesCounter">Total Fixes Applied Today: 0</span>
                             </div>
-                            <span class="sentinel-stream-tag"><i class="fa-solid fa-shield-halved text-bullish"></i> Autonomous Watchdog Active</span>
+                            <span class="sentinel-stream-tag"><i data-lucide="shield" class="lucide-sm text-bullish"></i> Autonomous Watchdog Active</span>
                         </div>
                         <div class="sentinel-stream-list" id="sentinelHealingStreamList">
                             <div class="sentinel-stream-empty">
-                                <i class="fa-solid fa-shield-heart text-bullish"></i> All 4 health categories verified nominal. Sentinel watchdog is actively monitoring every 30 seconds.
+                                <i data-lucide="shield-check" class="lucide-sm text-bullish"></i> All 4 health categories verified nominal. Sentinel watchdog is actively monitoring every 30 seconds.
                             </div>
                         </div>
                     </div>
@@ -1699,9 +1844,9 @@
                     <div class="sentinel-waterfall-header">
                         <div>
                             <div class="sentinel-waterfall-title-row">
-                                <h3 class="sentinel-waterfall-heading"><i class="fa-solid fa-microchip text-gold"></i> 10-PHASE DIAGNOSTIC WATERFALL ENGINE</h3>
+                                <h3 class="sentinel-waterfall-heading"><i data-lucide="cpu" class="lucide-sm text-gold"></i> 10-PHASE DIAGNOSTIC WATERFALL ENGINE</h3>
                                 <span class="badge badge-bullish" id="waterfallOverallBadge">10/10 PHASES OPTIMAL</span>
-                                <span class="waterfall-telemetry-chip" id="waterfallLatencyTag"><i class="fa-regular fa-clock"></i> Latency: <strong id="waterfallTotalLatencyVal">--ms</strong></span>
+                                <span class="waterfall-telemetry-chip" id="waterfallLatencyTag"><i data-lucide="clock" class="lucide-sm"></i> Latency: <strong id="waterfallTotalLatencyVal">--ms</strong></span>
                             </div>
                             <p class="sentinel-waterfall-subheading">
                                 Autonomous 10-tier forward telemetry verifying broker connections, fast-cache integrity, mutex locks, WebSocket backpressure, execution math, and quota limits.
@@ -1715,7 +1860,7 @@
                                 <button type="button" class="waterfall-filter-btn" data-filter="DEGRADED">DEGRADED</button>
                             </div>
                             <button id="btnRun10PhaseDiag" class="btn btn-pill btn-secondary">
-                                <i class="fa-solid fa-arrows-rotate text-gold"></i> <span>RUN DIAGNOSTICS</span>
+                                <i data-lucide="refresh-cw" class="lucide-sm text-gold"></i> <span>RUN DIAGNOSTICS</span>
                             </button>
                         </div>
                     </div>
@@ -1736,11 +1881,11 @@
                 <div class="health-milestone-header-row">
                     <div>
                         <h3 class="health-sub-heading">
-                            <i class="fa-solid fa-list-check text-gold"></i> 4-PILLAR AUTONOMOUS MILESTONE PIPELINE
+                            <i data-lucide="shopping-bag" class="lucide-sm text-gold"></i> 4-PILLAR AUTONOMOUS MILESTONE PIPELINE
                         </h3>
                         <span class="health-sub-subheading">Daily state progression: Pre-Market &rarr; 9:15 Gap Eval &rarr; 3:25 Snapshot &rarr; 3:30 Final Lock</span>
                     </div>
-                    <span class="milestone-pipeline-badge"><i class="fa-solid fa-shield-check text-bullish"></i> Thread-Safe State Machine</span>
+                    <span class="milestone-pipeline-badge"><i data-lucide="shield-check" class="lucide-sm text-bullish"></i> Thread-Safe State Machine</span>
                 </div>
 
                 <section class="health-milestones-full-grid">
@@ -1819,7 +1964,7 @@
                                 <span class="light green"></span>
                             </div>
                             <h3 class="terminal-title">
-                                <i class="fa-solid fa-terminal text-gold"></i> LIVE SYSTEM CONSOLE &amp; ROLLING LOG TERMINAL
+                                <i data-lucide="terminal" class="lucide-sm text-gold"></i> LIVE SYSTEM CONSOLE &amp; ROLLING LOG TERMINAL
                             </h3>
                             <span class="terminal-badge" id="terminalStatusBadge">STREAMING</span>
                         </div>
@@ -1827,7 +1972,7 @@
                         <div class="terminal-controls-right">
                             <!-- Search filter -->
                             <div class="terminal-search-box">
-                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <i data-lucide="search" class="lucide-sm"></i>
                                 <input type="text" id="healthLogSearchInput" placeholder="Filter logs (regex/text)..." autocomplete="off" />
                             </div>
 
@@ -1840,13 +1985,13 @@
                             </div>
 
                             <button id="btnTerminalAutoScroll" class="btn btn-xs btn-pill btn-secondary terminal-action-btn active" title="Toggle Auto-Scroll">
-                                <i class="fa-solid fa-arrow-down-short-wide"></i> <span>SCROLL</span>
+                                <i data-lucide="arrow-up-down" class="lucide-sm"></i> <span>SCROLL</span>
                             </button>
                             <button id="btnTerminalCopy" class="btn btn-xs btn-pill btn-secondary terminal-action-btn" title="Copy Logs to Clipboard">
-                                <i class="fa-regular fa-copy"></i> <span>COPY</span>
+                                <i data-lucide="copy" class="lucide-sm"></i> <span>COPY</span>
                             </button>
                             <button id="btnTerminalRefresh" class="btn btn-xs btn-pill btn-secondary terminal-action-btn" title="Refresh Rolling Logs">
-                                <i class="fa-solid fa-rotate-right"></i>
+                                <i data-lucide="refresh-cw" class="lucide-sm"></i>
                             </button>
                         </div>
                     </div>
@@ -1855,7 +2000,7 @@
                     <div class="health-terminal-viewport" id="healthTerminalViewport">
                         <div class="health-log-list" id="pageHealthLogList">
                             <div class="health-empty-log">
-                                <i class="fa-solid fa-circle-check text-bullish"></i> Zero errors or exceptions recorded today. All background scheduler pipelines are running nominally.
+                                <i data-lucide="check-circle-2" class="lucide-sm text-bullish"></i> Zero errors or exceptions recorded today. All background scheduler pipelines are running nominally.
                             </div>
                         </div>
                     </div>
@@ -1870,12 +2015,12 @@
                 <div class="health-archive-header-row">
                     <div>
                         <h3 class="health-sub-heading">
-                            <i class="fa-solid fa-calendar-check text-cyan"></i> DAILY HEALTH AUDIT ARCHIVE
+                            <i data-lucide="calendar-check" class="lucide-sm text-cyan"></i> DAILY HEALTH AUDIT ARCHIVE
                         </h3>
                         <span class="health-sub-subheading">Historical multi-day forward-testing integrity records &amp; audit reports</span>
                     </div>
                     <div class="health-archive-search-box">
-                        <i class="fa-solid fa-filter text-muted"></i>
+                        <i data-lucide="filter" class="lucide-sm text-muted"></i>
                         <input type="text" id="healthArchiveSearchInput" placeholder="Filter by date (YYYY-MM-DD)..." autocomplete="off" />
                     </div>
                 </div>
@@ -1905,49 +2050,49 @@
             </div>
             <!-- ============================== END SYSTEM HEALTH & DIAGNOSTICS SECTION ============================== -->
 
-            <!-- ============================== GUIDE / EXPORT / SETTINGS SECTION ============================== -->
+            <!-- ============================== GUIDE & DOCUMENTATION SECTION ============================== -->
             <div id="guideSection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-gear text-gold"></i> GUIDE / EXPORT / SETTINGS
+                    <h2 class="section-page-title"><i data-lucide="book-open" class="lucide-sm text-gold"></i> GUIDE &amp; DOCUMENTATION
                         <span class="section-page-subtitle">Export Your Watchlist &amp; Review How TRADEXO Works</span>
                     </h2>
                 </div>
 
                 <section class="guide-settings-grid">
                     <div class="guide-step-box">
-                        <h4><i class="fa-solid fa-play text-gold"></i> Platform Intro Video</h4>
+                        <h4><i data-lucide="play" class="lucide-sm text-gold"></i> Platform Intro Video</h4>
                         <p>Watch the TRADEXO cinematic overview and feature walkthrough reel with full audio and animated 5-pillar highlights.</p>
                         <button id="guideWatchIntroBtn" class="btn btn-pill btn-primary" style="margin-top:10px;width:100%;">
-                            <i class="fa-solid fa-play"></i> PLAY PLATFORM INTRO
+                            <i data-lucide="play" class="lucide-sm"></i> PLAY PLATFORM INTRO
                         </button>
                     </div>
 
                     <div class="guide-step-box">
-                        <h4><i class="fa-solid fa-file-csv text-gold"></i> Export Watchlist</h4>
+                        <h4><i data-lucide="file-spreadsheet" class="lucide-sm text-gold"></i> Export Watchlist</h4>
                         <p>Download the current filtered Signals Engine view as a CSV file — same data, same filters, same sort order you're looking at right now.</p>
                         <button id="exportCsvBtnGuide" class="btn btn-pill btn-primary" style="margin-top:10px;width:100%;">
-                            <i class="fa-solid fa-file-csv"></i> EXPORT CSV
+                            <i data-lucide="file-spreadsheet" class="lucide-sm"></i> EXPORT CSV
                         </button>
                     </div>
 
                     <div class="guide-step-box">
-                        <h4><i class="fa-solid fa-trophy text-gold"></i> Win Rate &amp; Gap Accuracy Analytics</h4>
+                        <h4><i data-lucide="trophy" class="lucide-sm text-gold"></i> Win Rate &amp; Gap Accuracy Analytics</h4>
                         <p>Open the full historical trade log: predicted gap vs. actual gap, per-pick accuracy score, and overall BTST win rate.</p>
                         <button id="winRateBtnGuide" class="btn btn-pill btn-secondary" style="margin-top:10px;width:100%;">
-                            <i class="fa-solid fa-trophy text-gold"></i> OPEN WIN RATE ANALYTICS
+                            <i data-lucide="trophy" class="lucide-sm text-gold"></i> OPEN WIN RATE ANALYTICS
                         </button>
                     </div>
 
                     <div class="guide-step-box">
-                        <h4><i class="fa-solid fa-scale-balanced text-gold"></i> Quantitative Rules</h4>
+                        <h4><i data-lucide="scale" class="lucide-sm text-gold"></i> Quantitative Rules</h4>
                         <p>Priority thresholds, the 5-Pillar matrix, scanning/locking schedule, and the fundamentals/news quality gates — all in one place, unchanged from the engine's actual scoring logic.</p>
                         <button class="btn btn-pill btn-secondary sidebar-nav-jump" data-section-link="rules" style="margin-top:10px;width:100%;">
-                            <i class="fa-solid fa-arrow-right"></i> VIEW RULES
+                            <i data-lucide="arrow-right" class="lucide-sm"></i> VIEW RULES
                         </button>
                     </div>
 
                     <div class="guide-step-box">
-                        <h4><i class="fa-solid fa-circle-info text-gold"></i> About This Build</h4>
+                        <h4><i data-lucide="info" class="lucide-sm text-gold"></i> About This Build</h4>
                         <p>TRADEXO is a paper/simulated research engine — no real broker order placement is executed (SmartAPI stream is used read-only for live market data &amp; tick-rule delta analysis). All quantitative rules, thresholds, and scoring logic are identical across desktop and mobile.</p>
                     </div>
                 </section>
@@ -1957,7 +2102,7 @@
             <!-- ============================== RULES SECTION ============================== -->
             <div id="rulesSection" class="hidden">
                 <div class="section-heading-row">
-                    <h2 class="section-page-title"><i class="fa-solid fa-scale-balanced text-gold"></i> RULES
+                    <h2 class="section-page-title"><i data-lucide="scale" class="lucide-sm text-gold"></i> RULES
                         <span class="section-page-subtitle">Priority Ranking &amp; Gap Prediction — Exactly How The Engine Scores</span>
                     </h2>
                 </div>
@@ -2001,13 +2146,261 @@
             </div>
             <!-- ============================== END RULES SECTION ============================== -->
 
+            <!-- ============================== SETTINGS & PREFERENCES SECTION ============================== -->
+            <div id="settingsSection" class="hidden">
+                <div class="section-heading-row">
+                    <h2 class="section-page-title"><i data-lucide="settings" class="lucide-sm text-gold"></i> SETTINGS &amp; PREFERENCES
+                        <span class="section-page-subtitle">Personalize Workspace Appearance, Feed Health, Refresh Rates, and Alerts</span>
+                    </h2>
+                </div>
+
+                <div class="settings-dashboard-grid">
+                    <!-- 1. Theme Selection Card (Exclusive Source of Truth) -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon-wrap">
+                                <i data-lucide="palette" class="lucide-sm text-gold"></i>
+                            </div>
+                            <div class="settings-card-titles">
+                                <h3 class="settings-card-title">Theme &amp; Appearance</h3>
+                                <p class="settings-card-desc">Exclusively controlled here. Sets the global color scheme across all 15 workspaces.</p>
+                            </div>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-segmented-group" id="settingsThemeGroup">
+                                <button type="button" class="settings-segmented-btn active" data-theme-val="dark" id="themeOptDark">
+                                    <i data-lucide="moon" class="lucide-sm text-gold"></i>
+                                    <div class="segmented-btn-content">
+                                        <span class="segmented-title">Dark Terminal</span>
+                                        <span class="segmented-desc">Obsidian &amp; Champagne Gold (Institutional default)</span>
+                                    </div>
+                                    <span class="segmented-check"><i data-lucide="check-circle-2" class="lucide-xs"></i></span>
+                                </button>
+                                <button type="button" class="settings-segmented-btn" data-theme-val="light" id="themeOptLight">
+                                    <i data-lucide="sun" class="lucide-sm text-amber"></i>
+                                    <div class="segmented-btn-content">
+                                        <span class="segmented-title">Clean Light</span>
+                                        <span class="segmented-desc">High-contrast slate &amp; warm white for bright environments</span>
+                                    </div>
+                                    <span class="segmented-check"><i data-lucide="check-circle-2" class="lucide-xs"></i></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Scanner Display Density Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon-wrap">
+                                <i data-lucide="sliders" class="lucide-sm text-gold"></i>
+                            </div>
+                            <div class="settings-card-titles">
+                                <h3 class="settings-card-title">Scanner Table Density</h3>
+                                <p class="settings-card-desc">Choose between high-density Kite-style layout or full technical breakdown matrix.</p>
+                            </div>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-segmented-group" id="settingsDensityGroup">
+                                <button type="button" class="settings-segmented-btn active" data-density-val="compact" id="densityOptCompact">
+                                    <i data-lucide="align-justify" class="lucide-sm text-gold"></i>
+                                    <div class="segmented-btn-content">
+                                        <span class="segmented-title">Compact (Kite Density)</span>
+                                        <span class="segmented-desc">9 essential columns &amp; tight padding. Secondary columns hidden from first view.</span>
+                                    </div>
+                                    <span class="segmented-check"><i data-lucide="check-circle-2" class="lucide-xs"></i></span>
+                                </button>
+                                <button type="button" class="settings-segmented-btn" data-density-val="comfortable" id="densityOptComfortable">
+                                    <i data-lucide="layout-grid" class="lucide-sm text-gold"></i>
+                                    <div class="segmented-btn-content">
+                                        <span class="segmented-title">Comfortable (12-Column Matrix)</span>
+                                        <span class="segmented-desc">Displays all technical pillars, RSI momentum, and option types inline.</span>
+                                    </div>
+                                    <span class="segmented-check"><i data-lucide="check-circle-2" class="lucide-xs"></i></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Live Refresh Interval Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon-wrap">
+                                <i data-lucide="refresh-cw" class="lucide-sm text-gold"></i>
+                            </div>
+                            <div class="settings-card-titles">
+                                <h3 class="settings-card-title">Live Refresh Interval</h3>
+                                <p class="settings-card-desc">Configure the polling frequency for overnight signals, scoring weights, and market ticks.</p>
+                            </div>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-options-row" id="settingsRefreshRow">
+                                <button type="button" class="settings-chip-btn" data-refresh="5000">
+                                    <strong>5s</strong>
+                                    <span>High Frequency</span>
+                                </button>
+                                <button type="button" class="settings-chip-btn active" data-refresh="15000">
+                                    <strong>15s</strong>
+                                    <span>Recommended</span>
+                                </button>
+                                <button type="button" class="settings-chip-btn" data-refresh="30000">
+                                    <strong>30s</strong>
+                                    <span>Eco Mode</span>
+                                </button>
+                                <button type="button" class="settings-chip-btn" data-refresh="60000">
+                                    <strong>60s</strong>
+                                    <span>Conservative</span>
+                                </button>
+                            </div>
+                            <div class="settings-hint">
+                                <i data-lucide="info" class="lucide-xs"></i>
+                                <span>Note: Real-time price ticks stream continuously via WebSocket. This setting adjusts signal recomputation frequency.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Notification Preferences Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon-wrap">
+                                <i data-lucide="bell" class="lucide-sm text-gold"></i>
+                            </div>
+                            <div class="settings-card-titles">
+                                <h3 class="settings-card-title">Notification &amp; Audio Alerts</h3>
+                                <p class="settings-card-desc">Configure audio signals and desktop notifications when high-conviction P1 setups trigger.</p>
+                            </div>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="settings-toggle-row">
+                                <div class="toggle-text-block">
+                                    <div class="toggle-label-text">In-App Audio Bell</div>
+                                    <div class="toggle-sub-text">Synthesized chime (587Hz &rarr; 880Hz sweep) when Priority 1 setups or 3x volume surges trigger.</div>
+                                </div>
+                                <label class="settings-switch">
+                                    <input type="checkbox" id="settingsAudioAlertsToggle" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="settings-toggle-row" style="margin-top:14px;">
+                                <div class="toggle-text-block">
+                                    <div class="toggle-label-text">Desktop Web Push Notifications</div>
+                                    <div class="toggle-sub-text">Native OS alerts when browser tab is minimized or backgrounded during Power Hour.</div>
+                                </div>
+                                <div class="toggle-action-block">
+                                    <button type="button" id="settingsTestPushBtn" class="btn btn-pill btn-secondary" style="font-size:11px;padding:4px 10px;margin-right:8px;">Test Push</button>
+                                    <label class="settings-switch">
+                                        <input type="checkbox" id="settingsWebPushToggle" checked>
+                                        <span class="switch-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Data Source / API Health Card (Read-Only) -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon-wrap">
+                                <i data-lucide="shield-check" class="lucide-sm text-gold"></i>
+                            </div>
+                            <div class="settings-card-titles">
+                                <h3 class="settings-card-title">Data Feeds &amp; Broker API Health</h3>
+                                <p class="settings-card-desc">Live connection diagnostics. Protected read-only display — raw API secrets are never exposed.</p>
+                            </div>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="api-health-list">
+                                <div class="api-health-item">
+                                    <div class="api-health-left">
+                                        <div class="api-name">Angel One / SmartAPI Stream</div>
+                                        <div class="api-details">Live Level 2 Ticks &bull; Client: <span class="font-mono text-gold">ANGEL-******72</span></div>
+                                    </div>
+                                    <div class="api-health-right">
+                                        <span class="api-badge status-connected"><i data-lucide="radio" class="lucide-xs"></i> CONNECTED</span>
+                                    </div>
+                                </div>
+
+                                <div class="api-health-item">
+                                    <div class="api-health-left">
+                                        <div class="api-name">NSE Official Bhavcopy Engine</div>
+                                        <div class="api-details">100% Volume Reconciliation &bull; 210 F&amp;O Equities Indexed</div>
+                                    </div>
+                                    <div class="api-health-right">
+                                        <span class="api-badge status-active"><i data-lucide="check" class="lucide-xs"></i> ACTIVE</span>
+                                    </div>
+                                </div>
+
+                                <div class="api-health-item">
+                                    <div class="api-health-left">
+                                        <div class="api-name">CurrentsAPI Global News</div>
+                                        <div class="api-details">Quota Guard &bull; Cached (3x/day background refresh compliance)</div>
+                                    </div>
+                                    <div class="api-health-right">
+                                        <span class="api-badge status-cached"><i data-lucide="database" class="lucide-xs"></i> CACHED</span>
+                                    </div>
+                                </div>
+
+                                <div class="api-health-item">
+                                    <div class="api-health-left">
+                                        <div class="api-name">Kite Connect / Upstox Gateway</div>
+                                        <div class="api-details">Paper Trading &amp; Order Router Bridge &bull; Read-Only Watcher</div>
+                                    </div>
+                                    <div class="api-health-right">
+                                        <span class="api-badge status-standby"><i data-lucide="check-circle" class="lucide-xs"></i> READY</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-security-note">
+                                <i data-lucide="lock" class="lucide-xs text-gold"></i>
+                                <span><strong>Security Architecture:</strong> API credentials and JWT access tokens are stored strictly within encrypted environment variables on the backend server. The client interface never accesses or receives secret tokens.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Default Landing Page Selector Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon-wrap">
+                                <i data-lucide="compass" class="lucide-sm text-gold"></i>
+                            </div>
+                            <div class="settings-card-titles">
+                                <h3 class="settings-card-title">Default Landing Workspace</h3>
+                                <p class="settings-card-desc">Choose which workspace TRADEXO automatically boots into when launched.</p>
+                            </div>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="landing-page-select-wrap">
+                                <label for="defaultLandingSelect" class="settings-field-label">Boot Workspace:</label>
+                                <div class="select-styled-container">
+                                    <select id="defaultLandingSelect" class="form-select">
+                                        <option value="scanner">Scanner (Institutional Signals Engine)</option>
+                                        <option value="indices">Index Intelligence (Nifty &amp; BankNifty Regimes)</option>
+                                        <option value="liveTrades">Live Trade (Real-Time Trade Center)</option>
+                                        <option value="paperTrading">Paper Portfolio (Simulated Trades &amp; P&amp;L)</option>
+                                        <option value="orderFlow">Order Flow (CVD &amp; Institutional Delta)</option>
+                                        <option value="accuracy">Accuracy &amp; Win Rate (Predictive Analytics)</option>
+                                        <option value="systemHealth">System Health &amp; Diagnostics</option>
+                                    </select>
+                                    <i data-lucide="chevron-down" class="select-caret"></i>
+                                </div>
+                            </div>
+                            <div class="settings-hint" style="margin-top:10px;">
+                                <i data-lucide="check" class="lucide-xs text-bullish"></i>
+                                <span>Preference is saved locally and applies instantly on next launch or browser refresh.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ============================== END SETTINGS & PREFERENCES SECTION ============================== -->
+
             <!-- ============================== DEDICATED STOCK DETAIL & TRADINGVIEW CHART SECTION ============================== -->
             <div id="stockDetailSection" class="hidden">
                 <!-- Single-Row Non-Overlapping Stock Header -->
                 <div class="stock-detail-header-card" style="margin-bottom:12px;">
                     <div class="stock-header-left">
                         <button id="btnBackFromStockDetail" class="btn-icon-back" title="Back to Scanner">
-                            <i class="fa-solid fa-arrow-left"></i>
+                            <i data-lucide="arrow-left" class="lucide-sm"></i>
                         </button>
                         <div id="stockDetailLogoWrap" class="stock-logo-wrap"></div>
                         <div class="stock-info-col">
@@ -2027,24 +2420,26 @@
                             <!-- Signal badge injected by JS -->
                         </div>
                     </div>
+                </div>
+
                 <!-- View Switcher Tabs (Analysis vs Chart) -->
                 <div class="filter-group" id="stockDetailViewSwitcher" style="margin-bottom: 14px; display: flex; gap: 8px;">
                     <button class="tab-btn active" id="btnStockDetailAnalysisTab" data-detail-view="analysis" style="padding: 8px 14px; font-weight: 800; font-size: 12px; border-radius: 8px;">
-                        <i class="fa-solid fa-chart-pie text-cyan"></i> <span class="btn-text-full">QUANTITATIVE ANALYSIS</span><span class="btn-text-mobile">ANALYSIS</span>
+                        <i data-lucide="pie-chart" class="lucide-sm text-cyan"></i> <span class="btn-text-full">QUANTITATIVE ANALYSIS</span><span class="btn-text-mobile">ANALYSIS</span>
                     </button>
                     <button class="tab-btn" id="btnStockDetailChartTab" data-detail-view="chart" style="padding: 8px 14px; font-weight: 800; font-size: 12px; border-radius: 8px;">
-                        <i class="fa-solid fa-chart-candlestick text-gold"></i> <span class="btn-text-full">INTERACTIVE CANDLESTICK CHART</span><span class="btn-text-mobile">CHART</span>
+                        <i data-lucide="candlestick-chart" class="lucide-sm text-gold"></i> <span class="btn-text-full">INTERACTIVE CANDLESTICK CHART</span><span class="btn-text-mobile">CHART</span>
                     </button>
                 </div>
 
                 <!-- Analysis Container (Quantitative Matrix) -->
                 <div id="stockDetailAnalysisContainer" class="stock-detail-view-container">
                     <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                        <h3 style="font-size:16px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px;margin:0;">
-                            <i class="fa-solid fa-brain text-gold"></i> QUANTITATIVE MULTI-PILLAR DEEP-DIVE &amp; BREAKOUT MATRIX
+                        <h3 style="font-size:16px;font-weight:800;color:var(--color-text-primary);display:flex;align-items:center;gap:8px;margin:0;">
+                            <i data-lucide="cpu" class="lucide-sm text-gold"></i> QUANTITATIVE MULTI-PILLAR DEEP-DIVE &amp; BREAKOUT MATRIX
                         </h3>
                         <div id="matrixCandleInfo" style="font-size:11.5px;font-weight:700;color:var(--cyan);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);padding:3px 10px;border-radius:20px;">
-                            <i class="fa-solid fa-bolt"></i> Live Calculated from Candle Series
+                            <i data-lucide="zap" class="lucide-sm"></i> Live Calculated from Candle Series
                         </div>
                     </div>
 
@@ -2088,27 +2483,27 @@
                         <!-- Right: Pro Chart Drawing & Analysis Tools -->
                         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;" id="chartToolsGroup">
                             <button class="chart-tool-btn" id="toolMeasure" data-tool="measure" title="Measure Price Range & %">
-                                <i class="fa-solid fa-ruler-combined text-gold"></i> Measure
+                                <i data-lucide="ruler" class="lucide-sm text-gold"></i> Measure
                             </button>
                             <button class="chart-tool-btn" id="toolHLine" data-tool="hline" title="Add Horizontal Support/Resistance Line">
-                                <i class="fa-solid fa-arrows-left-right text-cyan"></i> H-Line
+                                <i data-lucide="arrow-left-right" class="lucide-sm text-cyan"></i> H-Line
                             </button>
                             <button class="chart-tool-btn" id="toolLongPos" data-tool="long" title="Long Position Risk/Reward Tool">
-                                <i class="fa-solid fa-arrow-trend-up text-bullish"></i> Long Pos
+                                <i data-lucide="trending-up" class="lucide-sm text-bullish"></i> Long Pos
                             </button>
                             <button class="chart-tool-btn" id="toolShortPos" data-tool="short" title="Short Position Risk/Reward Tool">
-                                <i class="fa-solid fa-arrow-trend-down text-bearish"></i> Short Pos
+                                <i data-lucide="trending-down" class="lucide-sm text-bearish"></i> Short Pos
                             </button>
                             <button class="chart-tool-btn" id="toolClearDrawings" title="Clear All Drawings" style="color:var(--bearish);">
-                                <i class="fa-solid fa-trash-can"></i>
+                                <i data-lucide="trash-2" class="lucide-sm"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Interactive OHLC Chart Container -->
-                    <div class="table-card" style="margin-bottom:20px;padding:0;overflow:hidden;border-radius:16px;min-height:450px;background:#ffffff;border:1px solid #e2e8f0;width:100%;position:relative;box-shadow:0 1px 3px rgba(15,23,42,0.05);">
+                    <div class="table-card" style="margin-bottom:20px;padding:0;overflow:hidden;border-radius:16px;min-height:450px;background:var(--color-surface-card);border:1px solid var(--color-border-subtle);width:100%;position:relative;box-shadow:0 1px 3px rgba(15,23,42,0.05);">
                         <div id="chart_tool_hint" style="display:none;position:absolute;top:10px;left:14px;background:#0f172a;border:1px solid #d97706;border-radius:6px;padding:5px 12px;font-size:11.5px;font-weight:700;color:#ffffff;z-index:10;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.15);"></div>
-                        <div id="tradingview_chart_container" style="width:100%;height:450px;min-height:400px;position:relative;background:#ffffff;"></div>
+                        <div id="tradingview_chart_container" style="width:100%;height:450px;min-height:400px;position:relative;background:transparent;"></div>
                     </div>
                 </div>
             </div>
@@ -2127,7 +2522,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div class="modal-title-group">
-                    <h2 id="strategyFormTitle"><i class="fa-solid fa-sliders text-gold"></i> Add Strategy</h2>
+                    <h2 id="strategyFormTitle"><i data-lucide="sliders" class="lucide-sm text-gold"></i> Add Strategy</h2>
                 </div>
                 <button id="closeStrategyFormBtn" class="modal-close-btn">&times;</button>
             </div>
@@ -2150,7 +2545,7 @@
                         <div style="display:flex;gap:8px;">
                             <input type="text" id="strategyTextPrompt" class="form-input" placeholder="e.g. 5m RSI > 70 with 2x volume spike, 1.5% TP and 0.75% SL">
                             <button type="button" id="btnAiParseText" class="btn btn-pill btn-secondary" style="white-space:nowrap;">
-                                <i class="fa-solid fa-wand-magic-sparkles text-gold"></i> AI PARSE
+                                <i data-lucide="sparkles" class="lucide-sm text-gold"></i> AI PARSE
                             </button>
                         </div>
                     </div>
@@ -2164,11 +2559,11 @@
                     <div class="form-group">
                         <label class="form-label">PER-STRATEGY SCOPE TOGGLES</label>
                         <div class="toggle-row">
-                            <span class="lbl"><i class="fa-solid fa-arrow-trend-up text-cyan"></i> Toggle A — Stocks (Intraday / Scalping)</span>
+                            <span class="lbl"><i data-lucide="trending-up" class="lucide-sm text-cyan"></i> Toggle A — Stocks (Intraday / Scalping)</span>
                             <label class="switch"><input type="checkbox" id="strategyToggleStocks" checked><span class="slider round"></span></label>
                         </div>
                         <div class="toggle-row">
-                            <span class="lbl"><i class="fa-solid fa-chart-line text-gold"></i> Toggle B — Index Options (Nifty / Bank Nifty / Sensex)</span>
+                            <span class="lbl"><i data-lucide="trending-up" class="lucide-sm text-gold"></i> Toggle B — Index Options (Nifty / Bank Nifty / Sensex)</span>
                             <label class="switch"><input type="checkbox" id="strategyToggleIndices" checked><span class="slider round"></span></label>
                         </div>
                     </div>
@@ -2210,7 +2605,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-pill btn-primary" style="width:100%;margin-top:10px;justify-content:center;">
-                        <i class="fa-solid fa-floppy-disk"></i> SAVE STRATEGY
+                        <i data-lucide="save" class="lucide-sm"></i> SAVE STRATEGY
                     </button>
                 </form>
             </div>
@@ -2222,7 +2617,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div class="modal-title-group">
-                    <h2><i class="fa-solid fa-robot text-gold"></i> AI Strategy Clarification Summary</h2>
+                    <h2><i data-lucide="bot" class="lucide-sm text-gold"></i> AI Strategy Clarification Summary</h2>
                 </div>
                 <button id="closeClarificationBtn" class="modal-close-btn">&times;</button>
             </div>
@@ -2239,13 +2634,13 @@
 
                 <div style="display:flex; gap:10px; margin-top:16px;">
                     <button id="clarificationConfirmBtn" class="btn btn-pill btn-primary" style="flex:1;justify-content:center;">
-                        <i class="fa-solid fa-check"></i> CONFIRM &amp; ACTIVATE STRATEGY
+                        <i data-lucide="check" class="lucide-sm"></i> CONFIRM &amp; ACTIVATE STRATEGY
                     </button>
                     <button id="clarificationRejectBtn" class="btn btn-pill btn-secondary" style="flex:1;justify-content:center;">
-                        <i class="fa-solid fa-pen"></i> EDIT / CORRECTION NEEDED
+                        <i data-lucide="edit-3" class="lucide-sm"></i> EDIT / CORRECTION NEEDED
                     </button>
                     <button id="clarificationResubmitBtn" class="btn btn-pill btn-primary hidden" style="flex:1;justify-content:center;">
-                        <i class="fa-solid fa-paper-plane"></i> RESUBMIT FOR AI RE-CLARIFICATION
+                        <i data-lucide="send" class="lucide-sm"></i> RESUBMIT FOR AI RE-CLARIFICATION
                     </button>
                 </div>
             </div>
@@ -2268,10 +2663,10 @@
                 <!-- Action Controls -->
                 <div class="winrate-action-bar">
                     <button id="lockPicksBtn" class="btn btn-pill btn-primary">
-                        <i class="fa-solid fa-lock"></i> LOCK TODAY'S 3:30 PM BTST PICKS
+                        <i data-lucide="lock" class="lucide-sm"></i> LOCK TODAY'S 3:30 PM BTST PICKS
                     </button>
                     <button id="evaluatePicksBtn" class="btn btn-pill btn-secondary">
-                        <i class="fa-solid fa-chart-line"></i> RUN 9:15 AM GAP ANALYSIS
+                        <i data-lucide="trending-up" class="lucide-sm"></i> RUN 9:15 AM GAP ANALYSIS
                     </button>
                 </div>
 
@@ -2296,7 +2691,7 @@
                 </div>
 
                 <!-- Historical Trade Log Table -->
-                <h4 class="section-heading mt-4"><i class="fa-solid fa-history"></i> PREDICTED GAP VS ACTUAL GAP ACCURACY LOG</h4>
+                <h4 class="section-heading mt-4"><i data-lucide="history" class="lucide-sm"></i> PREDICTED GAP VS ACTUAL GAP ACCURACY LOG</h4>
                 <div class="recent-candles-wrapper">
                     <table class="data-table mini-table">
                         <thead>
@@ -2331,7 +2726,7 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;">
                     <button id="modalTradeBtn" class="btn btn-sm btn-pill btn-gold" style="font-weight:800;padding:6px 16px;min-height:34px;display:inline-flex;align-items:center;justify-content:center;line-height:1.2;box-sizing:border-box;">
-                        <i class="fa-solid fa-bolt"></i> TRADE
+                        <i data-lucide="zap" class="lucide-sm"></i> TRADE
                     </button>
                     <button id="closeModalBtn" class="modal-close-btn">&times;</button>
                 </div>
@@ -2340,10 +2735,10 @@
             <!-- View Switcher Tabs inside Modal -->
             <div class="filter-group" id="modalViewSwitcher" style="padding: 10px 20px 0 20px; display: flex; gap: 8px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
                 <button class="tab-btn active" id="btnModalAnalysisTab" data-modal-view="analysis" style="padding: 6px 16px; font-weight: 800; font-size: 11.5px; border-radius: 6px;">
-                    <i class="fa-solid fa-chart-pie text-cyan"></i> ANALYSIS
+                    <i data-lucide="pie-chart" class="lucide-sm text-cyan"></i> ANALYSIS
                 </button>
                 <button class="tab-btn" id="btnModalChartTab" data-modal-view="chart" style="padding: 6px 16px; font-weight: 800; font-size: 11.5px; border-radius: 6px;">
-                    <i class="fa-solid fa-chart-candlestick text-gold"></i> CHART
+                    <i data-lucide="candlestick-chart" class="lucide-sm text-gold"></i> CHART
                 </button>
             </div>
 
@@ -2377,24 +2772,24 @@
                     </div>
 
                     <!-- 5-Pillar Confirmation Matrix (REQ-MOD-004) -->
-                    <h4 class="section-heading mt-4"><i class="fa-solid fa-layer-group text-gold"></i> 5-PILLAR CONFIRMATION MATRIX</h4>
+                    <h4 class="section-heading mt-4"><i data-lucide="layers" class="lucide-sm text-gold"></i> 5-PILLAR CONFIRMATION MATRIX</h4>
                     <div id="modalPillarsContainer" class="modal-pillars-grid">
                         <!-- Dynamic 5 Pillars Injected by JS -->
                     </div>
 
                     <!-- Breakdown Checklist -->
-                    <h4 class="section-heading mt-4"><i class="fa-solid fa-list-check"></i> QUANTITATIVE TIER 1 CONVICTION CHECKLIST</h4>
+                    <h4 class="section-heading mt-4"><i data-lucide="shopping-bag" class="lucide-sm"></i> QUANTITATIVE TIER 1 CONVICTION CHECKLIST</h4>
                     <div id="modalChecklist" class="checklist-grid">
                         <!-- Dynamic Checklist Injected by JS -->
                     </div>
 
                     <!-- Order Flow Veto Panel (3:15-3:25 PM Closing Aggression) -->
-                    <h4 class="section-heading mt-4"><i class="fa-solid fa-bolt text-gold"></i> ORDER FLOW VETO LAYER (3:15-3:25 PM LIVE FEED)</h4>
+                    <h4 class="section-heading mt-4"><i data-lucide="zap" class="lucide-sm text-gold"></i> ORDER FLOW VETO LAYER (3:15-3:25 PM LIVE FEED)</h4>
                     <div id="modalOrderFlowPanel" class="order-flow-panel-box" style="background:var(--glass-bg-soft);border:1px solid var(--gridline);border-radius:12px;padding:14px;margin-bottom:16px;">
                         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
                             <div style="display:flex;align-items:center;gap:8px;">
                                 <span id="modalOfVetoBadge" class="badge badge-gold" style="font-size:11px;font-weight:800;padding:4px 10px;">CONFIRMED</span>
-                                <span id="modalOfHealthBadge" style="font-size:11px;font-weight:700;color:var(--bullish-green);"><i class="fa-solid fa-circle" style="font-size:8px;"></i> Ticker Live</span>
+                                <span id="modalOfHealthBadge" style="font-size:11px;font-weight:700;color:var(--bullish-green);"><i data-lucide="circle" class="lucide-sm" style="font-size:8px;"></i> Ticker Live</span>
                                 <span id="modalOfBarsAgreedBadge" class="badge" style="font-size:10px;font-weight:700;background:rgba(16,185,129,0.15);color:var(--bullish-green);border:1px solid rgba(16,185,129,0.3);">8/10 Bars Agree</span>
                             </div>
                             <div style="font-size:10px;font-weight:700;color:var(--ink-secondary);" id="modalOfSource">
@@ -2428,7 +2823,7 @@
                         <!-- Mini 1-Minute CVD Progression Sparkline (REQ-OFL-002) -->
                         <div style="background:rgba(11,15,25,0.6);border-radius:8px;padding:8px 10px;border:1px solid var(--gridline);">
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                <span style="font-size:9.5px;font-weight:800;color:var(--ink-muted);"><i class="fa-solid fa-chart-line text-gold"></i> 1-MIN CUMULATIVE VOLUME DELTA (CVD) CURVE</span>
+                                <span style="font-size:9.5px;font-weight:800;color:var(--ink-muted);"><i data-lucide="trending-up" class="lucide-sm text-gold"></i> 1-MIN CUMULATIVE VOLUME DELTA (CVD) CURVE</span>
                                 <span style="font-size:9px;font-weight:700;color:var(--bullish-green);" id="modalOfCvdSum">+0.00K CVD</span>
                             </div>
                             <div id="modalOfCvdSparklineWrap" style="height:40px;width:100%;">
@@ -2442,7 +2837,7 @@
                 <div id="modalChartContainerWrap" class="modal-view-container hidden">
                     <!-- Candle Chart with TradingView Timeframe Selector -->
                     <div class="chart-header-row">
-                        <h4 class="section-heading" style="margin-bottom:0;"><i class="fa-solid fa-chart-candlestick"></i> INTERACTIVE CANDLE CHART</h4>
+                        <h4 class="section-heading" style="margin-bottom:0;"><i data-lucide="candlestick-chart" class="lucide-sm"></i> INTERACTIVE CANDLE CHART</h4>
                         <div class="timeframe-switcher-bar" id="chartTimeframeSwitcher">
                             <button class="tf-btn" data-tf="1m">1m</button>
                             <button class="tf-btn" data-tf="3m">3m</button>
@@ -2562,13 +2957,13 @@
                         <strong style="color:#d97706;font-size:14px;font-family:var(--font-mono);" id="orderTotalMarginRequired">₹0.00</strong>
                     </div>
                     <div id="orderMarginWarning" class="hidden" style="margin-top:10px;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:6px;font-size:11.5px;font-weight:700;display:flex;align-items:center;gap:6px;">
-                        <i class="fa-solid fa-triangle-exclamation"></i> ⚠️ INSUFFICIENT VIRTUAL CASH FOR THIS TRADE
+                        <i data-lucide="alert-triangle" class="lucide-sm"></i> ⚠️ INSUFFICIENT VIRTUAL CASH FOR THIS TRADE
                     </div>
                 </div>
 
                 <!-- Submit Button -->
                 <button type="button" id="confirmPaperTradeBtn" class="btn btn-gold btn-block" style="padding:14px;font-size:14px;font-weight:900;letter-spacing:0.5px;border-radius:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;">
-                    <i class="fa-solid fa-bolt"></i> CONFIRM PAPER TRADE
+                    <i data-lucide="zap" class="lucide-sm"></i> CONFIRM PAPER TRADE
                 </button>
             </div>
         </div>
@@ -2622,12 +3017,12 @@
 
                 <!-- Live Validation Error Box (REQ-MOD-003) -->
                 <div id="editPosValidationWarning" class="hidden" style="margin-bottom:14px;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:6px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;">
-                    <i class="fa-solid fa-triangle-exclamation"></i> <span id="editPosValidationMsg">Invalid Stop Loss</span>
+                    <i data-lucide="alert-triangle" class="lucide-sm"></i> <span id="editPosValidationMsg">Invalid Stop Loss</span>
                 </div>
 
                 <!-- Save Button -->
                 <button type="button" id="saveEditPosBtn" class="btn btn-gold btn-block" style="padding:12px;font-weight:900;border-radius:10px;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;">
-                    <i class="fa-solid fa-check"></i> UPDATE POSITION
+                    <i data-lucide="check" class="lucide-sm"></i> UPDATE POSITION
                 </button>
             </div>
         </div>
@@ -2675,9 +3070,10 @@
                         </select>
                     </div>
                     <div class="oc-view-toggles" id="ocViewToggles">
-                        <button type="button" class="oc-toggle-btn active" data-oc-mode="all">ALL</button>
-                        <button type="button" class="oc-toggle-btn" data-oc-mode="calls">CALLS</button>
-                        <button type="button" class="oc-toggle-btn" data-oc-mode="puts">PUTS</button>
+                        <button type="button" class="oc-toggle-btn active" data-oc-mode="cards" id="ocModeCardsBtn"><i data-lucide="layout-grid" class="lucide-xs"></i> CARDS</button>
+                        <button type="button" class="oc-toggle-btn" data-oc-mode="calls" id="ocModeCallsBtn"><i data-lucide="trending-up" class="lucide-xs"></i> CALLS</button>
+                        <button type="button" class="oc-toggle-btn" data-oc-mode="puts" id="ocModePutsBtn"><i data-lucide="trending-down" class="lucide-xs"></i> PUTS</button>
+                        <button type="button" class="oc-toggle-btn" data-oc-mode="all" id="ocModeAllBtn"><i data-lucide="table" class="lucide-xs"></i> ALL</button>
                     </div>
                 </div>
                 <div style="font-size: 11.5px; color: var(--tradexo-obsidian-muted); display: flex; align-items: center; gap: 12px;">
@@ -2686,8 +3082,16 @@
                 </div>
             </div>
 
-            <!-- Option Chain Matrix Table -->
-            <div class="option-chain-table-wrap" style="flex: 1; overflow-y: auto; max-height: 60vh;">
+            <!-- Option Chain Matrix Table & Mobile Cards Container -->
+            <div class="option-chain-table-wrap" style="flex: 1; overflow-y: auto; overflow-x: auto; max-height: 62vh;">
+                <!-- Mobile Swipe / Scroll Affordance Banner for Matrix Table -->
+                <div class="oc-table-scroll-hint hidden" id="ocTableScrollHint" style="padding: 6px 12px; background: rgba(212, 175, 55, 0.1); border-bottom: 1px solid rgba(212, 175, 55, 0.25); font-size: 11px; color: #f59e0b; display: none; align-items: center; justify-content: center; gap: 8px; font-weight: 700;">
+                    <i data-lucide="chevrons-left" class="lucide-xs"></i>
+                    <span>Swipe horizontally for full Calls &amp; Puts depth • Strike column stays frozen</span>
+                    <i data-lucide="chevrons-right" class="lucide-xs"></i>
+                </div>
+
+                <!-- Desktop / Matrix Table -->
                 <table class="data-table oc-matrix-table" style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px;">
                     <thead style="position: sticky; top: 0; z-index: 10;">
                         <tr>
@@ -2720,6 +3124,11 @@
                         <!-- Injected by JS with 1-second dynamic updater -->
                     </tbody>
                 </table>
+
+                <!-- Mobile Per-Strike Expandable Cards View -->
+                <div id="ocMobileCardList" class="oc-mobile-cards-list" style="display: none; padding: 10px; gap: 10px;">
+                    <!-- Injected by JS for Mobile Viewports -->
+                </div>
             </div>
         </div>
     </div>
@@ -2844,7 +3253,12 @@
     </div>
 
     <!-- App JavaScript -->
-    <script src="/static/app.js?v=50.1.0"></script>
+    <script src="/static/app.js?v=53.0.0"></script>
+    <script>
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+            window.lucide.createIcons({ attrs: { 'stroke-width': 1.75 } });
+        }
+    </script>
 
 </body>
 </html>

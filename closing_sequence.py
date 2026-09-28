@@ -88,7 +88,7 @@ def is_trading_holiday(today_date_str: str) -> bool:
 _EMPTY_STATE = {
     "date": None, "snapshot_done": False, "auto_lock_25_done": False, "final_bell_30_done": False,
     "cas_close_done": False, "scoring_done": False, "broadcast_done": False, "lock_done": False,
-    "snapshot_picks": [], "cas_close_prices": {}, "lock_result": None,
+    "snapshot_picks": [], "cas_close_prices": {}, "cas_index_prices": {}, "lock_result": None,
     "lock_timestamp": None,
 }
 
@@ -187,6 +187,18 @@ def _step_cas_close(state: Dict[str, Any]) -> None:
         logger.warning(f"[Closing Sequence] CAS close unavailable for {len(missing)}/{len(tickers)} ticker(s): {missing}")
 
     state["cas_close_prices"] = prices
+
+    # Capture settled closing prices for all tracked benchmark indices
+    try:
+        from index_scoring import fetch_major_indices_live
+        live_indices = fetch_major_indices_live() or []
+        index_cas_prices = {idx["index_name"]: idx["ltp"] for idx in live_indices if idx.get("index_name") and idx.get("ltp")}
+        if index_cas_prices:
+            state["cas_index_prices"] = index_cas_prices
+            logger.info(f"[Closing Sequence] 3:35 PM CAS CLOSE: locked {len(index_cas_prices)} index closing price(s): {index_cas_prices}")
+    except Exception as e:
+        logger.warning(f"[Closing Sequence] CAS index prices capture notice: {e}")
+
     state["cas_close_done"] = True
     logger.info(f"[Closing Sequence] 3:35 PM CAS CLOSE: fetched {len(prices)}/{len(tickers)} confirmed closing price(s).")
 

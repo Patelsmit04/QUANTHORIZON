@@ -211,7 +211,7 @@ def generate_index_verdict(index_name: str, index_result: Dict[str, Any]) -> Dic
         "price_verified": price_verified,
         "verdict": verdict,
         "expected_open": _derive_expected_open(index_result),
-        "confidence_level_pct": int(index_result.get("confidence_score") or (75 if index_result.get("signal") != "NEUTRAL" else 50)),
+        "confidence_level_pct": int(index_result.get("confidence_score") or (75 if index_result.get("signal") != "NEUTRAL" else 50)) if price_verified else None,
         "primary_reason": _build_primary_reason(index_result, verdict),
         "greek_outlook": greek_outlook_text,
         "key_overnight_catalysts": _build_key_catalysts(index_result) if price_verified else [UNVERIFIED_PRICE_REASON],

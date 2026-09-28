@@ -430,5 +430,343 @@
       }
     ],
     "status": "DISCREPANCIES_FOUND"
+  },
+  {
+    "date": "2026-09-21",
+    "run_at": "2026-09-21T19:30:20.001892+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 26,
+    "archive_symbol_count": 20,
+    "symbols_only_in_live": [
+      "AQYLON",
+      "AVALON",
+      "DEEPA",
+      "ENTERO",
+      "GNA",
+      "LUMINO",
+      "MARSONS",
+      "MOS",
+      "PAISALO",
+      "PINELABS",
+      "RIR",
+      "SHAREINDIA",
+      "SIGACHI",
+      "SJS",
+      "SKFINDUS",
+      "VEEGALAND",
+      "VENUSPIPES",
+      "WELENT"
+    ],
+    "symbols_only_in_archive": [
+      "AGIIL",
+      "ANURAS",
+      "COMSYN",
+      "GAJA",
+      "GCSL",
+      "JASH",
+      "KANOHAR",
+      "LENSKART",
+      "PROTEAN",
+      "RAYMOND",
+      "SAMBHV",
+      "SUNSHINE"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "AARTIPHARM",
+        "live_net_value_cr": -51.46,
+        "archive_net_value_cr": 75.03
+      },
+      {
+        "symbol": "GLASSWALL",
+        "live_net_value_cr": -15.78,
+        "archive_net_value_cr": -6.25
+      },
+      {
+        "symbol": "MOTISONS",
+        "live_net_value_cr": -1.77,
+        "archive_net_value_cr": 11.42
+      },
+      {
+        "symbol": "MVELECTRO",
+        "live_net_value_cr": -2.34,
+        "archive_net_value_cr": 13.64
+      },
+      {
+        "symbol": "RATNAVEER",
+        "live_net_value_cr": -18.73,
+        "archive_net_value_cr": 20.39
+      },
+      {
+        "symbol": "RENTOMOJO",
+        "live_net_value_cr": 16.62,
+        "archive_net_value_cr": 0.36
+      },
+      {
+        "symbol": "SKYWAYS",
+        "live_net_value_cr": -4.97,
+        "archive_net_value_cr": 0.51
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
+  },
+  {
+    "date": "2026-09-22",
+    "run_at": "2026-09-22T21:43:00.143729+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 20,
+    "archive_symbol_count": 22,
+    "symbols_only_in_live": [
+      "AARTIPHARM",
+      "AGIIL",
+      "ANURAS",
+      "GAJA",
+      "JASH",
+      "KANOHAR",
+      "LENSKART",
+      "RENTOMOJO",
+      "SAMBHV"
+    ],
+    "symbols_only_in_archive": [
+      "CAPINVIT",
+      "FEDDERSHOL",
+      "FISCHER",
+      "KAYNES",
+      "LUMINO",
+      "PACEDIGITK",
+      "PCJEWELLER",
+      "RAMRAT",
+      "RHIM",
+      "STYLEBAAZA",
+      "TRANSRAILL"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "AHCL",
+        "live_net_value_cr": -1.75,
+        "archive_net_value_cr": -13.13
+      },
+      {
+        "symbol": "COMSYN",
+        "live_net_value_cr": -12.49,
+        "archive_net_value_cr": 0.97
+      },
+      {
+        "symbol": "GCSL",
+        "live_net_value_cr": 21.68,
+        "archive_net_value_cr": 11.98
+      },
+      {
+        "symbol": "GLASSWALL",
+        "live_net_value_cr": -6.25,
+        "archive_net_value_cr": 22.97
+      },
+      {
+        "symbol": "MOTISONS",
+        "live_net_value_cr": 11.42,
+        "archive_net_value_cr": -4.1
+      },
+      {
+        "symbol": "MVELECTRO",
+        "live_net_value_cr": 13.64,
+        "archive_net_value_cr": 0.77
+      },
+      {
+        "symbol": "PROTEAN",
+        "live_net_value_cr": -1.76,
+        "archive_net_value_cr": 5.37
+      },
+      {
+        "symbol": "RATNAVEER",
+        "live_net_value_cr": 20.39,
+        "archive_net_value_cr": 4.55
+      },
+      {
+        "symbol": "RAYMOND",
+        "live_net_value_cr": 4.01,
+        "archive_net_value_cr": -3.36
+      },
+      {
+        "symbol": "SKYWAYS",
+        "live_net_value_cr": 0.51,
+        "archive_net_value_cr": -2.76
+      },
+      {
+        "symbol": "SUNSHINE",
+        "live_net_value_cr": 1.66,
+        "archive_net_value_cr": -2.92
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
+  },
+  {
+    "date": "2026-09-23",
+    "run_at": "2026-09-23T20:09:07.791919+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 22,
+    "archive_symbol_count": 29,
+    "symbols_only_in_live": [
+      "CAPINVIT",
+      "COMSYN",
+      "FISCHER",
+      "GCSL",
+      "KAYNES",
+      "LUMINO",
+      "MVELECTRO",
+      "PACEDIGITK",
+      "PROTEAN",
+      "RAMRAT",
+      "RHIM",
+      "SKYWAYS",
+      "STYLEBAAZA",
+      "SUNSHINE",
+      "TRANSRAILL"
+    ],
+    "symbols_only_in_archive": [
+      "AGIIL",
+      "ANANTAM",
+      "ARVSMART",
+      "EKC",
+      "ELECON",
+      "GNA",
+      "GUJTHEM",
+      "HEROMOTORS",
+      "KANOHAR",
+      "KROSS",
+      "MANINDS",
+      "MARINE",
+      "OLAELEC",
+      "OPTIEMUS",
+      "RAYMONDREL",
+      "SHANTIGOLD",
+      "SSRETAIL",
+      "TECHNOCRAF",
+      "TEXINFRA",
+      "TRUALT",
+      "WELSPUNLIV",
+      "WESTLIFE"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "AHCL",
+        "live_net_value_cr": -13.13,
+        "archive_net_value_cr": -0.66
+      },
+      {
+        "symbol": "FEDDERSHOL",
+        "live_net_value_cr": 10.06,
+        "archive_net_value_cr": -6.95
+      },
+      {
+        "symbol": "GLASSWALL",
+        "live_net_value_cr": 22.97,
+        "archive_net_value_cr": -10.92
+      },
+      {
+        "symbol": "MOTISONS",
+        "live_net_value_cr": -4.1,
+        "archive_net_value_cr": 2.61
+      },
+      {
+        "symbol": "PCJEWELLER",
+        "live_net_value_cr": -0.22,
+        "archive_net_value_cr": 21.68
+      },
+      {
+        "symbol": "RATNAVEER",
+        "live_net_value_cr": 4.55,
+        "archive_net_value_cr": -19.25
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
+  },
+  {
+    "date": "2026-09-24",
+    "run_at": "2026-09-24T21:11:53.775903+05:30",
+    "live_snapshot_checkpoint_used": "live_trigger",
+    "live_symbol_count": 29,
+    "archive_symbol_count": 25,
+    "symbols_only_in_live": [
+      "ANANTAM",
+      "ARVSMART",
+      "EKC",
+      "ELECON",
+      "FEDDERSHOL",
+      "GUJTHEM",
+      "KANOHAR",
+      "KROSS",
+      "MANINDS",
+      "MARINE",
+      "OPTIEMUS",
+      "PCJEWELLER",
+      "TECHNOCRAF",
+      "TEXINFRA",
+      "TRUALT",
+      "WELSPUNLIV",
+      "WESTLIFE"
+    ],
+    "symbols_only_in_archive": [
+      "AJAXENGG",
+      "FIRSTCRY",
+      "FRONTSP",
+      "HGINFRA",
+      "JAGSNPHARM",
+      "KSCL",
+      "MARSONS",
+      "NEPHROPLUS",
+      "POLICYBZR",
+      "SANOFI",
+      "SEDEMAC",
+      "SKYWAYS",
+      "STARHEALTH"
+    ],
+    "value_mismatches": [
+      {
+        "symbol": "AGIIL",
+        "live_net_value_cr": -52.79,
+        "archive_net_value_cr": 0.41
+      },
+      {
+        "symbol": "GLASSWALL",
+        "live_net_value_cr": -10.92,
+        "archive_net_value_cr": 6.17
+      },
+      {
+        "symbol": "GNA",
+        "live_net_value_cr": -32.91,
+        "archive_net_value_cr": 0.11
+      },
+      {
+        "symbol": "HEROMOTORS",
+        "live_net_value_cr": -2.61,
+        "archive_net_value_cr": -29.09
+      },
+      {
+        "symbol": "MOTISONS",
+        "live_net_value_cr": 2.61,
+        "archive_net_value_cr": 12.37
+      },
+      {
+        "symbol": "RAYMOND",
+        "live_net_value_cr": -4.24,
+        "archive_net_value_cr": -2.41
+      },
+      {
+        "symbol": "RAYMONDREL",
+        "live_net_value_cr": 7.55,
+        "archive_net_value_cr": -2.56
+      },
+      {
+        "symbol": "SHANTIGOLD",
+        "live_net_value_cr": 16.43,
+        "archive_net_value_cr": -11.31
+      },
+      {
+        "symbol": "SSRETAIL",
+        "live_net_value_cr": 18.52,
+        "archive_net_value_cr": 15.74
+      }
+    ],
+    "status": "DISCREPANCIES_FOUND"
   }
 ]

@@ -12,6 +12,7 @@ from typing import Optional, Tuple
 import yfinance as yf
 
 from net_utils import call_with_retry
+import sentry_config
 
 logger = logging.getLogger("IndiaVIXProvider")
 
@@ -44,6 +45,7 @@ def fetch_india_vix() -> Tuple[Optional[float], str]:
                         return round(latest_close, 2), regime
         except Exception as e:
             logger.warning(f"Failed to fetch VIX via {ticker}: {e}")
+            sentry_config.capture_exception(e, provider="vix_provider", ticker=ticker)
 
     logger.warning("India VIX feed unavailable after retrying all tickers — reporting UNAVAILABLE.")
     return None, "UNAVAILABLE"

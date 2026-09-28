@@ -24,6 +24,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List
 
 from env_utils import IST, safe_float_env
+import sentry_config
 
 logger = logging.getLogger("NSEScraperWorkers")
 
@@ -214,6 +215,7 @@ def run_option_chain_worker(stop_event: threading.Event):
 
         except Exception as e:
             logger.error(f"Option Chain Worker error: {e}")
+            sentry_config.capture_exception(e, provider="nse_scraper_workers", function="run_option_chain_worker")
 
         # Wait for next cycle
         for _ in range(INTERVAL):
@@ -322,6 +324,7 @@ def run_block_deal_worker(stop_event: threading.Event):
 
         except Exception as e:
             logger.error(f"Block Deal Worker error: {e}")
+            sentry_config.capture_exception(e, provider="nse_scraper_workers", function="run_block_deal_worker")
 
         # Check every 30 seconds
         for _ in range(30):

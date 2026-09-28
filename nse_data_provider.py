@@ -23,6 +23,7 @@ from typing import Dict, Any, Optional, List
 
 from json_utils import atomic_write_json, read_json, json_file_lock
 from net_utils import call_with_retry
+import sentry_config
 from lock_utils import file_lock
 from env_utils import DATA_DIR
 
@@ -137,6 +138,7 @@ def fetch_stock_delivery_history(symbol: str, lookback_days: int = 20) -> Option
 
     except Exception as e:
         logger.error(f"Error fetching delivery history for {symbol}: {e}")
+        sentry_config.capture_exception(e, provider="nse_data_provider", symbol=symbol, function="fetch_stock_delivery_history")
         return None
 
 
