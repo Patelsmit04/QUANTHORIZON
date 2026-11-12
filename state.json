@@ -1,19 +1,12 @@
 {
   "current_status": "HEALTHY",
-  "consecutive_failures": 1,
+  "consecutive_failures": 2,
   "consecutive_successes": 0,
-  "last_check": "2026-11-12T04:12:22.580Z",
+  "last_check": "2026-11-12T12:40:40.921Z",
   "last_success": "2026-11-11T23:39:32.089Z",
-  "last_failure": "2026-11-12T04:12:22.580Z",
+  "last_failure": "2026-11-12T12:40:40.921Z",
   "down_since": null,
   "history": [
-    {
-      "timestamp": "2026-08-25T05:59:01.739Z",
-      "success": false,
-      "status_code": 503,
-      "response_time_ms": 298.8,
-      "error": "HTTP_503_SERVER_ERROR"
-    },
     {
       "timestamp": "2026-08-25T06:49:32.321Z",
       "success": false,
@@ -3505,6 +3498,13 @@
       "success": false,
       "status_code": null,
       "response_time_ms": 12033.9,
+      "error": "TIMEOUT"
+    },
+    {
+      "timestamp": "2026-11-12T12:40:40.921Z",
+      "success": false,
+      "status_code": null,
+      "response_time_ms": 12052.5,
       "error": "TIMEOUT"
     }
   ],
